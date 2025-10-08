@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<!--
+  93% Claude, 
+  6% ChatGPT, 
+  1% me just asking AI to write this.
+  -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport"/>
+    <title>Alt-Sim</title>
+    <meta name="description" content="Calc base multiplier and randomize around your stats for better results."/>
+    <meta name="theme-color" content="#36393f">
+    <meta name="msapplication-TileColor" content="#36393f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="stylesheet" href="/sim/style/sim.min.css">
+  </head>
+  <body>
+    <div id="top"></div>
+    <div class="container" id="altsim">
+      <div id="version">
+        <p>
+          <a href="https://discord.gg/9j2WnTAnMu" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 512">
+              <path fill="#5865F2" d="M105 0h302c57.928.155 104.845 47.072 105 104.996V407c-.155 57.926-47.072 104.844-104.996 104.998L105 512C47.074 511.844.156 464.926.002 407.003L0 105C.156 47.072 47.074.155 104.997 0H105z"/>
+              <g data-name="">
+                <g data-name="Discord Logos">
+                  <path fill="#fff" fill-rule="nonzero" d="M368.896 153.381a269.506 269.506 0 00-67.118-20.637 186.88 186.88 0 00-8.57 17.475 250.337 250.337 0 00-37.247-2.8c-12.447 0-24.955.946-37.25 2.776-2.511-5.927-5.427-11.804-8.592-17.454a271.73 271.73 0 00-67.133 20.681c-42.479 62.841-53.991 124.112-48.235 184.513a270.622 270.622 0 0082.308 41.312c6.637-8.959 12.582-18.497 17.63-28.423a173.808 173.808 0 01-27.772-13.253c2.328-1.688 4.605-3.427 6.805-5.117 25.726 12.083 53.836 18.385 82.277 18.385 28.442 0 56.551-6.302 82.279-18.387 2.226 1.817 4.503 3.557 6.805 5.117a175.002 175.002 0 01-27.823 13.289 197.847 197.847 0 0017.631 28.4 269.513 269.513 0 0082.363-41.305l-.007.007c6.754-70.045-11.538-130.753-48.351-184.579zM201.968 300.789c-16.04 0-29.292-14.557-29.292-32.465s12.791-32.592 29.241-32.592 29.599 14.684 29.318 32.592c-.282 17.908-12.919 32.465-29.267 32.465zm108.062 0c-16.066 0-29.267-14.557-29.267-32.465s12.791-32.592 29.267-32.592c16.475 0 29.522 14.684 29.241 32.592-.281 17.908-12.894 32.465-29.241 32.465z" data-name="Discord Logo - Large - White"/>
+                </g>
+              </g>
+            </svg>
+            Ragnarok X University
+          </a>
+        </p>
+        <p><i>v1.1.3</i> [<button id="openLog" type="button">Changelog</button>]</p>
+      </div>
+      <details id="howto">
+        <summary>
+          <span>How to Use</span>
+        </summary>
+        <div class="body">
+          <ol>
+            <li>
+              <strong>Dropdowns</strong>
+              <ul>
+                <li>Set <strong>Attack Type</strong>, <strong>Weapon</strong>, and <strong>Weapon Attribute</strong>.</li>
+                <li>
+                  For <strong>MVP/MINI</strong>:
+                  <ul>
+                    <li>
+                      Selecting a specific MVP/Mini will auto <strong>sync and lock</strong> its <strong>size, race, and attribute</strong>.
+                      <em>(Example: <strong>Phreeoni = Large / Brute / Neutral</strong>. The fields stay fixed and you’ll need to fill the related numbers.)</em>
+                      <ul>
+                        <li>
+                          If you only have a <strong>Race enchant (or only Attribute)</strong>, just set the other field to <code>0</code>.
+                          <ul>
+                            <li>Example: <strong>Brute 0 / Neutral 20</strong></li>
+                            <li>Example: <strong>Brute 30 / Neutral 0</strong></li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>Selecting an <strong>Average Lv.</strong> can skip or set target race/attribute manually.</li>
+                    <li><em>If you don’t have race and/or attribute enchants, better go with <strong>Average Lv. Boss</strong> and skip those.</em></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              Equipment
+              <ul>
+                <li>Choose the set you’re using <strong>(Vesper / Blue / White)</strong>.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Stat Inputs</strong>
+              <ul>
+                <li>Enter your stats exactly as shown in game.</li>
+                <li>
+                  Extra: <strong>Final DMG Bonus %</strong>
+                  <ul>
+                    <li>
+                      <strong><s>F. P/M DMG BONUS</s></strong>
+                      <ul>
+                        <li>Shown in <strong>detailed stats</strong> as <strong>Final Damage Stack / Final Damage Bonus</strong>. Make sure <strong>no buffs</strong> are on. If you don’t see it, set <strong>0</strong>.</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>Only <strong>numbers</strong>, don’t type <strong><s>“%”</s></strong>.</li>
+                <li><strong>Decimals</strong> are fine. <em>(Example: <strong>888.88</strong>)</em></li>
+              </ul>
+            </li>
+            <li>
+              <strong>Calculate</strong>
+              <ul>
+                <li>Once everything is filled, hit <strong>Calculate</strong>.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Results</strong>
+              <ul>
+                <li>You’ll see <strong>base multiplier</strong> and a breakdown of your stats.</li>
+              </ul>
+            </li>
+            <li>
+              Simulate Flash
+              <ul>
+                <li>
+                  <strong>Spear of Eternity</strong> and <strong>Reaper Scythe</strong>.
+                  <ul>
+                    <li><em>Each has 10s duration / 20s cooldown with <strong>+84% or +28%</strong> bonus. This tool normalize <strong>to 42</strong> and <strong>14</strong> for <strong>100% uptime</strong>(?) in flash bonus contribution. But still using original value for calculation.</em></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>Swap Target</strong>
+              <ul>
+                <li>Lets you <strong>switch bosses</strong> without starting over.</li>
+                <li>If the new boss has <strong>different size/race/element</strong>, the inputs unlock and you’ll need to <strong>re-input stats</strong>.</li>
+                <li>
+                  If it’s the
+                  <strong>
+                  same type</strong>, the calc <strong>updates instantly</strong>.
+                </li>
+                <li>
+                  <em>Examples:</em>
+                  <ul>
+                    <li><strong>Phreeoni 140 → Deviling 150</strong> → re-enter <strong>Medium / Demon / Shadow</strong>.</li>
+                    <li><strong>Phreeoni 140 → Phreeoni 150</strong> → auto updates, no changes.</li>
+                    <li><strong>Phreeoni 150 → Avg. 140</strong> → race/element are <strong>cleared</strong>, treated as average <strong>Large Boss Lv.140</strong>.</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>Recommendations</strong>
+              <ul>
+                <li>At the bottom you’ll see a table with recommended <strong><s>ratios</s></strong> stat allocations.</li>
+                <li>Hit <strong>Refresh</strong> to roll new sets until you see one you can actually use.</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
+      </details>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="penCritSelect"><span id="atkTypeLabel">Attack Type</span></label>
+          <div class="input-wrap select-wrap">
+            <select id="penCritSelect"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="weaponSelect"><span id="weaponLabel">Weapon Type</span></label>
+          <div class="input-wrap select-wrap">
+            <select id="weaponSelect"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="weaponElementSelect"><span id="wElemLabel">Weapon Attribute</span></label>
+          <div class="input-wrap select-wrap">
+            <select id="weaponElementSelect"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="targetDefSelect">
+          <span id="tDefLabel">MVP/MINI</span>
+          <button type="button" id="mvpminiTips" class="tooltip-button"></button>
+          </label>
+          <div class="input-wrap select-wrap">
+            <select id="targetDefSelect"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="targetSizeSelect"><span id="tSizeLabel">Target Size</span></label>
+          <div class="input-wrap select-wrap">
+            <select id="targetSizeSelect"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="targetRaceSelect">
+          <span id="tRaceLabel">Target Race</span>
+          <button type="button" id="targetRaceTips" class="tooltip-button">
+          </button>
+          </label>
+          <div class="input-wrap select-wrap">
+            <select id="targetRaceSelect"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="targetElementSelect">
+          <span id="tAttrLabel">Target Attribute</span>
+          <button type="button" id="targetAttrTips" class="tooltip-button">
+          </button>
+          </label>
+          <div class="input-wrap select-wrap">
+            <select id="targetElementSelect"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="vesperSet"><span id="vesperSetLabel">Vesper Set</span></label>
+          <div class="input-wrap select-wrap">
+            <select id="vesperSet"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="blueSet"><span id="blueSetLabel">Blue Set</span><button type="button" id="blueTips" class="tooltip-button">
+          </button></label>
+          <div class="input-wrap select-wrap">
+            <select id="blueSet"></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="whiteSet"><span id="whiteSetLabel">White Set (110*3)</span></label>
+          <div class="input-wrap select-wrap">
+            <select id="whiteSet"></select>
+          </div>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group hidden">
+          <label for="atkValue"><span id="atkLabel">P/M Attack</span>
+          </label>
+          <div class="input-wrap">
+            <input disabled id="attack" type="number" min="1" max="8888888" placeholder="input p/m attack..." />
+          </div>
+        </div>
+        <div class="form-group pen-group">
+          <label for="pen"><span id="penLabel">Final P M PEN %</span></label>
+          <div class="input-wrap">
+            <input id="pen" type="number" min="1" max="3333" disabled placeholder="select attack type first" />
+          </div>
+        </div>
+        <div class="form-group crit-group">
+          <label for="crit"><span id="critLabel">Critical DMG Bonus %</span></label>
+          <div class="input-wrap">
+            <input id="crit" type="number" min="1" max="3333" disabled placeholder="select attack type first" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="dmg"><span id="dmgLabel">Final P/M DMG Bonus %</span></label>
+          <div class="input-wrap">
+            <input id="dmg" type="number" min="1" max="2222" placeholder="input f. p/m dmg bns..." />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="elemEnhance"><span  id="elemEnhLabel">Element Enhance %</span></label>
+          <div class="input-wrap">
+            <input id="elemEnhance" type="number" min="1" max="2222"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="sizeEnhance"><span id="sizeLabel">DMG to Size %</span></label>
+          <div class="input-wrap">
+            <input id="sizeEnhance" type="number" min="1" max="2222"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="race">
+          <span id="raceLabel">Race</span>
+          <button type="button" id="dmgRaceTips" class="tooltip-button">
+          </button>
+          </label>
+          <div class="input-wrap">
+            <input id="race" type="number" min="0" max="888" disabled />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="attr">
+          <span id="attrLabel">DMG to Attribute</span>
+          <button type="button" id="dmgAttrTips" class="tooltip-button">
+          </button>
+          </label>
+          <div class="input-wrap">
+            <input id="attr" type="number" min="0" max="888" disabled />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="dmgStack">
+          <span id="dmgStackLabel">Extra: Final DMG Bonus</span>
+          <button type="button" id="dmgStackTips" class="tooltip-button">
+          </button>
+          </label>
+          <div class="input-wrap">
+            <input id="dmgStack" type="number" min="0" max="888" placeholder="input final dmg bonus%..." />
+          </div>
+        </div>
+      </div>
+      <div class="btn-row" id="btn-row">
+        <button id="submitBtn" type="button">Calculate</button>
+        <button id="testSpear" type="button" disabled>Simulate Spear</button>
+        <button id="testReaper" type="button" disabled>Simulate Reaper</button>
+        <button class="reset-recommendations reset-rek-btn" id="resetRekomenBtn" type="button" disabled>Refresh Recommendations</button>
+        <button id="resetAllBtn" type="button" disabled>Reset All</button>
+      </div>
+      <div id="stickyStart"></div>
+      <div id="hasil">
+        Input stats to see the result...
+      </div>
+      <div id="recommendations">
+        Recommended stat allocations will show up here. This tool randomizes your stats to find the best combination for higher output.
+      </div>
+      <div class="footer">
+        <i>Have an issue?</i><br/>
+        Silja [Odin-Nastia] 
+        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 512">
+          <path fill="#5865F2" d="M105 0h302c57.928.155 104.845 47.072 105 104.996V407c-.155 57.926-47.072 104.844-104.996 104.998L105 512C47.074 511.844.156 464.926.002 407.003L0 105C.156 47.072 47.074.155 104.997 0H105z"/>
+          <g data-name="">
+            <g data-name="Discord Logos">
+              <path fill="#fff" fill-rule="nonzero" d="M368.896 153.381a269.506 269.506 0 00-67.118-20.637 186.88 186.88 0 00-8.57 17.475 250.337 250.337 0 00-37.247-2.8c-12.447 0-24.955.946-37.25 2.776-2.511-5.927-5.427-11.804-8.592-17.454a271.73 271.73 0 00-67.133 20.681c-42.479 62.841-53.991 124.112-48.235 184.513a270.622 270.622 0 0082.308 41.312c6.637-8.959 12.582-18.497 17.63-28.423a173.808 173.808 0 01-27.772-13.253c2.328-1.688 4.605-3.427 6.805-5.117 25.726 12.083 53.836 18.385 82.277 18.385 28.442 0 56.551-6.302 82.279-18.387 2.226 1.817 4.503 3.557 6.805 5.117a175.002 175.002 0 01-27.823 13.289 197.847 197.847 0 0017.631 28.4 269.513 269.513 0 0082.363-41.305l-.007.007c6.754-70.045-11.538-130.753-48.351-184.579zM201.968 300.789c-16.04 0-29.292-14.557-29.292-32.465s12.791-32.592 29.241-32.592 29.599 14.684 29.318 32.592c-.282 17.908-12.919 32.465-29.267 32.465zm108.062 0c-16.066 0-29.267-14.557-29.267-32.465s12.791-32.592 29.267-32.592c16.475 0 29.522 14.684 29.241 32.592-.281 17.908-12.894 32.465-29.241 32.465z" data-name="Discord Logo - Large - White"/>
+            </g>
+          </g>
+        </svg>
+        sanditama#7047
+      </div>
+    </div>
+    <div class="log" id="log">
+      <div class="changelog">
+        <div class="header-log">
+          <span class="close" id="closeLog">&times;</span>
+          <h2>Changelog</h2>
+        </div>
+        <div class="version">
+          <h3>[1.1.3] - 7 Oct, 2025</h3>
+          <ul>
+            <li>
+              <span class="sub-cats">Added</span>
+              <ul>
+                <li>Lightbox Image Gallery</li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Update</span>
+              <ul>
+                <li>Divinity flash use original value for calculation</li>
+                <li>flash bonus contribution (normalize to 100% uptime)</li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Improved</span>
+              <ul>
+                <li>Breakdown with tooltip</li>
+                <li>performance</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="version">
+          <h3>[1.1.2] - 28 Sept, 2025</h3>
+          <ul>
+            <li>
+              <span class="sub-cats">Added</span>
+              <ul>
+                <li>Average MVP/MINI 140/150 per size</li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Improved</span>
+              <ul>
+                <li>micro animation n transition</li>
+                <li>structure code</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="version">
+          <h3>[v1.1.1] - Sept 21, 2025</h3>
+          <ul>
+            <li>
+              <span class="sub-cats">Added</span>
+              <ul>
+                <li>Tooltips (help) for inputing data</li>
+              </ul>
+            </li>
+            <!--li><span class="sub-cats">Updated</span>
+              <ul>
+              </ul>
+              </li-->
+            <li>
+              <span class="sub-cats">Improved</span>
+              <ul>
+                <li>Input validation</li>
+                <li>optimize flow n logic 3 eq set selection</li>
+                <li>Button feedback</li>
+                <li>push your stats to table</li>
+                <li>ui/ux (mobile prior)</li>
+                <li>cross-browser compatibility</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="version">
+          <h3>[v1.1.0] - Sept 18, 2025</h3>
+          <ul>
+            <li>
+              <span class="sub-cats">Added</span>
+              <ul>
+                <li>Welcome dark theme</li>
+                <li>
+                  Equipment SET
+                  <ul>
+                    <li>Vesper</li>
+                    <li>Blue</li>
+                    <li>White 110</li>
+                  </ul>
+                </li>
+                <li>Final DMG Bonus field</li>
+                <li>
+                  Simulate "Interactive" Divinity Flash
+                  <ul>
+                    <li>Spear of Eternity</li>
+                    <li>Reaper Scythe</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Updated</span>
+              <ul>
+                <li>Calculation Formula</li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Improved</span>
+              <ul>
+                <li>
+                  UI/UX
+                  <ul>
+                    <li>Input validation tips</li>
+                    <li>each button has its own feedback</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="version">
+          <h3>[v1.0.9] - Sept 11, 2025</h3>
+          <ul>
+            <li>
+              <span class="sub-cats">Added</span>
+              <ul>
+                <li>
+                  All MVP/MINI Lv. 140 & Lv. 150 includes
+                  <ul>
+                    <li>DEF stats</li>
+                    <li>Size</li>
+                    <li>Race</li>
+                    <li>and Attribute</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Updated</span>
+              <ul>
+                <li>"How to Use" section</li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Improved</span>
+              <ul>
+                <li>
+                  Results
+                  <ul>
+                    <li>more precise stats calc</li>
+                    <li>show/hide precise nums</li>
+                  </ul>
+                </li>
+                <li>
+                  Balancing recommendations
+                  <ul>
+                    <li>better logic for race and/or attr</li>
+                    <li>extra cats when race & attr too low</li>
+                  </ul>
+                </li>
+                <li>Sticky "smooth" button</li>
+                <li>
+                  Swap Boss
+                  <ul>
+                    <li>stats editable after swap</li>
+                    <li>can skip race / attr field (set to 0)</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="version">
+          <h3>[v1.0.8] - Aug 31, 2025</h3>
+          <ul>
+            <li>
+              <span class="sub-cats">Added</span>
+              <ul>
+                <li>Changelog</li>
+                <li>"How to Use" section at top of page</li>
+                <li>
+                  Target DEF dropdown (used in calc)
+                  <ul>
+                    <li>Dummy (0 DEF)</li>
+                    <li>Avg. MVP/MINI Lv. 130</li>
+                    <li>Avg. MVP/MINI Lv. 140</li>
+                    <li>Avg. MVP/MINI Lv. 150</li>
+                  </ul>
+                </li>
+                <li>Swap target DEF</li>
+                <li>Double tap/click guard</li>
+                <li>Sticky collapsible button on scroll (mobile)</li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Updated</span>
+              <ul>
+                <li>
+                  Calc formula
+                  <ul>
+                    <li>added counter DEF</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <span class="sub-cats">Improved</span>
+              <ul>
+                <li>cross-browser support</li>
+                <li>main flow + logic</li>
+                <li>input validation</li>
+                <li>results breakdown by factor</li>
+                <li>recommendation table logic</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="version">
+          <h3>[v1.0.0] - Aug 28, 2025</h3>
+          <ul>
+            <li>
+              Initial release
+              <ul>
+                <li>6 dropdowns + 6 numeric inputs</li>
+                <li>3 buttons</li>
+                <li>Result card</li>
+                <li>randomize stats in rec table</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div aria-live="polite" class="snackbar" id="snackbar" role="status"></div>
+    <div class="img-lightbox-overlay" id="img-lightbox-overlay">
+      <span class="img-lightbox-close">&times;</span>
+      <div class="img-lightbox-counter">1 / 1</div>
+      <button class="img-lightbox-nav img-lightbox-prev">‹</button>
+      <button class="img-lightbox-nav img-lightbox-next">›</button>
+      <div class="img-lightbox-inner">
+        <div class="img-lightbox-loader">Loading...</div>
+        <img class="img-lightbox-image" src="" alt="">
+      </div>
+      <div class="img-lightbox-caption"></div>
+    </div>
+    <div style="display: none;">
+      <div data-lightbox-item="my-gallery" 
+        data-lightbox-image="https://masihterjaga.github.io/sim/img/Calc_vs_Ingame-0.jpg" data-caption=""></div>
+      <div data-lightbox-item="my-gallery" 
+        data-lightbox-image="https://masihterjaga.github.io/sim/img/Calc_vs_Ingame-1.jpg" data-caption="no buff active (P ATTK 325002)"></div>
+      <div data-lightbox-item="my-gallery" 
+        data-lightbox-image="https://masihterjaga.github.io/sim/img/Calc_vs_Ingame-2.jpg" 
+        data-caption="5 Stack Vesper (P ATTK 352793)"></div>
+      <div data-lightbox-item="my-gallery" 
+        data-lightbox-image="https://masihterjaga.github.io/sim/img/Calc_vs_Ingame-3.jpg" 
+        data-caption="Spear Flash Triggered (P ATTK 325002)"></div>
+      <div data-lightbox-item="my-gallery" 
+        data-lightbox-image="https://masihterjaga.github.io/sim/img/Calc_vs_Ingame-4.jpg" 
+        data-caption="Spear + 5 Stack Vesper (P ATTK 352793)"></div>
+    </div>
+    <script src="/sim/script/sim.min.js"></script>
+  </body>
+</html>
