@@ -1,6 +1,6 @@
 # ROX Base Damage Multiplier Calculator
 
-A Single Page Application for **Ragnarok X: Next Generation** players to calculate base damage multipliers and optimize stat distribution for maximum DPS output.
+A Single Page Application for **Ragnarok X: Next Generation** players to calculate base multipliers and optimize stat distribution for maximum DPS output.
 
 🔗 **Live Demo:** [https://masihterjaga.github.io/sim/](https://masihterjaga.github.io/sim/)
 
@@ -14,11 +14,11 @@ Calculate your character's damage potential based on your stats. Get optimized s
 
 ## ✨ Key Features
 
-- **Base Damage Multiplier Calculator** - Real-time calculation based on your stats
+- **Base Multiplier Calculator** - Calculation based on your stats
 - **Multi-Target Support** - Configure for specific MVPs/Mini-bosses or average boss levels
 - **Stat Optimization Engine** - Get randomized stat allocation recommendations
 - **Equipment Set Bonuses** - Support for Vesper, Blue, and White sets
-- **Flash Skill Simulation** - Normalized calculations for Spear of Eternity and Reaper Scythe
+- **Flash Skill Simulation** - Calculations for Spear of Eternity and Reaper Scythe
 - **Swap Target** - Quickly switch between bosses without re-entering data
 
 ---
@@ -34,7 +34,3 @@ Calculate your character's damage potential based on your stats. Get optimized s
 ## 📄 License
 
 MIT
-
----
-
-⭐ **Star this repo if it helped you optimize your ROX character!**
