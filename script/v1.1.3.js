@@ -3284,40 +3284,154 @@ setupTooltips({
 
 // ========== NOTIFICATION ==========
 const SnackbarManager = (() => {
-  let timer = null;
-  const namespace = 'snackbar-manager';
+  let hideTimer = null;
+  let trackingKeyboard = false;
+  let lastBottom = -1;
+  let viewportChangeTimer = null;
   
-  const cleanup = () => {
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
+  const NS = 'snackbar';
+  
+  const CONFIG = {
+    MOBILE_MAX_WIDTH: 480,
+    KEYBOARD_MIN: 100,
+    BASE_OFFSET: 20,
+    SHOW_DURATION: 3000,
+    HIDE_ANIMATION: 300,
+    RESIZE_DEBOUNCE: 150
+  };
+  
+  const isMobileView = () => window.innerWidth <= CONFIG.MOBILE_MAX_WIDTH;
+  
+  const calcKeyboardHeight = () => {
+    const vp = window.visualViewport;
+    if (!vp) return 0;
+    
+    const gap = window.innerHeight - vp.height;
+    return (gap > 50 && gap < window.innerHeight * 0.7) ? gap : 0;
+  };
+  
+  const updatePosition = () => {
+    const el = DOM_ELEMENTS?.snackbar;
+    if (!el?.classList.contains('show') || !isMobileView() || !window.visualViewport) return;
+    
+    const kbHeight = calcKeyboardHeight();
+    const bottom = (kbHeight > CONFIG.KEYBOARD_MIN ? kbHeight : 0) 
+                   + CONFIG.BASE_OFFSET 
+                   - window.visualViewport.offsetTop;
+    
+    if (bottom === lastBottom) return;
+    
+    lastBottom = bottom;
+    el.style.bottom = `${bottom}px`;
+  };
+  
+  const toggleTracking = (enable) => {
+    if (trackingKeyboard === enable) return;
+    
+    const vp = window.visualViewport;
+    if (!vp) return;
+    
+    trackingKeyboard = enable;
+    lastBottom = -1;
+    
+    if (enable) {
+      EventManager.addNS(`${NS}_viewport`, vp, 'resize', updatePosition, { passive: true });
+      EventManager.addNS(`${NS}_viewport`, vp, 'scroll', updatePosition, { passive: true });
+    } else {
+      EventManager.removeNS(`${NS}_viewport`);
+      const el = DOM_ELEMENTS?.snackbar;
+      if (el) el.style.bottom = '';
     }
   };
   
-  const show = (text) => {
-    const sb = DOM_ELEMENTS?.snackbar;
-    if (!sb || !text) return;
+  const show = (message) => {
+    const el = DOM_ELEMENTS?.snackbar;
+    if (!el || !message) return;
     
-    sb.textContent = text;
-    
-    // Clear previous timer
-    if (timer) {
-      clearTimeout(timer);
-      timer = null;
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
     }
     
-    sb.classList.remove('show');
-    void sb.offsetHeight;
+    el.textContent = message;
+    el.classList.remove('show');
+    void el.offsetHeight;
+    el.classList.add('show');
     
-    sb.classList.add('show');
+    if (isMobileView()) {
+      lastBottom = -1;
+      updatePosition();
+      toggleTracking(true);
+    } else {
+      el.style.bottom = `${CONFIG.BASE_OFFSET}px`;
+    }
     
-    timer = setTimeout(() => {
-      sb.classList.remove('show');
-      timer = null;
-    }, 3000);
+    hideTimer = setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => {
+        if (!el.classList.contains('show')) toggleTracking(false);
+      }, CONFIG.HIDE_ANIMATION);
+      hideTimer = null;
+    }, CONFIG.SHOW_DURATION);
   };
   
-  return { show, cleanup, destroy: cleanup };
+  const handleWindowResize = () => {
+    if (viewportChangeTimer) {
+      clearTimeout(viewportChangeTimer);
+      viewportChangeTimer = null;
+    }
+    
+    viewportChangeTimer = setTimeout(() => {
+      const el = DOM_ELEMENTS?.snackbar;
+      if (!el?.classList.contains('show')) {
+        viewportChangeTimer = null;
+        return;
+      }
+      
+      if (isMobileView()) {
+        if (!trackingKeyboard) {
+          lastBottom = -1;
+          toggleTracking(true);
+          updatePosition();
+        }
+      } else {
+        toggleTracking(false);
+        el.style.bottom = `${CONFIG.BASE_OFFSET}px`;
+      }
+      
+      viewportChangeTimer = null;
+    }, CONFIG.RESIZE_DEBOUNCE);
+  };
+  
+  EventManager.addNS(NS, window, 'resize', handleWindowResize, { passive: true });
+  
+  return {
+    show,
+    cleanup: () => {
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+      
+      if (viewportChangeTimer) {
+        clearTimeout(viewportChangeTimer);
+        viewportChangeTimer = null;
+      }
+      
+      EventManager.removeNS(NS);
+      EventManager.removeNS(`${NS}_viewport`);
+      EventManager.forceCleanup();
+      
+      trackingKeyboard = false;
+      lastBottom = -1;
+      
+      const el = DOM_ELEMENTS?.snackbar;
+      if (el) {
+        el.style.bottom = '';
+        el.classList.remove('show');
+      }
+    }
+  };
 })();
 const showSnackbar = SnackbarManager.show;
 const scrollAndFocusElement = (el, msg) => {
