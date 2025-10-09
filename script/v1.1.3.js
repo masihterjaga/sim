@@ -6234,18 +6234,41 @@ function resetAllData() {
   }
 }
 
-// Service Worker Registration
-// Tambahkan di akhir file script/v1.1.3.js kamu
+// Service Worker Registration with Auto-Update Detection
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sim/sw.js')
       .then(registration => {
         console.log('SW registered: ', registration);
+
+        // Detect when new service worker is waiting
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing;
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New service worker available!
+              if (confirm('Update available! Reload to get the latest version?')) {
+                newWorker.postMessage({ action: 'skipWaiting' });
+                window.location.reload();
+              }
+            }
+          });
+        });
       })
       .catch(registrationError => {
         console.log('SW registration failed: ', registrationError);
       });
+
+    // Auto reload when new service worker takes control
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        window.location.reload();
+      }
+    });
   });
 }
 
@@ -6253,15 +6276,9 @@ if ('serviceWorker' in navigator) {
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Prevent the mini-infobar from appearing on mobile
   e.preventDefault();
-  // Stash the event so it can be triggered later
   deferredPrompt = e;
-  
   console.log('PWA can be installed');
-  
-  // Optional: Tampilkan button install custom
-  // showInstallButton();
 });
 
 window.addEventListener('appinstalled', () => {
