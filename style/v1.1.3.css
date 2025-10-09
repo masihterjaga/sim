@@ -1320,7 +1320,7 @@ td.delta:hover {
 .snackbar {
   position: fixed;
   left: 50%;
-  bottom: 60px;
+  bottom: 80px;
   font-size: var(--font-size-sm);
   line-height: var(--line-height-normal);
   color: #fff;
