@@ -81,3 +81,10 @@ self.addEventListener('activate', event => {
   );
   self.clients.claim();
 });
+
+// Listen for skip waiting message
+self.addEventListener('message', event => {
+  if (event.data && event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});
