@@ -3301,7 +3301,7 @@ const SnackbarManager = (() => {
 
     const updatePosition = () => {
   const offset = window.innerHeight - (window.visualViewport.height || window.innerHeight);
-  sb.style.bottom = `${Math.max(16, 80 - offset)}px`;
+  sb.style.bottom = `${Math.max(30, 80 - offset)}px`;
 };
 
     EventManager.addNS(namespace, window.visualViewport, 'resize', updatePosition, {
