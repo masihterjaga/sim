@@ -3286,7 +3286,7 @@ setupTooltips({
 const SnackbarManager = (() => {
   let timer = null;
   const namespace = 'snackbar-manager';
-
+  
   const cleanup = () => {
     if (timer) {
       clearTimeout(timer);
@@ -3295,73 +3295,72 @@ const SnackbarManager = (() => {
     EventManager.removeNS(namespace);
     AppState.set('keyboardListenersAdded', false);
   };
-
+  
   const setupVisualViewportListeners = (sb) => {
     if (!window.visualViewport) return;
-
+    
     const updatePosition = () => {
-  const offset = window.innerHeight - (window.visualViewport.height || window.innerHeight);
-  sb.style.bottom = `${Math.max(30, 80 - offset)}px`;
-};
-
+      // Calculate keyboard height offset
+      const offset = window.innerHeight - (window.visualViewport.height || window.innerHeight);
+      // Add offset to base position to move snackbar above keyboard
+      sb.style.bottom = `${Math.max(30, 20 + offset)}px`;
+    };
+    
     EventManager.addNS(namespace, window.visualViewport, 'resize', updatePosition, {
       passive: true
     });
     EventManager.addNS(namespace, window.visualViewport, 'scroll', updatePosition, {
       passive: true
     });
+    
+    // Set initial position once
+    updatePosition();
   };
-
-  const setupInputFocusListeners = (sb) => {
-    const input = document.querySelector('input[type=number]');
-    if (!input) return;
-
-    EventManager.addNS(namespace, input, 'focusin', () => sb.style.bottom = '300px');
-    EventManager.addNS(namespace, input, 'focusout', () => sb.style.bottom = '16px');
-  };
-
+  
   const setupMobileKeyboardHandlers = (sb) => {
     if (window.innerWidth > 480) return;
+    // Only setup once per session to prevent double adjustments
     if (AppState.get('keyboardListenersAdded')) return;
-
+    
     AppState.set('keyboardListenersAdded', true);
-
+    
+    // Use visualViewport API for keyboard detection
     if (window.visualViewport) {
       setupVisualViewportListeners(sb);
-    } else {
-      setupInputFocusListeners(sb);
     }
   };
-
+  
   const show = (text) => {
     const sb = DOM_ELEMENTS?.snackbar;
     if (!sb || !text) return;
-
+    
     sb.textContent = text;
-
+    
     if (timer) clearTimeout(timer);
-
+    
     sb.classList.remove('show');
     void sb.offsetHeight;
-    sb.classList.add('show');
-
+    
+    // Setup keyboard handlers on first show only (guarded by AppState check)
     setupMobileKeyboardHandlers(sb);
-
+    
+    sb.classList.add('show');
+    
     timer = setTimeout(() => {
       sb.classList.remove('show');
     }, 3000);
   };
-
+  
   const handleResize = () => {
     if (window.innerWidth > 480 && AppState.get('keyboardListenersAdded')) {
       cleanup();
     }
   };
-
+  
   EventManager.addNS(namespace, window, 'resize', handleResize, {
     passive: true
   });
-
+  
   return {
     show,
     cleanup,
