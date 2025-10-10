@@ -1,6 +1,6 @@
 {
   "name": "ROX Base Multiplier Calculator",
-  "short_name": "RöX Calc",
+  "short_name": "RöX Calculator",
   "description": "A Single Page Application for Ragnarok X: Next Generation players to calculate damage multipliers and optimize stats",
   "start_url": "/sim/",
   "scope": "/sim/",
