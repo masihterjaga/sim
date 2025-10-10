@@ -1,21 +1,21 @@
 const CACHE_NAME = 'rox-calc-v1.0.01';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/style/v1.1.3.css',
-  '/script/v1.1.3.js',
-  '/manifest.json',
-  '/img/Calc_vs_Ingame-0.jpg',
-  '/img/Calc_vs_Ingame-1.jpg',
-  '/img/Calc_vs_Ingame-2.jpg',
-  '/img/Calc_vs_Ingame-3.jpg',
-  '/img/Calc_vs_Ingame-4.jpg',
-  '/icons/apple-touch-icon.png',
-  '/icons/favicon-96x96.png',
-  '/icons/favicon.ico',
-  '/icons/favicon.svg',
-  '/icons/web-app-manifest-192x192.png',
-  '/icons/web-app-manifest-512x512.png'
+  './',
+  './index.html',
+  './style/v1.1.3.css',
+  './script/v1.1.3.js',
+  './manifest.json',
+  './img/Calc_vs_Ingame-0.jpg',
+  './img/Calc_vs_Ingame-1.jpg',
+  './img/Calc_vs_Ingame-2.jpg',
+  './img/Calc_vs_Ingame-3.jpg',
+  './img/Calc_vs_Ingame-4.jpg',
+  './icons/apple-touch-icon.png',
+  './icons/favicon-96x96.png',
+  './icons/favicon.ico',
+  './icons/favicon.svg',
+  './icons/web-app-manifest-192x192.png',
+  './icons/web-app-manifest-512x512.png'
 ];
 
 self.addEventListener('install', event => {
