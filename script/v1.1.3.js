@@ -6234,222 +6234,322 @@ function resetAllData() {
   }
 }
 
-// Service Worker Registration with Auto-Update Detection
-
+// ======== BETA PWA ========
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sim/sw.js')
-      .then(registration => {
-        console.log('SW registered: ', registration);
-
-        // Detect when new service worker is waiting
-        registration.addEventListener('updatefound', () => {
-          const newWorker = registration.installing;
-          
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New service worker available!
-              if (confirm('Update available! Reload to get the latest version?')) {
-                newWorker.postMessage({ action: 'skipWaiting' });
-                window.location.reload();
-              }
-            }
-          });
-        });
-      })
-      .catch(registrationError => {
-        console.log('SW registration failed: ', registrationError);
-      });
-
-    // Auto reload when new service worker takes control
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (!refreshing) {
-        refreshing = true;
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+  
+  // Save current app state before reload
+  const saveState = () => {
+    typeof StateManager !== 'undefined' && StateManager.snap();
+  };
+  
+  // Reload app with optional cache version update
+  const reloadApp = (cacheVersion = null) => {
+    cacheVersion && localStorage.setItem('app_cache_version', cacheVersion);
+    saveState();
+    window.location.reload(true);
+  };
+  
+  // Prompt user for update confirmation (only in PWA mode)
+  const askUserToUpdate = (message) => isPWA ? confirm(message) : true;
+  
+  // Check if cache version changed and prompt for update
+  const checkCacheVersion = async () => {
+    try {
+      const cacheNames = await caches.keys();
+      const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
+      
+      if (!currentCache) return false;
+      
+      const storedVersion = localStorage.getItem('app_cache_version');
+      
+      // First time initialization
+      if (!storedVersion) {
+        localStorage.setItem('app_cache_version', currentCache);
+        return false;
+      }
+      
+      // Version mismatch - prompt for update (only in PWA)
+      if (storedVersion !== currentCache && isPWA) {
+        if (confirm('New version available! Update now?\n\nYour progress will be saved.')) {
+          reloadApp(currentCache);
+          return true;
+        }
+      }
+      
+      return false;
+    } catch (e) {
+      return false;
+    }
+  };
+  
+  // Handle new service worker state changes
+  const handleNewWorker = (newWorker) => {
+    newWorker.addEventListener('statechange', () => {
+      if (newWorker.state !== 'installed' || !navigator.serviceWorker.controller) return;
+      
+      if (isPWA && confirm('Update available! Reload to get the latest version?')) {
+        saveState();
+        newWorker.postMessage({ action: 'skipWaiting' });
         window.location.reload();
       }
     });
-  });
-}
-
-// Optional: PWA Install Prompt
-let deferredPrompt;
-
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  console.log('PWA can be installed');
-});
-
-window.addEventListener('appinstalled', () => {
-  console.log('PWA was installed');
-  deferredPrompt = null;
-});
-
-// Optional: Function untuk trigger install prompt
-function installPWA() {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-      } else {
-        console.log('User dismissed the install prompt');
-      }
-      deferredPrompt = null;
+  };
+  
+  // Register service worker and listen for updates
+  const registerSW = () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        registration.addEventListener('updatefound', () => {
+          handleNewWorker(registration.installing);
+        });
+        registration.update();
+      })
+      .catch(err => {});
+  };
+  
+  // Initialize on page load
+  window.addEventListener('load', async () => {
+    const updated = await checkCacheVersion();
+    !updated && registerSW();
+    
+    // Prevent duplicate reloads on controller change
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      window.location.reload();
     });
-  }
-}
-
-// ========== CLEANUP ==========
-const cleanupAll = () => {
-  // Clear debounce
-  if (debounceCleanupInterval) {
-    clearInterval(debounceCleanupInterval);
-    debounceCleanupInterval = null;
-  }
-  debounceMap.forEach(data => {
-    if (data?.timerId) clearTimeout(data.timerId);
   });
-  debounceMap.clear();
-
-  // Force cleanup EventManager
-  if (typeof EventManager !== 'undefined') {
-    EventManager.forceCleanup?.();
-    EventManager.removeAll?.();
-  }
-
-  // Clear AppState listeners
-  if (typeof AppState !== 'undefined') {
-    AppState.clearListeners?.();
-  }
-
-  // Destroy managers (proper order - UI first, then data)
-  ValidationSSoTInstance?.destroy();
-  TooltipManager?.destroyAll();
-  SnackbarManager?.destroy();
-  dropdownManager?.destroy();
-  stickyHandler?.destroy();
-  accordionManager?.destroy();
-  modalManager?.destroy();
-
-  // Clear cache
-  if (typeof cache !== 'undefined') {
-    cache.clear();
-  }
-  if (typeof RandomGenerator !== 'undefined') {
-    RandomGenerator.reset();
-  }
-
-  // Clear window debounce
-  if (window.debounceMap) {
-    window.debounceMap.forEach(t => clearTimeout(t));
-    window.debounceMap.clear();
-  }
-
-  // Remove button listeners
-  if (window._buttonListenerIds && typeof EventManager !== 'undefined') {
-    window._buttonListenerIds.forEach(id => EventManager.remove?.(id));
-    window._buttonListenerIds = [];
-  }
-
-  // Clear flags
-  delete window._eventsAlreadyBound;
-  delete window._lastSnackbarTime;
-};
-
-// PWA State Persistence + Disable Pull-to-Refresh
-const isPWA = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-if (isPWA()) {
-  // ========== DISABLE PULL-TO-REFRESH ==========
-  let lastTouchY = 0;
-  let preventPullToRefresh = false;
-
-  document.addEventListener('touchstart', (e) => {
-    if (e.touches.length !== 1) return;
-    lastTouchY = e.touches[0].clientY;
-    preventPullToRefresh = (window.scrollY === 0);
-  }, { passive: false });
-
-  document.addEventListener('touchmove', (e) => {
-    const touchY = e.touches[0].clientY;
-    const touchYDelta = touchY - lastTouchY;
-    lastTouchY = touchY;
-
-    if (preventPullToRefresh && touchYDelta > 0) {
-      e.preventDefault();
-      return;
-    }
-  }, { passive: false });
-
-  const style = document.createElement('style');
-  style.textContent = `
-    body {
-      overscroll-behavior-y: contain;
-      -webkit-overflow-scrolling: touch;
-    }
-  `;
-  document.head.appendChild(style);
-
-  // ========== STATE PERSISTENCE ==========
-  const snap = () => {
-    try {
-      const state = {
-        form: {},
-        isResultShown: AppState.get('isResultShown'),
-        ts: Date.now()
-      };
-      
-      // Capture ONLY select & input elements
-      document.querySelectorAll('select, input[type="number"]').forEach(el => {
-        if (el.id && el.value !== '') {
-          state.form[el.id] = el.value;
-        }
-      });
-      
-      sessionStorage.setItem('pwa_snap', JSON.stringify(state));
-    } catch(e) { console.error('Snap failed:', e); }
-  };
   
-  const restore = () => {
-    try {
-      const saved = sessionStorage.getItem('pwa_snap');
-      if (!saved) return;
-      
-      const state = JSON.parse(saved);
-      
-      // Validate (1 hour expiry)
-      if (Date.now() - state.ts > 3600000) {
-        sessionStorage.removeItem('pwa_snap');
-        return;
+  // Check for updates when app becomes visible (PWA only)
+  isPWA && document.addEventListener('visibilitychange', async () => {
+    if (!document.hidden) {
+      const updated = await checkCacheVersion();
+      if (!updated) {
+        const reg = await navigator.serviceWorker.getRegistration();
+        reg?.update();
       }
-      
-      // Restore form values
-      Object.entries(state.form).forEach(([id, value]) => {
-        const el = document.getElementById(id);
-        if (el) el.value = value;
-      });
-      
-      // Recalculate if result was shown
-      if (state.isResultShown && typeof processMainCalculation === 'function') {
-        setTimeout(processMainCalculation, 200);
-      }
-      
-      sessionStorage.removeItem('pwa_snap');
-      
-    } catch(e) { 
-      console.error('Restore failed:', e);
-      sessionStorage.removeItem('pwa_snap');
     }
-  };
-  
-  window.addEventListener('DOMContentLoaded', restore);
-  EventManager.add(window, 'beforeunload', () => { snap(); cleanupAll(); });
-  window.addEventListener('visibilitychange', () => document.hidden && snap());
-  
-} else {
-  EventManager.add(window, 'beforeunload', cleanupAll);
+  });
 }
+const CleanupManager = (() => {
+  let debounceCleanupInterval = null;
+  const debounceMap = new Map();
+  
+  const cleanupListeners = () => {
+    // Cleanup EventManager listeners
+    if (typeof EventManager !== 'undefined') {
+      EventManager.forceCleanup?.();
+      EventManager.removeAll?.();
+    }
+    
+    typeof AppState !== 'undefined' && AppState.clearListeners?.();
+    
+    // Cleanup button listeners
+    if (window._buttonListenerIds && typeof EventManager !== 'undefined') {
+      window._buttonListenerIds.forEach(id => EventManager.remove?.(id));
+      window._buttonListenerIds = [];
+    }
+  };
+  
+  const cleanupTimers = () => {
+    // Clear internal debounce interval
+    if (debounceCleanupInterval) {
+      clearInterval(debounceCleanupInterval);
+      debounceCleanupInterval = null;
+    }
+    
+    // Clear all debounce timers
+    debounceMap.forEach(data => data?.timerId && clearTimeout(data.timerId));
+    debounceMap.clear();
+    
+    // Clear global debounce map
+    if (window.debounceMap) {
+      window.debounceMap.forEach(t => clearTimeout(t));
+      window.debounceMap.clear();
+    }
+  };
+  
+  const cleanupManagers = () => {
+    typeof ValidationSSoTInstance !== 'undefined' && ValidationSSoTInstance?.destroy();
+    typeof TooltipManager !== 'undefined' && TooltipManager?.destroyAll();
+    typeof SnackbarManager !== 'undefined' && SnackbarManager?.cleanup();
+    typeof dropdownManager !== 'undefined' && dropdownManager?.destroy();
+    typeof stickyHandler !== 'undefined' && stickyHandler?.destroy();
+    typeof accordionManager !== 'undefined' && accordionManager?.destroy();
+    typeof modalManager !== 'undefined' && modalManager?.destroy();
+  };
+  
+  const cleanupCache = () => {
+    typeof cache !== 'undefined' && cache.clear();
+    typeof RandomGenerator !== 'undefined' && RandomGenerator.reset();
+    
+    delete window._eventsAlreadyBound;
+    delete window._lastSnackbarTime;
+  };
+  
+  const cleanupAll = () => {
+    cleanupListeners();
+    cleanupTimers();
+    cleanupManagers();
+    cleanupCache();
+  };
+  
+  return { cleanupListeners, cleanupTimers, cleanupManagers, cleanupCache, cleanupAll };
+})();
+const cleanupAll = CleanupManager.cleanupAll;
+EventManager.add(window, 'beforeunload', cleanupAll);
+typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
 
-if (typeof window !== 'undefined') window.__forceCleanup = cleanupAll;
+(() => {
+  const CONFIG = {
+    STORAGE_KEY: 'pwa_snap',
+    EXPIRY_MS: 691200000, // 8 days
+    RESTORE_DELAY_MS: 200,
+    SELECTORS: 'select, input[type="number"]',
+    NAMESPACE: 'pwa_persistence'
+  };
+  
+  const isPWA = () => window.matchMedia('(display-mode: standalone)').matches || 
+    window.navigator.standalone;
+  
+  // Remove storage if not running as PWA
+  if (!isPWA()) {
+    localStorage.removeItem(CONFIG.STORAGE_KEY);
+    return;
+  }
+  
+  const StateManager = (() => {
+    // Collect all form input values by ID
+    const collectFormValues = () => {
+      const values = {};
+      document.querySelectorAll(CONFIG.SELECTORS).forEach(el => {
+        el.id && el.value && (values[el.id] = el.value);
+      });
+      return values;
+    };
+    
+    // Save current state to localStorage
+    const snap = () => {
+      try {
+        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({
+          form: collectFormValues(),
+          isResultShown: true,
+          ts: Date.now()
+        }));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+    
+    // Restore saved state from localStorage
+    const restore = () => {
+      try {
+        const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
+        if (!saved) return false;
+        
+        const state = JSON.parse(saved);
+        
+        // Check if state expired
+        if (Date.now() - state.ts > CONFIG.EXPIRY_MS) {
+          localStorage.removeItem(CONFIG.STORAGE_KEY);
+          return false;
+        }
+        
+        // Restore form values
+        Object.entries(state.form).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          el && (el.value = val);
+        });
+        
+        // Trigger calculation if result was shown
+        state.isResultShown && typeof processMainCalculation === 'function' && 
+          setTimeout(processMainCalculation, CONFIG.RESTORE_DELAY_MS);
+        
+        return true;
+      } catch (e) {
+        localStorage.removeItem(CONFIG.STORAGE_KEY);
+        return false;
+      }
+    };
+    
+    return { snap, restore };
+  })();
+  
+  // Cleanup resources without listeners
+  const cleanupResources = () => {
+    CleanupManager.cleanupTimers();
+    CleanupManager.cleanupManagers();
+    CleanupManager.cleanupCache();
+  };
+  
+  const init = () => {
+    StateManager.restore();
+    
+    // Handle app exit (visibility change or page hide)
+    const handleExit = () => {
+      CleanupManager.cleanupListeners();
+      AppState.get('isResultShown') && StateManager.snap();
+      cleanupResources();
+    };
+    
+    EventManager.addNS(CONFIG.NAMESPACE, document, 'visibilitychange', () => {
+      document.hidden && handleExit();
+    }, { capture: true });
+    
+    EventManager.addNS(CONFIG.NAMESPACE, window, 'pagehide', handleExit, { capture: true });
+    
+    // Expose cleanup function
+    window.__pwaPersistenceCleanup = () => EventManager.removeNS(CONFIG.NAMESPACE);
+  };
+  
+  // Prevent pull-to-refresh gesture on mobile
+  const preventPullToRefresh = () => {
+    let lastY = 0;
+    let shouldPrevent = false;
+    
+    EventManager.addNS(CONFIG.NAMESPACE, document, 'touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      lastY = e.touches[0].clientY;
+      shouldPrevent = window.scrollY === 0;
+    }, { passive: false });
+    
+    EventManager.addNS(CONFIG.NAMESPACE, document, 'touchmove', (e) => {
+      const deltaY = e.touches[0].clientY - lastY;
+      lastY = e.touches[0].clientY;
+      
+      shouldPrevent && deltaY > 0 && e.cancelable && e.preventDefault();
+    }, { passive: false });
+    
+    // Apply overscroll containment via CSS
+    const style = document.createElement('style');
+    style.textContent = 'body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}';
+    document.head.appendChild(style);
+  };
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    preventPullToRefresh();
+    init();
+  });
+  
+  // Utility to manually clear PWA storage
+  window.clearPWAStorage = () => {
+    try {
+      localStorage.removeItem(CONFIG.STORAGE_KEY);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+})();
+
+// Cleanup on page hide for non-PWA environments
+window.addEventListener('pagehide', () => {
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
+    window.navigator.standalone;
+  
+  !isPWA && CleanupManager.cleanupAll();
+});
