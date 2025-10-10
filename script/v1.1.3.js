@@ -6299,7 +6299,7 @@ if ('serviceWorker' in navigator) {
   
   // Register service worker and listen for updates
   const registerSW = () => {
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('./sw.js')
       .then(registration => {
         registration.addEventListener('updatefound', () => {
           handleNewWorker(registration.installing);
