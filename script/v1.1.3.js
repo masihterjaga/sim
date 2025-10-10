@@ -6358,5 +6358,98 @@ const cleanupAll = () => {
   delete window._lastSnackbarTime;
 };
 
-EventManager.add(window, 'beforeunload', cleanupAll);
+// PWA State Persistence + Disable Pull-to-Refresh
+const isPWA = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+if (isPWA()) {
+  // ========== DISABLE PULL-TO-REFRESH ==========
+  let lastTouchY = 0;
+  let preventPullToRefresh = false;
+
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    lastTouchY = e.touches[0].clientY;
+    preventPullToRefresh = (window.scrollY === 0);
+  }, { passive: false });
+
+  document.addEventListener('touchmove', (e) => {
+    const touchY = e.touches[0].clientY;
+    const touchYDelta = touchY - lastTouchY;
+    lastTouchY = touchY;
+
+    if (preventPullToRefresh && touchYDelta > 0) {
+      e.preventDefault();
+      return;
+    }
+  }, { passive: false });
+
+  const style = document.createElement('style');
+  style.textContent = `
+    body {
+      overscroll-behavior-y: contain;
+      -webkit-overflow-scrolling: touch;
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ========== STATE PERSISTENCE ==========
+  const snap = () => {
+    try {
+      const state = {
+        form: {},
+        isResultShown: AppState.get('isResultShown'),
+        ts: Date.now()
+      };
+      
+      // Capture ONLY select & input elements
+      document.querySelectorAll('select, input[type="number"]').forEach(el => {
+        if (el.id && el.value !== '') {
+          state.form[el.id] = el.value;
+        }
+      });
+      
+      sessionStorage.setItem('pwa_snap', JSON.stringify(state));
+    } catch(e) { console.error('Snap failed:', e); }
+  };
+  
+  const restore = () => {
+    try {
+      const saved = sessionStorage.getItem('pwa_snap');
+      if (!saved) return;
+      
+      const state = JSON.parse(saved);
+      
+      // Validate (1 hour expiry)
+      if (Date.now() - state.ts > 3600000) {
+        sessionStorage.removeItem('pwa_snap');
+        return;
+      }
+      
+      // Restore form values
+      Object.entries(state.form).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.value = value;
+      });
+      
+      // Recalculate if result was shown
+      if (state.isResultShown && typeof processMainCalculation === 'function') {
+        setTimeout(processMainCalculation, 200);
+      }
+      
+      sessionStorage.removeItem('pwa_snap');
+      
+    } catch(e) { 
+      console.error('Restore failed:', e);
+      sessionStorage.removeItem('pwa_snap');
+    }
+  };
+  
+  window.addEventListener('DOMContentLoaded', restore);
+  EventManager.add(window, 'beforeunload', () => { snap(); cleanupAll(); });
+  window.addEventListener('visibilitychange', () => document.hidden && snap());
+  
+} else {
+  EventManager.add(window, 'beforeunload', cleanupAll);
+}
+
 if (typeof window !== 'undefined') window.__forceCleanup = cleanupAll;
