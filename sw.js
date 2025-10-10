@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.0.111';
+const CACHE_NAME = 'rox-calc-v1.0.112';
 const urlsToCache = [
   './',
   './index.html',
