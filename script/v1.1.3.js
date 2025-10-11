@@ -6041,6 +6041,10 @@ const stickyHandler = new StickyHandler();
 
 // ========== CONSTANTS ==========
 const CONSTANTS = {
+/**
+ * Still on working, pwa with proper flow n cleanup 🧹
+ * better now, but still not stable 
+*/
   PWA_STORAGE_KEY: 'pwa_snap',
   PWA_EXPIRY_MS: 691200000, // 8 days
   PWA_RESTORE_DELAY_MS: 200,
@@ -6420,6 +6424,30 @@ const CleanupManager = (() => {
 (() => {
   if (!isPWAMode()) return;
   
+  const preventPullToRefresh = (() => {
+    let lastY = 0;
+    let shouldPrevent = false;
+    
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchstart', (e) => {
+      if (e.touches.length !== 1) return;
+      lastY = e.touches[0].clientY;
+      shouldPrevent = window.scrollY === 0;
+    }, { passive: false });
+    
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchmove', (e) => {
+      const deltaY = e.touches[0].clientY - lastY;
+      lastY = e.touches[0].clientY;
+      
+      if (shouldPrevent && deltaY > 0 && e.cancelable) {
+        e.preventDefault();
+      }
+    }, { passive: false });
+    
+    const style = document.createElement('style');
+    style.textContent = 'body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}';
+    document.head.appendChild(style);
+  })();
+  
   const PWAPersistence = (() => {
     const collectFormValues = () => {
       const values = {};
@@ -6474,49 +6502,14 @@ const CleanupManager = (() => {
   })();
   
   window.PWAPersistence = PWAPersistence;
-  
-  const cleanupPWAResources = () => {
-    /*
-    CleanupManager.cleanupTimers();
-    CleanupManager.cleanupManagers();
-    CleanupManager.cleanupCache();
-    */
-    CleanupManager.cleanupAll();
-  };
-  
+
   const handlePWAExit = () => {
     if (AppState.get('isResultShown')) {
       PWAPersistence.snap();
-    } else {
-      localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
-    }
-    cleanupPWAResources();
+    } 
+    CleanupManager.cleanupAll();
   };
-  
-  const preventPullToRefresh = () => {
-    let lastY = 0;
-    let shouldPrevent = false;
-    
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchstart', (e) => {
-      if (e.touches.length !== 1) return;
-      lastY = e.touches[0].clientY;
-      shouldPrevent = window.scrollY === 0;
-    }, { passive: false });
-    
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchmove', (e) => {
-      const deltaY = e.touches[0].clientY - lastY;
-      lastY = e.touches[0].clientY;
-      
-      if (shouldPrevent && deltaY > 0 && e.cancelable) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-    
-    const style = document.createElement('style');
-    style.textContent = 'body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}';
-    document.head.appendChild(style);
-  };
-  
+
   const init = () => {
     PWAPersistence.restore();
     
@@ -6533,7 +6526,6 @@ const CleanupManager = (() => {
   };
   
   document.addEventListener('DOMContentLoaded', () => {
-    preventPullToRefresh();
     init();
   });
   
@@ -6548,6 +6540,6 @@ const CleanupManager = (() => {
   };
 })();
 
-// ========== GLOBAL CLEANUP ==========
+// ========== MORE N MAKE SURE VERY CLEAN ==========
 EventManager.add(window, 'beforeunload', CleanupManager.cleanupAll);
 window.__forceCleanup = CleanupManager.cleanupAll;
