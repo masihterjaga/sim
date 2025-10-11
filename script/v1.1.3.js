@@ -6251,11 +6251,10 @@ if ('serviceWorker' in navigator) {
     window.location.reload(true);
   };
   
-  // Prompt user for update confirmation (only in PWA mode)
-  const askUserToUpdate = (message) => isPWA ? confirm(message) : true;
-  
   // Check if cache version changed and prompt for update
   const checkCacheVersion = async () => {
+    if (!isPWA) return false;
+    
     try {
       const cacheNames = await caches.keys();
       const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
@@ -6270,8 +6269,8 @@ if ('serviceWorker' in navigator) {
         return false;
       }
       
-      // Version mismatch - prompt for update (only in PWA)
-      if (storedVersion !== currentCache && isPWA) {
+      // Version mismatch - prompt for update
+      if (storedVersion !== currentCache) {
         if (confirm('New version available! Update now?\nYour progress will be saved.')) {
           reloadApp(currentCache);
           return true;
@@ -6284,41 +6283,63 @@ if ('serviceWorker' in navigator) {
     }
   };
   
-  // Register service worker and listen for updates
+  // Register service worker
   const registerSW = () => {
     navigator.serviceWorker.register('/sim/sw.js', {
-      scope: '/sim/'
+      scope: '/sim/',
+      updateViaCache: 'none'
     })
       .then(registration => {
-        registration.update();
+        if (isPWA) {
+          registration.update();
+          
+          // Listen for new SW waiting
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
+            
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New SW ready, check cache version
+                checkCacheVersion();
+              }
+            });
+          });
+        }
       })
       .catch(err => {});
   };
   
   // Initialize on page load
   window.addEventListener('load', async () => {
-    const updated = await checkCacheVersion();
-    !updated && registerSW();
-    
-    // Prevent duplicate reloads on controller change
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return;
-      refreshing = true;
-      window.location.reload();
-    });
-  });
-  
-  // Check for updates when app becomes visible (PWA only)
-  isPWA && document.addEventListener('visibilitychange', async () => {
-    if (!document.hidden) {
+    if (isPWA) {
       const updated = await checkCacheVersion();
-      if (!updated) {
-        const reg = await navigator.serviceWorker.getRegistration();
-        reg?.update();
-      }
+      !updated && registerSW();
+      
+      // Prevent duplicate reloads on controller change
+      let refreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshing) return;
+        refreshing = true;
+        window.location.reload();
+      });
+    } else {
+      registerSW();
     }
   });
+  
+  // Check for updates when app becomes visible
+  if (isPWA) {
+    document.addEventListener('visibilitychange', async () => {
+      if (!document.hidden) {
+        const reg = await navigator.serviceWorker.getRegistration('/sim/');
+        if (reg) {
+          await reg.update();
+          // Wait a bit for new SW to install
+          setTimeout(() => checkCacheVersion(), 1000);
+        }
+      }
+    });
+  }
 }
 const CleanupManager = (() => {
   let debounceCleanupInterval = null;
