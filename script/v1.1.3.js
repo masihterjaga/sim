@@ -6048,7 +6048,7 @@ const CONSTANTS = {
   FORM_SELECTORS: 'select, input[type="number"]',
   SCROLL_OFFSET: 80,
   SNACKBAR_DELAY: 300,
-  SW_UPDATE_CHECK_DELAY: 1000
+  SW_UPDATE_CHECK_DELAY: 500
 };
 
 // ========== UTILITIES ==========
@@ -6229,7 +6229,9 @@ function resetAllData() {
     cache.rewarm();
     RandomGenerator.reset();
   }
-
+  
+  localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
+  
   AppState.reset();
   ResetHelpers.clearDebounceTimers();
   ResetHelpers.resetDropdownManager();
