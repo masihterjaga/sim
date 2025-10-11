@@ -6411,6 +6411,12 @@ EventManager.add(window, 'beforeunload', cleanupAll);
 typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
 
 (() => {
+  const isPWA = () => window.matchMedia('(display-mode: standalone)').matches || 
+    window.navigator.standalone;
+  
+  // Exit early if not PWA
+  if (!isPWA()) return;
+  
   const CONFIG = {
     STORAGE_KEY: 'pwa_snap',
     EXPIRY_MS: 691200000, // 8 days
@@ -6418,12 +6424,6 @@ typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
     SELECTORS: 'select, input[type="number"]',
     NAMESPACE: 'pwa_persistence'
   };
-  
-  const isPWA = () => window.matchMedia('(display-mode: standalone)').matches || 
-    window.navigator.standalone;
-  
-  // early skip if not running as PWA
-  if (!isPWA()) return;
   
   const StateManager = (() => {
     // Collect all form input values by ID
@@ -6472,7 +6472,6 @@ typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
         // Trigger calculation if result was shown
         state.isResultShown && typeof processMainCalculation === 'function' && 
           setTimeout(processMainCalculation, CONFIG.RESTORE_DELAY_MS);
-        scrollAndFocusElement(DOM_ELEMENTS.hasil, "Welcome back. I still remember your stats quite well, by the way");
         
         return true;
       } catch (e) {
