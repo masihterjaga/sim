@@ -6044,10 +6044,6 @@ const isPWAMode = () =>
   window.matchMedia('(display-mode: standalone)').matches || 
   window.navigator.standalone === true;
 const CONSTANTS = {
-/**
- * Still on working, pwa with proper flow n cleanup 🧹
- * better now, but still not stable 
-*/
   PWA_STORAGE_KEY: 'pwa_snap',
   PWA_EXPIRY_MS: 691200000, // 8 days
   PWA_RESTORE_DELAY_MS: 200,
@@ -6237,7 +6233,6 @@ const preventPullToRefresh = (() => {
         
         if (state.isResultShown && typeof processMainCalculation === 'function') {
           setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
-          scrollAndFocusElement(DOM_ELEMENTS.stickyStart);
         }
         
         return true;
@@ -6256,7 +6251,7 @@ const preventPullToRefresh = (() => {
     if (AppState.get('isResultShown')) {
       PWAPersistence.snap();
     }
-    CleanupManager.cleanupAll();
+    // CleanupManager.cleanupAll();
   };
   
   const init = () => {
@@ -6269,7 +6264,7 @@ const preventPullToRefresh = (() => {
     }, { capture: true });
     
     EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', () => {
-      CleanupManager.cleanupListeners();
+      //CleanupManager.cleanupListeners();
       handlePWAExit();
     }, { capture: true });
   };
@@ -6543,5 +6538,4 @@ function resetAllData() {
 }
 
 // ========== NEW BORN ==========
-EventManager.add(window, 'beforeunload', CleanupManager.cleanupListeners);
-window.__forceCleanup = CleanupManager.cleanupAll;
+// EventManager.add(window, 'beforeunload', CleanupManager.cleanupListeners);
