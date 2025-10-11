@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v0.0.1';
+const CACHE_NAME = 'rox-calc-v0.1.3';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
@@ -48,7 +48,10 @@ self.addEventListener('activate', event => {
     caches.keys()
     .then(names => Promise.all(
       names.filter(name => name !== CACHE_NAME)
-      .map(name => caches.delete(name))
+      .map(name => {
+        console.log('Deleting old cache:', name);
+        return caches.delete(name);
+      })
     ))
   );
   self.clients.claim();
