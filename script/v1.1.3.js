@@ -6157,28 +6157,43 @@ if ('serviceWorker' in navigator) {
   PWAServiceWorker.init();
 };
 const preventPullToRefresh = (() => {
-  if (!isPWAMode()) return;
+  if (!isPWAMode()) return { cleanup: () => {} };
+  
   let lastY = 0;
   let shouldPrevent = false;
+  let listenerIds = [];
   
-  EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchstart', (e) => {
+  const touchStartHandler = (e) => {
     if (e.touches.length !== 1) return;
     lastY = e.touches[0].clientY;
     shouldPrevent = window.scrollY === 0;
-  }, { passive: false });
+  };
   
-  EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchmove', (e) => {
+  const touchMoveHandler = (e) => {
+    if (!shouldPrevent) return;
+    
     const deltaY = e.touches[0].clientY - lastY;
     lastY = e.touches[0].clientY;
     
-    if (shouldPrevent && deltaY > 0 && e.cancelable) {
+    if (deltaY > 0 && e.cancelable) {
       e.preventDefault();
     }
-  }, { passive: false });
+  };
+  
+  listenerIds.push(EventManager.add(document, 'touchstart', touchStartHandler, { passive: false }));
+  listenerIds.push(EventManager.add(document, 'touchmove', touchMoveHandler, { passive: false }));
   
   const style = document.createElement('style');
-  style.textContent = 'body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}';
+  style.textContent = 'body { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }';
   document.head.appendChild(style);
+  
+  const cleanup = () => {
+    listenerIds.forEach(id => EventManager.remove(id));
+    listenerIds = [];
+    style?.remove();
+  };
+  
+  return { cleanup };
 })();
 (() => {
   if (!isPWAMode()) return;
