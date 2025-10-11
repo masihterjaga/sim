@@ -6230,7 +6230,7 @@ function resetAllData() {
     RandomGenerator.reset();
   }
   
-  localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
+  clearPWAStorage()
   
   AppState.reset();
   ResetHelpers.clearDebounceTimers();
@@ -6282,7 +6282,7 @@ if ('serviceWorker' in navigator) {
         }
         
         if (storedVersion !== currentCache) {
-          if (confirm('New version available! Update now?\nYour progress will be saved.')) {
+          if (confirm('Update Available!\nDont worry, your stats will stay the same even if you’ve already done some calculations.')) {
             reloadApp(currentCache);
             return true;
           }
@@ -6476,14 +6476,19 @@ const CleanupManager = (() => {
   window.PWAPersistence = PWAPersistence;
   
   const cleanupPWAResources = () => {
+    /*
     CleanupManager.cleanupTimers();
     CleanupManager.cleanupManagers();
     CleanupManager.cleanupCache();
+    */
+    CleanupManager.cleanupAll();
   };
   
   const handlePWAExit = () => {
     if (AppState.get('isResultShown')) {
       PWAPersistence.snap();
+    } else {
+      localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
     }
     cleanupPWAResources();
   };
