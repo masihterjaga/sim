@@ -6039,7 +6039,10 @@ const stickyHandler = new StickyHandler();
   });
 })();
 
-// ========== CONSTANTS ==========
+// ========== PWA UTIL N FLOW==========
+const isPWAMode = () => 
+  window.matchMedia('(display-mode: standalone)').matches || 
+  window.navigator.standalone === true;
 const CONSTANTS = {
 /**
  * Still on working, pwa with proper flow n cleanup 🧹
@@ -6054,24 +6057,224 @@ const CONSTANTS = {
   SNACKBAR_DELAY: 300,
   SW_UPDATE_CHECK_DELAY: 500
 };
+if ('serviceWorker' in navigator) {
+  const PWAServiceWorker = (() => {
+    const saveState = () => PWAPersistence?.snap?.();
+    
+    const reloadApp = (cacheVersion = null) => {
+      if (cacheVersion) {
+        localStorage.setItem('app_cache_version', cacheVersion);
+      }
+      saveState();
+      window.location.reload(true);
+    };
+    
+    const checkCacheVersion = async () => {
+      if (!isPWAMode()) return false;
+      
+      try {
+        const cacheNames = await caches.keys();
+        const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
+        
+        if (!currentCache) return false;
+        
+        const storedVersion = localStorage.getItem('app_cache_version');
+        
+        if (!storedVersion) {
+          localStorage.setItem('app_cache_version', currentCache);
+          return false;
+        }
+        
+        if (storedVersion !== currentCache) {
+          if (confirm('Update Available!\nDont worry, your stats will stay the same even if you’ve already done some calculations.')) {
+            reloadApp(currentCache);
+            return true;
+          }
+        }
+        
+        return false;
+      } catch (e) {
+        return false;
+      }
+    };
+    
+    const registerSW = () => {
+      navigator.serviceWorker.register('/sim/sw.js', {
+          scope: '/sim/',
+          updateViaCache: 'none'
+        })
+        .then(registration => {
+          if (isPWAMode()) {
+            registration.update();
+            
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  checkCacheVersion();
+                }
+              });
+            });
+          }
+        })
+        .catch(() => {});
+    };
+    
+    const init = () => {
+      window.addEventListener('load', async () => {
+        if (isPWAMode()) {
+          const updated = await checkCacheVersion();
+          if (!updated) registerSW();
+          
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+          });
+        } else {
+          registerSW();
+        }
+      });
+      
+      if (isPWAMode()) {
+        document.addEventListener('visibilitychange', async () => {
+          if (!document.hidden) {
+            const reg = await navigator.serviceWorker.getRegistration('/sim/');
+            if (reg) {
+              await reg.update();
+              setTimeout(() => checkCacheVersion(), CONSTANTS.SW_UPDATE_CHECK_DELAY);
+            }
+          }
+        });
+      }
+    };
+    
+    return { init };
+  })();
+  
+  PWAServiceWorker.init();
+};
+const preventPullToRefresh = (() => {
+  if (!isPWAMode()) return;
+  let lastY = 0;
+  let shouldPrevent = false;
+  
+  EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchstart', (e) => {
+    if (e.touches.length !== 1) return;
+    lastY = e.touches[0].clientY;
+    shouldPrevent = window.scrollY === 0;
+  }, { passive: false });
+  
+  EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchmove', (e) => {
+    const deltaY = e.touches[0].clientY - lastY;
+    lastY = e.touches[0].clientY;
+    
+    if (shouldPrevent && deltaY > 0 && e.cancelable) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+  
+  const style = document.createElement('style');
+  style.textContent = 'body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}';
+  document.head.appendChild(style);
+})();
+(() => {
+  if (!isPWAMode()) return;
+  const PWAPersistence = (() => {
+    const collectFormValues = () => {
+      const values = {};
+      document.querySelectorAll(CONSTANTS.FORM_SELECTORS).forEach(el => {
+        if (el.id && el.value) values[el.id] = el.value;
+      });
+      return values;
+    };
+    
+    const snap = () => {
+      try {
+        localStorage.setItem(CONSTANTS.PWA_STORAGE_KEY, JSON.stringify({
+          form: collectFormValues(),
+          isResultShown: true,
+          ts: Date.now()
+        }));
+        return true;
+      } catch (e) {
+        return false;
+      }
+    };
+    
+    const restore = () => {
+      try {
+        const saved = localStorage.getItem(CONSTANTS.PWA_STORAGE_KEY);
+        if (!saved) return false;
+        
+        const state = JSON.parse(saved);
+        
+        if (Date.now() - state.ts > CONSTANTS.PWA_EXPIRY_MS) {
+          localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
+          return false;
+        }
+        
+        Object.entries(state.form).forEach(([id, val]) => {
+          const el = document.getElementById(id);
+          if (el) el.value = val;
+        });
+        
+        if (state.isResultShown && typeof processMainCalculation === 'function') {
+          setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
+        }
+        
+        return true;
+      } catch (e) {
+        localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
+        return false;
+      }
+    };
+    
+    return { snap, restore };
+  })();
+  
+  window.PWAPersistence = PWAPersistence;
+  
+  const handlePWAExit = () => {
+    if (AppState.get('isResultShown')) {
+      PWAPersistence.snap();
+    }
+    CleanupManager.cleanupAll();
+  };
+  
+  const init = () => {
+    PWAPersistence.restore();
+    
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'visibilitychange', () => {
+      if (document.hidden) {
+        handlePWAExit();
+      }
+    }, { capture: true });
+    
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', () => {
+      CleanupManager.cleanupListeners();
+      handlePWAExit();
+    }, { capture: true });
+  };
+  
+  document.addEventListener('DOMContentLoaded', () => {
+    init();
+  });
+  
+  window.clearPWAStorage = () => {
+    try {
+      localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
+      EventManager.removeNS(CONSTANTS.PWA_NAMESPACE);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+})();
 
-// ========== UTILITIES ==========
-const isPWAMode = () => 
-  window.matchMedia('(display-mode: standalone)').matches || 
-  window.navigator.standalone === true;
-
-// ========== CLEAR CACHE ==========
-function clearCache(type = null) {
-  if (type) {
-    cache.clear(type);
-  } else {
-    cache.clear();
-    cache.rewarm();
-    RandomGenerator.reset();
-  }
-}
-
-// ========== RESET HELPERS ==========
+// ========== RESET SYSTEM ==========
 const ResetHelpers = {
   clearDebounceTimers() {
     if (window.debounceCleanupInterval) {
@@ -6221,143 +6424,6 @@ const ResetHelpers = {
     }
   }
 };
-
-// ========== RESET SYSTEM ==========
-function resetAllData() {
-  if (!confirm('Reset all data and inputs?')) return;
-
-  const shouldClearCache = confirm('Also clear calculation cache?');
-
-  if (shouldClearCache) {
-    cache.clear();
-    cache.rewarm();
-    RandomGenerator.reset();
-  }
-  
-  clearPWAStorage()
-  
-  AppState.reset();
-  ResetHelpers.clearDebounceTimers();
-  ResetHelpers.resetDropdownManager();
-  ResetHelpers.resetStickyHandler();
-  ResetHelpers.resetValidation();
-  
-  SnackbarManager?.cleanup?.();
-  
-  ResetHelpers.resetFormInputs();
-  ResetHelpers.resetDisplayContainers();
-  ResetHelpers.resetButtons();
-  ResetHelpers.cleanupStickyStates();
-  ResetHelpers.resetSnackbar();
-  ResetHelpers.reinitializeComponents();
-  ResetHelpers.scrollToTop();
-
-  const message = shouldClearCache ? 'All data and cache cleared!' : 'All data reset!';
-  setTimeout(() => showSnackbar?.(message), CONSTANTS.SNACKBAR_DELAY);
-}
-
-// ========== PWA SERVICE WORKER ==========
-if ('serviceWorker' in navigator) {
-  const PWAServiceWorker = (() => {
-    const saveState = () => PWAPersistence?.snap?.();
-    
-    const reloadApp = (cacheVersion = null) => {
-      if (cacheVersion) {
-        localStorage.setItem('app_cache_version', cacheVersion);
-      }
-      saveState();
-      window.location.reload(true);
-    };
-    
-    const checkCacheVersion = async () => {
-      if (!isPWAMode()) return false;
-      
-      try {
-        const cacheNames = await caches.keys();
-        const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
-        
-        if (!currentCache) return false;
-        
-        const storedVersion = localStorage.getItem('app_cache_version');
-        
-        if (!storedVersion) {
-          localStorage.setItem('app_cache_version', currentCache);
-          return false;
-        }
-        
-        if (storedVersion !== currentCache) {
-          if (confirm('Update Available!\nDont worry, your stats will stay the same even if you’ve already done some calculations.')) {
-            reloadApp(currentCache);
-            return true;
-          }
-        }
-        
-        return false;
-      } catch (e) {
-        return false;
-      }
-    };
-    
-    const registerSW = () => {
-      navigator.serviceWorker.register('/sim/sw.js', {
-        scope: '/sim/',
-        updateViaCache: 'none'
-      })
-        .then(registration => {
-          if (isPWAMode()) {
-            registration.update();
-            
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  checkCacheVersion();
-                }
-              });
-            });
-          }
-        })
-        .catch(() => {});
-    };
-    
-    const init = () => {
-      window.addEventListener('load', async () => {
-        if (isPWAMode()) {
-          const updated = await checkCacheVersion();
-          if (!updated) registerSW();
-          
-          let refreshing = false;
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (refreshing) return;
-            refreshing = true;
-            window.location.reload();
-          });
-        } else {
-          registerSW();
-        }
-      });
-      
-      if (isPWAMode()) {
-        document.addEventListener('visibilitychange', async () => {
-          if (!document.hidden) {
-            const reg = await navigator.serviceWorker.getRegistration('/sim/');
-            if (reg) {
-              await reg.update();
-              setTimeout(() => checkCacheVersion(), CONSTANTS.SW_UPDATE_CHECK_DELAY);
-            }
-          }
-        });
-      }
-    };
-    
-    return { init };
-  })();
-  
-  PWAServiceWorker.init();
-}
-
-// ========== CLEANUP MANAGER ==========
 const CleanupManager = (() => {
   let isCleaningUp = false;
   
@@ -6419,127 +6485,48 @@ const CleanupManager = (() => {
     cleanupAll 
   };
 })();
+function clearCache(type = null) {
+  if (type) {
+    cache.clear(type);
+  } else {
+    cache.clear();
+    cache.rewarm();
+    RandomGenerator.reset();
+  }
+}
+function resetAllData() {
+  if (!confirm('Reset all data and inputs?')) return;
 
-// ========== PWA STATE PERSISTENCE ==========
-(() => {
-  if (!isPWAMode()) return;
-  
-  const preventPullToRefresh = (() => {
-    let lastY = 0;
-    let shouldPrevent = false;
-    
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchstart', (e) => {
-      if (e.touches.length !== 1) return;
-      lastY = e.touches[0].clientY;
-      shouldPrevent = window.scrollY === 0;
-    }, { passive: false });
-    
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchmove', (e) => {
-      const deltaY = e.touches[0].clientY - lastY;
-      lastY = e.touches[0].clientY;
-      
-      if (shouldPrevent && deltaY > 0 && e.cancelable) {
-        e.preventDefault();
-      }
-    }, { passive: false });
-    
-    const style = document.createElement('style');
-    style.textContent = 'body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}';
-    document.head.appendChild(style);
-  })();
-  
-  const PWAPersistence = (() => {
-    const collectFormValues = () => {
-      const values = {};
-      document.querySelectorAll(CONSTANTS.FORM_SELECTORS).forEach(el => {
-        if (el.id && el.value) values[el.id] = el.value;
-      });
-      return values;
-    };
-    
-    const snap = () => {
-      try {
-        localStorage.setItem(CONSTANTS.PWA_STORAGE_KEY, JSON.stringify({
-          form: collectFormValues(),
-          isResultShown: true,
-          ts: Date.now()
-        }));
-        return true;
-      } catch (e) {
-        return false;
-      }
-    };
-    
-    const restore = () => {
-      try {
-        const saved = localStorage.getItem(CONSTANTS.PWA_STORAGE_KEY);
-        if (!saved) return false;
-        
-        const state = JSON.parse(saved);
-        
-        if (Date.now() - state.ts > CONSTANTS.PWA_EXPIRY_MS) {
-          localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
-          return false;
-        }
-        
-        Object.entries(state.form).forEach(([id, val]) => {
-          const el = document.getElementById(id);
-          if (el) el.value = val;
-        });
-        
-        if (state.isResultShown && typeof processMainCalculation === 'function') {
-          setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
-        }
-        
-        return true;
-      } catch (e) {
-        localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
-        return false;
-      }
-    };
-    
-    return { snap, restore };
-  })();
-  
-  window.PWAPersistence = PWAPersistence;
+  const shouldClearCache = confirm('Also clear calculation cache?');
 
-  const handlePWAExit = () => {
-    if (AppState.get('isResultShown')) {
-      PWAPersistence.snap();
-    } 
-    CleanupManager.cleanupAll();
-  };
-
-  const init = () => {
-    PWAPersistence.restore();
-    
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'visibilitychange', () => {
-      if (document.hidden) {
-        handlePWAExit();
-      }
-    }, { capture: true });
-    
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', () => {
-      CleanupManager.cleanupListeners();
-      handlePWAExit();
-    }, { capture: true });
-  };
+  if (shouldClearCache) {
+    cache.clear();
+    cache.rewarm();
+    RandomGenerator.reset();
+  }
   
-  document.addEventListener('DOMContentLoaded', () => {
-    init();
-  });
+  clearPWAStorage()
   
-  window.clearPWAStorage = () => {
-    try {
-      localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
-      EventManager.removeNS(CONSTANTS.PWA_NAMESPACE);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-})();
+  AppState.reset();
+  ResetHelpers.clearDebounceTimers();
+  ResetHelpers.resetDropdownManager();
+  ResetHelpers.resetStickyHandler();
+  ResetHelpers.resetValidation();
+  
+  SnackbarManager?.cleanup?.();
+  
+  ResetHelpers.resetFormInputs();
+  ResetHelpers.resetDisplayContainers();
+  ResetHelpers.resetButtons();
+  ResetHelpers.cleanupStickyStates();
+  ResetHelpers.resetSnackbar();
+  ResetHelpers.reinitializeComponents();
+  ResetHelpers.scrollToTop();
 
-// ========== MORE N MAKE SURE VERY CLEAN ==========
+  const message = shouldClearCache ? 'All data and cache cleared!' : 'All data reset!';
+  setTimeout(() => showSnackbar?.(message), CONSTANTS.SNACKBAR_DELAY);
+}
+
+// ========== NEW BORN ==========
 EventManager.add(window, 'beforeunload', CleanupManager.cleanupAll);
 window.__forceCleanup = CleanupManager.cleanupAll;
