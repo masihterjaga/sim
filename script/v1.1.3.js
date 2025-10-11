@@ -6284,26 +6284,10 @@ if ('serviceWorker' in navigator) {
     }
   };
   
-  // Handle new service worker state changes
-  const handleNewWorker = (newWorker) => {
-    newWorker.addEventListener('statechange', () => {
-      if (newWorker.state !== 'installed' || !navigator.serviceWorker.controller) return;
-      
-      if (isPWA && confirm('Update available! Reload to get the latest version?')) {
-        saveState();
-        newWorker.postMessage({ action: 'skipWaiting' });
-        window.location.reload();
-      }
-    });
-  };
-  
   // Register service worker and listen for updates
   const registerSW = () => {
     navigator.serviceWorker.register('./sw.js')
       .then(registration => {
-        registration.addEventListener('updatefound', () => {
-          handleNewWorker(registration.installing);
-        });
         registration.update();
       })
       .catch(err => {});
