@@ -6039,6 +6039,23 @@ const stickyHandler = new StickyHandler();
   });
 })();
 
+// ========== CONSTANTS ==========
+const CONSTANTS = {
+  PWA_STORAGE_KEY: 'pwa_snap',
+  PWA_EXPIRY_MS: 691200000, // 8 days
+  PWA_RESTORE_DELAY_MS: 200,
+  PWA_NAMESPACE: 'pwa_persistence',
+  FORM_SELECTORS: 'select, input[type="number"]',
+  SCROLL_OFFSET: 80,
+  SNACKBAR_DELAY: 300,
+  SW_UPDATE_CHECK_DELAY: 1000
+};
+
+// ========== UTILITIES ==========
+const isPWAMode = () => 
+  window.matchMedia('(display-mode: standalone)').matches || 
+  window.navigator.standalone === true;
+
 // ========== CLEAR CACHE ==========
 function clearCache(type = null) {
   if (type) {
@@ -6050,65 +6067,52 @@ function clearCache(type = null) {
   }
 }
 
-// ========== RESET SYSTEM ==========
-function resetAllData() {
-  if (!confirm('Reset all data and inputs?')) return;
+// ========== RESET HELPERS ==========
+const ResetHelpers = {
+  clearDebounceTimers() {
+    if (window.debounceCleanupInterval) {
+      clearInterval(window.debounceCleanupInterval);
+      window.debounceCleanupInterval = null;
+    }
+    
+    if (window.debounceMap) {
+      window.debounceMap.forEach(data => {
+        if (data?.timerId) clearTimeout(data.timerId);
+      });
+      window.debounceMap.clear();
+    }
+  },
 
-  const shouldClearCache = confirm('Also clear calculation cache?');
-
-  // Clear cache if requested
-  if (shouldClearCache) {
-    cache.clear();
-    cache.rewarm();
-    RandomGenerator.reset();
-  }
-
-  // Reset AppState
-  AppState.reset();
-
-  // Clear debounce timers
-  if (debounceCleanupInterval) {
-    clearInterval(debounceCleanupInterval);
-    debounceCleanupInterval = null;
-  }
-  debounceMap.forEach(data => {
-    if (data?.timerId) clearTimeout(data.timerId);
-  });
-  debounceMap.clear();
-
-  // Reset Dropdown Manager state
-  if (typeof dropdownManager !== 'undefined') {
+  resetDropdownManager() {
+    if (typeof dropdownManager === 'undefined') return;
+    
     dropdownManager.state.selectionOrder = [];
     dropdownManager.state.lockStates.clear();
     dropdownManager.state.isSwapping = false;
+    
     if (dropdownManager.state.updateTimer) {
       clearTimeout(dropdownManager.state.updateTimer);
       dropdownManager.state.updateTimer = null;
     }
-  }
+  },
 
-  // Reset Sticky Handler state (synced with new structure)
-  if (typeof stickyHandler !== 'undefined') {
-    // Cancel RAF
+  resetStickyHandler() {
+    if (typeof stickyHandler === 'undefined') return;
+
     if (stickyHandler.scrollRAF) {
       cancelAnimationFrame(stickyHandler.scrollRAF);
       stickyHandler.scrollRAF = null;
     }
 
-    // Clear all timeouts
-    if (stickyHandler.clearAllTimeouts) {
-      stickyHandler.clearAllTimeouts();
-    }
+    stickyHandler.clearAllTimeouts?.();
 
-    // Reset state
     if (stickyHandler.state) {
       stickyHandler.state.isActive = false;
       stickyHandler.state.isCollapsed = false;
       stickyHandler.state.animating = false;
     }
 
-    // Clean up buttons
-    const buttons = stickyHandler.getOrderedButtons ? stickyHandler.getOrderedButtons() : [];
+    const buttons = stickyHandler.getOrderedButtons?.() || [];
     buttons.forEach(button => {
       button.classList.remove('sticky', 'collapsed');
       button.style.cssText = '';
@@ -6117,244 +6121,248 @@ function resetAllData() {
       }
     });
 
-    // Reset toggle button
     const toggleBtn = stickyHandler.elements?.get('toggleBtn');
-    if (toggleBtn) {
-      toggleBtn.dataset.collapse = 'false';
-    }
-  }
+    if (toggleBtn) toggleBtn.dataset.collapse = 'false';
+  },
 
-  // Reset Validation state
-  if (typeof ValidationSSoTInstance !== 'undefined') {
+  resetValidation() {
+    if (typeof ValidationSSoTInstance === 'undefined') return;
+    
     ValidationSSoTInstance.touchedFields.clear();
     ValidationSSoTInstance.snackbarCooldowns.clear();
-  }
+  },
 
-  // Clear Snackbar keyboard listeners
-  if (typeof SnackbarManager !== 'undefined' && SnackbarManager.cleanup) {
-    SnackbarManager.cleanup();
-  }
+  resetFormInputs() {
+    document.querySelectorAll('input[type="number"], input[type="text"], select, textarea').forEach(el => {
+      el.value = '';
+      el.disabled = false;
+      el.classList.remove('invalid-value');
 
-  // Reset all form inputs
-  document.querySelectorAll('input[type="number"], input[type="text"], select, textarea').forEach(el => {
-    el.value = '';
-    el.disabled = false;
-    el.classList.remove('invalid-value');
+      const wrapper = el.closest('.input-wrap');
+      if (wrapper) {
+        wrapper.classList.remove('locked');
+        delete wrapper.dataset.tempUnlocked;
+      }
+    });
+  },
 
-    const wrapper = el.closest('.input-wrap');
-    if (wrapper) {
-      wrapper.classList.remove('locked');
-      delete wrapper.dataset.tempUnlocked;
+  resetDisplayContainers() {
+    if (DOM_ELEMENTS.hasil) {
+      DOM_ELEMENTS.hasil.innerHTML = '';
+      DOM_ELEMENTS.hasil.textContent = 'Input your stats to see the result...';
+      delete DOM_ELEMENTS.hasil.dataset.showFullPrecision;
+      delete DOM_ELEMENTS.hasil.dataset.specificMode;
     }
-  });
 
-  // Reset display containers
-  if (DOM_ELEMENTS.hasil) {
-    DOM_ELEMENTS.hasil.innerHTML = '';
-    DOM_ELEMENTS.hasil.textContent = 'Input your stats to see the result...';
-    delete DOM_ELEMENTS.hasil.dataset.showFullPrecision;
-    delete DOM_ELEMENTS.hasil.dataset.specificMode;
-  }
-
-  if (DOM_ELEMENTS.rec) {
-    DOM_ELEMENTS.rec.innerHTML = '';
-    DOM_ELEMENTS.rec.textContent = 'Balancing stat recommendations for a higher output multiplier.';
-  }
-
-  // Reset button states
-  if (DOM_ELEMENTS.submit) {
-    DOM_ELEMENTS.submit.disabled = false;
-    DOM_ELEMENTS.submit.textContent = "Calculate";
-  }
-
-  [DOM_ELEMENTS.resetRek, DOM_ELEMENTS.resetAll, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.testReaper].forEach(btn => {
-    if (btn) {
-      btn.disabled = true;
-      btn.classList.remove('activated');
+    if (DOM_ELEMENTS.rec) {
+      DOM_ELEMENTS.rec.innerHTML = '';
+      DOM_ELEMENTS.rec.textContent = 'Balancing stat recommendations for a higher output multiplier.';
     }
-  });
+  },
 
-  // Remove all sticky states from DOM (fallback cleanup)
-  document.querySelectorAll('.sticky').forEach(el => {
-    el.classList.remove('sticky', 'collapsed');
-    el.style.cssText = '';
-    if (el.dataset.originalText) {
-      el.textContent = el.dataset.originalText;
+  resetButtons() {
+    if (DOM_ELEMENTS.submit) {
+      DOM_ELEMENTS.submit.disabled = false;
+      DOM_ELEMENTS.submit.textContent = "Calculate";
     }
-  });
 
-  // Reset toggle button (fallback)
-  const toggleBtn = document.getElementById('toggleStickyBtn');
-  if (toggleBtn) {
-    toggleBtn.dataset.collapse = 'false';
+    [DOM_ELEMENTS.resetRek, DOM_ELEMENTS.resetAll, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.testReaper]
+      .forEach(btn => {
+        if (btn) {
+          btn.disabled = true;
+          btn.classList.remove('activated');
+        }
+      });
+  },
+
+  cleanupStickyStates() {
+    document.querySelectorAll('.sticky').forEach(el => {
+      el.classList.remove('sticky', 'collapsed');
+      el.style.cssText = '';
+      if (el.dataset.originalText) {
+        el.textContent = el.dataset.originalText;
+      }
+    });
+
+    const toggleBtn = document.getElementById('toggleStickyBtn');
+    if (toggleBtn) toggleBtn.dataset.collapse = 'false';
+  },
+
+  resetSnackbar() {
+    if (DOM_ELEMENTS.snackbar) {
+      DOM_ELEMENTS.snackbar.classList.remove('show');
+      DOM_ELEMENTS.snackbar.style.cssText = '';
+    }
+    delete window._lastSnackbarTime;
+  },
+
+  reinitializeComponents() {
+    if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
+      dropdownManager.populateAllDropdowns();
+      dropdownManager.updateAll();
+      dropdownManager.syncThreeSets();
+    }
+
+    ValidationSSoTInstance?.init?.();
+    stickyHandler?.updateSticky?.();
+  },
+
+  scrollToTop(smooth = true) {
+    if (DOM_ELEMENTS.topOfPage) {
+      const offsetTop = DOM_ELEMENTS.topOfPage.getBoundingClientRect().top + 
+        window.pageYOffset - CONSTANTS.SCROLL_OFFSET;
+      window.scrollTo({ top: offsetTop, behavior: smooth ? 'smooth' : 'auto' });
+    } else {
+      window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+    }
+  }
+};
+
+// ========== RESET SYSTEM ==========
+function resetAllData() {
+  if (!confirm('Reset all data and inputs?')) return;
+
+  const shouldClearCache = confirm('Also clear calculation cache?');
+
+  if (shouldClearCache) {
+    cache.clear();
+    cache.rewarm();
+    RandomGenerator.reset();
   }
 
-  // Reset snackbar
-  if (DOM_ELEMENTS.snackbar) {
-    DOM_ELEMENTS.snackbar.classList.remove('show');
-    DOM_ELEMENTS.snackbar.style.cssText = '';
-  }
+  AppState.reset();
+  ResetHelpers.clearDebounceTimers();
+  ResetHelpers.resetDropdownManager();
+  ResetHelpers.resetStickyHandler();
+  ResetHelpers.resetValidation();
+  
+  SnackbarManager?.cleanup?.();
+  
+  ResetHelpers.resetFormInputs();
+  ResetHelpers.resetDisplayContainers();
+  ResetHelpers.resetButtons();
+  ResetHelpers.cleanupStickyStates();
+  ResetHelpers.resetSnackbar();
+  ResetHelpers.reinitializeComponents();
+  ResetHelpers.scrollToTop();
 
-  // Clear global timestamps
-  delete window._lastSnackbarTime;
-
-  // Reinitialize components
-  if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
-    dropdownManager.populateAllDropdowns();
-    dropdownManager.updateAll();
-    dropdownManager.syncThreeSets();
-  }
-
-  if (typeof ValidationSSoTInstance !== 'undefined' && ValidationSSoTInstance.init) {
-    ValidationSSoTInstance.init();
-  }
-
-  if (typeof stickyHandler !== 'undefined' && stickyHandler.updateSticky) {
-    stickyHandler.updateSticky();
-  }
-
-  // Scroll to top
   const message = shouldClearCache ? 'All data and cache cleared!' : 'All data reset!';
-
-  if (DOM_ELEMENTS.topOfPage) {
-    const offsetTop = DOM_ELEMENTS.topOfPage.getBoundingClientRect().top + window.pageYOffset - 80;
-    window.scrollTo({
-      top: offsetTop,
-      behavior: 'smooth'
-    });
-  } else {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  }
-
-  if (typeof showSnackbar === 'function') {
-    setTimeout(() => showSnackbar(message), 300);
-  }
+  setTimeout(() => showSnackbar?.(message), CONSTANTS.SNACKBAR_DELAY);
 }
 
-// ======== BETA PWA ========
+// ========== PWA SERVICE WORKER ==========
 if ('serviceWorker' in navigator) {
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches ||
-    window.navigator.standalone === true;
-  
-  // Save current app state before reload
-  const saveState = () => {
-    typeof StateManager !== 'undefined' && StateManager.snap();
-  };
-  
-  // Reload app with optional cache version update
-  const reloadApp = (cacheVersion = null) => {
-    cacheVersion && localStorage.setItem('app_cache_version', cacheVersion);
-    saveState();
-    window.location.reload(true);
-  };
-  
-  // Check if cache version changed and prompt for update
-  const checkCacheVersion = async () => {
-    if (!isPWA) return false;
+  const PWAServiceWorker = (() => {
+    const saveState = () => PWAPersistence?.snap?.();
     
-    try {
-      const cacheNames = await caches.keys();
-      const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
+    const reloadApp = (cacheVersion = null) => {
+      if (cacheVersion) {
+        localStorage.setItem('app_cache_version', cacheVersion);
+      }
+      saveState();
+      window.location.reload(true);
+    };
+    
+    const checkCacheVersion = async () => {
+      if (!isPWAMode()) return false;
       
-      if (!currentCache) return false;
-      
-      const storedVersion = localStorage.getItem('app_cache_version');
-      
-      // First time initialization
-      if (!storedVersion) {
-        localStorage.setItem('app_cache_version', currentCache);
+      try {
+        const cacheNames = await caches.keys();
+        const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
+        
+        if (!currentCache) return false;
+        
+        const storedVersion = localStorage.getItem('app_cache_version');
+        
+        if (!storedVersion) {
+          localStorage.setItem('app_cache_version', currentCache);
+          return false;
+        }
+        
+        if (storedVersion !== currentCache) {
+          if (confirm('New version available! Update now?\nYour progress will be saved.')) {
+            reloadApp(currentCache);
+            return true;
+          }
+        }
+        
+        return false;
+      } catch (e) {
         return false;
       }
-      
-      // Version mismatch - prompt for update
-      if (storedVersion !== currentCache) {
-        if (confirm('New version available! Update now?\nYour progress will be saved.')) {
-          reloadApp(currentCache);
-          return true;
-        }
-      }
-      
-      return false;
-    } catch (e) {
-      return false;
-    }
-  };
-  
-  // Register service worker
-  const registerSW = () => {
-    navigator.serviceWorker.register('/sim/sw.js', {
-      scope: '/sim/',
-      updateViaCache: 'none'
-    })
-      .then(registration => {
-        if (isPWA) {
-          registration.update();
-          
-          // Listen for new SW waiting
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                // New SW ready, check cache version
-                checkCacheVersion();
-              }
-            });
-          });
-        }
+    };
+    
+    const registerSW = () => {
+      navigator.serviceWorker.register('/sim/sw.js', {
+        scope: '/sim/',
+        updateViaCache: 'none'
       })
-      .catch(err => {});
-  };
-  
-  // Initialize on page load
-  window.addEventListener('load', async () => {
-    if (isPWA) {
-      const updated = await checkCacheVersion();
-      !updated && registerSW();
-      
-      // Prevent duplicate reloads on controller change
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (refreshing) return;
-        refreshing = true;
-        window.location.reload();
-      });
-    } else {
-      registerSW();
-    }
-  });
-  
-  // Check for updates when app becomes visible
-  if (isPWA) {
-    document.addEventListener('visibilitychange', async () => {
-      if (!document.hidden) {
-        const reg = await navigator.serviceWorker.getRegistration('/sim/');
-        if (reg) {
-          await reg.update();
-          // Wait a bit for new SW to install
-          setTimeout(() => checkCacheVersion(), 1000);
+        .then(registration => {
+          if (isPWAMode()) {
+            registration.update();
+            
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  checkCacheVersion();
+                }
+              });
+            });
+          }
+        })
+        .catch(() => {});
+    };
+    
+    const init = () => {
+      window.addEventListener('load', async () => {
+        if (isPWAMode()) {
+          const updated = await checkCacheVersion();
+          if (!updated) registerSW();
+          
+          let refreshing = false;
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+          });
+        } else {
+          registerSW();
         }
+      });
+      
+      if (isPWAMode()) {
+        document.addEventListener('visibilitychange', async () => {
+          if (!document.hidden) {
+            const reg = await navigator.serviceWorker.getRegistration('/sim/');
+            if (reg) {
+              await reg.update();
+              setTimeout(() => checkCacheVersion(), CONSTANTS.SW_UPDATE_CHECK_DELAY);
+            }
+          }
+        });
       }
-    });
-  }
+    };
+    
+    return { init };
+  })();
+  
+  PWAServiceWorker.init();
 }
+
+// ========== CLEANUP MANAGER ==========
 const CleanupManager = (() => {
-  let debounceCleanupInterval = null;
-  const debounceMap = new Map();
+  let isCleaningUp = false;
   
   const cleanupListeners = () => {
-    // Cleanup EventManager listeners
     if (typeof EventManager !== 'undefined') {
       EventManager.forceCleanup?.();
       EventManager.removeAll?.();
     }
     
-    typeof AppState !== 'undefined' && AppState.clearListeners?.();
+    AppState?.clearListeners?.();
     
-    // Cleanup button listeners
     if (window._buttonListenerIds && typeof EventManager !== 'undefined') {
       window._buttonListenerIds.forEach(id => EventManager.remove?.(id));
       window._buttonListenerIds = [];
@@ -6362,83 +6370,66 @@ const CleanupManager = (() => {
   };
   
   const cleanupTimers = () => {
-    // Clear internal debounce interval
-    if (debounceCleanupInterval) {
-      clearInterval(debounceCleanupInterval);
-      debounceCleanupInterval = null;
-    }
-    
-    // Clear all debounce timers
-    debounceMap.forEach(data => data?.timerId && clearTimeout(data.timerId));
-    debounceMap.clear();
-    
-    // Clear global debounce map
-    if (window.debounceMap) {
-      window.debounceMap.forEach(t => clearTimeout(t));
-      window.debounceMap.clear();
-    }
+    ResetHelpers.clearDebounceTimers();
   };
   
   const cleanupManagers = () => {
-    typeof ValidationSSoTInstance !== 'undefined' && ValidationSSoTInstance?.destroy();
-    typeof TooltipManager !== 'undefined' && TooltipManager?.destroyAll();
-    typeof SnackbarManager !== 'undefined' && SnackbarManager?.cleanup();
-    typeof dropdownManager !== 'undefined' && dropdownManager?.destroy();
-    typeof stickyHandler !== 'undefined' && stickyHandler?.destroy();
-    typeof accordionManager !== 'undefined' && accordionManager?.destroy();
-    typeof modalManager !== 'undefined' && modalManager?.destroy();
+    ValidationSSoTInstance?.destroy?.();
+    TooltipManager?.destroyAll?.();
+    SnackbarManager?.cleanup?.();
+    dropdownManager?.destroy?.();
+    stickyHandler?.destroy?.();
+    accordionManager?.destroy?.();
+    modalManager?.destroy?.();
   };
   
   const cleanupCache = () => {
-    typeof cache !== 'undefined' && cache.clear();
-    typeof RandomGenerator !== 'undefined' && RandomGenerator.reset();
+    cache?.clear?.();
+    RandomGenerator?.reset?.();
     
     delete window._eventsAlreadyBound;
     delete window._lastSnackbarTime;
   };
   
   const cleanupAll = () => {
-    cleanupListeners();
-    cleanupTimers();
-    cleanupManagers();
-    cleanupCache();
+    if (isCleaningUp) return;
+    isCleaningUp = true;
+    
+    try {
+      cleanupListeners();
+      cleanupTimers();
+      cleanupManagers();
+      cleanupCache();
+    } finally {
+      isCleaningUp = false;
+    }
   };
   
-  return { cleanupListeners, cleanupTimers, cleanupManagers, cleanupCache, cleanupAll };
+  return { 
+    cleanupListeners, 
+    cleanupTimers, 
+    cleanupManagers, 
+    cleanupCache, 
+    cleanupAll 
+  };
 })();
-const cleanupAll = CleanupManager.cleanupAll;
-EventManager.add(window, 'beforeunload', cleanupAll);
-typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
 
+// ========== PWA STATE PERSISTENCE ==========
 (() => {
-  const isPWA = () => window.matchMedia('(display-mode: standalone)').matches || 
-    window.navigator.standalone;
+  if (!isPWAMode()) return;
   
-  // Exit early if not PWA
-  if (!isPWA()) return;
-  
-  const CONFIG = {
-    STORAGE_KEY: 'pwa_snap',
-    EXPIRY_MS: 691200000, // 8 days
-    RESTORE_DELAY_MS: 200,
-    SELECTORS: 'select, input[type="number"]',
-    NAMESPACE: 'pwa_persistence'
-  };
-  
-  const StateManager = (() => {
-    // Collect all form input values by ID
+  const PWAPersistence = (() => {
     const collectFormValues = () => {
       const values = {};
-      document.querySelectorAll(CONFIG.SELECTORS).forEach(el => {
-        el.id && el.value && (values[el.id] = el.value);
+      document.querySelectorAll(CONSTANTS.FORM_SELECTORS).forEach(el => {
+        if (el.id && el.value) values[el.id] = el.value;
       });
       return values;
     };
     
-    // Save current state to localStorage
     const snap = () => {
       try {
-        localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify({
+        localStorage.setItem(CONSTANTS.PWA_STORAGE_KEY, JSON.stringify({
           form: collectFormValues(),
           isResultShown: true,
           ts: Date.now()
@@ -6449,33 +6440,30 @@ typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
       }
     };
     
-    // Restore saved state from localStorage
     const restore = () => {
       try {
-        const saved = localStorage.getItem(CONFIG.STORAGE_KEY);
+        const saved = localStorage.getItem(CONSTANTS.PWA_STORAGE_KEY);
         if (!saved) return false;
         
         const state = JSON.parse(saved);
         
-        // Check if state expired
-        if (Date.now() - state.ts > CONFIG.EXPIRY_MS) {
-          localStorage.removeItem(CONFIG.STORAGE_KEY);
+        if (Date.now() - state.ts > CONSTANTS.PWA_EXPIRY_MS) {
+          localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
           return false;
         }
         
-        // Restore form values
         Object.entries(state.form).forEach(([id, val]) => {
           const el = document.getElementById(id);
-          el && (el.value = val);
+          if (el) el.value = val;
         });
         
-        // Trigger calculation if result was shown
-        state.isResultShown && typeof processMainCalculation === 'function' && 
-          setTimeout(processMainCalculation, CONFIG.RESTORE_DELAY_MS);
+        if (state.isResultShown && typeof processMainCalculation === 'function') {
+          setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
+        }
         
         return true;
       } catch (e) {
-        localStorage.removeItem(CONFIG.STORAGE_KEY);
+        localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
         return false;
       }
     };
@@ -6483,55 +6471,58 @@ typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
     return { snap, restore };
   })();
   
-  // Cleanup resources without listeners
-  const cleanupResources = () => {
+  window.PWAPersistence = PWAPersistence;
+  
+  const cleanupPWAResources = () => {
     CleanupManager.cleanupTimers();
     CleanupManager.cleanupManagers();
     CleanupManager.cleanupCache();
   };
   
-  const init = () => {
-    StateManager.restore();
-    
-    // Handle app exit (visibility change or page hide)
-    const handleExit = () => {
-      CleanupManager.cleanupListeners();
-      AppState.get('isResultShown') && StateManager.snap();
-      cleanupResources();
-    };
-    
-    EventManager.addNS(CONFIG.NAMESPACE, document, 'visibilitychange', () => {
-      document.hidden && handleExit();
-    }, { capture: true });
-    
-    EventManager.addNS(CONFIG.NAMESPACE, window, 'pagehide', handleExit, { capture: true });
-    
-    // Expose cleanup function
-    window.__pwaPersistenceCleanup = () => EventManager.removeNS(CONFIG.NAMESPACE);
+  const handlePWAExit = () => {
+    if (AppState.get('isResultShown')) {
+      PWAPersistence.snap();
+    }
+    cleanupPWAResources();
   };
   
-  // Prevent pull-to-refresh gesture on mobile
   const preventPullToRefresh = () => {
     let lastY = 0;
     let shouldPrevent = false;
     
-    EventManager.addNS(CONFIG.NAMESPACE, document, 'touchstart', (e) => {
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchstart', (e) => {
       if (e.touches.length !== 1) return;
       lastY = e.touches[0].clientY;
       shouldPrevent = window.scrollY === 0;
     }, { passive: false });
     
-    EventManager.addNS(CONFIG.NAMESPACE, document, 'touchmove', (e) => {
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'touchmove', (e) => {
       const deltaY = e.touches[0].clientY - lastY;
       lastY = e.touches[0].clientY;
       
-      shouldPrevent && deltaY > 0 && e.cancelable && e.preventDefault();
+      if (shouldPrevent && deltaY > 0 && e.cancelable) {
+        e.preventDefault();
+      }
     }, { passive: false });
     
-    // Apply overscroll containment via CSS
     const style = document.createElement('style');
     style.textContent = 'body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}';
     document.head.appendChild(style);
+  };
+  
+  const init = () => {
+    PWAPersistence.restore();
+    
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'visibilitychange', () => {
+      if (document.hidden) {
+        handlePWAExit();
+      }
+    }, { capture: true });
+    
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', () => {
+      CleanupManager.cleanupListeners();
+      handlePWAExit();
+    }, { capture: true });
   };
   
   document.addEventListener('DOMContentLoaded', () => {
@@ -6539,10 +6530,10 @@ typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
     init();
   });
   
-  // Utility to manually clear PWA storage
   window.clearPWAStorage = () => {
     try {
-      localStorage.removeItem(CONFIG.STORAGE_KEY);
+      localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
+      EventManager.removeNS(CONSTANTS.PWA_NAMESPACE);
       return true;
     } catch (e) {
       return false;
@@ -6550,10 +6541,6 @@ typeof window !== 'undefined' && (window.__forceCleanup = cleanupAll);
   };
 })();
 
-// Cleanup on page hide for non-PWA environments
-window.addEventListener('pagehide', () => {
-  const isPWA = window.matchMedia('(display-mode: standalone)').matches || 
-    window.navigator.standalone;
-  
-  !isPWA && CleanupManager.cleanupAll();
-});
+// ========== GLOBAL CLEANUP ==========
+EventManager.add(window, 'beforeunload', CleanupManager.cleanupAll);
+window.__forceCleanup = CleanupManager.cleanupAll;
