@@ -6520,7 +6520,7 @@ function resetAllData() {
     RandomGenerator.reset();
   }
   
-  clearPWAStorage()
+  clearPWAStorage();
   
   AppState.reset();
   ResetHelpers.clearDebounceTimers();
@@ -6543,5 +6543,5 @@ function resetAllData() {
 }
 
 // ========== NEW BORN ==========
-EventManager.add(window, 'beforeunload', CleanupManager.cleanupAll);
+EventManager.add(window, 'beforeunload', CleanupManager.cleanupListeners);
 window.__forceCleanup = CleanupManager.cleanupAll;
