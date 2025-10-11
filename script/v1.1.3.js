@@ -6538,4 +6538,4 @@ function resetAllData() {
 }
 
 // ========== NEW BORN ==========
-// EventManager.add(window, 'beforeunload', CleanupManager.cleanupListeners);
+//EventManager.add(window, 'beforeunload', CleanupManager.cleanupListeners);
