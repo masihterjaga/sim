@@ -6286,7 +6286,7 @@ if ('serviceWorker' in navigator) {
   
   // Register service worker and listen for updates
   const registerSW = () => {
-    navigator.serviceWorker.register('./sw.js')
+    navigator.serviceWorker.register('/sim/sw.js')
       .then(registration => {
         registration.update();
       })
