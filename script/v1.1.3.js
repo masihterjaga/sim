@@ -6237,6 +6237,7 @@ const preventPullToRefresh = (() => {
         
         if (state.isResultShown && typeof processMainCalculation === 'function') {
           setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
+          scrollAndFocusElement(DOM_ELEMENTS.stickyStart);
         }
         
         return true;
