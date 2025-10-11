@@ -6161,7 +6161,6 @@ const preventPullToRefresh = (() => {
   
   let lastY = 0;
   let shouldPrevent = false;
-  let listenerIds = [];
   
   const touchStartHandler = (e) => {
     if (e.touches.length !== 1) return;
@@ -6180,16 +6179,16 @@ const preventPullToRefresh = (() => {
     }
   };
   
-  listenerIds.push(EventManager.add(document, 'touchstart', touchStartHandler, { passive: false }));
-  listenerIds.push(EventManager.add(document, 'touchmove', touchMoveHandler, { passive: false }));
+  document.addEventListener('touchstart', touchStartHandler, { passive: false });
+  document.addEventListener('touchmove', touchMoveHandler, { passive: false });
   
   const style = document.createElement('style');
   style.textContent = 'body { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }';
   document.head.appendChild(style);
   
   const cleanup = () => {
-    listenerIds.forEach(id => EventManager.remove(id));
-    listenerIds = [];
+    document.removeEventListener('touchstart', touchStartHandler);
+    document.removeEventListener('touchmove', touchMoveHandler);
     style?.remove();
   };
   
