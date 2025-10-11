@@ -6272,7 +6272,7 @@ if ('serviceWorker' in navigator) {
       
       // Version mismatch - prompt for update (only in PWA)
       if (storedVersion !== currentCache && isPWA) {
-        if (confirm('New version available! Update now?\n\nYour progress will be saved.')) {
+        if (confirm('New version available! Update now?\nYour progress will be saved.')) {
           reloadApp(currentCache);
           return true;
         }
@@ -6286,7 +6286,9 @@ if ('serviceWorker' in navigator) {
   
   // Register service worker and listen for updates
   const registerSW = () => {
-    navigator.serviceWorker.register('/sim/sw.js')
+    navigator.serviceWorker.register('/sim/sw.js', {
+      scope: '/sim/'
+    })
       .then(registration => {
         registration.update();
       })
