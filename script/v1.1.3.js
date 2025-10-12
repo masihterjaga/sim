@@ -6229,6 +6229,8 @@ const preventPullToRefresh = (() => {
           if (el) el.value = val;
         });
         
+        ResetHelpers.reinitializeComponents();
+
         if (state.isResultShown && typeof processMainCalculation === 'function') {
           setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
         }
@@ -6267,6 +6269,7 @@ const preventPullToRefresh = (() => {
   
   document.addEventListener('DOMContentLoaded', () => {
     init();
+    
   });
   
   window.clearPWAStorage = () => {
