@@ -4451,18 +4451,12 @@ const smoothDebounce = (fn, delay, key) => {
 
   const timerId = setTimeout(() => {
     const existing = debounceMap.get(key);
-    debounceMap.set(key, {
-      ...existing,
-      running: true
-    });
+    debounceMap.set(key, { ...existing, running: true });
     fn();
     debounceMap.delete(key);
   }, delay);
 
-  debounceMap.set(key, {
-    timerId,
-    running: false
-  });
+  debounceMap.set(key, { timerId, running: false });
 };
 function simulateFlash(event) {
   if (!AppState.get('isResultShown')) return;
@@ -4471,8 +4465,7 @@ function simulateFlash(event) {
     buttonCooldown: 1600,
     flashTrigger: 150,
     calculationDelayOn: 950,
-    calculationDelayOff: 100,
-    animationDuration: 1800
+    calculationDelayOff: 100
   };
 
   const btn = event?.currentTarget;
@@ -4494,7 +4487,8 @@ function simulateFlash(event) {
 
   const isTransitionToOn = !wasActive && isNowActive;
 
-  if (isTransitionToOn && AppState.get('currentAnimatingWeapon') && AppState.get('currentAnimatingWeapon') !== prefix) {
+  if (isTransitionToOn && AppState.get('currentAnimatingWeapon') && 
+      AppState.get('currentAnimatingWeapon') !== prefix) {
     ['flash', 'calc'].forEach(type => {
       const key = `${oppositePrefix}-${type}`;
       const timeout = debounceMap.get(key);
@@ -4517,7 +4511,10 @@ function simulateFlash(event) {
     DOM_ELEMENTS.submit.textContent = "Calculating...";
   }
 
-  const calcDelay = isTransitionToOn ? TIMING.calculationDelayOn : TIMING.calculationDelayOff;
+  const calcDelay = isTransitionToOn 
+    ? TIMING.calculationDelayOn 
+    : TIMING.calculationDelayOff;
+
   smoothDebounce(() => {
     if (typeof processMainCalculation === 'function') {
       processMainCalculation();
@@ -4530,11 +4527,9 @@ function simulateFlash(event) {
   if (typeof showSnackbar === 'function') {
     showSnackbar(`${weaponName} ${statusText}`);
   }
-};
+}
 function triggerPulseFlash() {
-  if (!AppState.get('isResultShown')) return;
-  if (!isMobile()) return;
-  if (AppState.get('isFlashActive')) return;
+  if (!AppState.get('isResultShown') || !isMobile() || AppState.get('isFlashActive')) return;
 
   const TIMING = {
     animationDuration: 1800,
@@ -4572,9 +4567,9 @@ function triggerPulseFlash() {
       }
     }, TIMING.emergencyCleanup);
   });
-};
+}
 
-// ========== NOTIFICATION ==========
+// ======== SNACKBAR ========
 const SnackbarManager = (() => {
   let hideTimer = null;
   let trackingKeyboard = false;
@@ -4600,6 +4595,11 @@ const SnackbarManager = (() => {
     
     const gap = window.innerHeight - vp.height;
     return (gap > 50 && gap < window.innerHeight * 0.7) ? gap : 0;
+  };
+
+  const clearTimer = (timer) => {
+    if (timer) clearTimeout(timer);
+    return null;
   };
   
   const updatePosition = () => {
@@ -4627,8 +4627,9 @@ const SnackbarManager = (() => {
     lastBottom = -1;
     
     if (enable) {
-      EventManager.addNS(`${NS}_viewport`, vp, 'resize', updatePosition, { passive: true });
-      EventManager.addNS(`${NS}_viewport`, vp, 'scroll', updatePosition, { passive: true });
+      const passiveOpt = { passive: true };
+      EventManager.addNS(`${NS}_viewport`, vp, 'resize', updatePosition, passiveOpt);
+      EventManager.addNS(`${NS}_viewport`, vp, 'scroll', updatePosition, passiveOpt);
     } else {
       EventManager.removeNS(`${NS}_viewport`);
       const el = DOM_ELEMENTS?.snackbar;
@@ -4640,10 +4641,7 @@ const SnackbarManager = (() => {
     const el = DOM_ELEMENTS?.snackbar;
     if (!el || !message) return;
     
-    if (hideTimer) {
-      clearTimeout(hideTimer);
-      hideTimer = null;
-    }
+    hideTimer = clearTimer(hideTimer);
     
     el.textContent = message;
     el.classList.remove('show');
@@ -4668,10 +4666,7 @@ const SnackbarManager = (() => {
   };
   
   const handleWindowResize = () => {
-    if (viewportChangeTimer) {
-      clearTimeout(viewportChangeTimer);
-      viewportChangeTimer = null;
-    }
+    viewportChangeTimer = clearTimer(viewportChangeTimer);
     
     viewportChangeTimer = setTimeout(() => {
       const el = DOM_ELEMENTS?.snackbar;
@@ -4700,15 +4695,8 @@ const SnackbarManager = (() => {
   return {
     show,
     cleanup: () => {
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        hideTimer = null;
-      }
-      
-      if (viewportChangeTimer) {
-        clearTimeout(viewportChangeTimer);
-        viewportChangeTimer = null;
-      }
+      hideTimer = clearTimer(hideTimer);
+      viewportChangeTimer = clearTimer(viewportChangeTimer);
       
       EventManager.removeNS(NS);
       EventManager.removeNS(`${NS}_viewport`);
@@ -4736,9 +4724,7 @@ const scrollAndFocusElement = (el, msg) => {
   });
 
   if (!el.disabled) {
-    el.focus({
-      preventScroll: true
-    });
+    el.focus({ preventScroll: true });
   }
 
   return false;
@@ -5115,7 +5101,6 @@ const TooltipManager = (() => {
     initializeElement
   };
 })();
-
 const setupTooltips = (config) => {
   TooltipManager.setConfig(config);
 
@@ -5131,7 +5116,6 @@ const setupTooltips = (config) => {
     });
   });
 };
-
 setupTooltips({
   "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are two <strong>different</strong> things! Look for it in your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set 0.",
   "#targetRaceTips": "Specific MVP/MINi will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target spesific race!",
