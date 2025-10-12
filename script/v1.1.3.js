@@ -5035,16 +5035,17 @@ const TooltipManager = (() => {
     const hide = () => {
       if (!isVisible) return;
 
+      isVisible = false;
+      
       // Animate out
       tooltip.style.opacity = '0';
       tooltip.style.transform = tooltip.style.transform.replace(' scale(1)', ' scale(0.95)');
       
-      tooltip.classList.remove('show');
-      isVisible = false;
-
-      hideTimer = setTimeout(() => {
+      // Wait for animation to complete before cleanup
+      setTimeout(() => {
+        tooltip.classList.remove('show');
         cleanup();
-      }, CONFIG.HIDE_DELAY);
+      }, 200); // Match transition duration
     };
 
     const handleOutsideClick = (e) => {
@@ -5257,14 +5258,20 @@ const accordionManager = (() => {
 
     const animateOpen = () => {
       details.setAttribute('open', '');
-      setStyles(content, '0px', 0.3);
+      content.style.maxHeight = '0px';
+      content.style.opacity = '0.3';
 
       currentAnimation = requestAnimationFrame(() => {
         const targetHeight = content.scrollHeight + 'px';
-        setStyles(content, targetHeight, 1);
+        content.style.maxHeight = targetHeight;
+        content.style.opacity = '1';
 
-        const onTransitionEnd = () => {
-          setStyles(content, 'none', 1);
+        const onTransitionEnd = (e) => {
+          // Only respond to max-height transition
+          if (e.propertyName !== 'max-height') return;
+          
+          content.style.maxHeight = 'none';
+          content.style.opacity = '1';
           isAnimating = false;
           if (transitionListenerId !== null) {
             EventManager.remove(transitionListenerId);
@@ -5277,12 +5284,17 @@ const accordionManager = (() => {
 
     const animateClose = () => {
       const currentHeight = content.scrollHeight + 'px';
-      setStyles(content, currentHeight, 1);
+      content.style.maxHeight = currentHeight;
+      content.style.opacity = '1';
 
       currentAnimation = requestAnimationFrame(() => {
-        setStyles(content, '0px', 0.3);
+        content.style.maxHeight = '0px';
+        content.style.opacity = '0.3';
 
-        const onTransitionEnd = () => {
+        const onTransitionEnd = (e) => {
+          // Only respond to max-height transition
+          if (e.propertyName !== 'max-height') return;
+          
           details.removeAttribute('open');
           isAnimating = false;
           if (transitionListenerId !== null) {

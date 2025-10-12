@@ -1032,7 +1032,6 @@ td.delta:hover {
   padding: 16px 16px 16px 20px;
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, .1);
   cursor: pointer;
-  transition: .25s cubic-bezier(.4, 0, .2, 1);
 }
 
 #howto summary:hover {
@@ -1047,7 +1046,6 @@ td.delta:hover {
 
 #howto summary span {
   color: var(--label);
-  transition: color .2s;
 }
 
 #howto summary::after {
@@ -1077,13 +1075,11 @@ td.delta:hover {
   box-shadow: inset 0 1px 3px rgba(0, 0, 0, .1);
   overflow: hidden;
   max-height: 0;
-  transition: max-height .4s;
 }
 
 #howto .content {
   max-height: 0;
   overflow: hidden;
-  transition: max-height .4s;
 }
 
 #howto ol {
@@ -1900,7 +1896,6 @@ td.delta:hover {
     padding: 10px 14px 14px;
     max-height: 0;
     overflow: hidden;
-    transition: max-height .4s;
   }
 
   #howto ol>li {
