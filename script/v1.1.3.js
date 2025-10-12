@@ -5897,6 +5897,7 @@ const mainButtonEvent = (() => {
 const isPWAMode = () => 
   window.matchMedia('(display-mode: standalone)').matches || 
   window.navigator.standalone === true;
+
 const CONSTANTS = {
   PWA_STORAGE_KEY: 'pwa_snap',
   PWA_EXPIRY_MS: 691200000, // 8 days
@@ -5907,6 +5908,7 @@ const CONSTANTS = {
   SNACKBAR_DELAY: 300,
   SW_UPDATE_CHECK_DELAY: 500
 };
+
 if ('serviceWorker' in navigator) {
   const PWAServiceWorker = (() => {
     const saveState = () => PWAPersistence?.snap?.();
@@ -5936,7 +5938,7 @@ if ('serviceWorker' in navigator) {
         }
         
         if (storedVersion !== currentCache) {
-          if (confirm('Update Available!\nDont worry, your stats will stay the same even if you’ve already done some calculations.')) {
+          if (confirm('Update Available!\nDont worry, your stats will stay the same even if youve already done some calculations.')) {
             reloadApp(currentCache);
             return true;
           }
@@ -5954,19 +5956,19 @@ if ('serviceWorker' in navigator) {
           updateViaCache: 'none'
         })
         .then(registration => {
-          if (isPWAMode()) {
-            registration.update();
+          if (!isPWAMode()) return;
+          
+          registration.update();
+          
+          registration.addEventListener('updatefound', () => {
+            const newWorker = registration.installing;
             
-            registration.addEventListener('updatefound', () => {
-              const newWorker = registration.installing;
-              
-              newWorker.addEventListener('statechange', () => {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  checkCacheVersion();
-                }
-              });
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                checkCacheVersion();
+              }
             });
-          }
+          });
         })
         .catch(() => {});
     };
@@ -5990,12 +5992,12 @@ if ('serviceWorker' in navigator) {
       
       if (isPWAMode()) {
         document.addEventListener('visibilitychange', async () => {
-          if (!document.hidden) {
-            const reg = await navigator.serviceWorker.getRegistration('/sim/');
-            if (reg) {
-              await reg.update();
-              setTimeout(() => checkCacheVersion(), CONSTANTS.SW_UPDATE_CHECK_DELAY);
-            }
+          if (document.hidden) return;
+          
+          const reg = await navigator.serviceWorker.getRegistration('/sim/');
+          if (reg) {
+            await reg.update();
+            setTimeout(() => checkCacheVersion(), CONSTANTS.SW_UPDATE_CHECK_DELAY);
           }
         });
       }
@@ -6005,7 +6007,8 @@ if ('serviceWorker' in navigator) {
   })();
   
   PWAServiceWorker.init();
-};
+}
+
 const preventPullToRefresh = (() => {
   if (!isPWAMode()) return { cleanup: () => {} };
   
@@ -6028,9 +6031,10 @@ const preventPullToRefresh = (() => {
       e.preventDefault();
     }
   };
-  
-  document.addEventListener('touchstart', touchStartHandler, { passive: false });
-  document.addEventListener('touchmove', touchMoveHandler, { passive: false });
+
+  const passiveOpt = { passive: false };
+  document.addEventListener('touchstart', touchStartHandler, passiveOpt);
+  document.addEventListener('touchmove', touchMoveHandler, passiveOpt);
   
   const style = document.createElement('style');
   style.textContent = 'body { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }';
@@ -6044,8 +6048,10 @@ const preventPullToRefresh = (() => {
   
   return { cleanup };
 })();
+
 const PWAPersistenceInit = (() => {
   if (!isPWAMode()) return;
+
   const PWAPersistence = (() => {
     const collectFormValues = () => {
       const values = {};
@@ -6110,23 +6116,22 @@ const PWAPersistenceInit = (() => {
   const init = () => {
     PWAPersistence.restore();
 
+    const captureOpt = { capture: true };
+
     EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'visibilitychange', () => {
       if (document.hidden) {
         handlePWAExit();
       }
-    }, { capture: true });
+    }, captureOpt);
     
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', () => {
-      handlePWAExit();
-    }, { capture: true });
+    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', handlePWAExit, captureOpt);
   };
   
   document.addEventListener('DOMContentLoaded', () => {
     init();
-        if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
-          dropdownManager.scheduleUpdate();
-        }
-
+    if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
+      dropdownManager.scheduleUpdate();
+    }
   });
   
   window.clearPWAStorage = () => {
