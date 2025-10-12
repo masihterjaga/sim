@@ -5858,7 +5858,6 @@ const mainButtonEvent = (() => {
 const isPWAMode = () => 
   window.matchMedia('(display-mode: standalone)').matches || 
   window.navigator.standalone === true;
-
 const CONSTANTS = {
   PWA_STORAGE_KEY: 'pwa_snap',
   PWA_EXPIRY_MS: 691200000, // 8 days
@@ -5869,7 +5868,6 @@ const CONSTANTS = {
   SNACKBAR_DELAY: 300,
   SW_UPDATE_CHECK_DELAY: 500
 };
-
 if ('serviceWorker' in navigator) {
   const PWAServiceWorker = (() => {
     const saveState = () => PWAPersistence?.snap?.();
@@ -5969,7 +5967,6 @@ if ('serviceWorker' in navigator) {
   
   PWAServiceWorker.init();
 }
-
 const preventPullToRefresh = (() => {
   if (!isPWAMode()) return { cleanup: () => {} };
   
@@ -6009,7 +6006,6 @@ const preventPullToRefresh = (() => {
   
   return { cleanup };
 })();
-
 const PWAPersistenceInit = (() => {
   if (!isPWAMode()) return;
 
