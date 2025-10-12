@@ -4756,57 +4756,64 @@ const TooltipManager = (() => {
     HIDE_DELAY: 300,
     THROTTLE_DELAY: 16,
     MARGIN: 16,
-    OFFSET: 12
+    OFFSET: 12,
+    TRANSITION_DURATION: 200,
+    TRANSITION_TIMING: 'cubic-bezier(0.25, 0.8, 0.25, 1)'
+  };
+
+  const SVG_ICON = `<svg xmlns="http://www.w3.org/2000/svg" height="70" fill="#dcddde" viewBox="0 -960 960 960" width="70"><path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>`;
+
+  const forceReflow = (element) => void element.offsetHeight;
+
+  const cleanupTooltipData = (map, node) => {
+    const data = map.get(node);
+    if (!data) return;
+
+    if (data.cleanup) data.cleanup();
+    if (data.listenerIds) {
+      data.listenerIds.forEach(id => EventManager.remove(id));
+    }
+    map.delete(node);
   };
 
   const cleanupOrphanedTooltip = (node) => {
-    if (activeTooltips.has(node)) {
-      const activeData = activeTooltips.get(node);
-      if (activeData?.cleanup) activeData.cleanup();
-      activeTooltips.delete(node);
-    }
-
-    if (lazyTooltips.has(node)) {
-      const lazyData = lazyTooltips.get(node);
-      if (lazyData?.listenerIds) {
-        lazyData.listenerIds.forEach(id => EventManager.remove(id));
-      }
-      lazyTooltips.delete(node);
-    }
+    cleanupTooltipData(activeTooltips, node);
+    cleanupTooltipData(lazyTooltips, node);
   };
 
   const cleanupChildTooltips = (node) => {
     if (!node.querySelectorAll) return;
 
-    activeTooltips.forEach((data, el) => {
-      if (el !== node && node.contains(el)) {
-        if (data?.cleanup) data.cleanup();
-        activeTooltips.delete(el);
-      }
-    });
-
-    lazyTooltips.forEach((data, el) => {
-      if (el !== node && node.contains(el)) {
-        if (data?.listenerIds) {
-          data.listenerIds.forEach(id => EventManager.remove(id));
+    [activeTooltips, lazyTooltips].forEach(map => {
+      map.forEach((data, el) => {
+        if (el !== node && node.contains(el)) {
+          if (data.cleanup) data.cleanup();
+          if (data.listenerIds) {
+            data.listenerIds.forEach(id => EventManager.remove(id));
+          }
+          map.delete(el);
         }
-        lazyTooltips.delete(el);
-      }
+      });
     });
+  };
+
+  const createObserver = (callback, shouldObserve) => {
+    if (!shouldObserve || typeof MutationObserver === 'undefined') return null;
+
+    const observer = new MutationObserver(callback);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return observer;
   };
 
   const startOrphanDetection = () => {
     if (orphanObserver) return;
-    if (typeof MutationObserver === 'undefined') return;
 
-    orphanObserver = new MutationObserver((mutations) => {
+    orphanObserver = createObserver((mutations) => {
       const elementsToCheck = new Set();
 
       mutations.forEach(mutation => {
         mutation.removedNodes.forEach(node => {
-          if (node.nodeType === 1) {
-            elementsToCheck.add(node);
-          }
+          if (node.nodeType === 1) elementsToCheck.add(node);
         });
       });
 
@@ -4814,27 +4821,19 @@ const TooltipManager = (() => {
         cleanupOrphanedTooltip(node);
         cleanupChildTooltips(node);
       });
-    });
-
-    orphanObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+    }, true);
   };
 
   const matchesSelector = (element, selector) => {
-    if (selector.startsWith('#')) {
-      return element.id === selector.slice(1);
-    } else if (selector.startsWith('.')) {
-      return element.classList.contains(selector.slice(1));
-    } else if (selector.startsWith('[')) {
+    if (selector.startsWith('#')) return element.id === selector.slice(1);
+    if (selector.startsWith('.')) return element.classList.contains(selector.slice(1));
+    if (selector.startsWith('[')) {
       const attrMatch = selector.match(/\[([^\]]+)\]/);
       if (attrMatch) {
         const [attrName, attrValue] = attrMatch[1].split('=');
-        if (attrValue) {
-          return element.getAttribute(attrName) === attrValue.replace(/['"]/g, '');
-        }
-        return element.hasAttribute(attrName);
+        return attrValue 
+          ? element.getAttribute(attrName) === attrValue.replace(/['"]/g, '')
+          : element.hasAttribute(attrName);
       }
     }
     return element.matches(selector);
@@ -4842,11 +4841,7 @@ const TooltipManager = (() => {
 
   const injectSVG = (element) => {
     if (element.classList.contains('tooltip-button') && !element.querySelector('svg')) {
-      element.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" height="70" fill="#dcddde" viewBox="0 -960 960 960" width="70">
-          <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
-        </svg>
-      `;
+      element.innerHTML = SVG_ICON;
     }
   };
 
@@ -4860,67 +4855,51 @@ const TooltipManager = (() => {
         if (matchesSelector(element, selector)) {
           registerLazyTooltip(element, content);
         }
-      } catch (e) {
-        // Selector invalid, skip
-      }
+      } catch (e) {}
     });
   };
 
   const startAutoInit = () => {
-    if (autoInitObserver) return;
-    if (typeof MutationObserver === 'undefined') return;
-    if (Object.keys(tooltipConfig).length === 0) return;
+    if (autoInitObserver || Object.keys(tooltipConfig).length === 0) return;
 
-    autoInitObserver = new MutationObserver((mutations) => {
+    autoInitObserver = createObserver((mutations) => {
       mutations.forEach(mutation => {
         mutation.addedNodes.forEach(node => {
           if (node.nodeType !== 1) return;
 
-          // Check the node itself
           initializeElement(node);
 
-          // Check all descendants
           if (node.querySelectorAll) {
             Object.keys(tooltipConfig).forEach(selector => {
               try {
-                const elements = node.querySelectorAll(selector);
-                elements.forEach(el => initializeElement(el));
-              } catch (e) {
-                // Invalid selector, skip
-              }
+                node.querySelectorAll(selector).forEach(el => initializeElement(el));
+              } catch (e) {}
             });
           }
         });
       });
-    });
+    }, true);
+  };
 
-    autoInitObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
+  const stopObserver = (observer) => {
+    if (!observer) return null;
+    observer.disconnect();
+    return null;
   };
 
   const stopAutoInit = () => {
-    if (!autoInitObserver) return;
-    autoInitObserver.disconnect();
-    autoInitObserver = null;
+    autoInitObserver = stopObserver(autoInitObserver);
   };
 
   const stopOrphanDetection = () => {
-    if (!orphanObserver) return;
-    orphanObserver.disconnect();
-    orphanObserver = null;
+    orphanObserver = stopObserver(orphanObserver);
   };
 
   const calculateTooltipSize = (tooltip) => {
     tooltip.style.cssText = 'visibility:hidden;display:block';
-    const width = tooltip.offsetWidth;
-    const height = tooltip.offsetHeight;
+    const size = { width: tooltip.offsetWidth, height: tooltip.offsetHeight };
     tooltip.style.cssText = '';
-    return {
-      width,
-      height
-    };
+    return size;
   };
 
   const calculatePosition = (rect, scrollX, scrollY, tooltipWidth, tooltipHeight) => {
@@ -4936,11 +4915,12 @@ const TooltipManager = (() => {
       isFlipped = true;
     }
 
-    return {
-      left,
-      top,
-      isFlipped
-    };
+    return { left, top, isFlipped };
+  };
+
+  const applyTooltipStyles = (tooltip, transform, opacity) => {
+    tooltip.style.transform = transform;
+    tooltip.style.opacity = opacity.toString();
   };
 
   const createTooltip = (triggerElement, content) => {
@@ -4956,8 +4936,8 @@ const TooltipManager = (() => {
     tooltip.className = "tooltip-wrap";
     tooltip.innerHTML = content;
     
-    // Add transition styles
-    tooltip.style.transition = 'opacity 200ms cubic-bezier(0.25, 0.8, 0.25, 1), transform 200ms cubic-bezier(0.25, 0.8, 0.25, 1)';
+    const transitionProps = `opacity ${CONFIG.TRANSITION_DURATION}ms ${CONFIG.TRANSITION_TIMING}, transform ${CONFIG.TRANSITION_DURATION}ms ${CONFIG.TRANSITION_TIMING}`;
+    tooltip.style.transition = transitionProps;
     tooltip.style.willChange = 'opacity, transform';
     
     document.body.appendChild(tooltip);
@@ -4991,15 +4971,8 @@ const TooltipManager = (() => {
       const scrollX = window.pageXOffset;
       const scrollY = window.pageYOffset;
 
-      const {
-        width: tooltipWidth,
-        height: tooltipHeight
-      } = calculateTooltipSize(tooltip);
-      const {
-        left,
-        top,
-        isFlipped
-      } = calculatePosition(rect, scrollX, scrollY, tooltipWidth, tooltipHeight);
+      const { width: tooltipWidth, height: tooltipHeight } = calculateTooltipSize(tooltip);
+      const { left, top, isFlipped } = calculatePosition(rect, scrollX, scrollY, tooltipWidth, tooltipHeight);
 
       tooltip.classList.toggle('flipped', isFlipped);
       tooltip.style.transform = `translate(${left}px, ${top}px)`;
@@ -5015,20 +4988,14 @@ const TooltipManager = (() => {
 
       updatePosition();
       
-      // Add initial state for smooth transition
-      tooltip.style.opacity = '0';
-      tooltip.style.transform = `${tooltip.style.transform} scale(0.95)`;
-      
-      // Trigger reflow
-      tooltip.offsetHeight;
+      applyTooltipStyles(tooltip, `${tooltip.style.transform} scale(0.95)`, 0);
+      forceReflow(tooltip);
       
       isVisible = true;
       tooltip.classList.add('show');
       
-      // Animate in
       requestAnimationFrame(() => {
-        tooltip.style.opacity = '1';
-        tooltip.style.transform = tooltip.style.transform.replace(' scale(0.95)', ' scale(1)');
+        applyTooltipStyles(tooltip, tooltip.style.transform.replace(' scale(0.95)', ' scale(1)'), 1);
       });
     };
 
@@ -5036,30 +5003,22 @@ const TooltipManager = (() => {
       if (!isVisible) return;
 
       isVisible = false;
+      applyTooltipStyles(tooltip, tooltip.style.transform.replace(' scale(1)', ' scale(0.95)'), 0);
       
-      // Animate out
-      tooltip.style.opacity = '0';
-      tooltip.style.transform = tooltip.style.transform.replace(' scale(1)', ' scale(0.95)');
-      
-      // Wait for animation to complete before cleanup
       setTimeout(() => {
         tooltip.classList.remove('show');
         cleanup();
-      }, 200); // Match transition duration
+      }, CONFIG.TRANSITION_DURATION);
     };
 
-    const handleOutsideClick = (e) => {
+    const handleOutsideInteraction = (e) => {
       if (!isVisible) return;
-      if (triggerElement.contains(e.target)) return;
-      if (tooltip.contains(e.target)) return;
-
+      if (triggerElement.contains(e.target) || tooltip.contains(e.target)) return;
       hide();
     };
 
     const handleKeydown = (e) => {
-      if (e.key === "Escape" && isVisible) {
-        hide();
-      }
+      if (e.key === "Escape" && isVisible) hide();
     };
 
     const throttledPosition = () => {
@@ -5076,23 +5035,15 @@ const TooltipManager = (() => {
       }, CONFIG.THROTTLE_DELAY);
     };
 
-    EventManager.addNS(namespace, document, "click", handleOutsideClick);
-    EventManager.addNS(namespace, document, "touchend", handleOutsideClick, {
-      passive: true
-    });
-    EventManager.addNS(namespace, document, "keydown", handleKeydown);
-    EventManager.addNS(namespace, window, 'resize', throttledPosition, {
-      passive: true
-    });
-    EventManager.addNS(namespace, window, 'scroll', throttledPosition, {
-      passive: true
-    });
+    const passiveOpt = { passive: true };
 
-    activeTooltips.set(triggerElement, {
-      tooltip,
-      cleanup,
-      namespace
-    });
+    EventManager.addNS(namespace, document, "click", handleOutsideInteraction);
+    EventManager.addNS(namespace, document, "touchend", handleOutsideInteraction, passiveOpt);
+    EventManager.addNS(namespace, document, "keydown", handleKeydown);
+    EventManager.addNS(namespace, window, 'resize', throttledPosition, passiveOpt);
+    EventManager.addNS(namespace, window, 'scroll', throttledPosition, passiveOpt);
+
+    activeTooltips.set(triggerElement, { tooltip, cleanup, namespace });
 
     show();
   };
@@ -5108,7 +5059,6 @@ const TooltipManager = (() => {
     }
 
     const namespace = `tooltip-lazy-${Date.now()}-${Math.random()}`;
-    const listenerIds = [];
 
     const initTooltip = (e) => {
       if (e?.cancelable) e.preventDefault();
@@ -5116,25 +5066,18 @@ const TooltipManager = (() => {
     };
 
     const handleClick = (e) => {
-      // Check if click is on SVG or its children
       const target = e.target;
       if (target === triggerElement || triggerElement.contains(target)) {
         initTooltip(e);
       }
     };
 
-    listenerIds.push(
+    const listenerIds = [
       EventManager.addNS(namespace, triggerElement, "click", handleClick),
-      EventManager.addNS(namespace, triggerElement, "touchend", handleClick, {
-        passive: false
-      })
-    );
+      EventManager.addNS(namespace, triggerElement, "touchend", handleClick, { passive: false })
+    ];
 
-    lazyTooltips.set(triggerElement, {
-      content,
-      namespace,
-      listenerIds
-    });
+    lazyTooltips.set(triggerElement, { content, namespace, listenerIds });
 
     if (lazyTooltips.size === 1 && !orphanObserver) {
       startOrphanDetection();
@@ -5145,16 +5088,12 @@ const TooltipManager = (() => {
     stopAutoInit();
     stopOrphanDetection();
 
-    activeTooltips.forEach(({
-      cleanup
-    }) => {
+    activeTooltips.forEach(({ cleanup }) => {
       if (cleanup) cleanup();
     });
     activeTooltips.clear();
 
-    lazyTooltips.forEach(({
-      listenerIds
-    }) => {
+    lazyTooltips.forEach(({ listenerIds }) => {
       if (listenerIds) {
         listenerIds.forEach(id => EventManager.remove(id));
       }
@@ -5172,31 +5111,22 @@ const TooltipManager = (() => {
       tooltipConfig = config;
       startAutoInit();
     },
-    destroyAll
+    destroyAll,
+    initializeElement
   };
 })();
 
 const setupTooltips = (config) => {
-  // Save config for auto-init
   TooltipManager.setConfig(config);
 
-  // Initialize existing elements
   Object.entries(config).forEach(([selector, content]) => {
-    const elements = typeof selector === 'string' ?
-      document.querySelectorAll(selector) :
-      selector instanceof Element ? [selector] : [];
+    const elements = typeof selector === 'string' 
+      ? document.querySelectorAll(selector)
+      : selector instanceof Element ? [selector] : [];
 
     elements.forEach(el => {
       if (el instanceof Element) {
-        // Auto inject SVG if it's a tooltip-button
-        if (el.classList.contains('tooltip-button') && !el.querySelector('svg')) {
-          el.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" height="70" fill="#dcddde" viewBox="0 -960 960 960" width="70">
-              <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
-            </svg>
-          `;
-        }
-        TooltipManager.registerLazyTooltip(el, content);
+        TooltipManager.initializeElement(el);
       }
     });
   });
@@ -5209,7 +5139,6 @@ setupTooltips({
   "#dmgRaceTips": "Unlocked when target race selected, minimum valid value is 0.",
   "#dmgAttrTips": "same condition with dmg to race",
   "#mvpminiTips": "DUMMY have no defense stat. Avg 130, Necro, Ogre, Ktul defs less accurate than others!",
-  //'"#blueTips": "BLUE*8 is experimental.",
   "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>But, dont expect to much! This tool calculates RNG buffs from equipment sets, flashes, and doesn't include flat or percentage damage bonuses.",
   "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20 second cooldown.",
   "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn't have 100% uptime since it only lasts 10 seconds with a 20-second cooldown, and the final result shown below represents the highest output during the buff's active period.",
@@ -5217,7 +5146,6 @@ setupTooltips({
   "#elemCtrTips": "Tools assume target Neutral if you're not targeting any attribute.",
   "#breakdownTips": "Values shown to two decimal places for readability. The final result is computed with full precision, so it may differ slightly if you recompute using the displayed (rounded) numbers.",
   "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward means lower."
-
 });
 
 // ========== ACCORDION SYSTEM ==========
@@ -5229,20 +5157,21 @@ const accordionManager = (() => {
   const namespace = 'accordion-manager';
   let observer = null;
   let cleanupInterval = null;
-
-  const setStyles = (content, maxHeight, opacity = 1) => {
-    Object.assign(content.style, {
-      maxHeight,
-      opacity: opacity.toString()
-    });
+  
+  const forceReflow = (element) => void element.offsetHeight;
+  
+  const applyStyles = (content, maxHeight, opacity, enableTransition) => {
+    content.style.transition = enableTransition ? transition : 'none';
+    content.style.maxHeight = maxHeight;
+    content.style.opacity = opacity.toString();
   };
-
+  
   const createInstance = (details, summary, content) => {
     let isAnimating = false;
     let currentAnimation = null;
     let transitionListenerId = null;
     const instanceNamespace = `${namespace}-${Date.now()}-${Math.random()}`;
-
+    
     const cleanup = () => {
       if (currentAnimation) {
         cancelAnimationFrame(currentAnimation);
@@ -5252,83 +5181,74 @@ const accordionManager = (() => {
         EventManager.remove(transitionListenerId);
         transitionListenerId = null;
       }
-      EventManager.removeNS(instanceNamespace);
       isAnimating = false;
     };
-
+    
+    const setupTransitionListener = (callback) => {
+      if (transitionListenerId !== null) {
+        EventManager.remove(transitionListenerId);
+      }
+      
+      const onTransitionEnd = (e) => {
+        if (e.target !== content) return;
+        if (e.propertyName !== 'max-height' && e.propertyName !== 'opacity') return;
+        
+        EventManager.remove(transitionListenerId);
+        transitionListenerId = null;
+        isAnimating = false;
+        callback();
+      };
+      
+      transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
+    };
+    
+    const performAnimation = (initialHeight, initialOpacity, targetHeight, targetOpacity, onComplete) => {
+      applyStyles(content, initialHeight, initialOpacity, false);
+      forceReflow(content);
+      applyStyles(content, targetHeight, targetOpacity, true);
+      
+      setupTransitionListener(onComplete);
+    };
+    
     const animateOpen = () => {
       details.setAttribute('open', '');
-      content.style.maxHeight = '0px';
-      content.style.opacity = '0.3';
-
+      
       currentAnimation = requestAnimationFrame(() => {
         const targetHeight = content.scrollHeight + 'px';
-        content.style.maxHeight = targetHeight;
-        content.style.opacity = '1';
-
-        const onTransitionEnd = (e) => {
-          // Only respond to max-height transition
-          if (e.propertyName !== 'max-height') return;
-          
-          content.style.maxHeight = 'none';
-          content.style.opacity = '1';
-          isAnimating = false;
-          if (transitionListenerId !== null) {
-            EventManager.remove(transitionListenerId);
-            transitionListenerId = null;
-          }
-        };
-        transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
+        performAnimation('0px', 0.3, targetHeight, 1, () => {
+          applyStyles(content, 'none', 1, true);
+        });
       });
     };
-
+    
     const animateClose = () => {
-      const currentHeight = content.scrollHeight + 'px';
-      content.style.maxHeight = currentHeight;
-      content.style.opacity = '1';
-
       currentAnimation = requestAnimationFrame(() => {
-        content.style.maxHeight = '0px';
-        content.style.opacity = '0.3';
-
-        const onTransitionEnd = (e) => {
-          // Only respond to max-height transition
-          if (e.propertyName !== 'max-height') return;
-          
+        const currentHeight = content.scrollHeight + 'px';
+        performAnimation(currentHeight, 1, '0px', 0.3, () => {
           details.removeAttribute('open');
-          isAnimating = false;
-          if (transitionListenerId !== null) {
-            EventManager.remove(transitionListenerId);
-            transitionListenerId = null;
-          }
-        };
-        transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
+        });
       });
     };
-
+    
     const animate = (isOpening) => {
       if (isAnimating) return;
-
-      isAnimating = true;
+      
       cleanup();
-
-      if (isOpening) {
-        animateOpen();
-      } else {
-        animateClose();
-      }
+      isAnimating = true;
+      
+      isOpening ? animateOpen() : animateClose();
     };
-
+    
     const handleClick = (e) => {
       e.preventDefault();
       if (isAnimating) return;
-
+      
       const isOpen = details.hasAttribute('open');
       animate(!isOpen);
     };
-
+    
     EventManager.addNS(instanceNamespace, summary, 'click', handleClick);
-
+    
     return {
       animate,
       cleanup: () => {
@@ -5341,90 +5261,77 @@ const accordionManager = (() => {
       namespace: instanceNamespace
     };
   };
-
+  
   const cleanupOrphans = () => {
     const orphanedKeys = [];
-
+    
     instances.forEach((instance, details) => {
       if (!document.contains(details)) {
         instance.cleanup();
         orphanedKeys.push(details);
       }
     });
-
+    
     orphanedKeys.forEach(key => instances.delete(key));
-
+    
     if (instances.size === 0 && cleanupInterval) {
       clearInterval(cleanupInterval);
       cleanupInterval = null;
     }
   };
-
+  
   const startCleanupInterval = () => {
-    if (cleanupInterval) return;
-    if (instances.size === 0) return;
-
+    if (cleanupInterval || instances.size === 0) return;
     cleanupInterval = setInterval(cleanupOrphans, 30000);
   };
-
+  
   const initializeDetailsElement = (details) => {
     const summary = details.querySelector('summary');
     const content = details.querySelector('.body');
-
-    if (!summary || !content) return;
-    if (instances.has(details)) return;
-
+    
+    if (!summary || !content || instances.has(details)) return;
+    
     const isOpen = details.hasAttribute('open');
-    Object.assign(content.style, {
-      transition,
-      overflow: 'hidden',
-      maxHeight: isOpen ? 'none' : '0px',
-      opacity: isOpen ? '1' : '0.3'
-    });
-
-    const instance = createInstance(details, summary, content);
-    instances.set(details, instance);
+    
+    content.style.overflow = 'hidden';
+    applyStyles(content, isOpen ? 'none' : '0px', isOpen ? 1 : 0.3, false);
+    forceReflow(content);
+    content.style.transition = transition;
+    
+    instances.set(details, createInstance(details, summary, content));
   };
-
+  
   const processDetails = () => {
     cleanupOrphans();
-
-    document.querySelectorAll('details').forEach(details => {
-      initializeDetailsElement(details);
-    });
-
-    if (instances.size > 0) {
-      startCleanupInterval();
-    }
+    document.querySelectorAll('details').forEach(initializeDetailsElement);
+    startCleanupInterval();
   };
-
+  
   const shouldProcessMutation = (mutations) => {
     for (const mutation of mutations) {
       if (mutation.addedNodes.length === 0) continue;
-
+      
       for (const node of mutation.addedNodes) {
         if (node.nodeType !== 1) continue;
-        if (node.tagName === 'DETAILS') return true;
-        if (node.querySelector?.('details')) return true;
+        if (node.tagName === 'DETAILS' || node.querySelector?.('details')) return true;
       }
     }
     return false;
   };
-
+  
   const handleRemovedNodes = (mutations) => {
     for (const mutation of mutations) {
       if (mutation.removedNodes.length === 0) continue;
-
+      
       for (const node of mutation.removedNodes) {
         if (node.nodeType !== 1) continue;
-
+        
         if (node.tagName === 'DETAILS' && instances.has(node)) {
-          const instance = instances.get(node);
-          instance.cleanup();
+          instances.get(node).cleanup();
           instances.delete(node);
           continue;
         }
-
+        
         if (node.querySelectorAll) {
           instances.forEach((instance, details) => {
             if (node.contains(details)) {
@@ -5436,22 +5343,21 @@ const accordionManager = (() => {
       }
     }
   };
-
+  
   processDetails();
-
+  
   observer = new MutationObserver((mutations) => {
     handleRemovedNodes(mutations);
-
     if (shouldProcessMutation(mutations)) {
       requestAnimationFrame(processDetails);
     }
   });
-
+  
   observer.observe(document.body, {
     childList: true,
     subtree: true
   });
-
+  
   const destroy = () => {
     if (cleanupInterval) {
       clearInterval(cleanupInterval);
@@ -5464,9 +5370,9 @@ const accordionManager = (() => {
     instances.forEach(instance => instance.cleanup());
     instances.clear();
   };
-
+  
   EventManager.addNS(namespace, window, 'beforeunload', destroy);
-
+  
   return {
     destroy,
     reinitialize: processDetails
