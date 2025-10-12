@@ -5266,8 +5266,6 @@ class StickyHandler {
     const toggleBtn = this.elements.get('toggleBtn');
     if (toggleBtn) toggleBtn.dataset.collapse = String(this.state.isCollapsed);
 
-    if (navigator.vibrate) navigator.vibrate(50);
-
     this.applySticky();
     this.scheduleTimeout('animationEnd', () => {
       this.state.animating = false;
@@ -6251,7 +6249,6 @@ const preventPullToRefresh = (() => {
     if (AppState.get('isResultShown')) {
       PWAPersistence.snap();
     }
-    // CleanupManager.cleanupAll();
   };
   
   const init = () => {
@@ -6264,7 +6261,6 @@ const preventPullToRefresh = (() => {
     }, { capture: true });
     
     EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', () => {
-      //CleanupManager.cleanupListeners();
       handlePWAExit();
     }, { capture: true });
   };
@@ -6536,4 +6532,7 @@ function resetAllData() {
   const message = shouldClearCache ? 'All data and cache cleared!' : 'All data reset!';
   setTimeout(() => showSnackbar?.(message), CONSTANTS.SNACKBAR_DELAY);
 }
-EventManager.add(window, 'beforeunload', CleanupManager.cleanupListeners);
+EventManager.add(window, 'beforeunload', () => {
+  CleanupManager.cleanupListeners();
+  CleanupManager.cleanupTimers();
+})
