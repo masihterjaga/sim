@@ -6229,7 +6229,9 @@ const preventPullToRefresh = (() => {
           if (el) el.value = val;
         });
         
-        ResetHelpers.reinitializeComponents();
+        if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
+          dropdownManager.updateAll();
+        }
 
         if (state.isResultShown && typeof processMainCalculation === 'function') {
           setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
