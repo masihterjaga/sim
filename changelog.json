@@ -1,0 +1,237 @@
+{
+  "versions": [
+    {
+      "version": "1.1.3",
+      "date": "7 Oct, 2025",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "Lightbox Image Gallery"
+          ]
+        },
+        {
+          "category": "Update",
+          "items": [
+            "Divinity flash use original value for calculation",
+            "flash bonus contribution (normalize to 100% uptime)"
+          ]
+        },
+        {
+          "category": "Improved",
+          "items": [
+            "Breakdown with tooltip",
+            "performance"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "1.1.2",
+      "date": "28 Sept, 2025",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "Average MVP/MINI 140/150 per size"
+          ]
+        },
+        {
+          "category": "Improved",
+          "items": [
+            "micro animation n transition",
+            "structure code"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "v1.1.1",
+      "date": "Sept 21, 2025",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "Tooltips (help) for inputing data"
+          ]
+        },
+        {
+          "category": "Improved",
+          "items": [
+            "Input validation",
+            "optimize flow n logic 3 eq set selection",
+            "Button feedback",
+            "push your stats to table",
+            "ui/ux (mobile prior)",
+            "cross-browser compatibility"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "v1.1.0",
+      "date": "Sept 18, 2025",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "Welcome dark theme",
+            {
+              "text": "Equipment SET",
+              "items": [
+                "Vesper",
+                "Blue",
+                "White 110"
+              ]
+            },
+            "Final DMG Bonus field",
+            {
+              "text": "Simulate \"Interactive\" Divinity Flash",
+              "items": [
+                "Spear of Eternity",
+                "Reaper Scythe"
+              ]
+            }
+          ]
+        },
+        {
+          "category": "Updated",
+          "items": [
+            "Calculation Formula"
+          ]
+        },
+        {
+          "category": "Improved",
+          "items": [
+            {
+              "text": "UI/UX",
+              "items": [
+                "Input validation tips",
+                "each button has its own feedback"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "v1.0.9",
+      "date": "Sept 11, 2025",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            {
+              "text": "All MVP/MINI Lv. 140 & Lv. 150 includes",
+              "items": [
+                "DEF stats",
+                "Size",
+                "Race",
+                "and Attribute"
+              ]
+            }
+          ]
+        },
+        {
+          "category": "Updated",
+          "items": [
+            "\"How to Use\" section"
+          ]
+        },
+        {
+          "category": "Improved",
+          "items": [
+            {
+              "text": "Results",
+              "items": [
+                "more precise stats calc",
+                "show/hide precise nums"
+              ]
+            },
+            {
+              "text": "Balancing recommendations",
+              "items": [
+                "better logic for race and/or attr",
+                "extra cats when race & attr too low"
+              ]
+            },
+            "Sticky \"smooth\" button",
+            {
+              "text": "Swap Boss",
+              "items": [
+                "stats editable after swap",
+                "can skip race / attr field (set to 0)"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "version": "v1.0.8",
+      "date": "Aug 31, 2025",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "Changelog",
+            "\"How to Use\" section at top of page",
+            {
+              "text": "Target DEF dropdown (used in calc)",
+              "items": [
+                "Dummy (0 DEF)",
+                "Avg. MVP/MINI Lv. 130",
+                "Avg. MVP/MINI Lv. 140",
+                "Avg. MVP/MINI Lv. 150"
+              ]
+            },
+            "Swap target DEF",
+            "Double tap/click guard",
+            "Sticky collapsible button on scroll (mobile)"
+          ]
+        },
+        {
+          "category": "Updated",
+          "items": [
+            {
+              "text": "Calc formula",
+              "items": [
+                "added counter DEF"
+              ]
+            }
+          ]
+        },
+        {
+          "category": "Improved",
+          "items": [
+            "cross-browser support",
+            "main flow + logic",
+            "input validation",
+            "results breakdown by factor",
+            "recommendation table logic"
+          ]
+        }
+      ]
+    },
+    {
+      "version": "v1.0.0",
+      "date": "Aug 28, 2025",
+      "changes": [
+        {
+          "category": "",
+          "items": [
+            {
+              "text": "Initial release",
+              "items": [
+                "6 dropdowns + 6 numeric inputs",
+                "3 buttons",
+                "Result card",
+                "randomize stats in rec table"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

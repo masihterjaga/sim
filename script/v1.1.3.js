@@ -5334,12 +5334,13 @@ const modalManager = (() => {
       destroy: () => {}
     };
   }
-
+  
   const content = log.querySelector('.modal-content, .log-content, .modal-body') || log.firstElementChild;
+  const changelog = log.querySelector('#changelog');
   const duration = 280;
   const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
   const namespace = 'modal-manager';
-
+  
   const transition = `${duration}ms ${easing}`;
   const baseStyles = {
     modal: {
@@ -5351,14 +5352,15 @@ const modalManager = (() => {
       transition: `transform ${transition}, opacity ${transition}`
     } : null
   };
-
+  
   Object.assign(log.style, baseStyles.modal);
   if (content) Object.assign(content.style, baseStyles.content);
-
+  
   let isVisible = false;
   let animationId = null;
   let hideTimeout = null;
-
+  let changelogLoaded = false;
+  
   const clearTimers = () => {
     if (animationId) {
       cancelAnimationFrame(animationId);
@@ -5369,7 +5371,7 @@ const modalManager = (() => {
       hideTimeout = null;
     }
   };
-
+  
   const applyStyles = (isShowing) => {
     const modalStyles = isShowing ? {
       opacity: '1',
@@ -5382,7 +5384,7 @@ const modalManager = (() => {
       backdropFilter: 'blur(0px)',
       backgroundColor: 'transparent'
     };
-
+    
     const contentStyles = content ? (isShowing ? {
       transform: 'translateY(0) scale(1)',
       opacity: '1'
@@ -5390,65 +5392,133 @@ const modalManager = (() => {
       transform: 'translateY(-8px) scale(0.98)',
       opacity: '0.5'
     }) : null;
-
+    
     Object.assign(log.style, modalStyles);
     if (contentStyles) Object.assign(content.style, contentStyles);
   };
-
+  
+  // Render nested list items
+  const renderList = (items) => {
+    if (!Array.isArray(items)) return '';
+    
+    return items.map(item => {
+      if (typeof item === 'string') {
+        return `<li>${item}</li>`;
+      }
+      if (item.category !== undefined) {
+        // Jika category kosong, render items langsung tanpa wrapper
+        if (item.category === '') {
+          return renderList(item.items);
+        }
+        return `
+          <li>
+            <span class="sub-cats">${item.category}</span>
+            <ul>${renderList(item.items)}</ul>
+          </li>`;
+      }
+      if (item.text) {
+        const nested = item.items ? `<ul>${renderList(item.items)}</ul>` : '';
+        return `<li>${item.text}${nested}</li>`;
+      }
+      return '';
+    }).join('');
+  };
+  
+  // Load changelog from JSON
+  const loadChangelog = async () => {
+    if (changelogLoaded) return;
+    
+    try {
+      const response = await fetch('changelog.json');
+      if (!response.ok) throw new Error('Failed to load changelog');
+      
+      const data = await response.json();
+      
+      // Clear existing content except header
+      const header = changelog.querySelector('.header-log');
+      changelog.innerHTML = '';
+      if (header) changelog.appendChild(header);
+      
+      // Render versions
+      data.versions.forEach(version => {
+        const versionDiv = document.createElement('div');
+        versionDiv.className = 'version';
+        versionDiv.innerHTML = `
+          <h3>[${version.version}] - ${version.date}</h3>
+          <ul>${renderList(version.changes)}</ul>
+        `;
+        changelog.appendChild(versionDiv);
+      });
+      
+      changelogLoaded = true;
+    } catch (error) {
+      console.error('Error loading changelog:', error);
+      
+      // Show error message
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'version';
+      errorDiv.innerHTML = '<p style="color: #ff6b6b;">Failed to load changelog. Please try again later.</p>';
+      changelog.appendChild(errorDiv);
+    }
+  };
+  
   const hide = () => {
     if (!isVisible) return;
-
+    
     isVisible = false;
     clearTimers();
     applyStyles(false);
-
+    
     hideTimeout = setTimeout(() => {
       if (!isVisible) {
         log.style.display = 'none';
       }
     }, duration);
   };
-
-  const show = () => {
+  
+  const show = async () => {
     if (isVisible) return;
-
+    
     isVisible = true;
     clearTimers();
-
+    
     log.style.display = 'flex';
-
+    
+    // Lazy load changelog
+    await loadChangelog();
+    
     animationId = requestAnimationFrame(() => {
       applyStyles(true);
     });
   };
-
+  
   const handleOpen = (e) => {
     e.stopPropagation();
     show();
   };
-
+  
   const handleKeydown = (e) => {
     if (e.key === 'Escape' && isVisible) hide();
   };
-
+  
   const handleOutsideClick = (e) => {
     if (!isVisible || !content) return;
     if (content.contains(e.target) || e.target === openLog) return;
     hide();
   };
-
+  
   EventManager.addNS(namespace, openLog, 'click', handleOpen);
   EventManager.addNS(namespace, closeLog, 'click', hide);
   EventManager.addNS(namespace, document, 'keydown', handleKeydown);
   EventManager.addNS(namespace, document, 'click', handleOutsideClick);
-
+  
   const destroy = () => {
     clearTimers();
     EventManager.removeNS(namespace);
   };
-
+  
   EventManager.addNS(namespace, window, 'beforeunload', destroy);
-
+  
   return { show, hide, destroy };
 })();
 
