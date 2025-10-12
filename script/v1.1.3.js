@@ -6269,7 +6269,7 @@ const preventPullToRefresh = (() => {
     
     init();
     if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
-      dropdownManager.scheduleUpdate();
+      dropdownManager.bindEvents();
     }
 
   });
