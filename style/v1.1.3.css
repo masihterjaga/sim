@@ -57,8 +57,8 @@ body {
   letter-spacing: var(--letter-spacing-normal);
   padding-bottom: env(safe-area-inset-bottom);
   scroll-behavior: smooth;
-  overscroll-behavior-y: none;
-  touch-action: pan-y;
+  /*overscroll-behavior-y: none;
+  touch-action: pan-y;*/
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-overflow-scrolling: touch;
@@ -1360,6 +1360,7 @@ td.delta:hover {
   visibility: visible;
   display: none;
   z-index: 9999;
+  transition: .3s;
   box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
   transform: translate(0, 0) scale(.95);
   transform-origin: center bottom;
@@ -1373,6 +1374,7 @@ td.delta:hover {
   opacity: 1;
   pointer-events: auto;
   display: block;
+  transition: .3s;
   transform: translate(0, 0) scale(1);
 }
 
@@ -1823,7 +1825,28 @@ td.delta:hover {
   .container {
     padding: 16px;
   }
-
+  
+  .discord-server a,.calc-ver {
+    padding: 4px 0;
+  }
+  
+  .discord-server a {
+    font-size: 14px;
+    padding: 5px 8px;
+    background: var(--primary)!important;
+    border-radius: 6px;
+    display: flex;
+    vertical-align: center;
+    color: white!important;
+    transition: .3s;
+  }
+  
+  .discord-server svg {
+    width: 18px;
+    height: 18px;
+    margin: 0 2px 0 -3px;
+  }
+  
   #log {
     padding: 16px;
   }
@@ -1838,7 +1861,7 @@ td.delta:hover {
     box-shadow: var(--shadow);
   }
 
-  #multiplier-breakdown:hover {
+  .discord-server:hover a, #multiplier-breakdown:hover {
     box-shadow: 0 4px 16px rgba(0, 0, 0, .25);
   }
 
