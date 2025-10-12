@@ -298,12 +298,12 @@ const WEAPON_SIZE_MODIFIER_TABLE = {
     Medium: 1,
     Small: 1
   },
-  "Two-Handed Rod": {
+  "Two-Handed Staff": {
     Large: 1,
     Medium: 1,
     Small: 1
   },
-  "One-Handed Rod": {
+  "One-Handed Staff": {
     Large: 1,
     Medium: 1,
     Small: 1
