@@ -1239,7 +1239,7 @@ td.delta:hover {
 
 #version p:last-child {
   font-style: italic;
-  color: var(--text-subtle);
+  color: var(--text);
   text-align: right;
   white-space: nowrap;
 }
