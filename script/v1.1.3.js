@@ -6536,6 +6536,4 @@ function resetAllData() {
   const message = shouldClearCache ? 'All data and cache cleared!' : 'All data reset!';
   setTimeout(() => showSnackbar?.(message), CONSTANTS.SNACKBAR_DELAY);
 }
-
-// ========== NEW BORN ==========
-//EventManager.add(window, 'beforeunload', CleanupManager.cleanupListeners);
+EventManager.add(window, 'beforeunload', CleanupManager.cleanupListeners);
