@@ -1012,7 +1012,6 @@ td.delta:hover {
   margin: 0 auto 24px;
   box-shadow: var(--shadow);
   overflow: hidden;
-  transition: .3s;
 }
 
 #howto:hover {
@@ -1360,7 +1359,6 @@ td.delta:hover {
   visibility: visible;
   display: none;
   z-index: 9999;
-  transition: all .3s;
   box-shadow: 0 8px 24px rgba(0, 0, 0, .4);
   transform: translate(0, 0) scale(.95);
   transform-origin: center bottom;
@@ -1374,7 +1372,6 @@ td.delta:hover {
   opacity: 1;
   pointer-events: auto;
   display: block;
-  transition: .3s;
   transform: translate(0, 0) scale(1);
 }
 
@@ -1397,7 +1394,6 @@ td.delta:hover {
   padding-top: 0;
   margin: 0;
   cursor: pointer;
-  transition: transform .15s;
 }
 
 .tooltip-button:hover {
@@ -1418,7 +1414,6 @@ td.delta:hover {
   margin-left: 3px;
   fill: #b9bbbe;
   pointer-events: none;
-  transition: .2s cubic-bezier(.4, 0, .2, 1);
 }
 
 .tooltip-button:hover svg {

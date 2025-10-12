@@ -4955,6 +4955,11 @@ const TooltipManager = (() => {
     const tooltip = document.createElement("div");
     tooltip.className = "tooltip-wrap";
     tooltip.innerHTML = content;
+    
+    // Add transition styles
+    tooltip.style.transition = 'opacity 200ms cubic-bezier(0.25, 0.8, 0.25, 1), transform 200ms cubic-bezier(0.25, 0.8, 0.25, 1)';
+    tooltip.style.willChange = 'opacity, transform';
+    
     document.body.appendChild(tooltip);
 
     let isVisible = false;
@@ -5009,13 +5014,31 @@ const TooltipManager = (() => {
       }
 
       updatePosition();
+      
+      // Add initial state for smooth transition
+      tooltip.style.opacity = '0';
+      tooltip.style.transform = `${tooltip.style.transform} scale(0.95)`;
+      
+      // Trigger reflow
+      tooltip.offsetHeight;
+      
       isVisible = true;
       tooltip.classList.add('show');
+      
+      // Animate in
+      requestAnimationFrame(() => {
+        tooltip.style.opacity = '1';
+        tooltip.style.transform = tooltip.style.transform.replace(' scale(0.95)', ' scale(1)');
+      });
     };
 
     const hide = () => {
       if (!isVisible) return;
 
+      // Animate out
+      tooltip.style.opacity = '0';
+      tooltip.style.transform = tooltip.style.transform.replace(' scale(1)', ' scale(0.95)');
+      
       tooltip.classList.remove('show');
       isVisible = false;
 
@@ -5151,6 +5174,7 @@ const TooltipManager = (() => {
     destroyAll
   };
 })();
+
 const setupTooltips = (config) => {
   // Save config for auto-init
   TooltipManager.setConfig(config);
@@ -5176,6 +5200,7 @@ const setupTooltips = (config) => {
     });
   });
 };
+
 setupTooltips({
   "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are two <strong>different</strong> things! Look for it in your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set 0.",
   "#targetRaceTips": "Specific MVP/MINi will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target spesific race!",
@@ -5186,7 +5211,7 @@ setupTooltips({
   //'"#blueTips": "BLUE*8 is experimental.",
   "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>But, dont expect to much! This tool calculates RNG buffs from equipment sets, flashes, and doesn't include flat or percentage damage bonuses.",
   "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20 second cooldown.",
-  "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn’t have 100% uptime since it only lasts 10 seconds with a 20-second cooldown, and the final result shown below represents the highest output during the buff’s active period.",
+  "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn't have 100% uptime since it only lasts 10 seconds with a 20-second cooldown, and the final result shown below represents the highest output during the buff's active period.",
   "#spearTips": "This bonus doesn't have 100% uptime because it only lasts 10 seconds while the cooldown is 20 seconds. The final result shown below represents the highest output during the buff's active period.",
   "#elemCtrTips": "Tools assume target Neutral if you're not targeting any attribute.",
   "#breakdownTips": "Values shown to two decimal places for readability. The final result is computed with full precision, so it may differ slightly if you recompute using the displayed (rounded) numbers.",
