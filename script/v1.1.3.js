@@ -5938,7 +5938,7 @@ if ('serviceWorker' in navigator) {
         }
         
         if (storedVersion !== currentCache) {
-          if (confirm('Update Available!\nDont worry, your stats will stay the same even if youve already done some calculations.')) {
+          if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
             reloadApp(currentCache);
             return true;
           }
