@@ -1311,12 +1311,6 @@ function getCurrentCalculationState() {
 
   // Stats (DOM row 2, follows field order)
   const baseAttack = safeNum(DOM_ELEMENTS.attack);
-  /**
-   * Experimental, keep this
-  const vesperAttackMultiplier = vesperTier >= 0 ? (1 + (0.03 + vesperTier * 0.03)) : 1;
-  const baseAttack = rawBaseAttack * vesperAttackMultiplier;
-   */
-
   const pen = safeNum(DOM_ELEMENTS.pen);
   const crit = safeNum(DOM_ELEMENTS.crit);
   const dmg = safeNum(DOM_ELEMENTS.dmg);
@@ -1335,8 +1329,6 @@ function getCurrentCalculationState() {
 
   const state = {
     baseAttack,
-    // rawBaseAttack,
-    // vesperAttackMultiplier,
     atkType,
     pen,
     crit,
@@ -1509,11 +1501,6 @@ function calculateMultiplier(params={}) {
       label: 'Attack',
       val: baseAttack,
       mult: baseAttack || 1
-      /**
-       * Experimental, keep!
-      raw: params.rawBaseAttack,
-      vesperMult: params.vesperAttackMultiplier
-      */
     },
     {
       key: 'main',
@@ -1930,26 +1917,6 @@ function renderMultiplierBreakdown(calculationState) {
         return {
           html: '', mult: fmt(factor.mult)
         };
-        /*
-        * Experimental, not relevant. but keep this
-        if (factor.vesperMult && factor.vesperMult > 1) {
-          const tier = Math.round((state.vesper - 8) / 8);
-          factorData = {
-            title: 'Attack (Vesper Boosted)',
-            lines: [
-              `Base Attack: ${factor.raw}`,
-              `Vesper Tier ${tier} Bonus: \u00D7${fmt(factor.vesperMult)}`,
-              `${factor.raw} \u00D7 ${fmt(factor.vesperMult)} \u2192 <code>${factor.val}</code>`
-            ]
-          };
-        } else {
-          return {
-            html: `<li>Attack: ${factor.val}</li>`,
-            mult: fmt(factor.mult)
-          };
-        }
-        */
-
       case 'main':
         if (!state.isPenMode) {
           factorData = {
@@ -2111,12 +2078,6 @@ function renderMultiplierBreakdown(calculationState) {
 
   // Prepare UI components
   const targetInfo = [tSize, tRace, tAttr].filter(Boolean).join(" + ");
-
-  /**
-   * 
-  const bq1Text = "By default, every factor starts at \u00D71.00. Numbers show how it changes with your stats.\n\nValues shown to two decimal places for readability. The final result is computed with full precision(";
-  const bq1Suffix = document.createTextNode("), so it may differ slightly if you recompute using the displayed (rounded) numbers.");
-   */
   const bq1Text = `By default, every factor starts at \u00D71.00<button type='button' id='breakdownTips' class='tooltip-button'></button>\nNumbers`;
   const bq1Suffix = document.createTextNode(" how it changes with your stats.");
 
