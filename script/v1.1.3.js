@@ -1377,7 +1377,7 @@ function getCurrentCalculationState() {
     ...state,
     ...result
   };
-}
+};
 function calculateMultiplier(params={}) {
   const { baseAttack,
     atkType,
@@ -1604,7 +1604,7 @@ function calculateMultiplier(params={}) {
       extra2Sum: extra2.sum
     }
   };
-}
+};
 const processMainCalculation = (() => {
   let timeoutId = null;
   let calculationRAF = null;
@@ -2152,7 +2152,7 @@ function renderMultiplierBreakdown(calculationState) {
   bq1.appendChild(precisionBtn);
   bq1.appendChild(bq1Suffix);
   resultContainer.querySelector('#swap-wrapper').appendChild(swapSelect);
-}
+};
 
 // ========== RECOMMENDATION ==========
 const RandomGenerator = (() => {
@@ -2665,10 +2665,1138 @@ function generateRecommendationTable(gameState) {
   }
 
   DOM_ELEMENTS.rec.innerHTML = tablesHTML.join('');
-}
+};
 const regenerateRecommendations = () => {
   AppState.get('isResultShown') && (generateRecommendationTable(getCurrentCalculationState()), showSnackbar?.("Table Refreshed!"));
 };
+
+// ========== DROPDOWN MANAGER ==========
+class DropdownManager {
+  constructor() {
+    this.constants = {
+      formKeys: ['vesperSet', 'whiteSet', 'blueSet', 'tRace', 'tAttr', 'atkType', 'wElem', 'tSize', 'tDef', 'weapon', 'pen', 'crit'],
+      mobMapping: {
+        'sizeMob': 'tSize',
+        'raceMob': 'tRace',
+        'attributeMob': 'tAttr'
+      },
+      disableButtons: ['resetAll', 'resetRek', 'testSpear', 'testReaper'],
+      relatedFields: {
+        'tSize': 'sizeEnh',
+        'tRace': 'race',
+        'tAttr': 'attr'
+      },
+      calcFields: ['dmg', 'dmgStack', 'sizeEnh', 'race', 'attr', 'elemEnh'],
+      setKeys: ['blueSet', 'vesperSet', 'whiteSet']
+    };
+
+    this.config = this.buildConfig();
+    this.state = {
+      selectionOrder: [],
+      lockStates: new Map(),
+      isSwapping: false,
+      updateTimer: null
+    };
+    this.namespace = 'dropdown-manager';
+    this.isInitialized = false;
+    this.init();
+  }
+
+  buildConfig() {
+    return {
+      ...this.constants,
+      labels: {
+        static: {
+          blueSetLabel: "Blue SET",
+          vesperSetLabel: "Vesper SET",
+          whiteSetLabel: "White SET (110*3)",
+          atkTypeLabel: "Attack Type",
+          weaponLabel: "Weapon",
+          wElemLabel: "Weapon Element",
+          tSizeLabel: "Target Size",
+          tRaceLabel: "Target Race",
+          tAttrLabel: "Target Attribute",
+          tDefLabel: "MVP/MINI",
+          penLabel: "P/M PEN %",
+          critLabel: "Critical DMG Bonus %",
+          elemEnhLabel: "Element Enhance %",
+          sizeLabel: "DMG to Size %",
+          raceLabel: "Race",
+          attrLabel: "Attribute",
+          dmgLabel: "Final P/M Damage Bonus %",
+          dmgStackLabel: "Extra: Final Damage Stack %"
+        },
+        dynamic: {
+          vesper: {
+            "48": "BRO?!",
+            "56": "REALY?!",
+            "64": "Wake UP!",
+            "72": "STOP Dreaming!",
+            "80": "F2P DETECTED!"
+          },
+          white: {
+            "36": "Eh?",
+            "42": "WOW",
+            "48": "GG!!",
+            "54": "Have a Nice Day!"
+          }
+        }
+      },
+
+      fields: {
+        atkType: {
+          type: 'dropdown',
+          options: [{
+            value: "pen",
+            label: "P/M PEN"
+          }, {
+            value: "crit",
+            label: "CRIT"
+          }],
+          placeholder: "Select Attack Type",
+          onClear: ['pen', 'crit'],
+          onUpdate: 'updateAttackTypeUI'
+        },
+        tSize: {
+          type: 'dropdown',
+          options: ["Small", "Medium", "Large"],
+          placeholder: "Select Target Size"
+        },
+        tRace: {
+          type: 'dropdown',
+          options: () => RACE_TYPES,
+          placeholder: "skip race",
+          onClear: ['race']
+        },
+        tAttr: {
+          type: 'dropdown',
+          options: () => Object.keys(getElementCounter()),
+          placeholder: "skip attribute",
+          onClear: ['attr']
+        },
+        weapon: {
+          type: 'dropdown',
+          options: () => Object.keys(getWeaponSizeModifier()),
+          placeholder: "Select Weapon Type"
+        },
+        wElem: {
+          type: 'dropdown',
+          options: () => Object.keys(getElementCounter()),
+          placeholder: "Select Attribute"
+        },
+        tDef: {
+          type: 'dropdown',
+          options: () => Object.keys(getTargetDefenseData()),
+          placeholder: "Select target",
+          special: 'target'
+        },
+        vesperSet: {
+          type: 'set',
+          generator: 'vesper'
+        },
+        whiteSet: {
+          type: 'set',
+          generator: 'white'
+        },
+        blueSet: {
+          type: 'set',
+          generator: 'blue'
+        },
+
+        race: {
+          type: 'conditional',
+          dependsOn: 'tRace',
+          active: (race) => ({
+            label: `DMG to ${race}`,
+            placeholder: `dmg to ${race.toLowerCase()} %`
+          }),
+          default: {
+            label: "Race",
+            placeholder: "select target race first"
+          }
+        },
+        attr: {
+          type: 'conditional',
+          dependsOn: 'tAttr',
+          active: (attr) => ({
+            label: `DMG to ${attr} Attribute`,
+            placeholder: `dmg to ${attr.toLowerCase()} attribute %`
+          }),
+          default: {
+            label: "Attribute",
+            placeholder: "select target attribute first"
+          }
+        },
+        elemEnh: {
+          type: 'conditional',
+          dependsOn: 'wElem',
+          active: (elem) => ({
+            label: `${elem} Enhance %`,
+            placeholder: `${elem.toLowerCase()} enhance`
+          }),
+          default: {
+            label: "Element Enhance %",
+            placeholder: "select weapon attribute first"
+          }
+        },
+        sizeEnh: {
+          type: 'conditional',
+          dependsOn: 'tSize',
+          active: (size) => ({
+            label: `DMG to ${size} %`,
+            placeholder: `dmg to ${size.toLowerCase()}`
+          }),
+          default: {
+            label: "DMG to Size %",
+            placeholder: "select target size first"
+          }
+        },
+        dmg: {
+          type: 'conditional',
+          dependsOn: 'atkType',
+          active: () => ({
+            placeholder: "final p/m damage bonus"
+          }),
+          default: {
+            placeholder: "select attack type first"
+          }
+        },
+        dmgStack: {
+          type: 'conditional',
+          dependsOn: 'atkType',
+          active: () => ({
+            placeholder: "final damage bonus/stack %"
+          }),
+          default: {
+            placeholder: "select attack type first"
+          }
+        }
+      },
+
+      setGenerators: {
+        vesper: () => [{
+          value: "",
+          label: "skip vesper set"
+        }, ...Object.entries(VESPER_SET).map(([tier, val]) => ({
+          value: val,
+          label: `Tier ${tier}`
+        }))],
+        white: () => [{
+          value: "",
+          label: "skip white set"
+        }, ...Object.entries(WHITE_SET).map(([tier, val]) => ({
+          value: val,
+          label: tier
+        }))],
+        blue: () => [{
+          value: "",
+          label: "skip blue set"
+        }, ...Object.entries(BLUE_SET).flatMap(([multiplier, levels]) =>
+          Object.entries(levels).map(([lvl, val]) => ({
+            value: val,
+            label: `Level ${lvl}*${multiplier}`
+          })))]
+      },
+
+      eventMap: {
+        'penCritSelect': 'atkType',
+        'weaponSelect': 'weapon',
+        'weaponElementSelect': 'wElem',
+        'targetSizeSelect': 'tSize',
+        'targetRaceSelect': 'tRace',
+        'targetElementSelect': 'tAttr'
+      }
+    };
+  }
+
+  init() {
+    if (this.isInitialized) return;
+    this.populateAllDropdowns();
+    this.bindEvents();
+    this.updateAll();
+    this.syncThreeSets();
+    this.isInitialized = true;
+  }
+
+  getFormData() {
+    return this.config.formKeys.reduce((data, key) => {
+      const el = DOM_ELEMENTS[key];
+      if (el) {
+        data[key] = el.value || '';
+        if (el.tagName === 'SELECT' && el.selectedOptions[0]) {
+          data[`${key}Text`] = el.selectedOptions[0].textContent;
+        }
+      }
+      return data;
+    }, {});
+  }
+
+  getTargetData(targetKey) {
+    if (!targetKey) return null;
+    const rawData = getTargetDefenseData(targetKey);
+    return rawData ? {
+      ...rawData,
+      sizeMob: rawData.sizeMob || DOM_ELEMENTS.tSize?.value || ""
+    } : null;
+  }
+
+  getCurrentTarget() {
+    const targetKey = DOM_ELEMENTS.tDef?.value;
+    return targetKey ? {
+      key: targetKey,
+      data: this.getTargetData(targetKey)
+    } : null;
+  }
+
+  populateAllDropdowns() {
+    Object.entries(this.config.fields).forEach(([key, config]) => {
+      if (config.type !== 'dropdown' && config.type !== 'set') return;
+      const el = DOM_ELEMENTS[key];
+      if (!el) return;
+
+      const options = config.generator ?
+        this.config.setGenerators[config.generator]() :
+        (typeof config.options === 'function' ? config.options() : config.options);
+
+      this.populateOptions(el, options, config.placeholder);
+    });
+  }
+
+  populateOptions(select, options, placeholder) {
+    if (!select) return;
+    const fragment = document.createDocumentFragment();
+
+    if (placeholder) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = placeholder;
+      fragment.appendChild(opt);
+    }
+
+    options.forEach(optData => {
+      const opt = document.createElement('option');
+      const isString = typeof optData === "string";
+      opt.value = isString ? optData : optData.value;
+      opt.textContent = isString ? optData : optData.label;
+      if (optData.disabled) opt.disabled = true;
+      fragment.appendChild(opt);
+    });
+
+    select.innerHTML = '';
+    select.appendChild(fragment);
+  }
+
+  setFieldState(element, disabled, activeText = '', inactiveText = '') {
+    if (!element) return;
+    element.disabled = disabled;
+    element.placeholder = disabled ? inactiveText : activeText;
+
+    const wrapper = element.closest('.input-wrap');
+    if (wrapper) {
+      wrapper.classList.toggle('locked', disabled);
+      if (!disabled) wrapper.removeAttribute('data-temp-unlocked');
+    }
+  }
+
+  clearFields(fieldIds) {
+    fieldIds.forEach(id => {
+      const el = DOM_ELEMENTS[id];
+      if (el) el.value = '';
+    });
+  }
+
+  applyMobProperties(targetData, mode = 'standard', lockOverride = null) {
+    if (!targetData) return;
+
+    Object.entries(this.config.mobMapping).forEach(([mobProp, domKey]) => {
+      const el = DOM_ELEMENTS[domKey];
+      if (!el) return;
+
+      const targetValue = targetData[mobProp];
+      const shouldLock = this.shouldLock(domKey, targetValue, mode, lockOverride);
+
+      el.value = targetValue || "";
+      el.disabled = shouldLock;
+      this.state.lockStates.set(domKey, shouldLock);
+
+      const wrapper = el.closest('.input-wrap');
+      if (wrapper) wrapper.classList.toggle('locked', shouldLock);
+
+      if (!targetValue) {
+        const relatedKey = this.config.relatedFields[domKey];
+        const relatedField = relatedKey ? DOM_ELEMENTS[relatedKey] : null;
+        if (relatedField) {
+          relatedField.value = "";
+          const relatedWrapper = relatedField.closest('.input-wrap');
+          if (relatedWrapper) {
+            relatedWrapper.classList.remove('locked');
+            relatedWrapper.setAttribute('data-temp-unlocked', '1');
+          }
+        }
+      }
+    });
+  }
+
+  shouldLock(domKey, targetValue, mode, lockOverride) {
+    if (lockOverride !== null) return lockOverride;
+    const selectedKey = DOM_ELEMENTS.tDef?.value || "";
+    return mode === 'swap' ? !!targetValue : (targetValue && !selectedKey.includes("Lvl."));
+  }
+
+  bindEvents() {
+    EventManager.removeNS(this.namespace);
+
+    EventManager.addNS(this.namespace, document, 'change', (e) => {
+      if (AppState.get('isResultShown')) return;
+
+      if (e.target === DOM_ELEMENTS.tDef) {
+        this.handleTargetChange();
+        return;
+      }
+
+      if (this.constants.setKeys.includes(e.target.id)) {
+        this.recordSelection(e.target);
+        this.syncThreeSets();
+        this.scheduleUpdate();
+        return;
+      }
+
+      const fieldKey = this.config.eventMap[e.target.id];
+      if (fieldKey) {
+        const fieldConfig = this.config.fields[fieldKey];
+        if (fieldConfig?.onClear) this.clearFields(fieldConfig.onClear);
+        if (fieldConfig?.onUpdate === 'updateAttackTypeUI') this.updateAttackTypeUI();
+        this.scheduleUpdate();
+      }
+    });
+  }
+
+  handleTargetChange() {
+    if (this.state.isSwapping) return;
+
+    const selectedKey = DOM_ELEMENTS.tDef?.value;
+    if (!selectedKey) return;
+
+    const targetData = this.getTargetData(selectedKey);
+    if (targetData) {
+      this.applyMobProperties(targetData);
+      this.syncBreakdownSwap(selectedKey);
+      this.scheduleUpdate();
+    }
+  }
+
+  recordSelection(selectEl) {
+    const formData = this.getFormData();
+    const wasCycleComplete = this.state.selectionOrder.length >= 3 || (formData.blueSet && (formData.blueSetText || "").includes("*8"));
+
+    if (!selectEl?.value) {
+      this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== selectEl);
+      return;
+    }
+
+    this.state.selectionOrder = wasCycleComplete ? [selectEl] :
+      this.state.selectionOrder.includes(selectEl) ? this.state.selectionOrder : [...this.state.selectionOrder, selectEl];
+  }
+
+  syncThreeSets() {
+    const setElements = this.constants.setKeys.map(k => DOM_ELEMENTS[k]).filter(Boolean);
+    const formData = this.getFormData();
+    const blueIs8x = (formData.blueSetText || "").includes("*8");
+    const hasBlue8x = formData.blueSet && blueIs8x;
+
+    setElements.forEach(el => Array.from(el.options).forEach(opt => opt.disabled = false));
+
+    if (hasBlue8x) {
+      [DOM_ELEMENTS.vesperSet, DOM_ELEMENTS.whiteSet].forEach(el => {
+        if (el) {
+          Array.from(el.options).forEach(opt => opt.disabled = !!opt.value);
+          el.value = "";
+        }
+      });
+    } else {
+      if (this.state.selectionOrder.length > 0 && DOM_ELEMENTS.blueSet) {
+        Array.from(DOM_ELEMENTS.blueSet.options).forEach(opt => {
+          if (opt.value && opt.textContent.includes("*8")) opt.disabled = true;
+        });
+      }
+
+      if (this.state.selectionOrder.length >= 2) {
+        setElements.filter(el => !this.state.selectionOrder.includes(el)).forEach(el => {
+          Array.from(el.options).forEach(opt => opt.disabled = !!opt.value);
+          el.value = "";
+        });
+      }
+
+      const blueEl = DOM_ELEMENTS.blueSet;
+      if (blueEl?.value && blueEl.selectedOptions[0]?.disabled) {
+        blueEl.value = "";
+        this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== blueEl);
+      }
+    }
+  }
+
+  updateAll() {
+    const formData = this.getFormData();
+    this.updateStaticLabels();
+    this.updateDynamicLabels(formData);
+    this.updateConditionalFields(formData);
+    this.updateAttackTypeUI();
+  }
+
+  updateStaticLabels() {
+    Object.entries(this.config.labels.static).forEach(([key, label]) => {
+      const el = DOM_ELEMENTS[key];
+      if (el) el.textContent = label;
+    });
+  }
+
+  updateDynamicLabels(formData) {
+    const vesperLabel = DOM_ELEMENTS.vesperSetLabel;
+    const whiteLabel = DOM_ELEMENTS.whiteSetLabel;
+
+    if (vesperLabel) {
+      vesperLabel.textContent = this.config.labels.dynamic.vesper[formData.vesperSet] || "Vesper SET";
+    }
+    if (whiteLabel) {
+      whiteLabel.textContent = this.config.labels.dynamic.white[formData.whiteSet] || "White SET (110*3)";
+    }
+  }
+
+  updateConditionalFields(formData) {
+    Object.entries(this.config.fields).forEach(([key, config]) => {
+      if (config.type !== 'conditional') return;
+
+      const input = DOM_ELEMENTS[key];
+      const label = DOM_ELEMENTS[`${key}Label`];
+      const conditionValue = formData[config.dependsOn];
+
+      if (!input || !config.active || !config.default) return;
+
+      const settings = conditionValue ? config.active(conditionValue) : config.default;
+      const isActive = !!conditionValue;
+
+      input.disabled = !isActive;
+      input.placeholder = settings.placeholder;
+      if (label && settings.label) label.textContent = settings.label;
+    });
+  }
+
+  updateAttackTypeUI() {
+    const atkType = this.getFormData().atkType;
+    const penGroup = document.querySelector('.form-group.pen-group');
+    const critGroup = document.querySelector('.form-group.crit-group');
+
+    [penGroup, critGroup].forEach(group => group?.classList.add('hidden'));
+
+    if (atkType === 'pen' && penGroup) {
+      penGroup.classList.remove('hidden');
+      this.setFieldState(DOM_ELEMENTS.pen, false, 'total converted raw pen + final pen...');
+      this.setFieldState(DOM_ELEMENTS.crit, true);
+    } else if (atkType === 'crit' && critGroup) {
+      critGroup.classList.remove('hidden');
+      this.setFieldState(DOM_ELEMENTS.crit, false, 'critical damage bonus...');
+      this.setFieldState(DOM_ELEMENTS.pen, true);
+    } else {
+      this.setFieldState(DOM_ELEMENTS.pen, true);
+      this.setFieldState(DOM_ELEMENTS.crit, true);
+    }
+  }
+
+  scheduleUpdate() {
+    if (this.state.updateTimer) clearTimeout(this.state.updateTimer);
+    this.state.updateTimer = setTimeout(() => {
+      this.updateAll();
+      this.state.updateTimer = null;
+    }, 50);
+  }
+
+  determineSwapMode(prevKey, nextKey) {
+    if (!prevKey || !nextKey || nextKey === prevKey) return 'none';
+
+    const prevData = this.getTargetData(prevKey);
+    const nextData = this.getTargetData(nextKey);
+    if (!prevData || !nextData) return 'manual';
+
+    const prevRaw = getTargetDefenseData(prevKey) || {};
+    const nextRaw = getTargetDefenseData(nextKey) || {};
+
+    const currentDOM = {
+      sizeMob: DOM_ELEMENTS.tSize?.value || "",
+      raceMob: DOM_ELEMENTS.tRace?.value || "",
+      attributeMob: DOM_ELEMENTS.tAttr?.value || ""
+    };
+
+    for (const [mobProp] of Object.entries(this.config.mobMapping)) {
+      const prevValue = prevRaw[mobProp];
+      const nextValue = nextRaw[mobProp];
+
+      if (prevValue && nextValue && prevValue !== nextValue) return 'manual';
+      if (!nextValue || prevValue) continue;
+      if (mobProp === 'sizeMob' && currentDOM.sizeMob === nextValue) continue;
+
+      return 'manual';
+    }
+
+    return 'auto';
+  }
+
+  executeSwap(nextKey, state, isPenMode) {
+    const swapMode = this.determineSwapMode(this.getCurrentTarget()?.key, nextKey);
+    if (swapMode === 'none') return;
+
+    this.state.isSwapping = true;
+
+    if (DOM_ELEMENTS.tDef) DOM_ELEMENTS.tDef.value = nextKey;
+    this.syncBreakdownSwap(nextKey);
+    this.resetGlobalStates();
+
+    const targetData = this.getTargetData(nextKey);
+    if (!targetData) {
+      this.state.isSwapping = false;
+      return;
+    }
+
+    if (swapMode === 'auto') {
+      this.applyMobProperties(targetData, 'swap');
+      typeof processMainCalculation === 'function' && processMainCalculation();
+      typeof showSnackbar === 'function' && showSnackbar('Auto calc triggered!');
+      this.scheduleUpdate();
+    } else {
+      this.unlockCalculationFields(isPenMode);
+      this.applyMobProperties(targetData, 'manual', true);
+      this.updateManualSwapUI(state, isPenMode);
+      this.scheduleUpdate();
+    }
+
+    this.state.isSwapping = false;
+  }
+
+  unlockCalculationFields(isPenMode) {
+    const fields = [...this.config.calcFields, isPenMode ? "pen" : "crit"];
+    fields.forEach(fieldName => {
+      const field = DOM_ELEMENTS[fieldName];
+      if (!field) return;
+
+      const wrapper = field.closest(".input-wrap");
+      if (wrapper?.querySelector('input[type="number"]')) {
+        wrapper.classList.remove("locked");
+        wrapper.dataset.tempUnlocked = "1";
+      }
+      field.disabled = false;
+    });
+
+    typeof unbindInputLockGuard === 'function' && unbindInputLockGuard();
+  }
+
+  updateManualSwapUI(state, isPenMode) {
+    if (DOM_ELEMENTS.submit) DOM_ELEMENTS.submit.disabled = false;
+
+    this.config.disableButtons.forEach(btnId => {
+      const btn = DOM_ELEMENTS[btnId];
+      if (btn) btn.disabled = true;
+    });
+
+    if (DOM_ELEMENTS.hasil) {
+      DOM_ELEMENTS.hasil.dataset.specificMode = "0";
+      DOM_ELEMENTS.hasil.textContent = 'Input your stats to see the result...';
+    }
+    if (DOM_ELEMENTS.rec) {
+      DOM_ELEMENTS.rec.textContent = 'Balancing stat recommendations for a higher output multiplier.';
+    }
+
+    const focusElement = isPenMode ? DOM_ELEMENTS.pen : DOM_ELEMENTS.crit;
+    typeof scrollAndFocusElement === 'function' &&
+      scrollAndFocusElement(focusElement, "Target swapped - please verify stats and recalculate!");
+
+    typeof validateRequiredFields === 'function' && validateRequiredFields();
+    typeof validateStatsVsTarget === 'function' && validateStatsVsTarget(state);
+  }
+
+  syncBreakdownSwap(targetKey) {
+    const swapDropdown = document.querySelector('#breakdown-swap');
+    if (swapDropdown && swapDropdown.value !== targetKey) swapDropdown.value = targetKey;
+  }
+
+  resetGlobalStates() {
+    AppState.reset();
+    ['testSpear', 'testReaper'].forEach(btnId => {
+      const btn = DOM_ELEMENTS[btnId];
+      if (btn) btn.classList.remove('activated');
+    });
+  }
+
+  createSwapSelect(state, isPenMode) {
+    const select = document.createElement("select");
+    select.id = "breakdown-swap";
+    select.className = "breakdown-swap";
+
+    const pen = +(state.pen);
+    const dmg = +(state.dmg);
+    const currentKey = this.getCurrentTarget()?.key;
+    const allTargetData = getTargetDefenseData();
+
+    const options = Object.keys(allTargetData).map(key => {
+      const data = allTargetData[key];
+      const def = +(data?.def || 0);
+      const dmgred = +(data?.dmgred || 0);
+      const insufficient = dmg <= dmgred || (isPenMode && pen <= def);
+      const swapMode = this.determineSwapMode(currentKey, key);
+      const disabled = swapMode === 'auto' && insufficient;
+
+      const text = disabled ? `${key} (cant auto calc)` : key;
+      return `<option value="${key}"${disabled ? ' disabled' : ''}>${text}</option>`;
+    });
+
+    select.innerHTML = options.join('');
+    select.value = state.tDefKey || "DUMMY";
+
+    if (!select.hasAttribute('data-dropdown-bound')) {
+      EventManager.addNS(this.namespace, select, 'change', () => this.executeSwap(select.value, state, isPenMode));
+      select.setAttribute('data-dropdown-bound', 'true');
+    }
+
+    return select;
+  }
+
+  destroy() {
+    if (this.state.updateTimer) {
+      clearTimeout(this.state.updateTimer);
+      this.state.updateTimer = null;
+    }
+    EventManager.removeNS(this.namespace);
+    this.state.selectionOrder = [];
+    this.state.lockStates.clear();
+    this.state.isSwapping = false;
+    this.isInitialized = false;
+  }
+};
+const dropdownManager = new DropdownManager();
+
+// ======== VALIDATION ========
+class ValidationSSoT {
+  constructor() {
+    this.INVALID_CLASS = 'invalid-value';
+    this.touchedFields = new Set();
+    this.snackbarCooldowns = new Set();
+    this.namespace = 'validation-ssot';
+    this.isInitialized = false;
+    this.autoInit();
+  }
+
+  // Element type checkers
+  isPenOrDmg = (e) => ['pen', 'dmg'].includes(e?.id);
+  isRelatedNumeric = (e) => ['race', 'attr'].includes(e?.id);
+  isNumeric = (e) => e?.type === 'number' ||
+    e?.classList.contains('numeric-input') ||
+    this.isPenOrDmg(e) ||
+    this.isRelatedNumeric(e);
+
+  // Utilities
+  isValidNumber = (v) => !isNaN(+v) && isFinite(+v);
+  normalizeInput = (v) => String(v)
+    .replace(/[^\d.,]/g, '')
+    .replace(/,/g, '.')
+    .replace(/\.{2,}/g, '.')
+    .replace(/^\./, '0.')
+    .replace(/\.$/, '');
+
+  showMessage = (msg) => typeof showSnackbar === 'function' && showSnackbar(msg);
+
+  canShowSnackbar(elementId) {
+    if (this.snackbarCooldowns.has(elementId)) return false;
+
+    this.snackbarCooldowns.add(elementId);
+    setTimeout(() => this.snackbarCooldowns.delete(elementId), 2000);
+    return true;
+  }
+
+  // Validation helpers
+  getDropdownForRelated(element) {
+    return element.id === 'race' ? DOM_ELEMENTS.tRace : DOM_ELEMENTS.tAttr;
+  }
+
+  validateRelatedNumeric(element, value) {
+    const dropdown = this.getDropdownForRelated(element);
+
+    if (!dropdown?.value && !value) {
+      return {
+        isValid: true,
+        reason: 'related_empty'
+      };
+    }
+
+    if (dropdown?.value && !value) {
+      return {
+        isValid: false,
+        reason: 'related_required'
+      };
+    }
+
+    return null;
+  }
+
+  validateMinValue(element, numValue, showMessages) {
+    const min = element.getAttribute('min');
+    if (min === null || min === '') return null;
+
+    const minVal = +min;
+    if (numValue >= minVal) return null;
+
+    if (showMessages && this.canShowSnackbar(element.id)) {
+      const fieldName = element.getAttribute('data-field-name') || element.id || 'Field';
+      this.showMessage(`${fieldName} must be at least ${minVal}`);
+    }
+
+    return {
+      isValid: false,
+      reason: 'below_min'
+    };
+  }
+
+  validateMaxValue(element, numValue, showMessages) {
+    const max = element.getAttribute('max');
+    if (max === null || max === '') return null;
+
+    const maxVal = +max;
+    if (numValue <= maxVal) return null;
+
+    if (showMessages && this.canShowSnackbar(element.id)) {
+      this.showMessage('what are you doing?');
+    }
+
+    return {
+      isValid: false,
+      reason: 'above_max'
+    };
+  }
+
+  validateThreshold(element, numValue, showMessages) {
+    if (!this.isPenOrDmg(element)) return null;
+
+    const defData = getTargetDefenseData(DOM_ELEMENTS.tDef?.value);
+    const threshold = element.id === 'pen' ? (+(defData?.def) || 0) : (+(defData?.dmgred) || 0);
+
+    if (numValue > threshold) return null;
+
+    if (showMessages && this.canShowSnackbar(element.id)) {
+      const minRequired = (threshold + 8).toFixed(2);
+      const fieldType = element.id === 'pen' ? 'Final PEN' : 'Final P/M Bonus';
+      const targetLabel = DOM_ELEMENTS.tDef?.options?.[DOM_ELEMENTS.tDef.selectedIndex]?.textContent || 'target';
+      this.showMessage(`Need at least ${minRequired} ${fieldType} vs ${targetLabel}`);
+    }
+
+    return {
+      isValid: false,
+      reason: 'threshold_not_met'
+    };
+  }
+
+  validateField(element, showMessages = false) {
+    const value = element.value?.trim() || '';
+
+    // Check related numeric fields first
+    if (this.isRelatedNumeric(element)) {
+      const result = this.validateRelatedNumeric(element, value);
+      if (result) return result;
+    }
+
+    // Empty check
+    if (!value) return {
+      isValid: false,
+      reason: 'empty'
+    };
+
+    // Number format check
+    if (this.isNumeric(element) && !this.isValidNumber(value)) {
+      return {
+        isValid: false,
+        reason: 'invalid_number'
+      };
+    }
+
+    const numValue = +value;
+
+    // Min validation
+    const minResult = this.validateMinValue(element, numValue, showMessages);
+    if (minResult) return minResult;
+
+    // Max validation
+    const maxResult = this.validateMaxValue(element, numValue, showMessages);
+    if (maxResult) return maxResult;
+
+    // Threshold validation (pen/dmg specific)
+    const thresholdResult = this.validateThreshold(element, numValue, showMessages);
+    if (thresholdResult) return thresholdResult;
+
+    return {
+      isValid: true
+    };
+  }
+
+  updateFieldState(element, isValid) {
+    if (!this.touchedFields.has(element.id)) return;
+    element.classList.toggle(this.INVALID_CLASS, !isValid);
+  }
+
+  normalizeElement(element) {
+    if (!element || !this.isNumeric(element)) return;
+
+    const normalized = this.normalizeInput(element.value);
+    if (normalized !== element.value) {
+      element.value = normalized;
+    }
+
+    const result = this.validateField(element, this.touchedFields.has(element.id));
+    this.updateFieldState(element, result.isValid);
+  }
+
+  // Event handlers
+  createValidateHandler(element) {
+    return (showMessages = false) => {
+      const result = this.validateField(element, showMessages);
+      this.updateFieldState(element, result.isValid);
+    };
+  }
+
+  createNormalizeHandler(element) {
+    return () => {
+      if (!this.isNumeric(element)) return;
+
+      const normalized = this.normalizeInput(element.value);
+      if (normalized !== element.value) {
+        element.value = normalized;
+      }
+    };
+  }
+
+  setupField(element) {
+    const validateHandler = this.createValidateHandler(element);
+    const normalizeHandler = this.createNormalizeHandler(element);
+
+    EventManager.addNS(this.namespace, element, 'focus', () => {
+      this.touchedFields.add(element.id);
+    });
+
+    EventManager.addNS(this.namespace, element, 'input', () => {
+      normalizeHandler();
+      validateHandler(false);
+    });
+
+    EventManager.addNS(this.namespace, element, 'blur', () => validateHandler(true));
+    EventManager.addNS(this.namespace, element, 'change', () => validateHandler(true));
+
+    EventManager.addNS(this.namespace, element, 'paste', () => {
+      if (!this.isNumeric(element)) return;
+      setTimeout(() => this.normalizeElement(element), 0);
+    });
+  }
+
+  setupDefenseChangeHandler() {
+    if (!DOM_ELEMENTS.tDef) return;
+
+    EventManager.addNS(this.namespace, DOM_ELEMENTS.tDef, 'change', () => {
+      [DOM_ELEMENTS.pen, DOM_ELEMENTS.dmg]
+      .filter(el => el?.value.trim())
+        .forEach(el => {
+          const result = this.validateField(el, this.canShowSnackbar(el.id));
+          this.updateFieldState(el, result.isValid);
+        });
+    });
+  }
+
+  checkReady = () => typeof DOM_ELEMENTS !== 'undefined' && DOM_ELEMENTS;
+
+  init() {
+    if (this.isInitialized || !this.checkReady()) return false;
+
+    // Setup all field validations
+    ['atkType', 'weapon', 'wElem', 'tDef', 'tSize', 'pen', 'crit', 'dmg',
+      'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'
+    ]
+    .map(key => DOM_ELEMENTS[key])
+      .filter(Boolean)
+      .forEach(element => this.setupField(element));
+
+    // Setup defense change handler
+    this.setupDefenseChangeHandler();
+
+    this.isInitialized = true;
+    return true;
+  }
+
+  autoInit() {
+    if (this.isInitialized) return;
+
+    const initHandler = () => {
+      if (!this.isInitialized) this.init();
+    };
+
+    if (document.readyState === 'loading' || document.readyState === 'interactive') {
+      document.addEventListener('DOMContentLoaded', initHandler, {
+        once: true
+      });
+    } else {
+      this.init();
+    }
+
+    window.addEventListener('load', initHandler, {
+      once: true
+    });
+  }
+
+  // Field definitions
+  getRequiredFields() {
+    return [{
+        el: DOM_ELEMENTS.atkType,
+        name: 'Attack Type'
+      },
+      {
+        el: DOM_ELEMENTS.weapon,
+        name: 'Weapon Type'
+      },
+      {
+        el: DOM_ELEMENTS.wElem,
+        name: 'Weapon Attribute'
+      },
+      {
+        el: DOM_ELEMENTS.tDef,
+        name: 'Target Boss'
+      },
+      {
+        el: DOM_ELEMENTS.tSize,
+        name: 'Target Size'
+      },
+      {
+        el: DOM_ELEMENTS.pen,
+        name: 'Final P M PEN %',
+        condition: () => DOM_ELEMENTS.atkType?.value === 'pen'
+      },
+      {
+        el: DOM_ELEMENTS.crit,
+        name: 'Critical DMG Bonus %',
+        condition: () => DOM_ELEMENTS.atkType?.value === 'crit'
+      },
+      {
+        el: DOM_ELEMENTS.dmg,
+        name: 'Final P M DMG Bonus %'
+      },
+      {
+        el: DOM_ELEMENTS.elemEnh,
+        name: 'Element Enhance %'
+      },
+      {
+        el: DOM_ELEMENTS.sizeEnh,
+        name: 'DMG to Size %'
+      },
+      {
+        el: DOM_ELEMENTS.race,
+        name: 'DMG to Race %',
+        condition: () => DOM_ELEMENTS.race && !DOM_ELEMENTS.race.disabled
+      },
+      {
+        el: DOM_ELEMENTS.attr,
+        name: 'DMG to Attribute %',
+        condition: () => DOM_ELEMENTS.attr && !DOM_ELEMENTS.attr.disabled
+      },
+      {
+        el: DOM_ELEMENTS.dmgStack,
+        name: 'Final DMG Bonus %'
+      }
+    ];
+  }
+
+  shouldValidateField(field) {
+    if (!field.el) return false;
+    if (!field.condition) return true;
+    return field.condition();
+  }
+
+  validateSingleField(field) {
+    this.touchedFields.add(field.el.id);
+    const result = this.validateField(field.el, this.canShowSnackbar(field.el.id));
+    this.updateFieldState(field.el, result.isValid);
+
+    if (!result.isValid) {
+      if (typeof scrollAndFocusElement === 'function') {
+        scrollAndFocusElement(field.el);
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  validateAllRequired() {
+    const fields = this.getRequiredFields();
+
+    for (const field of fields) {
+      if (!this.shouldValidateField(field)) continue;
+      if (!this.validateSingleField(field)) return false;
+    }
+
+    return true;
+  }
+
+  getStatsElements(state) {
+    const elements = [];
+
+    if (state?.atkType?.toLowerCase() === 'pen' && DOM_ELEMENTS.pen) {
+      elements.push(DOM_ELEMENTS.pen);
+    }
+
+    if (DOM_ELEMENTS.dmg) {
+      elements.push(DOM_ELEMENTS.dmg);
+    }
+
+    return elements;
+  }
+
+  shouldFocusElement(element, focusedElement) {
+    return focusedElement === element || !focusedElement;
+  }
+
+  validateStatsElement(element, focusedElement) {
+    this.touchedFields.add(element.id);
+    const result = this.validateField(element, this.canShowSnackbar(element.id));
+    this.updateFieldState(element, result.isValid);
+
+    if (!result.isValid && this.shouldFocusElement(element, focusedElement)) {
+      if (typeof scrollAndFocusElement === 'function') {
+        scrollAndFocusElement(element);
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  validateStats(state, focusedElement = null) {
+    const elements = this.getStatsElements(state);
+
+    for (const element of elements) {
+      if (!this.validateStatsElement(element, focusedElement)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  destroy() {
+    EventManager.removeNS(this.namespace);
+    this.touchedFields.clear();
+    this.snackbarCooldowns.clear();
+    this.isInitialized = false;
+  }
+};
+const ValidationSSoTInstance = new ValidationSSoT();
+const normalizeNumericInput = (el, pastedValue) => {
+  if (!el) return;
+  if (pastedValue !== undefined) el.value = pastedValue;
+  ValidationSSoTInstance.normalizeElement(el);
+};
+const validateRequiredFields = () => ValidationSSoTInstance.validateAllRequired();
+const validateStatsVsTarget = (state, focusedElement = null) => ValidationSSoTInstance.validateStats(state, focusedElement);
 
 // ========== FLASH SYSTEM ==========
 const isMobile = () => window.innerWidth < 480;
@@ -2780,7 +3908,7 @@ function simulateFlash(event) {
   if (typeof showSnackbar === 'function') {
     showSnackbar(`${weaponName} ${statusText}`);
   }
-}
+};
 function triggerPulseFlash() {
   if (!AppState.get('isResultShown')) return;
   if (!isMobile()) return;
@@ -2822,7 +3950,7 @@ function triggerPulseFlash() {
       }
     }, TIMING.emergencyCleanup);
   });
-}
+};
 
 // ========== TOOLTIP SYSTEM ==========
 const TooltipManager = (() => {
@@ -3836,1134 +4964,6 @@ const modalManager = (() => {
   };
 })();
 
-// ========== DROPDOWN MANAGER ==========
-class DropdownManager {
-  constructor() {
-    this.constants = {
-      formKeys: ['vesperSet', 'whiteSet', 'blueSet', 'tRace', 'tAttr', 'atkType', 'wElem', 'tSize', 'tDef', 'weapon', 'pen', 'crit'],
-      mobMapping: {
-        'sizeMob': 'tSize',
-        'raceMob': 'tRace',
-        'attributeMob': 'tAttr'
-      },
-      disableButtons: ['resetAll', 'resetRek', 'testSpear', 'testReaper'],
-      relatedFields: {
-        'tSize': 'sizeEnh',
-        'tRace': 'race',
-        'tAttr': 'attr'
-      },
-      calcFields: ['dmg', 'dmgStack', 'sizeEnh', 'race', 'attr', 'elemEnh'],
-      setKeys: ['blueSet', 'vesperSet', 'whiteSet']
-    };
-
-    this.config = this.buildConfig();
-    this.state = {
-      selectionOrder: [],
-      lockStates: new Map(),
-      isSwapping: false,
-      updateTimer: null
-    };
-    this.namespace = 'dropdown-manager';
-    this.isInitialized = false;
-    this.init();
-  }
-
-  buildConfig() {
-    return {
-      ...this.constants,
-      labels: {
-        static: {
-          blueSetLabel: "Blue SET",
-          vesperSetLabel: "Vesper SET",
-          whiteSetLabel: "White SET (110*3)",
-          atkTypeLabel: "Attack Type",
-          weaponLabel: "Weapon",
-          wElemLabel: "Weapon Element",
-          tSizeLabel: "Target Size",
-          tRaceLabel: "Target Race",
-          tAttrLabel: "Target Attribute",
-          tDefLabel: "MVP/MINI",
-          penLabel: "P/M PEN %",
-          critLabel: "Critical DMG Bonus %",
-          elemEnhLabel: "Element Enhance %",
-          sizeLabel: "DMG to Size %",
-          raceLabel: "Race",
-          attrLabel: "Attribute",
-          dmgLabel: "Final P/M Damage Bonus %",
-          dmgStackLabel: "Extra: Final Damage Stack %"
-        },
-        dynamic: {
-          vesper: {
-            "48": "BRO?!",
-            "56": "REALY?!",
-            "64": "Wake UP!",
-            "72": "STOP Dreaming!",
-            "80": "F2P DETECTED!"
-          },
-          white: {
-            "36": "Eh?",
-            "42": "WOW",
-            "48": "GG!!",
-            "54": "Have a Nice Day!"
-          }
-        }
-      },
-
-      fields: {
-        atkType: {
-          type: 'dropdown',
-          options: [{
-            value: "pen",
-            label: "P/M PEN"
-          }, {
-            value: "crit",
-            label: "CRIT"
-          }],
-          placeholder: "Select Attack Type",
-          onClear: ['pen', 'crit'],
-          onUpdate: 'updateAttackTypeUI'
-        },
-        tSize: {
-          type: 'dropdown',
-          options: ["Small", "Medium", "Large"],
-          placeholder: "Select Target Size"
-        },
-        tRace: {
-          type: 'dropdown',
-          options: () => RACE_TYPES,
-          placeholder: "skip race",
-          onClear: ['race']
-        },
-        tAttr: {
-          type: 'dropdown',
-          options: () => Object.keys(getElementCounter()),
-          placeholder: "skip attribute",
-          onClear: ['attr']
-        },
-        weapon: {
-          type: 'dropdown',
-          options: () => Object.keys(getWeaponSizeModifier()),
-          placeholder: "Select Weapon Type"
-        },
-        wElem: {
-          type: 'dropdown',
-          options: () => Object.keys(getElementCounter()),
-          placeholder: "Select Attribute"
-        },
-        tDef: {
-          type: 'dropdown',
-          options: () => Object.keys(getTargetDefenseData()),
-          placeholder: "Select target",
-          special: 'target'
-        },
-        vesperSet: {
-          type: 'set',
-          generator: 'vesper'
-        },
-        whiteSet: {
-          type: 'set',
-          generator: 'white'
-        },
-        blueSet: {
-          type: 'set',
-          generator: 'blue'
-        },
-
-        race: {
-          type: 'conditional',
-          dependsOn: 'tRace',
-          active: (race) => ({
-            label: `DMG to ${race}`,
-            placeholder: `dmg to ${race.toLowerCase()} %`
-          }),
-          default: {
-            label: "Race",
-            placeholder: "select target race first"
-          }
-        },
-        attr: {
-          type: 'conditional',
-          dependsOn: 'tAttr',
-          active: (attr) => ({
-            label: `DMG to ${attr} Attribute`,
-            placeholder: `dmg to ${attr.toLowerCase()} attribute %`
-          }),
-          default: {
-            label: "Attribute",
-            placeholder: "select target attribute first"
-          }
-        },
-        elemEnh: {
-          type: 'conditional',
-          dependsOn: 'wElem',
-          active: (elem) => ({
-            label: `${elem} Enhance %`,
-            placeholder: `${elem.toLowerCase()} enhance`
-          }),
-          default: {
-            label: "Element Enhance %",
-            placeholder: "select weapon attribute first"
-          }
-        },
-        sizeEnh: {
-          type: 'conditional',
-          dependsOn: 'tSize',
-          active: (size) => ({
-            label: `DMG to ${size} %`,
-            placeholder: `dmg to ${size.toLowerCase()}`
-          }),
-          default: {
-            label: "DMG to Size %",
-            placeholder: "select target size first"
-          }
-        },
-        dmg: {
-          type: 'conditional',
-          dependsOn: 'atkType',
-          active: () => ({
-            placeholder: "final p/m damage bonus"
-          }),
-          default: {
-            placeholder: "select attack type first"
-          }
-        },
-        dmgStack: {
-          type: 'conditional',
-          dependsOn: 'atkType',
-          active: () => ({
-            placeholder: "final damage bonus/stack %"
-          }),
-          default: {
-            placeholder: "select attack type first"
-          }
-        }
-      },
-
-      setGenerators: {
-        vesper: () => [{
-          value: "",
-          label: "skip vesper set"
-        }, ...Object.entries(VESPER_SET).map(([tier, val]) => ({
-          value: val,
-          label: `Tier ${tier}`
-        }))],
-        white: () => [{
-          value: "",
-          label: "skip white set"
-        }, ...Object.entries(WHITE_SET).map(([tier, val]) => ({
-          value: val,
-          label: tier
-        }))],
-        blue: () => [{
-          value: "",
-          label: "skip blue set"
-        }, ...Object.entries(BLUE_SET).flatMap(([multiplier, levels]) =>
-          Object.entries(levels).map(([lvl, val]) => ({
-            value: val,
-            label: `Level ${lvl}*${multiplier}`
-          })))]
-      },
-
-      eventMap: {
-        'penCritSelect': 'atkType',
-        'weaponSelect': 'weapon',
-        'weaponElementSelect': 'wElem',
-        'targetSizeSelect': 'tSize',
-        'targetRaceSelect': 'tRace',
-        'targetElementSelect': 'tAttr'
-      }
-    };
-  }
-
-  init() {
-    if (this.isInitialized) return;
-    this.populateAllDropdowns();
-    this.bindEvents();
-    this.updateAll();
-    this.syncThreeSets();
-    this.isInitialized = true;
-  }
-
-  getFormData() {
-    return this.config.formKeys.reduce((data, key) => {
-      const el = DOM_ELEMENTS[key];
-      if (el) {
-        data[key] = el.value || '';
-        if (el.tagName === 'SELECT' && el.selectedOptions[0]) {
-          data[`${key}Text`] = el.selectedOptions[0].textContent;
-        }
-      }
-      return data;
-    }, {});
-  }
-
-  getTargetData(targetKey) {
-    if (!targetKey) return null;
-    const rawData = getTargetDefenseData(targetKey);
-    return rawData ? {
-      ...rawData,
-      sizeMob: rawData.sizeMob || DOM_ELEMENTS.tSize?.value || ""
-    } : null;
-  }
-
-  getCurrentTarget() {
-    const targetKey = DOM_ELEMENTS.tDef?.value;
-    return targetKey ? {
-      key: targetKey,
-      data: this.getTargetData(targetKey)
-    } : null;
-  }
-
-  populateAllDropdowns() {
-    Object.entries(this.config.fields).forEach(([key, config]) => {
-      if (config.type !== 'dropdown' && config.type !== 'set') return;
-      const el = DOM_ELEMENTS[key];
-      if (!el) return;
-
-      const options = config.generator ?
-        this.config.setGenerators[config.generator]() :
-        (typeof config.options === 'function' ? config.options() : config.options);
-
-      this.populateOptions(el, options, config.placeholder);
-    });
-  }
-
-  populateOptions(select, options, placeholder) {
-    if (!select) return;
-    const fragment = document.createDocumentFragment();
-
-    if (placeholder) {
-      const opt = document.createElement('option');
-      opt.value = '';
-      opt.textContent = placeholder;
-      fragment.appendChild(opt);
-    }
-
-    options.forEach(optData => {
-      const opt = document.createElement('option');
-      const isString = typeof optData === "string";
-      opt.value = isString ? optData : optData.value;
-      opt.textContent = isString ? optData : optData.label;
-      if (optData.disabled) opt.disabled = true;
-      fragment.appendChild(opt);
-    });
-
-    select.innerHTML = '';
-    select.appendChild(fragment);
-  }
-
-  setFieldState(element, disabled, activeText = '', inactiveText = '') {
-    if (!element) return;
-    element.disabled = disabled;
-    element.placeholder = disabled ? inactiveText : activeText;
-
-    const wrapper = element.closest('.input-wrap');
-    if (wrapper) {
-      wrapper.classList.toggle('locked', disabled);
-      if (!disabled) wrapper.removeAttribute('data-temp-unlocked');
-    }
-  }
-
-  clearFields(fieldIds) {
-    fieldIds.forEach(id => {
-      const el = DOM_ELEMENTS[id];
-      if (el) el.value = '';
-    });
-  }
-
-  applyMobProperties(targetData, mode = 'standard', lockOverride = null) {
-    if (!targetData) return;
-
-    Object.entries(this.config.mobMapping).forEach(([mobProp, domKey]) => {
-      const el = DOM_ELEMENTS[domKey];
-      if (!el) return;
-
-      const targetValue = targetData[mobProp];
-      const shouldLock = this.shouldLock(domKey, targetValue, mode, lockOverride);
-
-      el.value = targetValue || "";
-      el.disabled = shouldLock;
-      this.state.lockStates.set(domKey, shouldLock);
-
-      const wrapper = el.closest('.input-wrap');
-      if (wrapper) wrapper.classList.toggle('locked', shouldLock);
-
-      if (!targetValue) {
-        const relatedKey = this.config.relatedFields[domKey];
-        const relatedField = relatedKey ? DOM_ELEMENTS[relatedKey] : null;
-        if (relatedField) {
-          relatedField.value = "";
-          const relatedWrapper = relatedField.closest('.input-wrap');
-          if (relatedWrapper) {
-            relatedWrapper.classList.remove('locked');
-            relatedWrapper.setAttribute('data-temp-unlocked', '1');
-          }
-        }
-      }
-    });
-  }
-
-  shouldLock(domKey, targetValue, mode, lockOverride) {
-    if (lockOverride !== null) return lockOverride;
-    const selectedKey = DOM_ELEMENTS.tDef?.value || "";
-    return mode === 'swap' ? !!targetValue : (targetValue && !selectedKey.includes("Lvl."));
-  }
-
-  bindEvents() {
-    EventManager.removeNS(this.namespace);
-
-    EventManager.addNS(this.namespace, document, 'change', (e) => {
-      if (AppState.get('isResultShown')) return;
-
-      if (e.target === DOM_ELEMENTS.tDef) {
-        this.handleTargetChange();
-        return;
-      }
-
-      if (this.constants.setKeys.includes(e.target.id)) {
-        this.recordSelection(e.target);
-        this.syncThreeSets();
-        this.scheduleUpdate();
-        return;
-      }
-
-      const fieldKey = this.config.eventMap[e.target.id];
-      if (fieldKey) {
-        const fieldConfig = this.config.fields[fieldKey];
-        if (fieldConfig?.onClear) this.clearFields(fieldConfig.onClear);
-        if (fieldConfig?.onUpdate === 'updateAttackTypeUI') this.updateAttackTypeUI();
-        this.scheduleUpdate();
-      }
-    });
-  }
-
-  handleTargetChange() {
-    if (this.state.isSwapping) return;
-
-    const selectedKey = DOM_ELEMENTS.tDef?.value;
-    if (!selectedKey) return;
-
-    const targetData = this.getTargetData(selectedKey);
-    if (targetData) {
-      this.applyMobProperties(targetData);
-      this.syncBreakdownSwap(selectedKey);
-      this.scheduleUpdate();
-    }
-  }
-
-  recordSelection(selectEl) {
-    const formData = this.getFormData();
-    const wasCycleComplete = this.state.selectionOrder.length >= 3 || (formData.blueSet && (formData.blueSetText || "").includes("*8"));
-
-    if (!selectEl?.value) {
-      this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== selectEl);
-      return;
-    }
-
-    this.state.selectionOrder = wasCycleComplete ? [selectEl] :
-      this.state.selectionOrder.includes(selectEl) ? this.state.selectionOrder : [...this.state.selectionOrder, selectEl];
-  }
-
-  syncThreeSets() {
-    const setElements = this.constants.setKeys.map(k => DOM_ELEMENTS[k]).filter(Boolean);
-    const formData = this.getFormData();
-    const blueIs8x = (formData.blueSetText || "").includes("*8");
-    const hasBlue8x = formData.blueSet && blueIs8x;
-
-    setElements.forEach(el => Array.from(el.options).forEach(opt => opt.disabled = false));
-
-    if (hasBlue8x) {
-      [DOM_ELEMENTS.vesperSet, DOM_ELEMENTS.whiteSet].forEach(el => {
-        if (el) {
-          Array.from(el.options).forEach(opt => opt.disabled = !!opt.value);
-          el.value = "";
-        }
-      });
-    } else {
-      if (this.state.selectionOrder.length > 0 && DOM_ELEMENTS.blueSet) {
-        Array.from(DOM_ELEMENTS.blueSet.options).forEach(opt => {
-          if (opt.value && opt.textContent.includes("*8")) opt.disabled = true;
-        });
-      }
-
-      if (this.state.selectionOrder.length >= 2) {
-        setElements.filter(el => !this.state.selectionOrder.includes(el)).forEach(el => {
-          Array.from(el.options).forEach(opt => opt.disabled = !!opt.value);
-          el.value = "";
-        });
-      }
-
-      const blueEl = DOM_ELEMENTS.blueSet;
-      if (blueEl?.value && blueEl.selectedOptions[0]?.disabled) {
-        blueEl.value = "";
-        this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== blueEl);
-      }
-    }
-  }
-
-  updateAll() {
-    const formData = this.getFormData();
-    this.updateStaticLabels();
-    this.updateDynamicLabels(formData);
-    this.updateConditionalFields(formData);
-    this.updateAttackTypeUI();
-  }
-
-  updateStaticLabels() {
-    Object.entries(this.config.labels.static).forEach(([key, label]) => {
-      const el = DOM_ELEMENTS[key];
-      if (el) el.textContent = label;
-    });
-  }
-
-  updateDynamicLabels(formData) {
-    const vesperLabel = DOM_ELEMENTS.vesperSetLabel;
-    const whiteLabel = DOM_ELEMENTS.whiteSetLabel;
-
-    if (vesperLabel) {
-      vesperLabel.textContent = this.config.labels.dynamic.vesper[formData.vesperSet] || "Vesper SET";
-    }
-    if (whiteLabel) {
-      whiteLabel.textContent = this.config.labels.dynamic.white[formData.whiteSet] || "White SET (110*3)";
-    }
-  }
-
-  updateConditionalFields(formData) {
-    Object.entries(this.config.fields).forEach(([key, config]) => {
-      if (config.type !== 'conditional') return;
-
-      const input = DOM_ELEMENTS[key];
-      const label = DOM_ELEMENTS[`${key}Label`];
-      const conditionValue = formData[config.dependsOn];
-
-      if (!input || !config.active || !config.default) return;
-
-      const settings = conditionValue ? config.active(conditionValue) : config.default;
-      const isActive = !!conditionValue;
-
-      input.disabled = !isActive;
-      input.placeholder = settings.placeholder;
-      if (label && settings.label) label.textContent = settings.label;
-    });
-  }
-
-  updateAttackTypeUI() {
-    const atkType = this.getFormData().atkType;
-    const penGroup = document.querySelector('.form-group.pen-group');
-    const critGroup = document.querySelector('.form-group.crit-group');
-
-    [penGroup, critGroup].forEach(group => group?.classList.add('hidden'));
-
-    if (atkType === 'pen' && penGroup) {
-      penGroup.classList.remove('hidden');
-      this.setFieldState(DOM_ELEMENTS.pen, false, 'total converted raw pen + final pen...');
-      this.setFieldState(DOM_ELEMENTS.crit, true);
-    } else if (atkType === 'crit' && critGroup) {
-      critGroup.classList.remove('hidden');
-      this.setFieldState(DOM_ELEMENTS.crit, false, 'critical damage bonus...');
-      this.setFieldState(DOM_ELEMENTS.pen, true);
-    } else {
-      this.setFieldState(DOM_ELEMENTS.pen, true);
-      this.setFieldState(DOM_ELEMENTS.crit, true);
-    }
-  }
-
-  scheduleUpdate() {
-    if (this.state.updateTimer) clearTimeout(this.state.updateTimer);
-    this.state.updateTimer = setTimeout(() => {
-      this.updateAll();
-      this.state.updateTimer = null;
-    }, 50);
-  }
-
-  determineSwapMode(prevKey, nextKey) {
-    if (!prevKey || !nextKey || nextKey === prevKey) return 'none';
-
-    const prevData = this.getTargetData(prevKey);
-    const nextData = this.getTargetData(nextKey);
-    if (!prevData || !nextData) return 'manual';
-
-    const prevRaw = getTargetDefenseData(prevKey) || {};
-    const nextRaw = getTargetDefenseData(nextKey) || {};
-
-    const currentDOM = {
-      sizeMob: DOM_ELEMENTS.tSize?.value || "",
-      raceMob: DOM_ELEMENTS.tRace?.value || "",
-      attributeMob: DOM_ELEMENTS.tAttr?.value || ""
-    };
-
-    for (const [mobProp] of Object.entries(this.config.mobMapping)) {
-      const prevValue = prevRaw[mobProp];
-      const nextValue = nextRaw[mobProp];
-
-      if (prevValue && nextValue && prevValue !== nextValue) return 'manual';
-      if (!nextValue || prevValue) continue;
-      if (mobProp === 'sizeMob' && currentDOM.sizeMob === nextValue) continue;
-
-      return 'manual';
-    }
-
-    return 'auto';
-  }
-
-  executeSwap(nextKey, state, isPenMode) {
-    const swapMode = this.determineSwapMode(this.getCurrentTarget()?.key, nextKey);
-    if (swapMode === 'none') return;
-
-    this.state.isSwapping = true;
-
-    if (DOM_ELEMENTS.tDef) DOM_ELEMENTS.tDef.value = nextKey;
-    this.syncBreakdownSwap(nextKey);
-    this.resetGlobalStates();
-
-    const targetData = this.getTargetData(nextKey);
-    if (!targetData) {
-      this.state.isSwapping = false;
-      return;
-    }
-
-    if (swapMode === 'auto') {
-      this.applyMobProperties(targetData, 'swap');
-      typeof processMainCalculation === 'function' && processMainCalculation();
-      typeof showSnackbar === 'function' && showSnackbar('Auto calc triggered!');
-      this.scheduleUpdate();
-    } else {
-      this.unlockCalculationFields(isPenMode);
-      this.applyMobProperties(targetData, 'manual', true);
-      this.updateManualSwapUI(state, isPenMode);
-      this.scheduleUpdate();
-    }
-
-    this.state.isSwapping = false;
-  }
-
-  unlockCalculationFields(isPenMode) {
-    const fields = [...this.config.calcFields, isPenMode ? "pen" : "crit"];
-    fields.forEach(fieldName => {
-      const field = DOM_ELEMENTS[fieldName];
-      if (!field) return;
-
-      const wrapper = field.closest(".input-wrap");
-      if (wrapper?.querySelector('input[type="number"]')) {
-        wrapper.classList.remove("locked");
-        wrapper.dataset.tempUnlocked = "1";
-      }
-      field.disabled = false;
-    });
-
-    typeof unbindInputLockGuard === 'function' && unbindInputLockGuard();
-  }
-
-  updateManualSwapUI(state, isPenMode) {
-    if (DOM_ELEMENTS.submit) DOM_ELEMENTS.submit.disabled = false;
-
-    this.config.disableButtons.forEach(btnId => {
-      const btn = DOM_ELEMENTS[btnId];
-      if (btn) btn.disabled = true;
-    });
-
-    if (DOM_ELEMENTS.hasil) {
-      DOM_ELEMENTS.hasil.dataset.specificMode = "0";
-      DOM_ELEMENTS.hasil.textContent = 'Input your stats to see the result...';
-    }
-    if (DOM_ELEMENTS.rec) {
-      DOM_ELEMENTS.rec.textContent = 'Balancing stat recommendations for a higher output multiplier.';
-    }
-
-    const focusElement = isPenMode ? DOM_ELEMENTS.pen : DOM_ELEMENTS.crit;
-    typeof scrollAndFocusElement === 'function' &&
-      scrollAndFocusElement(focusElement, "Target swapped - please verify stats and recalculate!");
-
-    typeof validateRequiredFields === 'function' && validateRequiredFields();
-    typeof validateStatsVsTarget === 'function' && validateStatsVsTarget(state);
-  }
-
-  syncBreakdownSwap(targetKey) {
-    const swapDropdown = document.querySelector('#breakdown-swap');
-    if (swapDropdown && swapDropdown.value !== targetKey) swapDropdown.value = targetKey;
-  }
-
-  resetGlobalStates() {
-    AppState.reset();
-    ['testSpear', 'testReaper'].forEach(btnId => {
-      const btn = DOM_ELEMENTS[btnId];
-      if (btn) btn.classList.remove('activated');
-    });
-  }
-
-  createSwapSelect(state, isPenMode) {
-    const select = document.createElement("select");
-    select.id = "breakdown-swap";
-    select.className = "breakdown-swap";
-
-    const pen = +(state.pen);
-    const dmg = +(state.dmg);
-    const currentKey = this.getCurrentTarget()?.key;
-    const allTargetData = getTargetDefenseData();
-
-    const options = Object.keys(allTargetData).map(key => {
-      const data = allTargetData[key];
-      const def = +(data?.def || 0);
-      const dmgred = +(data?.dmgred || 0);
-      const insufficient = dmg <= dmgred || (isPenMode && pen <= def);
-      const swapMode = this.determineSwapMode(currentKey, key);
-      const disabled = swapMode === 'auto' && insufficient;
-
-      const text = disabled ? `${key} (cant auto calc)` : key;
-      return `<option value="${key}"${disabled ? ' disabled' : ''}>${text}</option>`;
-    });
-
-    select.innerHTML = options.join('');
-    select.value = state.tDefKey || "DUMMY";
-
-    if (!select.hasAttribute('data-dropdown-bound')) {
-      EventManager.addNS(this.namespace, select, 'change', () => this.executeSwap(select.value, state, isPenMode));
-      select.setAttribute('data-dropdown-bound', 'true');
-    }
-
-    return select;
-  }
-
-  destroy() {
-    if (this.state.updateTimer) {
-      clearTimeout(this.state.updateTimer);
-      this.state.updateTimer = null;
-    }
-    EventManager.removeNS(this.namespace);
-    this.state.selectionOrder = [];
-    this.state.lockStates.clear();
-    this.state.isSwapping = false;
-    this.isInitialized = false;
-  }
-}
-const dropdownManager = new DropdownManager();
-
-// ======== VALIDATION ========
-class ValidationSSoT {
-  constructor() {
-    this.INVALID_CLASS = 'invalid-value';
-    this.touchedFields = new Set();
-    this.snackbarCooldowns = new Set();
-    this.namespace = 'validation-ssot';
-    this.isInitialized = false;
-    this.autoInit();
-  }
-
-  // Element type checkers
-  isPenOrDmg = (e) => ['pen', 'dmg'].includes(e?.id);
-  isRelatedNumeric = (e) => ['race', 'attr'].includes(e?.id);
-  isNumeric = (e) => e?.type === 'number' ||
-    e?.classList.contains('numeric-input') ||
-    this.isPenOrDmg(e) ||
-    this.isRelatedNumeric(e);
-
-  // Utilities
-  isValidNumber = (v) => !isNaN(+v) && isFinite(+v);
-  normalizeInput = (v) => String(v)
-    .replace(/[^\d.,]/g, '')
-    .replace(/,/g, '.')
-    .replace(/\.{2,}/g, '.')
-    .replace(/^\./, '0.')
-    .replace(/\.$/, '');
-
-  showMessage = (msg) => typeof showSnackbar === 'function' && showSnackbar(msg);
-
-  canShowSnackbar(elementId) {
-    if (this.snackbarCooldowns.has(elementId)) return false;
-
-    this.snackbarCooldowns.add(elementId);
-    setTimeout(() => this.snackbarCooldowns.delete(elementId), 2000);
-    return true;
-  }
-
-  // Validation helpers
-  getDropdownForRelated(element) {
-    return element.id === 'race' ? DOM_ELEMENTS.tRace : DOM_ELEMENTS.tAttr;
-  }
-
-  validateRelatedNumeric(element, value) {
-    const dropdown = this.getDropdownForRelated(element);
-
-    if (!dropdown?.value && !value) {
-      return {
-        isValid: true,
-        reason: 'related_empty'
-      };
-    }
-
-    if (dropdown?.value && !value) {
-      return {
-        isValid: false,
-        reason: 'related_required'
-      };
-    }
-
-    return null;
-  }
-
-  validateMinValue(element, numValue, showMessages) {
-    const min = element.getAttribute('min');
-    if (min === null || min === '') return null;
-
-    const minVal = +min;
-    if (numValue >= minVal) return null;
-
-    if (showMessages && this.canShowSnackbar(element.id)) {
-      const fieldName = element.getAttribute('data-field-name') || element.id || 'Field';
-      this.showMessage(`${fieldName} must be at least ${minVal}`);
-    }
-
-    return {
-      isValid: false,
-      reason: 'below_min'
-    };
-  }
-
-  validateMaxValue(element, numValue, showMessages) {
-    const max = element.getAttribute('max');
-    if (max === null || max === '') return null;
-
-    const maxVal = +max;
-    if (numValue <= maxVal) return null;
-
-    if (showMessages && this.canShowSnackbar(element.id)) {
-      this.showMessage('what are you doing?');
-    }
-
-    return {
-      isValid: false,
-      reason: 'above_max'
-    };
-  }
-
-  validateThreshold(element, numValue, showMessages) {
-    if (!this.isPenOrDmg(element)) return null;
-
-    const defData = getTargetDefenseData(DOM_ELEMENTS.tDef?.value);
-    const threshold = element.id === 'pen' ? (+(defData?.def) || 0) : (+(defData?.dmgred) || 0);
-
-    if (numValue > threshold) return null;
-
-    if (showMessages && this.canShowSnackbar(element.id)) {
-      const minRequired = (threshold + 8).toFixed(2);
-      const fieldType = element.id === 'pen' ? 'Final PEN' : 'Final P/M Bonus';
-      const targetLabel = DOM_ELEMENTS.tDef?.options?.[DOM_ELEMENTS.tDef.selectedIndex]?.textContent || 'target';
-      this.showMessage(`Need at least ${minRequired} ${fieldType} vs ${targetLabel}`);
-    }
-
-    return {
-      isValid: false,
-      reason: 'threshold_not_met'
-    };
-  }
-
-  validateField(element, showMessages = false) {
-    const value = element.value?.trim() || '';
-
-    // Check related numeric fields first
-    if (this.isRelatedNumeric(element)) {
-      const result = this.validateRelatedNumeric(element, value);
-      if (result) return result;
-    }
-
-    // Empty check
-    if (!value) return {
-      isValid: false,
-      reason: 'empty'
-    };
-
-    // Number format check
-    if (this.isNumeric(element) && !this.isValidNumber(value)) {
-      return {
-        isValid: false,
-        reason: 'invalid_number'
-      };
-    }
-
-    const numValue = +value;
-
-    // Min validation
-    const minResult = this.validateMinValue(element, numValue, showMessages);
-    if (minResult) return minResult;
-
-    // Max validation
-    const maxResult = this.validateMaxValue(element, numValue, showMessages);
-    if (maxResult) return maxResult;
-
-    // Threshold validation (pen/dmg specific)
-    const thresholdResult = this.validateThreshold(element, numValue, showMessages);
-    if (thresholdResult) return thresholdResult;
-
-    return {
-      isValid: true
-    };
-  }
-
-  updateFieldState(element, isValid) {
-    if (!this.touchedFields.has(element.id)) return;
-    element.classList.toggle(this.INVALID_CLASS, !isValid);
-  }
-
-  normalizeElement(element) {
-    if (!element || !this.isNumeric(element)) return;
-
-    const normalized = this.normalizeInput(element.value);
-    if (normalized !== element.value) {
-      element.value = normalized;
-    }
-
-    const result = this.validateField(element, this.touchedFields.has(element.id));
-    this.updateFieldState(element, result.isValid);
-  }
-
-  // Event handlers
-  createValidateHandler(element) {
-    return (showMessages = false) => {
-      const result = this.validateField(element, showMessages);
-      this.updateFieldState(element, result.isValid);
-    };
-  }
-
-  createNormalizeHandler(element) {
-    return () => {
-      if (!this.isNumeric(element)) return;
-
-      const normalized = this.normalizeInput(element.value);
-      if (normalized !== element.value) {
-        element.value = normalized;
-      }
-    };
-  }
-
-  setupField(element) {
-    const validateHandler = this.createValidateHandler(element);
-    const normalizeHandler = this.createNormalizeHandler(element);
-
-    EventManager.addNS(this.namespace, element, 'focus', () => {
-      this.touchedFields.add(element.id);
-    });
-
-    EventManager.addNS(this.namespace, element, 'input', () => {
-      normalizeHandler();
-      validateHandler(false);
-    });
-
-    EventManager.addNS(this.namespace, element, 'blur', () => validateHandler(true));
-    EventManager.addNS(this.namespace, element, 'change', () => validateHandler(true));
-
-    EventManager.addNS(this.namespace, element, 'paste', () => {
-      if (!this.isNumeric(element)) return;
-      setTimeout(() => this.normalizeElement(element), 0);
-    });
-  }
-
-  setupDefenseChangeHandler() {
-    if (!DOM_ELEMENTS.tDef) return;
-
-    EventManager.addNS(this.namespace, DOM_ELEMENTS.tDef, 'change', () => {
-      [DOM_ELEMENTS.pen, DOM_ELEMENTS.dmg]
-      .filter(el => el?.value.trim())
-        .forEach(el => {
-          const result = this.validateField(el, this.canShowSnackbar(el.id));
-          this.updateFieldState(el, result.isValid);
-        });
-    });
-  }
-
-  checkReady = () => typeof DOM_ELEMENTS !== 'undefined' && DOM_ELEMENTS;
-
-  init() {
-    if (this.isInitialized || !this.checkReady()) return false;
-
-    // Setup all field validations
-    ['atkType', 'weapon', 'wElem', 'tDef', 'tSize', 'pen', 'crit', 'dmg',
-      'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'
-    ]
-    .map(key => DOM_ELEMENTS[key])
-      .filter(Boolean)
-      .forEach(element => this.setupField(element));
-
-    // Setup defense change handler
-    this.setupDefenseChangeHandler();
-
-    this.isInitialized = true;
-    return true;
-  }
-
-  autoInit() {
-    if (this.isInitialized) return;
-
-    const initHandler = () => {
-      if (!this.isInitialized) this.init();
-    };
-
-    if (document.readyState === 'loading' || document.readyState === 'interactive') {
-      document.addEventListener('DOMContentLoaded', initHandler, {
-        once: true
-      });
-    } else {
-      this.init();
-    }
-
-    window.addEventListener('load', initHandler, {
-      once: true
-    });
-  }
-
-  // Field definitions
-  getRequiredFields() {
-    return [{
-        el: DOM_ELEMENTS.atkType,
-        name: 'Attack Type'
-      },
-      {
-        el: DOM_ELEMENTS.weapon,
-        name: 'Weapon Type'
-      },
-      {
-        el: DOM_ELEMENTS.wElem,
-        name: 'Weapon Attribute'
-      },
-      {
-        el: DOM_ELEMENTS.tDef,
-        name: 'Target Boss'
-      },
-      {
-        el: DOM_ELEMENTS.tSize,
-        name: 'Target Size'
-      },
-      {
-        el: DOM_ELEMENTS.pen,
-        name: 'Final P M PEN %',
-        condition: () => DOM_ELEMENTS.atkType?.value === 'pen'
-      },
-      {
-        el: DOM_ELEMENTS.crit,
-        name: 'Critical DMG Bonus %',
-        condition: () => DOM_ELEMENTS.atkType?.value === 'crit'
-      },
-      {
-        el: DOM_ELEMENTS.dmg,
-        name: 'Final P M DMG Bonus %'
-      },
-      {
-        el: DOM_ELEMENTS.elemEnh,
-        name: 'Element Enhance %'
-      },
-      {
-        el: DOM_ELEMENTS.sizeEnh,
-        name: 'DMG to Size %'
-      },
-      {
-        el: DOM_ELEMENTS.race,
-        name: 'DMG to Race %',
-        condition: () => DOM_ELEMENTS.race && !DOM_ELEMENTS.race.disabled
-      },
-      {
-        el: DOM_ELEMENTS.attr,
-        name: 'DMG to Attribute %',
-        condition: () => DOM_ELEMENTS.attr && !DOM_ELEMENTS.attr.disabled
-      },
-      {
-        el: DOM_ELEMENTS.dmgStack,
-        name: 'Final DMG Bonus %'
-      }
-    ];
-  }
-
-  shouldValidateField(field) {
-    if (!field.el) return false;
-    if (!field.condition) return true;
-    return field.condition();
-  }
-
-  validateSingleField(field) {
-    this.touchedFields.add(field.el.id);
-    const result = this.validateField(field.el, this.canShowSnackbar(field.el.id));
-    this.updateFieldState(field.el, result.isValid);
-
-    if (!result.isValid) {
-      if (typeof scrollAndFocusElement === 'function') {
-        scrollAndFocusElement(field.el);
-      }
-      return false;
-    }
-
-    return true;
-  }
-
-  validateAllRequired() {
-    const fields = this.getRequiredFields();
-
-    for (const field of fields) {
-      if (!this.shouldValidateField(field)) continue;
-      if (!this.validateSingleField(field)) return false;
-    }
-
-    return true;
-  }
-
-  getStatsElements(state) {
-    const elements = [];
-
-    if (state?.atkType?.toLowerCase() === 'pen' && DOM_ELEMENTS.pen) {
-      elements.push(DOM_ELEMENTS.pen);
-    }
-
-    if (DOM_ELEMENTS.dmg) {
-      elements.push(DOM_ELEMENTS.dmg);
-    }
-
-    return elements;
-  }
-
-  shouldFocusElement(element, focusedElement) {
-    return focusedElement === element || !focusedElement;
-  }
-
-  validateStatsElement(element, focusedElement) {
-    this.touchedFields.add(element.id);
-    const result = this.validateField(element, this.canShowSnackbar(element.id));
-    this.updateFieldState(element, result.isValid);
-
-    if (!result.isValid && this.shouldFocusElement(element, focusedElement)) {
-      if (typeof scrollAndFocusElement === 'function') {
-        scrollAndFocusElement(element);
-      }
-      return false;
-    }
-
-    return true;
-  }
-
-  validateStats(state, focusedElement = null) {
-    const elements = this.getStatsElements(state);
-
-    for (const element of elements) {
-      if (!this.validateStatsElement(element, focusedElement)) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  destroy() {
-    EventManager.removeNS(this.namespace);
-    this.touchedFields.clear();
-    this.snackbarCooldowns.clear();
-    this.isInitialized = false;
-  }
-}
-const ValidationSSoTInstance = new ValidationSSoT();
-const normalizeNumericInput = (el, pastedValue) => {
-  if (!el) return;
-  if (pastedValue !== undefined) el.value = pastedValue;
-  ValidationSSoTInstance.normalizeElement(el);
-};
-const validateRequiredFields = () => ValidationSSoTInstance.validateAllRequired();
-const validateStatsVsTarget = (state, focusedElement = null) => ValidationSSoTInstance.validateStats(state, focusedElement);
-
 // ========== INPUT LOCK SYSTEM ==========
 const InputLockManager = (() => {
   const PASSIVE_SUPPORT = (() => {
@@ -5583,7 +5583,7 @@ class StickyHandler {
     }
     return window.stickyHandler;
   }
-}
+};
 const stickyHandler = new StickyHandler();
 
 // ======== LIGHTBOX ========
@@ -6496,7 +6496,7 @@ function clearCache(type = null) {
     cache.rewarm();
     RandomGenerator.reset();
   }
-}
+};
 function resetAllData() {
   if (!confirm('Reset all data and inputs?')) return;
 
@@ -6528,10 +6528,10 @@ function resetAllData() {
 
   const message = shouldClearCache ? 'All data and cache cleared!' : 'All data reset!';
   setTimeout(() => showSnackbar?.(message), CONSTANTS.SNACKBAR_DELAY);
-}
+};
 
 // ========
 EventManager.add(window, 'beforeunload', () => {
   CleanupManager.cleanupListeners();
   CleanupManager.cleanupTimers();
-})
+});
