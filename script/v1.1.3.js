@@ -6245,7 +6245,7 @@ const PWAPersistenceInit = (() => {
   
   const init = () => {
     PWAPersistence.restore();
-    
+
     EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'visibilitychange', () => {
       if (document.hidden) {
         handlePWAExit();
@@ -6258,11 +6258,10 @@ const PWAPersistenceInit = (() => {
   };
   
   document.addEventListener('DOMContentLoaded', () => {
-    
     init();
-    if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
-      dropdownManager.bindEvents();
-    }
+        if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
+          dropdownManager.scheduleUpdate();
+        }
 
   });
   
