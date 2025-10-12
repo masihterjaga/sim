@@ -6231,11 +6231,6 @@ const preventPullToRefresh = (() => {
         
         if (state.isResultShown && typeof processMainCalculation === 'function') {
           setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
-          
-          if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
-            dropdownManager.updateAll();
-          }
-
         }
         
         return true;
@@ -6271,8 +6266,12 @@ const preventPullToRefresh = (() => {
   };
   
   document.addEventListener('DOMContentLoaded', () => {
-    init();
     
+    init();
+    if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
+      dropdownManager.scheduleUpdate();
+    }
+
   });
   
   window.clearPWAStorage = () => {
