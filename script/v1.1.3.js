@@ -1745,7 +1745,7 @@ const PrecisionToggle = {
     const btn = document.createElement('button');
     btn.className = 'toggle-precision job-sim';
     btn.type = 'button';
-    btn.textContent = showFullPrecision ? "hide" : "show";
+    btn.textContent = showFullPrecision ? "hide" : "shown";
 
     const listenerId = EventManager.add(btn, 'click', (e) => {
       e.preventDefault();
@@ -1755,7 +1755,7 @@ const PrecisionToggle = {
       const newState = resultContainer.dataset.showFullPrecision === "1" ? "0" : "1";
       resultContainer.dataset.showFullPrecision = newState;
 
-      btn.textContent = newState === "1" ? "hide" : "show";
+      btn.textContent = newState === "1" ? "hide" : "shown";
 
       onToggleCallback(newState === "1");
 
@@ -3798,1172 +3798,6 @@ const normalizeNumericInput = (el, pastedValue) => {
 const validateRequiredFields = () => ValidationSSoTInstance.validateAllRequired();
 const validateStatsVsTarget = (state, focusedElement = null) => ValidationSSoTInstance.validateStats(state, focusedElement);
 
-// ========== FLASH SYSTEM ==========
-const isMobile = () => window.innerWidth < 480;
-const debounceMap = new Map();
-let debounceCleanupInterval = null;
-const startDebounceCleanup = () => {
-  if (debounceCleanupInterval) return;
-
-  debounceCleanupInterval = setInterval(() => {
-    const now = Date.now();
-    const expiredEntries = Array.from(debounceMap.entries())
-      .filter(([, data]) => !data || (data.timestamp && now - data.timestamp > 10000));
-
-    expiredEntries.forEach(([key, data]) => {
-      if (data?.timerId) clearTimeout(data.timerId);
-      debounceMap.delete(key);
-    });
-
-    if (debounceMap.size === 0) {
-      clearInterval(debounceCleanupInterval);
-      debounceCleanupInterval = null;
-    }
-  }, 5000);
-};
-const smoothDebounce = (fn, delay, key) => {
-  const existing = debounceMap.get(key);
-
-  if (existing?.timerId) clearTimeout(existing.timerId);
-  if (existing?.running) return;
-
-  const timerId = setTimeout(() => {
-    const existing = debounceMap.get(key);
-    debounceMap.set(key, {
-      ...existing,
-      running: true
-    });
-    fn();
-    debounceMap.delete(key);
-  }, delay);
-
-  debounceMap.set(key, {
-    timerId,
-    running: false
-  });
-};
-function simulateFlash(event) {
-  if (!AppState.get('isResultShown')) return;
-
-  const TIMING = {
-    buttonCooldown: 1600,
-    flashTrigger: 150,
-    calculationDelayOn: 950,
-    calculationDelayOff: 100,
-    animationDuration: 1800
-  };
-
-  const btn = event?.currentTarget;
-  if (!btn || btn.disabled) return;
-
-  btn.disabled = true;
-  setTimeout(() => btn.disabled = false, TIMING.buttonCooldown);
-
-  const isReaper = btn === DOM_ELEMENTS.testReaper;
-  const prefix = isReaper ? 'reaper' : 'spear';
-  const oppositePrefix = isReaper ? 'spear' : 'reaper';
-  const stateKey = isReaper ? 'isTestReaperActive' : 'isTestSpearActive';
-
-  const wasActive = AppState.get(stateKey);
-  const isNowActive = !wasActive;
-
-  AppState.set(stateKey, isNowActive);
-  btn.classList.toggle('activated', isNowActive);
-
-  const isTransitionToOn = !wasActive && isNowActive;
-
-  if (isTransitionToOn && AppState.get('currentAnimatingWeapon') && AppState.get('currentAnimatingWeapon') !== prefix) {
-    ['flash', 'calc'].forEach(type => {
-      const key = `${oppositePrefix}-${type}`;
-      const timeout = debounceMap.get(key);
-      if (timeout) {
-        clearTimeout(timeout);
-        debounceMap.delete(key);
-      }
-    });
-  }
-
-  if (isTransitionToOn) {
-    AppState.set('currentAnimatingWeapon', prefix);
-    setTimeout(() => {
-      if (AppState.get('currentAnimatingWeapon') === prefix) {
-        AppState.set('currentAnimatingWeapon', null);
-      }
-    }, TIMING.calculationDelayOn + 100);
-
-    smoothDebounce(triggerPulseFlash, TIMING.flashTrigger, `${prefix}-flash`);
-    DOM_ELEMENTS.submit.textContent = "Calculating...";
-  }
-
-  const calcDelay = isTransitionToOn ? TIMING.calculationDelayOn : TIMING.calculationDelayOff;
-  smoothDebounce(() => {
-    if (typeof processMainCalculation === 'function') {
-      processMainCalculation();
-    }
-  }, calcDelay, `${prefix}-calc`);
-
-  const weaponName = isReaper ? 'Reaper' : 'Spear';
-  const statusText = isNowActive ? 'Flash Active' : 'Off';
-
-  if (typeof showSnackbar === 'function') {
-    showSnackbar(`${weaponName} ${statusText}`);
-  }
-};
-function triggerPulseFlash() {
-  if (!AppState.get('isResultShown')) return;
-  if (!isMobile()) return;
-  if (AppState.get('isFlashActive')) return;
-
-  const TIMING = {
-    animationDuration: 1800,
-    emergencyCleanup: 2200
-  };
-
-  AppState.set('isFlashActive', true);
-
-  requestAnimationFrame(() => {
-    const flash = document.createElement('div');
-    const lightning = document.createElement('div');
-    flash.className = 'lightning-flash-overlay';
-    lightning.className = 'lightning-icon';
-    flash.appendChild(lightning);
-
-    try {
-      document.body.appendChild(flash);
-    } catch (e) {
-      console.warn('Flash DOM insertion failed', e);
-      AppState.set('isFlashActive', false);
-      return;
-    }
-
-    const cleanup = () => {
-      if (flash.parentNode) {
-        flash.parentNode.removeChild(flash);
-      }
-      AppState.set('isFlashActive', false);
-    };
-
-    setTimeout(cleanup, TIMING.animationDuration);
-    setTimeout(() => {
-      if (AppState.get('isFlashActive') && flash.parentNode) {
-        cleanup();
-      }
-    }, TIMING.emergencyCleanup);
-  });
-};
-
-// ========== TOOLTIP SYSTEM ==========
-const TooltipManager = (() => {
-  const activeTooltips = new Map();
-  const lazyTooltips = new Map();
-  let orphanObserver = null;
-  let autoInitObserver = null;
-  let tooltipConfig = {};
-
-  const CONFIG = {
-    HIDE_DELAY: 300,
-    THROTTLE_DELAY: 16,
-    MARGIN: 16,
-    OFFSET: 12
-  };
-
-  const cleanupOrphanedTooltip = (node) => {
-    if (activeTooltips.has(node)) {
-      const activeData = activeTooltips.get(node);
-      if (activeData?.cleanup) activeData.cleanup();
-      activeTooltips.delete(node);
-    }
-
-    if (lazyTooltips.has(node)) {
-      const lazyData = lazyTooltips.get(node);
-      if (lazyData?.listenerIds) {
-        lazyData.listenerIds.forEach(id => EventManager.remove(id));
-      }
-      lazyTooltips.delete(node);
-    }
-  };
-
-  const cleanupChildTooltips = (node) => {
-    if (!node.querySelectorAll) return;
-
-    activeTooltips.forEach((data, el) => {
-      if (el !== node && node.contains(el)) {
-        if (data?.cleanup) data.cleanup();
-        activeTooltips.delete(el);
-      }
-    });
-
-    lazyTooltips.forEach((data, el) => {
-      if (el !== node && node.contains(el)) {
-        if (data?.listenerIds) {
-          data.listenerIds.forEach(id => EventManager.remove(id));
-        }
-        lazyTooltips.delete(el);
-      }
-    });
-  };
-
-  const startOrphanDetection = () => {
-    if (orphanObserver) return;
-    if (typeof MutationObserver === 'undefined') return;
-
-    orphanObserver = new MutationObserver((mutations) => {
-      const elementsToCheck = new Set();
-
-      mutations.forEach(mutation => {
-        mutation.removedNodes.forEach(node => {
-          if (node.nodeType === 1) {
-            elementsToCheck.add(node);
-          }
-        });
-      });
-
-      elementsToCheck.forEach(node => {
-        cleanupOrphanedTooltip(node);
-        cleanupChildTooltips(node);
-      });
-    });
-
-    orphanObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  };
-
-  const matchesSelector = (element, selector) => {
-    if (selector.startsWith('#')) {
-      return element.id === selector.slice(1);
-    } else if (selector.startsWith('.')) {
-      return element.classList.contains(selector.slice(1));
-    } else if (selector.startsWith('[')) {
-      const attrMatch = selector.match(/\[([^\]]+)\]/);
-      if (attrMatch) {
-        const [attrName, attrValue] = attrMatch[1].split('=');
-        if (attrValue) {
-          return element.getAttribute(attrName) === attrValue.replace(/['"]/g, '');
-        }
-        return element.hasAttribute(attrName);
-      }
-    }
-    return element.matches(selector);
-  };
-
-  const injectSVG = (element) => {
-    if (element.classList.contains('tooltip-button') && !element.querySelector('svg')) {
-      element.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" height="70" fill="#dcddde" viewBox="0 -960 960 960" width="70">
-          <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
-        </svg>
-      `;
-    }
-  };
-
-  const initializeElement = (element) => {
-    if (lazyTooltips.has(element)) return;
-
-    injectSVG(element);
-
-    Object.entries(tooltipConfig).forEach(([selector, content]) => {
-      try {
-        if (matchesSelector(element, selector)) {
-          registerLazyTooltip(element, content);
-        }
-      } catch (e) {
-        // Selector invalid, skip
-      }
-    });
-  };
-
-  const startAutoInit = () => {
-    if (autoInitObserver) return;
-    if (typeof MutationObserver === 'undefined') return;
-    if (Object.keys(tooltipConfig).length === 0) return;
-
-    autoInitObserver = new MutationObserver((mutations) => {
-      mutations.forEach(mutation => {
-        mutation.addedNodes.forEach(node => {
-          if (node.nodeType !== 1) return;
-
-          // Check the node itself
-          initializeElement(node);
-
-          // Check all descendants
-          if (node.querySelectorAll) {
-            Object.keys(tooltipConfig).forEach(selector => {
-              try {
-                const elements = node.querySelectorAll(selector);
-                elements.forEach(el => initializeElement(el));
-              } catch (e) {
-                // Invalid selector, skip
-              }
-            });
-          }
-        });
-      });
-    });
-
-    autoInitObserver.observe(document.body, {
-      childList: true,
-      subtree: true
-    });
-  };
-
-  const stopAutoInit = () => {
-    if (!autoInitObserver) return;
-    autoInitObserver.disconnect();
-    autoInitObserver = null;
-  };
-
-  const stopOrphanDetection = () => {
-    if (!orphanObserver) return;
-    orphanObserver.disconnect();
-    orphanObserver = null;
-  };
-
-  const calculateTooltipSize = (tooltip) => {
-    tooltip.style.cssText = 'visibility:hidden;display:block';
-    const width = tooltip.offsetWidth;
-    const height = tooltip.offsetHeight;
-    tooltip.style.cssText = '';
-    return {
-      width,
-      height
-    };
-  };
-
-  const calculatePosition = (rect, scrollX, scrollY, tooltipWidth, tooltipHeight) => {
-    const centerX = rect.left + scrollX + (rect.width / 2);
-    const maxLeft = window.innerWidth - tooltipWidth - CONFIG.MARGIN;
-    const left = Math.max(CONFIG.MARGIN, Math.min(centerX - (tooltipWidth / 2), maxLeft));
-
-    let top = rect.top + scrollY - tooltipHeight - CONFIG.OFFSET;
-    let isFlipped = false;
-
-    if (top < CONFIG.MARGIN + scrollY) {
-      top = rect.bottom + scrollY + CONFIG.OFFSET;
-      isFlipped = true;
-    }
-
-    return {
-      left,
-      top,
-      isFlipped
-    };
-  };
-
-  const createTooltip = (triggerElement, content) => {
-    if (!triggerElement || !content) return;
-
-    const existing = activeTooltips.get(triggerElement);
-    if (existing?.cleanup) {
-      existing.cleanup();
-      activeTooltips.delete(triggerElement);
-    }
-
-    const tooltip = document.createElement("div");
-    tooltip.className = "tooltip-wrap";
-    tooltip.innerHTML = content;
-    document.body.appendChild(tooltip);
-
-    let isVisible = false;
-    let hideTimer = null;
-    const namespace = `tooltip-active-${Date.now()}-${Math.random()}`;
-
-    const cleanup = () => {
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        hideTimer = null;
-      }
-
-      EventManager.removeNS(namespace);
-
-      if (tooltip.parentNode) {
-        tooltip.parentNode.removeChild(tooltip);
-      }
-
-      activeTooltips.delete(triggerElement);
-    };
-
-    const updatePosition = () => {
-      if (!document.contains(triggerElement) || !document.contains(tooltip)) {
-        cleanup();
-        return;
-      }
-
-      const rect = triggerElement.getBoundingClientRect();
-      const scrollX = window.pageXOffset;
-      const scrollY = window.pageYOffset;
-
-      const {
-        width: tooltipWidth,
-        height: tooltipHeight
-      } = calculateTooltipSize(tooltip);
-      const {
-        left,
-        top,
-        isFlipped
-      } = calculatePosition(rect, scrollX, scrollY, tooltipWidth, tooltipHeight);
-
-      tooltip.classList.toggle('flipped', isFlipped);
-      tooltip.style.transform = `translate(${left}px, ${top}px)`;
-    };
-
-    const show = () => {
-      if (isVisible) return;
-
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        hideTimer = null;
-      }
-
-      updatePosition();
-      isVisible = true;
-      tooltip.classList.add('show');
-    };
-
-    const hide = () => {
-      if (!isVisible) return;
-
-      tooltip.classList.remove('show');
-      isVisible = false;
-
-      hideTimer = setTimeout(() => {
-        cleanup();
-      }, CONFIG.HIDE_DELAY);
-    };
-
-    const handleOutsideClick = (e) => {
-      if (!isVisible) return;
-      if (triggerElement.contains(e.target)) return;
-      if (tooltip.contains(e.target)) return;
-
-      hide();
-    };
-
-    const handleKeydown = (e) => {
-      if (e.key === "Escape" && isVisible) {
-        hide();
-      }
-    };
-
-    const throttledPosition = () => {
-      if (!isVisible) return;
-
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        hideTimer = null;
-      }
-
-      hideTimer = setTimeout(() => {
-        updatePosition();
-        hideTimer = null;
-      }, CONFIG.THROTTLE_DELAY);
-    };
-
-    EventManager.addNS(namespace, document, "click", handleOutsideClick);
-    EventManager.addNS(namespace, document, "touchend", handleOutsideClick, {
-      passive: true
-    });
-    EventManager.addNS(namespace, document, "keydown", handleKeydown);
-    EventManager.addNS(namespace, window, 'resize', throttledPosition, {
-      passive: true
-    });
-    EventManager.addNS(namespace, window, 'scroll', throttledPosition, {
-      passive: true
-    });
-
-    activeTooltips.set(triggerElement, {
-      tooltip,
-      cleanup,
-      namespace
-    });
-
-    show();
-  };
-
-  const registerLazyTooltip = (triggerElement, content) => {
-    if (!triggerElement || !content) return;
-
-    const existing = lazyTooltips.get(triggerElement);
-    if (existing && existing.content === content) return;
-
-    if (existing?.listenerIds) {
-      existing.listenerIds.forEach(id => EventManager.remove(id));
-    }
-
-    const namespace = `tooltip-lazy-${Date.now()}-${Math.random()}`;
-    const listenerIds = [];
-
-    const initTooltip = (e) => {
-      if (e?.cancelable) e.preventDefault();
-      createTooltip(triggerElement, content);
-    };
-
-    const handleClick = (e) => {
-      // Check if click is on SVG or its children
-      const target = e.target;
-      if (target === triggerElement || triggerElement.contains(target)) {
-        initTooltip(e);
-      }
-    };
-
-    listenerIds.push(
-      EventManager.addNS(namespace, triggerElement, "click", handleClick),
-      EventManager.addNS(namespace, triggerElement, "touchend", handleClick, {
-        passive: false
-      })
-    );
-
-    lazyTooltips.set(triggerElement, {
-      content,
-      namespace,
-      listenerIds
-    });
-
-    if (lazyTooltips.size === 1 && !orphanObserver) {
-      startOrphanDetection();
-    }
-  };
-
-  const destroyAll = () => {
-    stopAutoInit();
-    stopOrphanDetection();
-
-    activeTooltips.forEach(({
-      cleanup
-    }) => {
-      if (cleanup) cleanup();
-    });
-    activeTooltips.clear();
-
-    lazyTooltips.forEach(({
-      listenerIds
-    }) => {
-      if (listenerIds) {
-        listenerIds.forEach(id => EventManager.remove(id));
-      }
-    });
-    lazyTooltips.clear();
-
-    tooltipConfig = {};
-  };
-
-  return {
-    registerLazyTooltip,
-    startAutoInit,
-    stopAutoInit,
-    setConfig: (config) => {
-      tooltipConfig = config;
-      startAutoInit();
-    },
-    destroyAll
-  };
-})();
-const setupTooltips = (config) => {
-  // Save config for auto-init
-  TooltipManager.setConfig(config);
-
-  // Initialize existing elements
-  Object.entries(config).forEach(([selector, content]) => {
-    const elements = typeof selector === 'string' ?
-      document.querySelectorAll(selector) :
-      selector instanceof Element ? [selector] : [];
-
-    elements.forEach(el => {
-      if (el instanceof Element) {
-        // Auto inject SVG if it's a tooltip-button
-        if (el.classList.contains('tooltip-button') && !el.querySelector('svg')) {
-          el.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" height="70" fill="#dcddde" viewBox="0 -960 960 960" width="70">
-              <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
-            </svg>
-          `;
-        }
-        TooltipManager.registerLazyTooltip(el, content);
-      }
-    });
-  });
-};
-setupTooltips({
-  "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are two <strong>different</strong> things! Look for it in your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set 0.",
-  "#targetRaceTips": "Specific MVP/MINi will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target spesific race!",
-  "#targetAttrTips": "also same with race.",
-  "#dmgRaceTips": "Unlocked when target race selected, minimum valid value is 0.",
-  "#dmgAttrTips": "same condition with dmg to race",
-  "#mvpminiTips": "DUMMY have no defense stat. Avg 130, Necro, Ogre, Ktul defs less accurate than others!",
-  //'"#blueTips": "BLUE*8 is experimental.",
-  "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>But, dont expect to much! This tool calculates RNG buffs from equipment sets, flashes, and doesn't include flat or percentage damage bonuses.",
-  "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20 second cooldown.",
-  "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn’t have 100% uptime since it only lasts 10 seconds with a 20-second cooldown, and the final result shown below represents the highest output during the buff’s active period.",
-  "#spearTips": "This bonus doesn't have 100% uptime because it only lasts 10 seconds while the cooldown is 20 seconds. The final result shown below represents the highest output during the buff's active period.",
-  "#elemCtrTips": "Tools assume target Neutral if you're not targeting any attribute.",
-  "#breakdownTips": "Values shown to two decimal places for readability. The final result is computed with full precision, so it may differ slightly if you recompute using the displayed (rounded) numbers.",
-  "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward means lower."
-
-});
-
-// ========== NOTIFICATION ==========
-const SnackbarManager = (() => {
-  let hideTimer = null;
-  let trackingKeyboard = false;
-  let lastBottom = -1;
-  let viewportChangeTimer = null;
-  
-  const NS = 'snackbar';
-  
-  const CONFIG = {
-    MOBILE_MAX_WIDTH: 480,
-    KEYBOARD_MIN: 100,
-    BASE_OFFSET: 20,
-    SHOW_DURATION: 3000,
-    HIDE_ANIMATION: 300,
-    RESIZE_DEBOUNCE: 150
-  };
-  
-  const isMobileView = () => window.innerWidth <= CONFIG.MOBILE_MAX_WIDTH;
-  
-  const calcKeyboardHeight = () => {
-    const vp = window.visualViewport;
-    if (!vp) return 0;
-    
-    const gap = window.innerHeight - vp.height;
-    return (gap > 50 && gap < window.innerHeight * 0.7) ? gap : 0;
-  };
-  
-  const updatePosition = () => {
-    const el = DOM_ELEMENTS?.snackbar;
-    if (!el?.classList.contains('show') || !isMobileView() || !window.visualViewport) return;
-    
-    const kbHeight = calcKeyboardHeight();
-    const bottom = (kbHeight > CONFIG.KEYBOARD_MIN ? kbHeight : 0) 
-                   + CONFIG.BASE_OFFSET 
-                   - window.visualViewport.offsetTop;
-    
-    if (bottom === lastBottom) return;
-    
-    lastBottom = bottom;
-    el.style.bottom = `${bottom}px`;
-  };
-  
-  const toggleTracking = (enable) => {
-    if (trackingKeyboard === enable) return;
-    
-    const vp = window.visualViewport;
-    if (!vp) return;
-    
-    trackingKeyboard = enable;
-    lastBottom = -1;
-    
-    if (enable) {
-      EventManager.addNS(`${NS}_viewport`, vp, 'resize', updatePosition, { passive: true });
-      EventManager.addNS(`${NS}_viewport`, vp, 'scroll', updatePosition, { passive: true });
-    } else {
-      EventManager.removeNS(`${NS}_viewport`);
-      const el = DOM_ELEMENTS?.snackbar;
-      if (el) el.style.bottom = '';
-    }
-  };
-  
-  const show = (message) => {
-    const el = DOM_ELEMENTS?.snackbar;
-    if (!el || !message) return;
-    
-    if (hideTimer) {
-      clearTimeout(hideTimer);
-      hideTimer = null;
-    }
-    
-    el.textContent = message;
-    el.classList.remove('show');
-    void el.offsetHeight;
-    el.classList.add('show');
-    
-    if (isMobileView()) {
-      lastBottom = -1;
-      updatePosition();
-      toggleTracking(true);
-    } else {
-      el.style.bottom = `${CONFIG.BASE_OFFSET}px`;
-    }
-    
-    hideTimer = setTimeout(() => {
-      el.classList.remove('show');
-      setTimeout(() => {
-        if (!el.classList.contains('show')) toggleTracking(false);
-      }, CONFIG.HIDE_ANIMATION);
-      hideTimer = null;
-    }, CONFIG.SHOW_DURATION);
-  };
-  
-  const handleWindowResize = () => {
-    if (viewportChangeTimer) {
-      clearTimeout(viewportChangeTimer);
-      viewportChangeTimer = null;
-    }
-    
-    viewportChangeTimer = setTimeout(() => {
-      const el = DOM_ELEMENTS?.snackbar;
-      if (!el?.classList.contains('show')) {
-        viewportChangeTimer = null;
-        return;
-      }
-      
-      if (isMobileView()) {
-        if (!trackingKeyboard) {
-          lastBottom = -1;
-          toggleTracking(true);
-          updatePosition();
-        }
-      } else {
-        toggleTracking(false);
-        el.style.bottom = `${CONFIG.BASE_OFFSET}px`;
-      }
-      
-      viewportChangeTimer = null;
-    }, CONFIG.RESIZE_DEBOUNCE);
-  };
-  
-  EventManager.addNS(NS, window, 'resize', handleWindowResize, { passive: true });
-  
-  return {
-    show,
-    cleanup: () => {
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        hideTimer = null;
-      }
-      
-      if (viewportChangeTimer) {
-        clearTimeout(viewportChangeTimer);
-        viewportChangeTimer = null;
-      }
-      
-      EventManager.removeNS(NS);
-      EventManager.removeNS(`${NS}_viewport`);
-      EventManager.forceCleanup();
-      
-      trackingKeyboard = false;
-      lastBottom = -1;
-      
-      const el = DOM_ELEMENTS?.snackbar;
-      if (el) {
-        el.style.bottom = '';
-        el.classList.remove('show');
-      }
-    }
-  };
-})();
-const showSnackbar = SnackbarManager.show;
-const scrollAndFocusElement = (el, msg) => {
-  if (msg) showSnackbar(msg);
-
-  const offsetTop = el.getBoundingClientRect().top + window.pageYOffset - 80;
-  window.scrollTo({
-    top: offsetTop,
-    behavior: 'smooth'
-  });
-
-  if (!el.disabled) {
-    el.focus({
-      preventScroll: true
-    });
-  }
-
-  return false;
-};
-
-// ========== ACCORDION SYSTEM ==========
-const accordionManager = (() => {
-  const duration = 320;
-  const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
-  const transition = `max-height ${duration}ms ${easing}, opacity ${duration}ms ease-out`;
-  const instances = new Map();
-  const namespace = 'accordion-manager';
-  let observer = null;
-  let cleanupInterval = null;
-
-  const setStyles = (content, maxHeight, opacity = 1) => {
-    Object.assign(content.style, {
-      maxHeight,
-      opacity: opacity.toString()
-    });
-  };
-
-  const createInstance = (details, summary, content) => {
-    let isAnimating = false;
-    let currentAnimation = null;
-    let transitionListenerId = null;
-    const instanceNamespace = `${namespace}-${Date.now()}-${Math.random()}`;
-
-    const cleanup = () => {
-      if (currentAnimation) {
-        cancelAnimationFrame(currentAnimation);
-        currentAnimation = null;
-      }
-      if (transitionListenerId !== null) {
-        EventManager.remove(transitionListenerId);
-        transitionListenerId = null;
-      }
-      EventManager.removeNS(instanceNamespace);
-      isAnimating = false;
-    };
-
-    const animateOpen = () => {
-      details.setAttribute('open', '');
-      setStyles(content, '0px', 0.3);
-
-      currentAnimation = requestAnimationFrame(() => {
-        const targetHeight = content.scrollHeight + 'px';
-        setStyles(content, targetHeight, 1);
-
-        const onTransitionEnd = () => {
-          setStyles(content, 'none', 1);
-          isAnimating = false;
-          if (transitionListenerId !== null) {
-            EventManager.remove(transitionListenerId);
-            transitionListenerId = null;
-          }
-        };
-        transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
-      });
-    };
-
-    const animateClose = () => {
-      const currentHeight = content.scrollHeight + 'px';
-      setStyles(content, currentHeight, 1);
-
-      currentAnimation = requestAnimationFrame(() => {
-        setStyles(content, '0px', 0.3);
-
-        const onTransitionEnd = () => {
-          details.removeAttribute('open');
-          isAnimating = false;
-          if (transitionListenerId !== null) {
-            EventManager.remove(transitionListenerId);
-            transitionListenerId = null;
-          }
-        };
-        transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
-      });
-    };
-
-    const animate = (isOpening) => {
-      if (isAnimating) return;
-
-      isAnimating = true;
-      cleanup();
-
-      if (isOpening) {
-        animateOpen();
-      } else {
-        animateClose();
-      }
-    };
-
-    const handleClick = (e) => {
-      e.preventDefault();
-      if (isAnimating) return;
-
-      const isOpen = details.hasAttribute('open');
-      animate(!isOpen);
-    };
-
-    EventManager.addNS(instanceNamespace, summary, 'click', handleClick);
-
-    return {
-      animate,
-      cleanup: () => {
-        cleanup();
-        EventManager.removeNS(instanceNamespace);
-      },
-      get isAnimating() {
-        return isAnimating;
-      },
-      namespace: instanceNamespace
-    };
-  };
-
-  const cleanupOrphans = () => {
-    const orphanedKeys = [];
-
-    instances.forEach((instance, details) => {
-      if (!document.contains(details)) {
-        instance.cleanup();
-        orphanedKeys.push(details);
-      }
-    });
-
-    orphanedKeys.forEach(key => instances.delete(key));
-
-    if (instances.size === 0 && cleanupInterval) {
-      clearInterval(cleanupInterval);
-      cleanupInterval = null;
-    }
-  };
-
-  const startCleanupInterval = () => {
-    if (cleanupInterval) return;
-    if (instances.size === 0) return;
-
-    cleanupInterval = setInterval(cleanupOrphans, 30000);
-  };
-
-  const initializeDetailsElement = (details) => {
-    const summary = details.querySelector('summary');
-    const content = details.querySelector('.body');
-
-    if (!summary || !content) return;
-    if (instances.has(details)) return;
-
-    const isOpen = details.hasAttribute('open');
-    Object.assign(content.style, {
-      transition,
-      overflow: 'hidden',
-      maxHeight: isOpen ? 'none' : '0px',
-      opacity: isOpen ? '1' : '0.3'
-    });
-
-    const instance = createInstance(details, summary, content);
-    instances.set(details, instance);
-  };
-
-  const processDetails = () => {
-    cleanupOrphans();
-
-    document.querySelectorAll('details').forEach(details => {
-      initializeDetailsElement(details);
-    });
-
-    if (instances.size > 0) {
-      startCleanupInterval();
-    }
-  };
-
-  const shouldProcessMutation = (mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.addedNodes.length === 0) continue;
-
-      for (const node of mutation.addedNodes) {
-        if (node.nodeType !== 1) continue;
-        if (node.tagName === 'DETAILS') return true;
-        if (node.querySelector?.('details')) return true;
-      }
-    }
-    return false;
-  };
-
-  const handleRemovedNodes = (mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.removedNodes.length === 0) continue;
-
-      for (const node of mutation.removedNodes) {
-        if (node.nodeType !== 1) continue;
-
-        if (node.tagName === 'DETAILS' && instances.has(node)) {
-          const instance = instances.get(node);
-          instance.cleanup();
-          instances.delete(node);
-          continue;
-        }
-
-        if (node.querySelectorAll) {
-          instances.forEach((instance, details) => {
-            if (node.contains(details)) {
-              instance.cleanup();
-              instances.delete(details);
-            }
-          });
-        }
-      }
-    }
-  };
-
-  processDetails();
-
-  observer = new MutationObserver((mutations) => {
-    handleRemovedNodes(mutations);
-
-    if (shouldProcessMutation(mutations)) {
-      requestAnimationFrame(processDetails);
-    }
-  });
-
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
-
-  const destroy = () => {
-    if (cleanupInterval) {
-      clearInterval(cleanupInterval);
-      cleanupInterval = null;
-    }
-    if (observer) {
-      observer.disconnect();
-      observer = null;
-    }
-    instances.forEach(instance => instance.cleanup());
-    instances.clear();
-  };
-
-  EventManager.addNS(namespace, window, 'beforeunload', destroy);
-
-  return {
-    destroy,
-    reinitialize: processDetails
-  };
-})();
-
-// ========== LOG MODAL ==========
-const modalManager = (() => {
-  const {
-    log,
-    openLog,
-    closeLog
-  } = DOM_ELEMENTS || {};
-  if (!log) {
-    return {
-      show: () => {},
-      hide: () => {},
-      destroy: () => {}
-    };
-  }
-
-  const content = log.querySelector('.modal-content, .log-content, .modal-body') || log.firstElementChild;
-  const duration = 280;
-  const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
-  const namespace = 'modal-manager';
-
-  const baseStyles = {
-    modal: {
-      display: 'none',
-      transition: `opacity ${duration}ms ${easing}, transform ${duration}ms ${easing}, backdrop-filter ${duration}ms ${easing}`,
-      transformOrigin: 'center'
-    },
-    content: content ? {
-      transition: `transform ${duration}ms ${easing}, opacity ${duration}ms ${easing}`
-    } : null
-  };
-
-  Object.assign(log.style, baseStyles.modal);
-  if (content) {
-    Object.assign(content.style, baseStyles.content);
-  }
-
-  let isVisible = false;
-  let animationId = null;
-  let hideTimeout = null;
-
-  const cleanup = () => {
-    if (animationId) {
-      cancelAnimationFrame(animationId);
-      animationId = null;
-    }
-    if (hideTimeout) {
-      clearTimeout(hideTimeout);
-      hideTimeout = null;
-    }
-  };
-
-  const applyHideStyles = () => {
-    Object.assign(log.style, {
-      opacity: '0',
-      transform: 'scale(0.96)',
-      backdropFilter: 'blur(0px)',
-      backgroundColor: 'transparent'
-    });
-
-    if (content) {
-      Object.assign(content.style, {
-        transform: 'translateY(-8px) scale(0.98)',
-        opacity: '0.5'
-      });
-    }
-  };
-
-  const applyShowStyles = () => {
-    Object.assign(log.style, {
-      opacity: '1',
-      transform: 'scale(1)',
-      backdropFilter: 'blur(6px)',
-      backgroundColor: 'rgba(0, 0, 0, 0.3)'
-    });
-
-    if (content) {
-      Object.assign(content.style, {
-        transform: 'translateY(0) scale(1)',
-        opacity: '1'
-      });
-    }
-  };
-
-  const hide = () => {
-    if (!isVisible) return;
-
-    isVisible = false;
-    cleanup();
-
-    applyHideStyles();
-
-    hideTimeout = setTimeout(() => {
-      if (!isVisible) {
-        log.style.display = 'none';
-      }
-    }, duration);
-  };
-
-  const show = () => {
-    if (isVisible) return;
-
-    isVisible = true;
-    cleanup();
-
-    log.style.display = 'flex';
-
-    animationId = requestAnimationFrame(() => {
-      applyShowStyles();
-    });
-  };
-
-  const handleOpen = (e) => {
-    e.stopPropagation();
-    show();
-  };
-
-  const handleKeydown = (e) => {
-    if (e.key === 'Escape' && isVisible) {
-      hide();
-    }
-  };
-
-  const handleOutsideClick = (e) => {
-    if (!isVisible) return;
-    if (!content) return;
-    if (content.contains(e.target)) return;
-    if (e.target === openLog) return;
-
-    hide();
-  };
-
-  EventManager.addNS(namespace, openLog, 'click', handleOpen);
-  EventManager.addNS(namespace, closeLog, 'click', hide);
-  EventManager.addNS(namespace, document, 'keydown', handleKeydown);
-  EventManager.addNS(namespace, document, 'click', handleOutsideClick);
-
-  const destroy = () => {
-    cleanup();
-    EventManager.removeNS(namespace);
-  };
-
-  EventManager.addNS(namespace, window, 'beforeunload', destroy);
-
-  return {
-    show,
-    hide,
-    destroy
-  };
-})();
-
 // ========== INPUT LOCK SYSTEM ==========
 const InputLockManager = (() => {
   const PASSIVE_SUPPORT = (() => {
@@ -5585,6 +4419,1172 @@ class StickyHandler {
   }
 };
 const stickyHandler = new StickyHandler();
+
+// ========== FLASH SYSTEM ==========
+const isMobile = () => window.innerWidth < 480;
+const debounceMap = new Map();
+let debounceCleanupInterval = null;
+const startDebounceCleanup = () => {
+  if (debounceCleanupInterval) return;
+
+  debounceCleanupInterval = setInterval(() => {
+    const now = Date.now();
+    const expiredEntries = Array.from(debounceMap.entries())
+      .filter(([, data]) => !data || (data.timestamp && now - data.timestamp > 10000));
+
+    expiredEntries.forEach(([key, data]) => {
+      if (data?.timerId) clearTimeout(data.timerId);
+      debounceMap.delete(key);
+    });
+
+    if (debounceMap.size === 0) {
+      clearInterval(debounceCleanupInterval);
+      debounceCleanupInterval = null;
+    }
+  }, 5000);
+};
+const smoothDebounce = (fn, delay, key) => {
+  const existing = debounceMap.get(key);
+
+  if (existing?.timerId) clearTimeout(existing.timerId);
+  if (existing?.running) return;
+
+  const timerId = setTimeout(() => {
+    const existing = debounceMap.get(key);
+    debounceMap.set(key, {
+      ...existing,
+      running: true
+    });
+    fn();
+    debounceMap.delete(key);
+  }, delay);
+
+  debounceMap.set(key, {
+    timerId,
+    running: false
+  });
+};
+function simulateFlash(event) {
+  if (!AppState.get('isResultShown')) return;
+
+  const TIMING = {
+    buttonCooldown: 1600,
+    flashTrigger: 150,
+    calculationDelayOn: 950,
+    calculationDelayOff: 100,
+    animationDuration: 1800
+  };
+
+  const btn = event?.currentTarget;
+  if (!btn || btn.disabled) return;
+
+  btn.disabled = true;
+  setTimeout(() => btn.disabled = false, TIMING.buttonCooldown);
+
+  const isReaper = btn === DOM_ELEMENTS.testReaper;
+  const prefix = isReaper ? 'reaper' : 'spear';
+  const oppositePrefix = isReaper ? 'spear' : 'reaper';
+  const stateKey = isReaper ? 'isTestReaperActive' : 'isTestSpearActive';
+
+  const wasActive = AppState.get(stateKey);
+  const isNowActive = !wasActive;
+
+  AppState.set(stateKey, isNowActive);
+  btn.classList.toggle('activated', isNowActive);
+
+  const isTransitionToOn = !wasActive && isNowActive;
+
+  if (isTransitionToOn && AppState.get('currentAnimatingWeapon') && AppState.get('currentAnimatingWeapon') !== prefix) {
+    ['flash', 'calc'].forEach(type => {
+      const key = `${oppositePrefix}-${type}`;
+      const timeout = debounceMap.get(key);
+      if (timeout) {
+        clearTimeout(timeout);
+        debounceMap.delete(key);
+      }
+    });
+  }
+
+  if (isTransitionToOn) {
+    AppState.set('currentAnimatingWeapon', prefix);
+    setTimeout(() => {
+      if (AppState.get('currentAnimatingWeapon') === prefix) {
+        AppState.set('currentAnimatingWeapon', null);
+      }
+    }, TIMING.calculationDelayOn + 100);
+
+    smoothDebounce(triggerPulseFlash, TIMING.flashTrigger, `${prefix}-flash`);
+    DOM_ELEMENTS.submit.textContent = "Calculating...";
+  }
+
+  const calcDelay = isTransitionToOn ? TIMING.calculationDelayOn : TIMING.calculationDelayOff;
+  smoothDebounce(() => {
+    if (typeof processMainCalculation === 'function') {
+      processMainCalculation();
+    }
+  }, calcDelay, `${prefix}-calc`);
+
+  const weaponName = isReaper ? 'Reaper' : 'Spear';
+  const statusText = isNowActive ? 'Flash Active' : 'Off';
+
+  if (typeof showSnackbar === 'function') {
+    showSnackbar(`${weaponName} ${statusText}`);
+  }
+};
+function triggerPulseFlash() {
+  if (!AppState.get('isResultShown')) return;
+  if (!isMobile()) return;
+  if (AppState.get('isFlashActive')) return;
+
+  const TIMING = {
+    animationDuration: 1800,
+    emergencyCleanup: 2200
+  };
+
+  AppState.set('isFlashActive', true);
+
+  requestAnimationFrame(() => {
+    const flash = document.createElement('div');
+    const lightning = document.createElement('div');
+    flash.className = 'lightning-flash-overlay';
+    lightning.className = 'lightning-icon';
+    flash.appendChild(lightning);
+
+    try {
+      document.body.appendChild(flash);
+    } catch (e) {
+      console.warn('Flash DOM insertion failed', e);
+      AppState.set('isFlashActive', false);
+      return;
+    }
+
+    const cleanup = () => {
+      if (flash.parentNode) {
+        flash.parentNode.removeChild(flash);
+      }
+      AppState.set('isFlashActive', false);
+    };
+
+    setTimeout(cleanup, TIMING.animationDuration);
+    setTimeout(() => {
+      if (AppState.get('isFlashActive') && flash.parentNode) {
+        cleanup();
+      }
+    }, TIMING.emergencyCleanup);
+  });
+};
+
+// ========== NOTIFICATION ==========
+const SnackbarManager = (() => {
+  let hideTimer = null;
+  let trackingKeyboard = false;
+  let lastBottom = -1;
+  let viewportChangeTimer = null;
+  
+  const NS = 'snackbar';
+  
+  const CONFIG = {
+    MOBILE_MAX_WIDTH: 480,
+    KEYBOARD_MIN: 100,
+    BASE_OFFSET: 20,
+    SHOW_DURATION: 3000,
+    HIDE_ANIMATION: 300,
+    RESIZE_DEBOUNCE: 150
+  };
+  
+  const isMobileView = () => window.innerWidth <= CONFIG.MOBILE_MAX_WIDTH;
+  
+  const calcKeyboardHeight = () => {
+    const vp = window.visualViewport;
+    if (!vp) return 0;
+    
+    const gap = window.innerHeight - vp.height;
+    return (gap > 50 && gap < window.innerHeight * 0.7) ? gap : 0;
+  };
+  
+  const updatePosition = () => {
+    const el = DOM_ELEMENTS?.snackbar;
+    if (!el?.classList.contains('show') || !isMobileView() || !window.visualViewport) return;
+    
+    const kbHeight = calcKeyboardHeight();
+    const bottom = (kbHeight > CONFIG.KEYBOARD_MIN ? kbHeight : 0) 
+                   + CONFIG.BASE_OFFSET 
+                   - window.visualViewport.offsetTop;
+    
+    if (bottom === lastBottom) return;
+    
+    lastBottom = bottom;
+    el.style.bottom = `${bottom}px`;
+  };
+  
+  const toggleTracking = (enable) => {
+    if (trackingKeyboard === enable) return;
+    
+    const vp = window.visualViewport;
+    if (!vp) return;
+    
+    trackingKeyboard = enable;
+    lastBottom = -1;
+    
+    if (enable) {
+      EventManager.addNS(`${NS}_viewport`, vp, 'resize', updatePosition, { passive: true });
+      EventManager.addNS(`${NS}_viewport`, vp, 'scroll', updatePosition, { passive: true });
+    } else {
+      EventManager.removeNS(`${NS}_viewport`);
+      const el = DOM_ELEMENTS?.snackbar;
+      if (el) el.style.bottom = '';
+    }
+  };
+  
+  const show = (message) => {
+    const el = DOM_ELEMENTS?.snackbar;
+    if (!el || !message) return;
+    
+    if (hideTimer) {
+      clearTimeout(hideTimer);
+      hideTimer = null;
+    }
+    
+    el.textContent = message;
+    el.classList.remove('show');
+    void el.offsetHeight;
+    el.classList.add('show');
+    
+    if (isMobileView()) {
+      lastBottom = -1;
+      updatePosition();
+      toggleTracking(true);
+    } else {
+      el.style.bottom = `${CONFIG.BASE_OFFSET}px`;
+    }
+    
+    hideTimer = setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => {
+        if (!el.classList.contains('show')) toggleTracking(false);
+      }, CONFIG.HIDE_ANIMATION);
+      hideTimer = null;
+    }, CONFIG.SHOW_DURATION);
+  };
+  
+  const handleWindowResize = () => {
+    if (viewportChangeTimer) {
+      clearTimeout(viewportChangeTimer);
+      viewportChangeTimer = null;
+    }
+    
+    viewportChangeTimer = setTimeout(() => {
+      const el = DOM_ELEMENTS?.snackbar;
+      if (!el?.classList.contains('show')) {
+        viewportChangeTimer = null;
+        return;
+      }
+      
+      if (isMobileView()) {
+        if (!trackingKeyboard) {
+          lastBottom = -1;
+          toggleTracking(true);
+          updatePosition();
+        }
+      } else {
+        toggleTracking(false);
+        el.style.bottom = `${CONFIG.BASE_OFFSET}px`;
+      }
+      
+      viewportChangeTimer = null;
+    }, CONFIG.RESIZE_DEBOUNCE);
+  };
+  
+  EventManager.addNS(NS, window, 'resize', handleWindowResize, { passive: true });
+  
+  return {
+    show,
+    cleanup: () => {
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+      
+      if (viewportChangeTimer) {
+        clearTimeout(viewportChangeTimer);
+        viewportChangeTimer = null;
+      }
+      
+      EventManager.removeNS(NS);
+      EventManager.removeNS(`${NS}_viewport`);
+      EventManager.forceCleanup();
+      
+      trackingKeyboard = false;
+      lastBottom = -1;
+      
+      const el = DOM_ELEMENTS?.snackbar;
+      if (el) {
+        el.style.bottom = '';
+        el.classList.remove('show');
+      }
+    }
+  };
+})();
+const showSnackbar = SnackbarManager.show;
+const scrollAndFocusElement = (el, msg) => {
+  if (msg) showSnackbar(msg);
+
+  const offsetTop = el.getBoundingClientRect().top + window.pageYOffset - 80;
+  window.scrollTo({
+    top: offsetTop,
+    behavior: 'smooth'
+  });
+
+  if (!el.disabled) {
+    el.focus({
+      preventScroll: true
+    });
+  }
+
+  return false;
+};
+
+// ========== TOOLTIP SYSTEM ==========
+const TooltipManager = (() => {
+  const activeTooltips = new Map();
+  const lazyTooltips = new Map();
+  let orphanObserver = null;
+  let autoInitObserver = null;
+  let tooltipConfig = {};
+
+  const CONFIG = {
+    HIDE_DELAY: 300,
+    THROTTLE_DELAY: 16,
+    MARGIN: 16,
+    OFFSET: 12
+  };
+
+  const cleanupOrphanedTooltip = (node) => {
+    if (activeTooltips.has(node)) {
+      const activeData = activeTooltips.get(node);
+      if (activeData?.cleanup) activeData.cleanup();
+      activeTooltips.delete(node);
+    }
+
+    if (lazyTooltips.has(node)) {
+      const lazyData = lazyTooltips.get(node);
+      if (lazyData?.listenerIds) {
+        lazyData.listenerIds.forEach(id => EventManager.remove(id));
+      }
+      lazyTooltips.delete(node);
+    }
+  };
+
+  const cleanupChildTooltips = (node) => {
+    if (!node.querySelectorAll) return;
+
+    activeTooltips.forEach((data, el) => {
+      if (el !== node && node.contains(el)) {
+        if (data?.cleanup) data.cleanup();
+        activeTooltips.delete(el);
+      }
+    });
+
+    lazyTooltips.forEach((data, el) => {
+      if (el !== node && node.contains(el)) {
+        if (data?.listenerIds) {
+          data.listenerIds.forEach(id => EventManager.remove(id));
+        }
+        lazyTooltips.delete(el);
+      }
+    });
+  };
+
+  const startOrphanDetection = () => {
+    if (orphanObserver) return;
+    if (typeof MutationObserver === 'undefined') return;
+
+    orphanObserver = new MutationObserver((mutations) => {
+      const elementsToCheck = new Set();
+
+      mutations.forEach(mutation => {
+        mutation.removedNodes.forEach(node => {
+          if (node.nodeType === 1) {
+            elementsToCheck.add(node);
+          }
+        });
+      });
+
+      elementsToCheck.forEach(node => {
+        cleanupOrphanedTooltip(node);
+        cleanupChildTooltips(node);
+      });
+    });
+
+    orphanObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  };
+
+  const matchesSelector = (element, selector) => {
+    if (selector.startsWith('#')) {
+      return element.id === selector.slice(1);
+    } else if (selector.startsWith('.')) {
+      return element.classList.contains(selector.slice(1));
+    } else if (selector.startsWith('[')) {
+      const attrMatch = selector.match(/\[([^\]]+)\]/);
+      if (attrMatch) {
+        const [attrName, attrValue] = attrMatch[1].split('=');
+        if (attrValue) {
+          return element.getAttribute(attrName) === attrValue.replace(/['"]/g, '');
+        }
+        return element.hasAttribute(attrName);
+      }
+    }
+    return element.matches(selector);
+  };
+
+  const injectSVG = (element) => {
+    if (element.classList.contains('tooltip-button') && !element.querySelector('svg')) {
+      element.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" height="70" fill="#dcddde" viewBox="0 -960 960 960" width="70">
+          <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+        </svg>
+      `;
+    }
+  };
+
+  const initializeElement = (element) => {
+    if (lazyTooltips.has(element)) return;
+
+    injectSVG(element);
+
+    Object.entries(tooltipConfig).forEach(([selector, content]) => {
+      try {
+        if (matchesSelector(element, selector)) {
+          registerLazyTooltip(element, content);
+        }
+      } catch (e) {
+        // Selector invalid, skip
+      }
+    });
+  };
+
+  const startAutoInit = () => {
+    if (autoInitObserver) return;
+    if (typeof MutationObserver === 'undefined') return;
+    if (Object.keys(tooltipConfig).length === 0) return;
+
+    autoInitObserver = new MutationObserver((mutations) => {
+      mutations.forEach(mutation => {
+        mutation.addedNodes.forEach(node => {
+          if (node.nodeType !== 1) return;
+
+          // Check the node itself
+          initializeElement(node);
+
+          // Check all descendants
+          if (node.querySelectorAll) {
+            Object.keys(tooltipConfig).forEach(selector => {
+              try {
+                const elements = node.querySelectorAll(selector);
+                elements.forEach(el => initializeElement(el));
+              } catch (e) {
+                // Invalid selector, skip
+              }
+            });
+          }
+        });
+      });
+    });
+
+    autoInitObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+  };
+
+  const stopAutoInit = () => {
+    if (!autoInitObserver) return;
+    autoInitObserver.disconnect();
+    autoInitObserver = null;
+  };
+
+  const stopOrphanDetection = () => {
+    if (!orphanObserver) return;
+    orphanObserver.disconnect();
+    orphanObserver = null;
+  };
+
+  const calculateTooltipSize = (tooltip) => {
+    tooltip.style.cssText = 'visibility:hidden;display:block';
+    const width = tooltip.offsetWidth;
+    const height = tooltip.offsetHeight;
+    tooltip.style.cssText = '';
+    return {
+      width,
+      height
+    };
+  };
+
+  const calculatePosition = (rect, scrollX, scrollY, tooltipWidth, tooltipHeight) => {
+    const centerX = rect.left + scrollX + (rect.width / 2);
+    const maxLeft = window.innerWidth - tooltipWidth - CONFIG.MARGIN;
+    const left = Math.max(CONFIG.MARGIN, Math.min(centerX - (tooltipWidth / 2), maxLeft));
+
+    let top = rect.top + scrollY - tooltipHeight - CONFIG.OFFSET;
+    let isFlipped = false;
+
+    if (top < CONFIG.MARGIN + scrollY) {
+      top = rect.bottom + scrollY + CONFIG.OFFSET;
+      isFlipped = true;
+    }
+
+    return {
+      left,
+      top,
+      isFlipped
+    };
+  };
+
+  const createTooltip = (triggerElement, content) => {
+    if (!triggerElement || !content) return;
+
+    const existing = activeTooltips.get(triggerElement);
+    if (existing?.cleanup) {
+      existing.cleanup();
+      activeTooltips.delete(triggerElement);
+    }
+
+    const tooltip = document.createElement("div");
+    tooltip.className = "tooltip-wrap";
+    tooltip.innerHTML = content;
+    document.body.appendChild(tooltip);
+
+    let isVisible = false;
+    let hideTimer = null;
+    const namespace = `tooltip-active-${Date.now()}-${Math.random()}`;
+
+    const cleanup = () => {
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+
+      EventManager.removeNS(namespace);
+
+      if (tooltip.parentNode) {
+        tooltip.parentNode.removeChild(tooltip);
+      }
+
+      activeTooltips.delete(triggerElement);
+    };
+
+    const updatePosition = () => {
+      if (!document.contains(triggerElement) || !document.contains(tooltip)) {
+        cleanup();
+        return;
+      }
+
+      const rect = triggerElement.getBoundingClientRect();
+      const scrollX = window.pageXOffset;
+      const scrollY = window.pageYOffset;
+
+      const {
+        width: tooltipWidth,
+        height: tooltipHeight
+      } = calculateTooltipSize(tooltip);
+      const {
+        left,
+        top,
+        isFlipped
+      } = calculatePosition(rect, scrollX, scrollY, tooltipWidth, tooltipHeight);
+
+      tooltip.classList.toggle('flipped', isFlipped);
+      tooltip.style.transform = `translate(${left}px, ${top}px)`;
+    };
+
+    const show = () => {
+      if (isVisible) return;
+
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+
+      updatePosition();
+      isVisible = true;
+      tooltip.classList.add('show');
+    };
+
+    const hide = () => {
+      if (!isVisible) return;
+
+      tooltip.classList.remove('show');
+      isVisible = false;
+
+      hideTimer = setTimeout(() => {
+        cleanup();
+      }, CONFIG.HIDE_DELAY);
+    };
+
+    const handleOutsideClick = (e) => {
+      if (!isVisible) return;
+      if (triggerElement.contains(e.target)) return;
+      if (tooltip.contains(e.target)) return;
+
+      hide();
+    };
+
+    const handleKeydown = (e) => {
+      if (e.key === "Escape" && isVisible) {
+        hide();
+      }
+    };
+
+    const throttledPosition = () => {
+      if (!isVisible) return;
+
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+
+      hideTimer = setTimeout(() => {
+        updatePosition();
+        hideTimer = null;
+      }, CONFIG.THROTTLE_DELAY);
+    };
+
+    EventManager.addNS(namespace, document, "click", handleOutsideClick);
+    EventManager.addNS(namespace, document, "touchend", handleOutsideClick, {
+      passive: true
+    });
+    EventManager.addNS(namespace, document, "keydown", handleKeydown);
+    EventManager.addNS(namespace, window, 'resize', throttledPosition, {
+      passive: true
+    });
+    EventManager.addNS(namespace, window, 'scroll', throttledPosition, {
+      passive: true
+    });
+
+    activeTooltips.set(triggerElement, {
+      tooltip,
+      cleanup,
+      namespace
+    });
+
+    show();
+  };
+
+  const registerLazyTooltip = (triggerElement, content) => {
+    if (!triggerElement || !content) return;
+
+    const existing = lazyTooltips.get(triggerElement);
+    if (existing && existing.content === content) return;
+
+    if (existing?.listenerIds) {
+      existing.listenerIds.forEach(id => EventManager.remove(id));
+    }
+
+    const namespace = `tooltip-lazy-${Date.now()}-${Math.random()}`;
+    const listenerIds = [];
+
+    const initTooltip = (e) => {
+      if (e?.cancelable) e.preventDefault();
+      createTooltip(triggerElement, content);
+    };
+
+    const handleClick = (e) => {
+      // Check if click is on SVG or its children
+      const target = e.target;
+      if (target === triggerElement || triggerElement.contains(target)) {
+        initTooltip(e);
+      }
+    };
+
+    listenerIds.push(
+      EventManager.addNS(namespace, triggerElement, "click", handleClick),
+      EventManager.addNS(namespace, triggerElement, "touchend", handleClick, {
+        passive: false
+      })
+    );
+
+    lazyTooltips.set(triggerElement, {
+      content,
+      namespace,
+      listenerIds
+    });
+
+    if (lazyTooltips.size === 1 && !orphanObserver) {
+      startOrphanDetection();
+    }
+  };
+
+  const destroyAll = () => {
+    stopAutoInit();
+    stopOrphanDetection();
+
+    activeTooltips.forEach(({
+      cleanup
+    }) => {
+      if (cleanup) cleanup();
+    });
+    activeTooltips.clear();
+
+    lazyTooltips.forEach(({
+      listenerIds
+    }) => {
+      if (listenerIds) {
+        listenerIds.forEach(id => EventManager.remove(id));
+      }
+    });
+    lazyTooltips.clear();
+
+    tooltipConfig = {};
+  };
+
+  return {
+    registerLazyTooltip,
+    startAutoInit,
+    stopAutoInit,
+    setConfig: (config) => {
+      tooltipConfig = config;
+      startAutoInit();
+    },
+    destroyAll
+  };
+})();
+const setupTooltips = (config) => {
+  // Save config for auto-init
+  TooltipManager.setConfig(config);
+
+  // Initialize existing elements
+  Object.entries(config).forEach(([selector, content]) => {
+    const elements = typeof selector === 'string' ?
+      document.querySelectorAll(selector) :
+      selector instanceof Element ? [selector] : [];
+
+    elements.forEach(el => {
+      if (el instanceof Element) {
+        // Auto inject SVG if it's a tooltip-button
+        if (el.classList.contains('tooltip-button') && !el.querySelector('svg')) {
+          el.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" height="70" fill="#dcddde" viewBox="0 -960 960 960" width="70">
+              <path d="M478-240q21 0 35.5-14.5T528-290q0-21-14.5-35.5T478-340q-21 0-35.5 14.5T428-290q0 21 14.5 35.5T478-240Zm-36-154h74q0-33 7.5-52t42.5-52q26-26 41-49.5t15-56.5q0-56-41-86t-97-30q-57 0-92.5 30T342-618l66 26q5-18 22.5-39t53.5-21q32 0 48 17.5t16 38.5q0 20-12 37.5T506-526q-44 39-54 59t-10 73Zm38 314q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+            </svg>
+          `;
+        }
+        TooltipManager.registerLazyTooltip(el, content);
+      }
+    });
+  });
+};
+setupTooltips({
+  "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are two <strong>different</strong> things! Look for it in your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set 0.",
+  "#targetRaceTips": "Specific MVP/MINi will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target spesific race!",
+  "#targetAttrTips": "also same with race.",
+  "#dmgRaceTips": "Unlocked when target race selected, minimum valid value is 0.",
+  "#dmgAttrTips": "same condition with dmg to race",
+  "#mvpminiTips": "DUMMY have no defense stat. Avg 130, Necro, Ogre, Ktul defs less accurate than others!",
+  //'"#blueTips": "BLUE*8 is experimental.",
+  "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>But, dont expect to much! This tool calculates RNG buffs from equipment sets, flashes, and doesn't include flat or percentage damage bonuses.",
+  "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20 second cooldown.",
+  "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn’t have 100% uptime since it only lasts 10 seconds with a 20-second cooldown, and the final result shown below represents the highest output during the buff’s active period.",
+  "#spearTips": "This bonus doesn't have 100% uptime because it only lasts 10 seconds while the cooldown is 20 seconds. The final result shown below represents the highest output during the buff's active period.",
+  "#elemCtrTips": "Tools assume target Neutral if you're not targeting any attribute.",
+  "#breakdownTips": "Values shown to two decimal places for readability. The final result is computed with full precision, so it may differ slightly if you recompute using the displayed (rounded) numbers.",
+  "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward means lower."
+
+});
+
+// ========== ACCORDION SYSTEM ==========
+const accordionManager = (() => {
+  const duration = 320;
+  const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
+  const transition = `max-height ${duration}ms ${easing}, opacity ${duration}ms ease-out`;
+  const instances = new Map();
+  const namespace = 'accordion-manager';
+  let observer = null;
+  let cleanupInterval = null;
+
+  const setStyles = (content, maxHeight, opacity = 1) => {
+    Object.assign(content.style, {
+      maxHeight,
+      opacity: opacity.toString()
+    });
+  };
+
+  const createInstance = (details, summary, content) => {
+    let isAnimating = false;
+    let currentAnimation = null;
+    let transitionListenerId = null;
+    const instanceNamespace = `${namespace}-${Date.now()}-${Math.random()}`;
+
+    const cleanup = () => {
+      if (currentAnimation) {
+        cancelAnimationFrame(currentAnimation);
+        currentAnimation = null;
+      }
+      if (transitionListenerId !== null) {
+        EventManager.remove(transitionListenerId);
+        transitionListenerId = null;
+      }
+      EventManager.removeNS(instanceNamespace);
+      isAnimating = false;
+    };
+
+    const animateOpen = () => {
+      details.setAttribute('open', '');
+      setStyles(content, '0px', 0.3);
+
+      currentAnimation = requestAnimationFrame(() => {
+        const targetHeight = content.scrollHeight + 'px';
+        setStyles(content, targetHeight, 1);
+
+        const onTransitionEnd = () => {
+          setStyles(content, 'none', 1);
+          isAnimating = false;
+          if (transitionListenerId !== null) {
+            EventManager.remove(transitionListenerId);
+            transitionListenerId = null;
+          }
+        };
+        transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
+      });
+    };
+
+    const animateClose = () => {
+      const currentHeight = content.scrollHeight + 'px';
+      setStyles(content, currentHeight, 1);
+
+      currentAnimation = requestAnimationFrame(() => {
+        setStyles(content, '0px', 0.3);
+
+        const onTransitionEnd = () => {
+          details.removeAttribute('open');
+          isAnimating = false;
+          if (transitionListenerId !== null) {
+            EventManager.remove(transitionListenerId);
+            transitionListenerId = null;
+          }
+        };
+        transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
+      });
+    };
+
+    const animate = (isOpening) => {
+      if (isAnimating) return;
+
+      isAnimating = true;
+      cleanup();
+
+      if (isOpening) {
+        animateOpen();
+      } else {
+        animateClose();
+      }
+    };
+
+    const handleClick = (e) => {
+      e.preventDefault();
+      if (isAnimating) return;
+
+      const isOpen = details.hasAttribute('open');
+      animate(!isOpen);
+    };
+
+    EventManager.addNS(instanceNamespace, summary, 'click', handleClick);
+
+    return {
+      animate,
+      cleanup: () => {
+        cleanup();
+        EventManager.removeNS(instanceNamespace);
+      },
+      get isAnimating() {
+        return isAnimating;
+      },
+      namespace: instanceNamespace
+    };
+  };
+
+  const cleanupOrphans = () => {
+    const orphanedKeys = [];
+
+    instances.forEach((instance, details) => {
+      if (!document.contains(details)) {
+        instance.cleanup();
+        orphanedKeys.push(details);
+      }
+    });
+
+    orphanedKeys.forEach(key => instances.delete(key));
+
+    if (instances.size === 0 && cleanupInterval) {
+      clearInterval(cleanupInterval);
+      cleanupInterval = null;
+    }
+  };
+
+  const startCleanupInterval = () => {
+    if (cleanupInterval) return;
+    if (instances.size === 0) return;
+
+    cleanupInterval = setInterval(cleanupOrphans, 30000);
+  };
+
+  const initializeDetailsElement = (details) => {
+    const summary = details.querySelector('summary');
+    const content = details.querySelector('.body');
+
+    if (!summary || !content) return;
+    if (instances.has(details)) return;
+
+    const isOpen = details.hasAttribute('open');
+    Object.assign(content.style, {
+      transition,
+      overflow: 'hidden',
+      maxHeight: isOpen ? 'none' : '0px',
+      opacity: isOpen ? '1' : '0.3'
+    });
+
+    const instance = createInstance(details, summary, content);
+    instances.set(details, instance);
+  };
+
+  const processDetails = () => {
+    cleanupOrphans();
+
+    document.querySelectorAll('details').forEach(details => {
+      initializeDetailsElement(details);
+    });
+
+    if (instances.size > 0) {
+      startCleanupInterval();
+    }
+  };
+
+  const shouldProcessMutation = (mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.addedNodes.length === 0) continue;
+
+      for (const node of mutation.addedNodes) {
+        if (node.nodeType !== 1) continue;
+        if (node.tagName === 'DETAILS') return true;
+        if (node.querySelector?.('details')) return true;
+      }
+    }
+    return false;
+  };
+
+  const handleRemovedNodes = (mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.removedNodes.length === 0) continue;
+
+      for (const node of mutation.removedNodes) {
+        if (node.nodeType !== 1) continue;
+
+        if (node.tagName === 'DETAILS' && instances.has(node)) {
+          const instance = instances.get(node);
+          instance.cleanup();
+          instances.delete(node);
+          continue;
+        }
+
+        if (node.querySelectorAll) {
+          instances.forEach((instance, details) => {
+            if (node.contains(details)) {
+              instance.cleanup();
+              instances.delete(details);
+            }
+          });
+        }
+      }
+    }
+  };
+
+  processDetails();
+
+  observer = new MutationObserver((mutations) => {
+    handleRemovedNodes(mutations);
+
+    if (shouldProcessMutation(mutations)) {
+      requestAnimationFrame(processDetails);
+    }
+  });
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+
+  const destroy = () => {
+    if (cleanupInterval) {
+      clearInterval(cleanupInterval);
+      cleanupInterval = null;
+    }
+    if (observer) {
+      observer.disconnect();
+      observer = null;
+    }
+    instances.forEach(instance => instance.cleanup());
+    instances.clear();
+  };
+
+  EventManager.addNS(namespace, window, 'beforeunload', destroy);
+
+  return {
+    destroy,
+    reinitialize: processDetails
+  };
+})();
+
+// ========== LOG MODAL ==========
+const modalManager = (() => {
+  const {
+    log,
+    openLog,
+    closeLog
+  } = DOM_ELEMENTS || {};
+  if (!log) {
+    return {
+      show: () => {},
+      hide: () => {},
+      destroy: () => {}
+    };
+  }
+
+  const content = log.querySelector('.modal-content, .log-content, .modal-body') || log.firstElementChild;
+  const duration = 280;
+  const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
+  const namespace = 'modal-manager';
+
+  const baseStyles = {
+    modal: {
+      display: 'none',
+      transition: `opacity ${duration}ms ${easing}, transform ${duration}ms ${easing}, backdrop-filter ${duration}ms ${easing}`,
+      transformOrigin: 'center'
+    },
+    content: content ? {
+      transition: `transform ${duration}ms ${easing}, opacity ${duration}ms ${easing}`
+    } : null
+  };
+
+  Object.assign(log.style, baseStyles.modal);
+  if (content) {
+    Object.assign(content.style, baseStyles.content);
+  }
+
+  let isVisible = false;
+  let animationId = null;
+  let hideTimeout = null;
+
+  const cleanup = () => {
+    if (animationId) {
+      cancelAnimationFrame(animationId);
+      animationId = null;
+    }
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+  };
+
+  const applyHideStyles = () => {
+    Object.assign(log.style, {
+      opacity: '0',
+      transform: 'scale(0.96)',
+      backdropFilter: 'blur(0px)',
+      backgroundColor: 'transparent'
+    });
+
+    if (content) {
+      Object.assign(content.style, {
+        transform: 'translateY(-8px) scale(0.98)',
+        opacity: '0.5'
+      });
+    }
+  };
+
+  const applyShowStyles = () => {
+    Object.assign(log.style, {
+      opacity: '1',
+      transform: 'scale(1)',
+      backdropFilter: 'blur(6px)',
+      backgroundColor: 'rgba(0, 0, 0, 0.3)'
+    });
+
+    if (content) {
+      Object.assign(content.style, {
+        transform: 'translateY(0) scale(1)',
+        opacity: '1'
+      });
+    }
+  };
+
+  const hide = () => {
+    if (!isVisible) return;
+
+    isVisible = false;
+    cleanup();
+
+    applyHideStyles();
+
+    hideTimeout = setTimeout(() => {
+      if (!isVisible) {
+        log.style.display = 'none';
+      }
+    }, duration);
+  };
+
+  const show = () => {
+    if (isVisible) return;
+
+    isVisible = true;
+    cleanup();
+
+    log.style.display = 'flex';
+
+    animationId = requestAnimationFrame(() => {
+      applyShowStyles();
+    });
+  };
+
+  const handleOpen = (e) => {
+    e.stopPropagation();
+    show();
+  };
+
+  const handleKeydown = (e) => {
+    if (e.key === 'Escape' && isVisible) {
+      hide();
+    }
+  };
+
+  const handleOutsideClick = (e) => {
+    if (!isVisible) return;
+    if (!content) return;
+    if (content.contains(e.target)) return;
+    if (e.target === openLog) return;
+
+    hide();
+  };
+
+  EventManager.addNS(namespace, openLog, 'click', handleOpen);
+  EventManager.addNS(namespace, closeLog, 'click', hide);
+  EventManager.addNS(namespace, document, 'keydown', handleKeydown);
+  EventManager.addNS(namespace, document, 'click', handleOutsideClick);
+
+  const destroy = () => {
+    cleanup();
+    EventManager.removeNS(namespace);
+  };
+
+  EventManager.addNS(namespace, window, 'beforeunload', destroy);
+
+  return {
+    show,
+    hide,
+    destroy
+  };
+})();
 
 // ======== LIGHTBOX ========
 const imgLightbox = (() => {
