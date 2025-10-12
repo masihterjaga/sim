@@ -5363,13 +5363,9 @@ const accordionManager = (() => {
   };
 })();
 
-// ========== LOG MODAL ==========
+// ======== LOG MODAL ========
 const modalManager = (() => {
-  const {
-    log,
-    openLog,
-    closeLog
-  } = DOM_ELEMENTS || {};
+  const { log, openLog, closeLog } = DOM_ELEMENTS || {};
   if (!log) {
     return {
       show: () => {},
@@ -5383,27 +5379,26 @@ const modalManager = (() => {
   const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
   const namespace = 'modal-manager';
 
+  const transition = `${duration}ms ${easing}`;
   const baseStyles = {
     modal: {
       display: 'none',
-      transition: `opacity ${duration}ms ${easing}, transform ${duration}ms ${easing}, backdrop-filter ${duration}ms ${easing}`,
+      transition: `opacity ${transition}, transform ${transition}, backdrop-filter ${transition}`,
       transformOrigin: 'center'
     },
     content: content ? {
-      transition: `transform ${duration}ms ${easing}, opacity ${duration}ms ${easing}`
+      transition: `transform ${transition}, opacity ${transition}`
     } : null
   };
 
   Object.assign(log.style, baseStyles.modal);
-  if (content) {
-    Object.assign(content.style, baseStyles.content);
-  }
+  if (content) Object.assign(content.style, baseStyles.content);
 
   let isVisible = false;
   let animationId = null;
   let hideTimeout = null;
 
-  const cleanup = () => {
+  const clearTimers = () => {
     if (animationId) {
       cancelAnimationFrame(animationId);
       animationId = null;
@@ -5414,45 +5409,37 @@ const modalManager = (() => {
     }
   };
 
-  const applyHideStyles = () => {
-    Object.assign(log.style, {
-      opacity: '0',
-      transform: 'scale(0.96)',
-      backdropFilter: 'blur(0px)',
-      backgroundColor: 'transparent'
-    });
-
-    if (content) {
-      Object.assign(content.style, {
-        transform: 'translateY(-8px) scale(0.98)',
-        opacity: '0.5'
-      });
-    }
-  };
-
-  const applyShowStyles = () => {
-    Object.assign(log.style, {
+  const applyStyles = (isShowing) => {
+    const modalStyles = isShowing ? {
       opacity: '1',
       transform: 'scale(1)',
       backdropFilter: 'blur(6px)',
       backgroundColor: 'rgba(0, 0, 0, 0.3)'
-    });
+    } : {
+      opacity: '0',
+      transform: 'scale(0.96)',
+      backdropFilter: 'blur(0px)',
+      backgroundColor: 'transparent'
+    };
 
-    if (content) {
-      Object.assign(content.style, {
-        transform: 'translateY(0) scale(1)',
-        opacity: '1'
-      });
-    }
+    const contentStyles = content ? (isShowing ? {
+      transform: 'translateY(0) scale(1)',
+      opacity: '1'
+    } : {
+      transform: 'translateY(-8px) scale(0.98)',
+      opacity: '0.5'
+    }) : null;
+
+    Object.assign(log.style, modalStyles);
+    if (contentStyles) Object.assign(content.style, contentStyles);
   };
 
   const hide = () => {
     if (!isVisible) return;
 
     isVisible = false;
-    cleanup();
-
-    applyHideStyles();
+    clearTimers();
+    applyStyles(false);
 
     hideTimeout = setTimeout(() => {
       if (!isVisible) {
@@ -5465,12 +5452,12 @@ const modalManager = (() => {
     if (isVisible) return;
 
     isVisible = true;
-    cleanup();
+    clearTimers();
 
     log.style.display = 'flex';
 
     animationId = requestAnimationFrame(() => {
-      applyShowStyles();
+      applyStyles(true);
     });
   };
 
@@ -5480,17 +5467,12 @@ const modalManager = (() => {
   };
 
   const handleKeydown = (e) => {
-    if (e.key === 'Escape' && isVisible) {
-      hide();
-    }
+    if (e.key === 'Escape' && isVisible) hide();
   };
 
   const handleOutsideClick = (e) => {
-    if (!isVisible) return;
-    if (!content) return;
-    if (content.contains(e.target)) return;
-    if (e.target === openLog) return;
-
+    if (!isVisible || !content) return;
+    if (content.contains(e.target) || e.target === openLog) return;
     hide();
   };
 
@@ -5500,17 +5482,13 @@ const modalManager = (() => {
   EventManager.addNS(namespace, document, 'click', handleOutsideClick);
 
   const destroy = () => {
-    cleanup();
+    clearTimers();
     EventManager.removeNS(namespace);
   };
 
   EventManager.addNS(namespace, window, 'beforeunload', destroy);
 
-  return {
-    show,
-    hide,
-    destroy
-  };
+  return { show, hide, destroy };
 })();
 
 // ======== LIGHTBOX ========
@@ -5549,7 +5527,6 @@ const imgLightbox = (() => {
     STEP: 0.3
   };
 
-  // Utilities
   const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
   const dist = (t1, t2) => Math.hypot(t1.clientX - t2.clientX, t1.clientY - t2.clientY);
   const center = (t1, t2) => ({
@@ -5584,21 +5561,15 @@ const imgLightbox = (() => {
     return state.currentGallery ? state.galleries[state.currentGallery] : [];
   };
 
-  const updateNavButtons = () => {
-    const items = getCurrentItems();
-    els.prevBtn.classList.toggle('disabled', state.currentIndex === 0);
-    els.nextBtn.classList.toggle('disabled', state.currentIndex === items.length - 1);
-  };
-
-  const updateCounter = () => {
-    const items = getCurrentItems();
-    els.counter.textContent = `${state.currentIndex + 1} / ${items.length}`;
-  };
-
-  const updateCaption = () => {
+  const updateUI = () => {
     const items = getCurrentItems();
     const item = items[state.currentIndex];
-    if (item && item.caption) {
+    
+    els.prevBtn.classList.toggle('disabled', state.currentIndex === 0);
+    els.nextBtn.classList.toggle('disabled', state.currentIndex === items.length - 1);
+    els.counter.textContent = `${state.currentIndex + 1} / ${items.length}`;
+    
+    if (item?.caption) {
       els.caption.textContent = item.caption;
       els.caption.classList.add('active');
     } else {
@@ -5632,31 +5603,27 @@ const imgLightbox = (() => {
     const id = Symbol();
     state.imageLoadId = id;
 
-    els.image.onload = () => {
-      if (state.imageLoadId === id) {
-        els.loader.style.display = 'none';
+    const handleLoad = (success) => {
+      if (state.imageLoadId !== id) return;
+      
+      els.loader.style.display = 'none';
+      if (success) {
         els.image.style.display = 'block';
-        cleanupLoaders();
-      }
-    };
-
-    els.image.onerror = () => {
-      if (state.imageLoadId === id) {
-        els.loader.style.display = 'none';
+      } else {
         console.error('Failed to load image');
-        cleanupLoaders();
       }
+      cleanupLoaders();
     };
 
+    els.image.onload = () => handleLoad(true);
+    els.image.onerror = () => handleLoad(false);
     els.image.src = item.src;
-    updateNavButtons();
-    updateCounter();
-    updateCaption();
+    
+    updateUI();
   };
 
   const openGallery = (galleryName, startIndex = 0) => {
     if (!state.galleries[galleryName]) return;
-
     state.currentGallery = galleryName;
     setActive(true);
     loadImage(startIndex);
@@ -5664,20 +5631,14 @@ const imgLightbox = (() => {
 
   const close = () => setActive(false);
 
-  const prev = () => {
-    if (state.currentIndex > 0) {
-      loadImage(state.currentIndex - 1);
-    }
-  };
-
-  const next = () => {
+  const navigate = (direction) => {
     const items = getCurrentItems();
-    if (state.currentIndex < items.length - 1) {
-      loadImage(state.currentIndex + 1);
+    const newIndex = state.currentIndex + direction;
+    if (newIndex >= 0 && newIndex < items.length) {
+      loadImage(newIndex);
     }
   };
 
-  // Event Handlers
   const onWheel = (e) => {
     if (!els.overlay.classList.contains('img-lightbox-active')) return;
     e.preventDefault();
@@ -5798,8 +5759,8 @@ const imgLightbox = (() => {
     const actions = {
       'Escape': close,
       '0': reset,
-      'ArrowLeft': prev,
-      'ArrowRight': next
+      'ArrowLeft': () => navigate(-1),
+      'ArrowRight': () => navigate(1)
     };
     actions[e.key]?.();
   };
@@ -5811,9 +5772,7 @@ const imgLightbox = (() => {
     }
   };
 
-  // Initialize galleries
   const initGalleries = (container = document) => {
-    // Collect all gallery items
     container.querySelectorAll('[data-lightbox-item]:not([data-lb-init])').forEach(item => {
       item.setAttribute('data-lb-init', '');
       const galleryName = item.getAttribute('data-lightbox-item');
@@ -5824,13 +5783,9 @@ const imgLightbox = (() => {
         state.galleries[galleryName] = [];
       }
 
-      state.galleries[galleryName].push({
-        src,
-        caption
-      });
+      state.galleries[galleryName].push({ src, caption });
     });
 
-    // Initialize gallery triggers
     container.querySelectorAll('[data-lightbox-trigger]:not([data-lb-trigger-init])').forEach(trigger => {
       trigger.setAttribute('data-lb-trigger-init', '');
       const galleryName = trigger.getAttribute('data-lightbox-gallery');
@@ -5843,18 +5798,13 @@ const imgLightbox = (() => {
       });
     });
 
-    // Initialize single image links (backward compatibility)
     container.querySelectorAll('[data-lightbox-image]:not([data-lightbox-trigger]):not([data-lb-single-init])').forEach(link => {
       link.setAttribute('data-lb-single-init', '');
       const src = link.getAttribute('data-lightbox-image');
       const caption = link.getAttribute('data-caption') || '';
 
-      // Create temporary gallery for single image
       const singleGalleryName = `single-${Math.random().toString(36).substr(2, 9)}`;
-      state.galleries[singleGalleryName] = [{
-        src,
-        caption
-      }];
+      state.galleries[singleGalleryName] = [{ src, caption }];
 
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -5865,7 +5815,6 @@ const imgLightbox = (() => {
 
   initGalleries();
 
-  // Observer for dynamic content
   const observer = new MutationObserver((mutations) => {
     for (const m of mutations) {
       for (const node of m.addedNodes) {
@@ -5881,33 +5830,24 @@ const imgLightbox = (() => {
     }
   });
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true
-  });
+  observer.observe(document.body, { childList: true, subtree: true });
 
-  // Bind events
+  const passiveOpt = { passive: false };
   const events = [
     [els.closeBtn, 'click', close],
-    [els.prevBtn, 'click', prev],
-    [els.nextBtn, 'click', next],
+    [els.prevBtn, 'click', () => navigate(-1)],
+    [els.nextBtn, 'click', () => navigate(1)],
     [els.overlay, 'click', (e) => e.target === els.overlay && close()],
     [els.inner, 'click', (e) => e.stopPropagation()],
     [document, 'keydown', onKey],
     [document, 'visibilitychange', onVisibility],
-    [els.image, 'wheel', onWheel, {
-      passive: false
-    }],
+    [els.image, 'wheel', onWheel, passiveOpt],
     [els.image, 'mousedown', onMouseDown],
     [document, 'mousemove', onMouseMove],
     [document, 'mouseup', onMouseUp],
     [els.image, 'dblclick', onDblClick],
-    [els.image, 'touchstart', onTouchStart, {
-      passive: false
-    }],
-    [els.image, 'touchmove', onTouchMove, {
-      passive: false
-    }],
+    [els.image, 'touchstart', onTouchStart, passiveOpt],
+    [els.image, 'touchmove', onTouchMove, passiveOpt],
     [els.image, 'touchend', onTouchEnd],
     [els.image, 'touchcancel', onTouchEnd]
   ];
@@ -5916,14 +5856,11 @@ const imgLightbox = (() => {
     EventManager.addNS(NS, el, type, handler, opts);
   });
 
-  // Cleanup on unload
   window.addEventListener('beforeunload', () => {
     cleanupLoaders();
     observer.disconnect();
     EventManager.removeNS(NS);
-  }, {
-    once: true
-  });
+  }, { once: true });
 })();
 
 // ========== MAIN BUTTON EVENT ==========
