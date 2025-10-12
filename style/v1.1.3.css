@@ -1952,26 +1952,6 @@ td.delta:hover {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-
-  .lightning-flash-overlay,
-  .lightning-icon {
-    -webkit-animation: none !important;
-    animation: none !important;
-  }
-
-  .lightning-flash-overlay {
-    opacity: .3;
-    transform: scale3d(1, 1, 1);
-  }
-
-  .lightning-icon {
-    opacity: 1;
-    transform: scale3d(1, 1, 1) rotate(0);
-  }
-}
-
-
 /* Keyframes */
 @-webkit-keyframes rotate-shine {
   from {
