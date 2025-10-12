@@ -110,6 +110,235 @@ const WHITE_SET = {
   "Tier 3": 48,
   "Tier 4": 54
 };
+const ELEMENT_COUNTER_TABLE = {
+  Neutral: {
+    Neutral: 1,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 1,
+    Holy: 1,
+    Shadow: 1,
+    Ghost: 0.70,
+    Undead: 1
+  },
+  Fire: {
+    Neutral: 1,
+    Fire: 0.25,
+    Water: 1,
+    Earth: 1.25,
+    Wind: 1,
+    Poison: 1,
+    Holy: 0.75,
+    Shadow: 1,
+    Ghost: 1,
+    Undead: 1.125
+  },
+  Water: {
+    Neutral: 1,
+    Fire: 1.25,
+    Water: 0.25,
+    Earth: 1,
+    Wind: 0.90,
+    Poison: 1,
+    Holy: 0.75,
+    Shadow: 1,
+    Ghost: 1,
+    Undead: 1
+  },
+  Earth: {
+    Neutral: 1,
+    Fire: 0.90,
+    Water: 1,
+    Earth: 0.25,
+    Wind: 1.25,
+    Poison: 1,
+    Holy: 0.75,
+    Shadow: 1,
+    Ghost: 1,
+    Undead: 1
+  },
+  Wind: {
+    Neutral: 1,
+    Fire: 1,
+    Water: 1.375,
+    Earth: 0.90,
+    Wind: 0.25,
+    Poison: 1,
+    Holy: 0.70,
+    Shadow: 1,
+    Ghost: 1,
+    Undead: 1
+  },
+  Poison: {
+    Neutral: 1,
+    Fire: 1.125,
+    Water: 1,
+    Earth: 1.125,
+    Wind: 1.125,
+    Poison: 0,
+    Holy: 0.75,
+    Shadow: 0.50,
+    Ghost: 1,
+    Undead: -0.25
+  },
+  Holy: {
+    Neutral: 1,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 1,
+    Holy: 0,
+    Shadow: 1.375,
+    Ghost: 1,
+    Undead: 1.375
+  },
+  Shadow: {
+    Neutral: 1.125,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 0.50,
+    Holy: 1.375,
+    Shadow: 0,
+    Ghost: 1,
+    Undead: -0.25
+  },
+  Ghost: {
+    Neutral: 0.90,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 1,
+    Holy: 0.75,
+    Shadow: 0.75,
+    Ghost: 1.375,
+    Undead: 1
+  },
+  Undead: {
+    Neutral: 1,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 0.50,
+    Holy: 1.375,
+    Shadow: 0,
+    Ghost: 1.25,
+    Undead: 0
+  }
+};
+const WEAPON_SIZE_MODIFIER_TABLE = {
+  "Empty Handed": {
+    Large: 0.5,
+    Medium: 0.5,
+    Small: 0.5
+  },
+  "One-Handed Sword": {
+    Large: 0.75,
+    Medium: 1,
+    Small: 0.75
+  },
+  "Two-Handed Sword": {
+    Large: 1,
+    Medium: 0.75,
+    Small: 0.75
+  },
+  "Two-Handed Spear": {
+    Large: 1,
+    Medium: 0.75,
+    Small: 0.75
+  },
+  "Dagger": {
+    Large: 0.75,
+    Medium: 0.75,
+    Small: 1
+  },
+  "Katar": {
+    Large: 0.75,
+    Medium: 1,
+    Small: 0.75
+  },
+  "Light Knuckle": {
+    Large: 0.75,
+    Medium: 0.75,
+    Small: 1
+  },
+  "Heavy Knuckle": {
+    Large: 1,
+    Medium: 0.75,
+    Small: 0.75
+  },
+  "GS": {
+    Large: 1,
+    Medium: 1,
+    Small: 1
+  },
+  "Ninja Sword": {
+    Large: 1,
+    Medium: 0.75,
+    Small: 0.75
+  },
+  "Huuma Shuriken": {
+    Large: 1,
+    Medium: 1,
+    Small: 1
+  },
+  "Tome": {
+    Large: 0.75,
+    Medium: 1,
+    Small: 1
+  },
+  "Book": {
+    Large: 1,
+    Medium: 1,
+    Small: 1
+  },
+  "Two-Handed Rod": {
+    Large: 1,
+    Medium: 1,
+    Small: 1
+  },
+  "One-Handed Rod": {
+    Large: 1,
+    Medium: 1,
+    Small: 1
+  },
+  "Mace": {
+    Large: 1,
+    Medium: 0.75,
+    Small: 0.75
+  },
+  "One-Handed Axe": {
+    Large: 0.75,
+    Medium: 0.75,
+    Small: 0.75
+  },
+  "Two-Handed Axe": {
+    Large: 0.5,
+    Medium: 0.75,
+    Small: 0.75
+  },
+  "Bow": {
+    Large: 0.75,
+    Medium: 1,
+    Small: 1
+  },
+  "Instrument": {
+    Large: 0.75,
+    Medium: 1,
+    Small: 0.75
+  },
+  "Whip": {
+    Large: 0.75,
+    Medium: 1,
+    Small: 0.75
+  }
+};
 const RACE_TYPES = [
   "Angel", 
   "Demon", 
@@ -841,235 +1070,28 @@ const DEFENSE_TABLE = {
     attributeMob: "Holy"
   }
 };
-const ELEMENT_COUNTER_TABLE = {
-  Neutral: {
-    Neutral: 1,
-    Fire: 1,
-    Water: 1,
-    Earth: 1,
-    Wind: 1,
-    Poison: 1,
-    Holy: 1,
-    Shadow: 1,
-    Ghost: 0.70,
-    Undead: 1
-  },
-  Fire: {
-    Neutral: 1,
-    Fire: 0.25,
-    Water: 1,
-    Earth: 1.25,
-    Wind: 1,
-    Poison: 1,
-    Holy: 0.75,
-    Shadow: 1,
-    Ghost: 1,
-    Undead: 1.125
-  },
-  Water: {
-    Neutral: 1,
-    Fire: 1.25,
-    Water: 0.25,
-    Earth: 1,
-    Wind: 0.90,
-    Poison: 1,
-    Holy: 0.75,
-    Shadow: 1,
-    Ghost: 1,
-    Undead: 1
-  },
-  Earth: {
-    Neutral: 1,
-    Fire: 0.90,
-    Water: 1,
-    Earth: 0.25,
-    Wind: 1.25,
-    Poison: 1,
-    Holy: 0.75,
-    Shadow: 1,
-    Ghost: 1,
-    Undead: 1
-  },
-  Wind: {
-    Neutral: 1,
-    Fire: 1,
-    Water: 1.375,
-    Earth: 0.90,
-    Wind: 0.25,
-    Poison: 1,
-    Holy: 0.70,
-    Shadow: 1,
-    Ghost: 1,
-    Undead: 1
-  },
-  Poison: {
-    Neutral: 1,
-    Fire: 1.125,
-    Water: 1,
-    Earth: 1.125,
-    Wind: 1.125,
-    Poison: 0,
-    Holy: 0.75,
-    Shadow: 0.50,
-    Ghost: 1,
-    Undead: -0.25
-  },
-  Holy: {
-    Neutral: 1,
-    Fire: 1,
-    Water: 1,
-    Earth: 1,
-    Wind: 1,
-    Poison: 1,
-    Holy: 0,
-    Shadow: 1.375,
-    Ghost: 1,
-    Undead: 1.375
-  },
-  Shadow: {
-    Neutral: 1.125,
-    Fire: 1,
-    Water: 1,
-    Earth: 1,
-    Wind: 1,
-    Poison: 0.50,
-    Holy: 1.375,
-    Shadow: 0,
-    Ghost: 1,
-    Undead: -0.25
-  },
-  Ghost: {
-    Neutral: 0.90,
-    Fire: 1,
-    Water: 1,
-    Earth: 1,
-    Wind: 1,
-    Poison: 1,
-    Holy: 0.75,
-    Shadow: 0.75,
-    Ghost: 1.375,
-    Undead: 1
-  },
-  Undead: {
-    Neutral: 1,
-    Fire: 1,
-    Water: 1,
-    Earth: 1,
-    Wind: 1,
-    Poison: 0.50,
-    Holy: 1.375,
-    Shadow: 0,
-    Ghost: 1.25,
-    Undead: 0
-  }
-};
-const WEAPON_SIZE_MODIFIER_TABLE = {
-  "Empty Handed": {
-    Large: 0.5,
-    Medium: 0.5,
-    Small: 0.5
-  },
-  "One-Handed Sword": {
-    Large: 0.75,
-    Medium: 1,
-    Small: 0.75
-  },
-  "Two-Handed Sword": {
-    Large: 1,
-    Medium: 0.75,
-    Small: 0.75
-  },
-  "Two-Handed Spear": {
-    Large: 1,
-    Medium: 0.75,
-    Small: 0.75
-  },
-  "Dagger": {
-    Large: 0.75,
-    Medium: 0.75,
-    Small: 1
-  },
-  "Katar": {
-    Large: 0.75,
-    Medium: 1,
-    Small: 0.75
-  },
-  "Light Knuckle": {
-    Large: 0.75,
-    Medium: 0.75,
-    Small: 1
-  },
-  "Heavy Knuckle": {
-    Large: 1,
-    Medium: 0.75,
-    Small: 0.75
-  },
-  "GS": {
-    Large: 1,
-    Medium: 1,
-    Small: 1
-  },
-  "Ninja Sword": {
-    Large: 1,
-    Medium: 0.75,
-    Small: 0.75
-  },
-  "Huuma Shuriken": {
-    Large: 1,
-    Medium: 1,
-    Small: 1
-  },
-  "Tome": {
-    Large: 0.75,
-    Medium: 1,
-    Small: 1
-  },
-  "Book": {
-    Large: 1,
-    Medium: 1,
-    Small: 1
-  },
-  "Two-Handed Rod": {
-    Large: 1,
-    Medium: 1,
-    Small: 1
-  },
-  "One-Handed Rod": {
-    Large: 1,
-    Medium: 1,
-    Small: 1
-  },
-  "Mace": {
-    Large: 1,
-    Medium: 0.75,
-    Small: 0.75
-  },
-  "One-Handed Axe": {
-    Large: 0.75,
-    Medium: 0.75,
-    Small: 0.75
-  },
-  "Two-Handed Axe": {
-    Large: 0.5,
-    Medium: 0.75,
-    Small: 0.75
-  },
-  "Bow": {
-    Large: 0.75,
-    Medium: 1,
-    Small: 1
-  },
-  "Instrument": {
-    Large: 0.75,
-    Medium: 1,
-    Small: 0.75
-  },
-  "Whip": {
-    Large: 0.75,
-    Medium: 1,
-    Small: 0.75
-  }
-};
+const cache = (() => {
+  const stores = {
+    weaponSize: new Map(),
+    elementCounter: new Map(),
+    defenseData: new Map()
+  };
+
+  const warm = () => {
+    Object.entries(WEAPON_SIZE_MODIFIER_TABLE).forEach(([w, sizes]) =>
+      Object.entries(sizes).forEach(([s, v]) => stores.weaponSize.set(`${w}:${s}`, v)));
+    Object.entries(ELEMENT_COUNTER_TABLE).forEach(([w, targets]) =>
+      Object.entries(targets).forEach(([t, v]) => stores.elementCounter.set(`${w}:${t}`, v)));
+    Object.entries(DEFENSE_TABLE).forEach(([k, v]) => stores.defenseData.set(k, v));
+  };
+
+  warm();
+  return {
+    get: (type, key) => stores[type]?.get(key),
+    clear: (type) => type ? stores[type]?.clear() : Object.values(stores).forEach(s => s.clear()),
+    rewarm: warm
+  };
+})();
 
 // ========== CENTRALIZED STATE ==========
 const AppState = (() => {
@@ -1245,154 +1267,10 @@ const EventManager = (() => {
   };
 })();
 
-// ========== OPTIMIZED CACHE ==========
-const cache = (() => {
-  const stores = {
-    weaponSize: new Map(),
-    elementCounter: new Map(),
-    defenseData: new Map()
-  };
-
-  const warm = () => {
-    Object.entries(WEAPON_SIZE_MODIFIER_TABLE).forEach(([w, sizes]) =>
-      Object.entries(sizes).forEach(([s, v]) => stores.weaponSize.set(`${w}:${s}`, v)));
-    Object.entries(ELEMENT_COUNTER_TABLE).forEach(([w, targets]) =>
-      Object.entries(targets).forEach(([t, v]) => stores.elementCounter.set(`${w}:${t}`, v)));
-    Object.entries(DEFENSE_TABLE).forEach(([k, v]) => stores.defenseData.set(k, v));
-  };
-
-  warm();
-  return {
-    get: (type, key) => stores[type]?.get(key),
-    clear: (type) => type ? stores[type]?.clear() : Object.values(stores).forEach(s => s.clear()),
-    rewarm: warm
-  };
-})();
-
-// ========== RANDOM GENERATOR ==========
-const RandomGenerator = (() => {
-  const SIZE = 500;
-  let cache = new Float64Array(SIZE),
-    idx = 0;
-  const refill = () => {
-    for (let i = 0; i < SIZE; i++) cache[i] = Math.random();
-    idx = 0;
-  };
-  refill();
-  return {
-    get: () => (idx >= SIZE && refill(), cache[idx++]),
-    reset: refill
-  };
-})();
-
-// ========== HELPER FUNCTIONS ==========
+// ========== CALCULATION CORE ==========
 const getWeaponSizeModifier = (weapon, size) => weapon === 'all' || !weapon ? WEAPON_SIZE_MODIFIER_TABLE : cache.get('weaponSize', `${weapon}:${size}`) ?? 1.0;
 const getElementCounter = (weaponElem, targetElem) => weaponElem === 'all' || !weaponElem ? ELEMENT_COUNTER_TABLE : cache.get('elementCounter', `${weaponElem}:${targetElem || 'Neutral'}`) ?? 1.0;
 const getTargetDefenseData = (key) => !key ? DEFENSE_TABLE : cache.get('defenseData', key) || DEFENSE_TABLE["DUMMY"];
-
-// ========== CALCULATION CORE ==========
-const processMainCalculation = (() => {
-  let timeoutId = null;
-  let calculationRAF = null;
-  let isProcessing = false;
-  let executionId = 0;
-
-  const resetUI = () => {
-    DOM_ELEMENTS.submit.disabled = false;
-    DOM_ELEMENTS.submit.textContent = "Calculate";
-  };
-
-  const setCalculatingUI = () => {
-    DOM_ELEMENTS.submit.disabled = true;
-    DOM_ELEMENTS.submit.textContent = "Calculating...";
-  };
-
-  const cleanup = () => {
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId);
-      timeoutId = null;
-    }
-    if (calculationRAF !== null) {
-      cancelAnimationFrame(calculationRAF);
-      calculationRAF = null;
-    }
-  };
-
-  const enableResultButtons = () => {
-    [DOM_ELEMENTS.testReaper, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.resetRek, DOM_ELEMENTS.resetAll]
-    .forEach(btn => {
-      if (btn) btn.disabled = false;
-    });
-  };
-
-  const performCalculation = (calculationState) => {
-    AppState.set('isResultShown', true);
-    lockAllInputs();
-    bindInputLockGuard();
-    renderMultiplierBreakdown(calculationState);
-    generateRecommendationTable(calculationState);
-    enableResultButtons();
-  };
-
-  const handleCalculationError = (error) => {
-    console.error('Calculation error:', error);
-    resetUI();
-
-    if (typeof showSnackbar === 'function') {
-      showSnackbar('Calculation failed. Please check your inputs.');
-    }
-  };
-
-  return () => {
-    if (isProcessing) return;
-
-    cleanup();
-
-    if (!validateRequiredFields()) {
-      resetUI();
-      return;
-    }
-
-    isProcessing = true;
-    executionId++;
-    const currentId = executionId;
-
-    setCalculatingUI();
-
-    timeoutId = setTimeout(() => {
-      timeoutId = null;
-
-      if (currentId !== executionId) return;
-
-      calculationRAF = requestAnimationFrame(() => {
-        calculationRAF = null;
-
-        if (currentId !== executionId) return;
-
-        try {
-          const calculationState = getCurrentCalculationState();
-
-          if (!validateStatsVsTarget(calculationState)) {
-            resetUI();
-            return;
-          }
-
-          performCalculation(calculationState);
-
-          DOM_ELEMENTS.submit.disabled = true;
-          DOM_ELEMENTS.submit.textContent = "Calculate";
-
-        } catch (error) {
-          handleCalculationError(error);
-        } finally {
-          if (currentId === executionId) {
-            isProcessing = false;
-          }
-        }
-      });
-    }, 300);
-  };
-})();
 function getCurrentCalculationState() {
   const safeNum = (el) => el ? (Number(el.value) || 0) : 0;
   const safeStr = (el) => el?.value || '';
@@ -1727,8 +1605,182 @@ function calculateMultiplier(params={}) {
     }
   };
 }
+const processMainCalculation = (() => {
+  let timeoutId = null;
+  let calculationRAF = null;
+  let isProcessing = false;
+  let executionId = 0;
+
+  const resetUI = () => {
+    DOM_ELEMENTS.submit.disabled = false;
+    DOM_ELEMENTS.submit.textContent = "Calculate";
+  };
+
+  const setCalculatingUI = () => {
+    DOM_ELEMENTS.submit.disabled = true;
+    DOM_ELEMENTS.submit.textContent = "Calculating...";
+  };
+
+  const cleanup = () => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    if (calculationRAF !== null) {
+      cancelAnimationFrame(calculationRAF);
+      calculationRAF = null;
+    }
+  };
+
+  const enableResultButtons = () => {
+    [DOM_ELEMENTS.testReaper, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.resetRek, DOM_ELEMENTS.resetAll]
+    .forEach(btn => {
+      if (btn) btn.disabled = false;
+    });
+  };
+
+  const performCalculation = (calculationState) => {
+    AppState.set('isResultShown', true);
+    lockAllInputs();
+    bindInputLockGuard();
+    renderMultiplierBreakdown(calculationState);
+    generateRecommendationTable(calculationState);
+    enableResultButtons();
+  };
+
+  const handleCalculationError = (error) => {
+    console.error('Calculation error:', error);
+    resetUI();
+
+    if (typeof showSnackbar === 'function') {
+      showSnackbar('Calculation failed. Please check your inputs.');
+    }
+  };
+
+  return () => {
+    if (isProcessing) return;
+
+    cleanup();
+
+    if (!validateRequiredFields()) {
+      resetUI();
+      return;
+    }
+
+    isProcessing = true;
+    executionId++;
+    const currentId = executionId;
+
+    setCalculatingUI();
+
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+
+      if (currentId !== executionId) return;
+
+      calculationRAF = requestAnimationFrame(() => {
+        calculationRAF = null;
+
+        if (currentId !== executionId) return;
+
+        try {
+          const calculationState = getCurrentCalculationState();
+
+          if (!validateStatsVsTarget(calculationState)) {
+            resetUI();
+            return;
+          }
+
+          performCalculation(calculationState);
+
+          DOM_ELEMENTS.submit.disabled = true;
+          DOM_ELEMENTS.submit.textContent = "Calculate";
+
+        } catch (error) {
+          handleCalculationError(error);
+        } finally {
+          if (currentId === executionId) {
+            isProcessing = false;
+          }
+        }
+      });
+    }, 300);
+  };
+})();
 
 // ======== BREAKDOWN ========
+const NumberFormatter = {
+  format(n, showFullPrecision) {
+    const num = Number(n) || 0;
+    const isInteger = num % 1 === 0;
+    const absNum = Math.abs(num);
+
+    if (showFullPrecision) {
+      if (absNum >= 99999) return Math.floor(num).toString();
+      if (isInteger) return num.toString();
+
+      const str = num.toFixed(6).replace(/(\.\d*?)0+$/, '$1');
+      if (str.endsWith('.')) return num.toFixed(2);
+
+      const parts = str.split('.');
+      if (parts[1] && parts[1].length === 1) return num.toFixed(2);
+
+      return str;
+    }
+
+    if (absNum > 99999) {
+      const divisor = absNum >= 1e6 ? 1e6 : 1e3;
+      const suffix = divisor === 1e6 ? 'M' : 'K';
+      return `${Math.floor(num / divisor)}${suffix}`;
+    }
+
+    if (isInteger) return num.toString();
+    return num.toFixed(2);
+  }
+};
+const PrecisionToggle = {
+  create(resultContainer, onToggleCallback) {
+    const showFullPrecision = resultContainer?.dataset?.showFullPrecision === "1";
+
+    const btn = document.createElement('button');
+    btn.className = 'toggle-precision job-sim';
+    btn.type = 'button';
+    btn.textContent = showFullPrecision ? "hide" : "show";
+
+    const listenerId = EventManager.add(btn, 'click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (!resultContainer?.dataset) return;
+
+      const newState = resultContainer.dataset.showFullPrecision === "1" ? "0" : "1";
+      resultContainer.dataset.showFullPrecision = newState;
+
+      btn.textContent = newState === "1" ? "hide" : "show";
+
+      onToggleCallback(newState === "1");
+
+      typeof showSnackbar === 'function' &&
+        showSnackbar(newState === "1" ? "Precise numbers displayed" : "Rounded numbers displayed");
+    });
+
+    btn.dataset.listenerId = listenerId;
+    return btn;
+  },
+
+  refreshNumbers(resultContainer, showFullPrecision) {
+    const fmt = (n) => NumberFormatter.format(n, showFullPrecision);
+
+    resultContainer.querySelectorAll('[data-raw-value]').forEach(el => {
+      const rawValue = parseFloat(el.dataset.rawValue);
+      el.textContent = fmt(rawValue);
+    });
+
+    resultContainer.querySelectorAll('code[data-raw-mult]').forEach(el => {
+      const rawMult = parseFloat(el.dataset.rawMult);
+      el.textContent = `\u00D7${fmt(rawMult)}`;
+    });
+  }
+};
 function renderMultiplierBreakdown(calculationState) {
   if (!AppState.get('isResultShown')) return;
 
@@ -2101,80 +2153,171 @@ function renderMultiplierBreakdown(calculationState) {
   bq1.appendChild(bq1Suffix);
   resultContainer.querySelector('#swap-wrapper').appendChild(swapSelect);
 }
-const NumberFormatter = {
-  format(n, showFullPrecision) {
-    const num = Number(n) || 0;
-    const isInteger = num % 1 === 0;
-    const absNum = Math.abs(num);
-
-    if (showFullPrecision) {
-      if (absNum >= 99999) return Math.floor(num).toString();
-      if (isInteger) return num.toString();
-
-      const str = num.toFixed(6).replace(/(\.\d*?)0+$/, '$1');
-      if (str.endsWith('.')) return num.toFixed(2);
-
-      const parts = str.split('.');
-      if (parts[1] && parts[1].length === 1) return num.toFixed(2);
-
-      return str;
-    }
-
-    if (absNum > 99999) {
-      const divisor = absNum >= 1e6 ? 1e6 : 1e3;
-      const suffix = divisor === 1e6 ? 'M' : 'K';
-      return `${Math.floor(num / divisor)}${suffix}`;
-    }
-
-    if (isInteger) return num.toString();
-    return num.toFixed(2);
-  }
-};
-const PrecisionToggle = {
-  create(resultContainer, onToggleCallback) {
-    const showFullPrecision = resultContainer?.dataset?.showFullPrecision === "1";
-
-    const btn = document.createElement('button');
-    btn.className = 'toggle-precision job-sim';
-    btn.type = 'button';
-    btn.textContent = showFullPrecision ? "hide" : "show";
-
-    const listenerId = EventManager.add(btn, 'click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!resultContainer?.dataset) return;
-
-      const newState = resultContainer.dataset.showFullPrecision === "1" ? "0" : "1";
-      resultContainer.dataset.showFullPrecision = newState;
-
-      btn.textContent = newState === "1" ? "hide" : "show";
-
-      onToggleCallback(newState === "1");
-
-      typeof showSnackbar === 'function' &&
-        showSnackbar(newState === "1" ? "Precise numbers displayed" : "Rounded numbers displayed");
-    });
-
-    btn.dataset.listenerId = listenerId;
-    return btn;
-  },
-
-  refreshNumbers(resultContainer, showFullPrecision) {
-    const fmt = (n) => NumberFormatter.format(n, showFullPrecision);
-
-    resultContainer.querySelectorAll('[data-raw-value]').forEach(el => {
-      const rawValue = parseFloat(el.dataset.rawValue);
-      el.textContent = fmt(rawValue);
-    });
-
-    resultContainer.querySelectorAll('code[data-raw-mult]').forEach(el => {
-      const rawMult = parseFloat(el.dataset.rawMult);
-      el.textContent = `\u00D7${fmt(rawMult)}`;
-    });
-  }
-};
 
 // ========== RECOMMENDATION ==========
+const RandomGenerator = (() => {
+  const SIZE = 500;
+  let cache = new Float64Array(SIZE),
+    idx = 0;
+  const refill = () => {
+    for (let i = 0; i < SIZE; i++) cache[i] = Math.random();
+    idx = 0;
+  };
+  refill();
+  return {
+    get: () => (idx >= SIZE && refill(), cache[idx++]),
+    reset: refill
+  };
+})();
+const RECOMMENDATION_CONFIG = {
+  randomMode: 'clamp',
+  maxAttempts: 500,
+  centerScale: 0.25,
+  jitter: 0.12,
+  jitterStep: 0.025,
+  jitterStepEvery: 35,
+  jitterMax: 0.50,
+  clampMaxFraction: 3.5,
+  clampMaxAbsolute: 0.20,
+  upDownThreshold: 3,
+  raceAttrCap: 310,
+  raceAttrSoloCap: 250,
+  raceAttrTol: 6,
+  smallThreshold: 115,
+  smallMin: 85,
+  smallExp: 0.75,
+  ratioMin: 0.32,
+  ratioMax: 0.64,
+  ratioNoise: 0.12,
+  bias: {
+    main: 1.0,
+    dmg: 0.95,
+    elem: 0.90,
+    size: 0.90,
+    race: 0.72,
+    attr: 0.72
+  },
+  cats: [{
+      label: '6-12%',
+      min: 1.06,
+      max: 1.12
+    },
+    {
+      label: '18-24%',
+      min: 1.18,
+      max: 1.24
+    },
+    {
+      label: '32-48%',
+      min: 1.32,
+      max: 1.48
+    },
+    {
+      label: '64-128%',
+      min: 1.64,
+      max: 2.28
+    }
+  ],
+  forSmallCats: [{
+      label: '84-168%',
+      min: 1.84,
+      max: 2.68
+    },
+    {
+      label: '180-270%',
+      min: 2.80,
+      max: 3.70
+    },
+    {
+      label: '320-480%',
+      min: 4.32,
+      max: 5.80
+    },
+    {
+      label: '510-720%',
+      min: 6.10,
+      max: 8.20
+    }
+  ]
+}
+const calculateRecommendationWeights = (params) => {
+  if (!AppState.get('isResultShown')) return;
+
+  const {
+    includeRace,
+    includeAttr,
+    baseMain,
+    baseDmg,
+    baseElem,
+    baseSize,
+    baseRace,
+    baseAttr
+  } = params;
+  const {
+    bias,
+    smallExp,
+    smallMin,
+    raceAttrCap
+  } = RECOMMENDATION_CONFIG;
+
+  // Calculate weighted values for core stats
+  const weights = [
+    baseMain * bias.main,
+    baseDmg * bias.dmg,
+    baseElem * bias.elem,
+    baseSize * bias.size
+  ];
+
+  const maxWeight = Math.max(...weights, 1);
+  const coreSum = Math.max(weights.reduce((sum, w) => sum + w / maxWeight, 0), 0.0001);
+
+  // Allocate weight share between core and additional stats
+  const hasAdditional = includeRace || includeAttr;
+  const coreShare = hasAdditional ? 0.75 : 1.0;
+
+  const finalWeights = {
+    main: (weights[0] / maxWeight / coreSum) * coreShare,
+    dmg: (weights[1] / maxWeight / coreSum) * coreShare,
+    elem: (weights[2] / maxWeight / coreSum) * coreShare,
+    size: (weights[3] / maxWeight / coreSum) * coreShare,
+    race: 0,
+    attr: 0
+  };
+
+  // If no additional stats, normalize and return
+  if (!hasAdditional) {
+    const totalSum = Object.values(finalWeights).reduce((a, b) => a + b, 0);
+    Object.keys(finalWeights).forEach(k => finalWeights[k] /= totalSum);
+    return finalWeights;
+  }
+
+  // Handle race/attr weight distribution - optimized
+  const additionalShare = 1 - coreShare;
+  const effectiveRace = includeRace ? Math.max(Math.pow(baseRace, smallExp), smallMin) : 0;
+  const effectiveAttr = includeAttr ? Math.max(Math.pow(baseAttr, smallExp), smallMin) : 0;
+  const raceAvailable = includeRace && effectiveRace > 0 && effectiveRace < raceAttrCap;
+  const attrAvailable = includeAttr && effectiveAttr > 0 && effectiveAttr < raceAttrCap;
+
+  if (raceAvailable && attrAvailable) {
+    const combinedSum = effectiveRace + effectiveAttr;
+    finalWeights.race = (effectiveRace / combinedSum) * additionalShare;
+    finalWeights.attr = (effectiveAttr / combinedSum) * additionalShare;
+  } else if (raceAvailable) {
+    finalWeights.race = additionalShare;
+  } else if (attrAvailable) {
+    finalWeights.attr = additionalShare;
+  } else {
+    // Redistribute to core stats if no additional stats qualify
+    const redistribution = additionalShare * 0.25;
+    ['main', 'dmg', 'elem', 'size'].forEach(k => finalWeights[k] += redistribution);
+  }
+
+  // Final normalization
+  const totalSum = Object.values(finalWeights).reduce((a, b) => a + b, 0);
+  Object.keys(finalWeights).forEach(k => finalWeights[k] /= totalSum);
+
+  return finalWeights;
+};
 function generateRecommendationTable(gameState) {
   if (!AppState.get('isResultShown')) return;
 
@@ -2523,160 +2666,9 @@ function generateRecommendationTable(gameState) {
 
   DOM_ELEMENTS.rec.innerHTML = tablesHTML.join('');
 }
-const calculateRecommendationWeights = (params) => {
-  if (!AppState.get('isResultShown')) return;
-
-  const {
-    includeRace,
-    includeAttr,
-    baseMain,
-    baseDmg,
-    baseElem,
-    baseSize,
-    baseRace,
-    baseAttr
-  } = params;
-  const {
-    bias,
-    smallExp,
-    smallMin,
-    raceAttrCap
-  } = RECOMMENDATION_CONFIG;
-
-  // Calculate weighted values for core stats
-  const weights = [
-    baseMain * bias.main,
-    baseDmg * bias.dmg,
-    baseElem * bias.elem,
-    baseSize * bias.size
-  ];
-
-  const maxWeight = Math.max(...weights, 1);
-  const coreSum = Math.max(weights.reduce((sum, w) => sum + w / maxWeight, 0), 0.0001);
-
-  // Allocate weight share between core and additional stats
-  const hasAdditional = includeRace || includeAttr;
-  const coreShare = hasAdditional ? 0.75 : 1.0;
-
-  const finalWeights = {
-    main: (weights[0] / maxWeight / coreSum) * coreShare,
-    dmg: (weights[1] / maxWeight / coreSum) * coreShare,
-    elem: (weights[2] / maxWeight / coreSum) * coreShare,
-    size: (weights[3] / maxWeight / coreSum) * coreShare,
-    race: 0,
-    attr: 0
-  };
-
-  // If no additional stats, normalize and return
-  if (!hasAdditional) {
-    const totalSum = Object.values(finalWeights).reduce((a, b) => a + b, 0);
-    Object.keys(finalWeights).forEach(k => finalWeights[k] /= totalSum);
-    return finalWeights;
-  }
-
-  // Handle race/attr weight distribution - optimized
-  const additionalShare = 1 - coreShare;
-  const effectiveRace = includeRace ? Math.max(Math.pow(baseRace, smallExp), smallMin) : 0;
-  const effectiveAttr = includeAttr ? Math.max(Math.pow(baseAttr, smallExp), smallMin) : 0;
-  const raceAvailable = includeRace && effectiveRace > 0 && effectiveRace < raceAttrCap;
-  const attrAvailable = includeAttr && effectiveAttr > 0 && effectiveAttr < raceAttrCap;
-
-  if (raceAvailable && attrAvailable) {
-    const combinedSum = effectiveRace + effectiveAttr;
-    finalWeights.race = (effectiveRace / combinedSum) * additionalShare;
-    finalWeights.attr = (effectiveAttr / combinedSum) * additionalShare;
-  } else if (raceAvailable) {
-    finalWeights.race = additionalShare;
-  } else if (attrAvailable) {
-    finalWeights.attr = additionalShare;
-  } else {
-    // Redistribute to core stats if no additional stats qualify
-    const redistribution = additionalShare * 0.25;
-    ['main', 'dmg', 'elem', 'size'].forEach(k => finalWeights[k] += redistribution);
-  }
-
-  // Final normalization
-  const totalSum = Object.values(finalWeights).reduce((a, b) => a + b, 0);
-  Object.keys(finalWeights).forEach(k => finalWeights[k] /= totalSum);
-
-  return finalWeights;
-};
 const regenerateRecommendations = () => {
   AppState.get('isResultShown') && (generateRecommendationTable(getCurrentCalculationState()), showSnackbar?.("Table Refreshed!"));
 };
-
-// Recommendation  configuration
-const RECOMMENDATION_CONFIG = {
-  randomMode: 'clamp',
-  maxAttempts: 500,
-  centerScale: 0.25,
-  jitter: 0.12,
-  jitterStep: 0.025,
-  jitterStepEvery: 35,
-  jitterMax: 0.50,
-  clampMaxFraction: 3.5,
-  clampMaxAbsolute: 0.20,
-  upDownThreshold: 3,
-  raceAttrCap: 310,
-  raceAttrSoloCap: 250,
-  raceAttrTol: 6,
-  smallThreshold: 115,
-  smallMin: 85,
-  smallExp: 0.75,
-  ratioMin: 0.32,
-  ratioMax: 0.64,
-  ratioNoise: 0.12,
-  bias: {
-    main: 1.0,
-    dmg: 0.95,
-    elem: 0.90,
-    size: 0.90,
-    race: 0.72,
-    attr: 0.72
-  },
-  cats: [{
-      label: '6-12%',
-      min: 1.06,
-      max: 1.12
-    },
-    {
-      label: '18-24%',
-      min: 1.18,
-      max: 1.24
-    },
-    {
-      label: '32-48%',
-      min: 1.32,
-      max: 1.48
-    },
-    {
-      label: '64-128%',
-      min: 1.64,
-      max: 2.28
-    }
-  ],
-  forSmallCats: [{
-      label: '84-168%',
-      min: 1.84,
-      max: 2.68
-    },
-    {
-      label: '180-270%',
-      min: 2.80,
-      max: 3.70
-    },
-    {
-      label: '320-480%',
-      min: 4.32,
-      max: 5.80
-    },
-    {
-      label: '510-720%',
-      min: 6.10,
-      max: 8.20
-    }
-  ]
-}
 
 // ========== FLASH SYSTEM ==========
 const isMobile = () => window.innerWidth < 480;
@@ -5595,7 +5587,7 @@ class StickyHandler {
 const stickyHandler = new StickyHandler();
 
 // ======== LIGHTBOX ========
-(() => {
+const imgLightbox = (() => {
   const NS = 'img-lightbox';
   const els = {
     overlay: document.getElementById('img-lightbox-overlay'),
@@ -6007,8 +5999,8 @@ const stickyHandler = new StickyHandler();
   });
 })();
 
-// ========== EVENT BINDING ==========
-(() => {
+// ========== MAIN BUTTON EVENT ==========
+const mainButtonEvent = (() => {
   if (window._eventsAlreadyBound) return;
   window._eventsAlreadyBound = true;
 
@@ -6037,7 +6029,7 @@ const stickyHandler = new StickyHandler();
   });
 })();
 
-// ========== PWA UTIL N FLOW==========
+// ========== PWA ==========
 const isPWAMode = () => 
   window.matchMedia('(display-mode: standalone)').matches || 
   window.navigator.standalone === true;
@@ -6188,7 +6180,7 @@ const preventPullToRefresh = (() => {
   
   return { cleanup };
 })();
-(() => {
+const PWAPersistenceInit = (() => {
   if (!isPWAMode()) return;
   const PWAPersistence = (() => {
     const collectFormValues = () => {
@@ -6537,6 +6529,8 @@ function resetAllData() {
   const message = shouldClearCache ? 'All data and cache cleared!' : 'All data reset!';
   setTimeout(() => showSnackbar?.(message), CONSTANTS.SNACKBAR_DELAY);
 }
+
+// ========
 EventManager.add(window, 'beforeunload', () => {
   CleanupManager.cleanupListeners();
   CleanupManager.cleanupTimers();
