@@ -5901,7 +5901,6 @@ if ('serviceWorker' in navigator) {
     
     return { init };
   })();
-  
   PWAServiceWorker.init();
 };
 const preventPullToRefresh = (() => {
