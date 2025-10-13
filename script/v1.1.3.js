@@ -353,7 +353,7 @@ const RACE_TYPES = [
 ];
 // Defense Stats From Nila
 const DEFENSE_TABLE = {
-  "DUMMY": {
+  "DUMMY Lvl.0 (0 DEF)": {
     def: 0,
     dmgred: 0
   },
@@ -1270,7 +1270,7 @@ const EventManager = (() => {
 // ========== CALCULATION CORE ==========
 const getWeaponSizeModifier = (weapon, size) => weapon === 'all' || !weapon ? WEAPON_SIZE_MODIFIER_TABLE : cache.get('weaponSize', `${weapon}:${size}`) ?? 1.0;
 const getElementCounter = (weaponElem, targetElem) => weaponElem === 'all' || !weaponElem ? ELEMENT_COUNTER_TABLE : cache.get('elementCounter', `${weaponElem}:${targetElem || 'Neutral'}`) ?? 1.0;
-const getTargetDefenseData = (key) => !key ? DEFENSE_TABLE : cache.get('defenseData', key) || DEFENSE_TABLE["DUMMY"];
+const getTargetDefenseData = (key) => !key ? DEFENSE_TABLE : cache.get('defenseData', key) || DEFENSE_TABLE["DUMMY Lvl.0 (0 DEF)"];
 function getCurrentCalculationState() {
   const safeNum = (el) => el ? (Number(el.value) || 0) : 0;
   const safeStr = (el) => el?.value || '';
@@ -3301,7 +3301,7 @@ class DropdownManager {
     });
 
     select.innerHTML = options.join('');
-    select.value = state.tDefKey || "DUMMY";
+    select.value = state.tDefKey || "DUMMY Lvl.0 (0 DEF)";
 
     if (!select.hasAttribute('data-dropdown-bound')) {
       EventManager.addNS(this.namespace, select, 'change', () => this.executeSwap(select.value, state, isPenMode));
@@ -3331,6 +3331,7 @@ class ValidationSSoT {
     this.INVALID_CLASS = 'invalid-value';
     this.touchedFields = new Set();
     this.snackbarCooldowns = new Set();
+    this.fieldLastValues = new Map();
     this.namespace = 'validation-ssot';
     this.isInitialized = false;
     this.autoInit();
@@ -3486,8 +3487,8 @@ class ValidationSSoT {
     };
   }
 
-  updateFieldState(element, isValid) {
-    if (!this.touchedFields.has(element.id)) return;
+  updateFieldState(element, isValid, force = false) {
+    if (!force && !this.touchedFields.has(element.id)) return;
     element.classList.toggle(this.INVALID_CLASS, !isValid);
   }
 
@@ -3500,7 +3501,7 @@ class ValidationSSoT {
     }
 
     const result = this.validateField(element, this.touchedFields.has(element.id));
-    this.updateFieldState(element, result.isValid);
+    this.updateFieldState(element, result.isValid, true);
   }
 
   // Event handlers
@@ -3525,6 +3526,9 @@ class ValidationSSoT {
   setupField(element) {
     const validateHandler = this.createValidateHandler(element);
     const normalizeHandler = this.createNormalizeHandler(element);
+
+    // Simpan initial value
+    this.fieldLastValues.set(element.id, element.value);
 
     EventManager.addNS(this.namespace, element, 'focus', () => {
       this.touchedFields.add(element.id);
@@ -3557,6 +3561,29 @@ class ValidationSSoT {
     });
   }
 
+  startWatchingTouchedFields() {
+    setInterval(() => {
+      if (this.touchedFields.size === 0) return;
+
+      this.touchedFields.forEach(fieldId => {
+        const el = document.getElementById(fieldId);
+        if (!el) return;
+
+        // Skip kalau field ga invalid
+        if (!el.classList.contains(this.INVALID_CLASS)) return;
+
+        const lastValue = this.fieldLastValues.get(fieldId);
+        const currentValue = el.value;
+
+        if (lastValue === currentValue) return;
+
+        this.fieldLastValues.set(fieldId, currentValue);
+        const result = this.validateField(el, false);
+        this.updateFieldState(el, result.isValid, true);
+      });
+    }, 200);
+  }
+
   checkReady = () => typeof DOM_ELEMENTS !== 'undefined' && DOM_ELEMENTS;
 
   init() {
@@ -3572,6 +3599,9 @@ class ValidationSSoT {
 
     // Setup defense change handler
     this.setupDefenseChangeHandler();
+
+    // Start watching for programmatic value changes
+    this.startWatchingTouchedFields();
 
     this.isInitialized = true;
     return true;
@@ -3667,7 +3697,7 @@ class ValidationSSoT {
   validateSingleField(field) {
     this.touchedFields.add(field.el.id);
     const result = this.validateField(field.el, this.canShowSnackbar(field.el.id));
-    this.updateFieldState(field.el, result.isValid);
+    this.updateFieldState(field.el, result.isValid, true);
 
     if (!result.isValid) {
       if (typeof scrollAndFocusElement === 'function') {
@@ -3711,7 +3741,7 @@ class ValidationSSoT {
   validateStatsElement(element, focusedElement) {
     this.touchedFields.add(element.id);
     const result = this.validateField(element, this.canShowSnackbar(element.id));
-    this.updateFieldState(element, result.isValid);
+    this.updateFieldState(element, result.isValid, true);
 
     if (!result.isValid && this.shouldFocusElement(element, focusedElement)) {
       if (typeof scrollAndFocusElement === 'function') {
@@ -3739,6 +3769,7 @@ class ValidationSSoT {
     EventManager.removeNS(this.namespace);
     this.touchedFields.clear();
     this.snackbarCooldowns.clear();
+    this.fieldLastValues.clear();
     this.isInitialized = false;
   }
 };
