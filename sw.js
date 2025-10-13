@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.0';
+const CACHE_NAME = 'rox-calc-v1.898';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
@@ -29,7 +29,6 @@ self.addEventListener('install', event => {
     })
     .catch(err => console.error('[SW] Failed to cache:', err))
   );
-  // REMOVED: self.skipWaiting() - let user control via message
 });
 
 self.addEventListener('fetch', event => {

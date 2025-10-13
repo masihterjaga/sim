@@ -1769,6 +1769,12 @@ td.delta:hover {
     color: white!important;
     transition: .3s;
   }
+  .discord-server a span {
+    max-width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   
   .discord-server svg {
     width: 18px;
