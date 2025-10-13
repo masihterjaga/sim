@@ -6264,20 +6264,22 @@ const initA2HS = (() => {
       const text = createElement('span');
       text.innerHTML = '<strong>Or tap the button below for quick install</strong>';
       
-      const btn = createElement('button', 'a2hs-btn');
-      btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
-      state.installButton = btn;
-      
       const li = createElement('li');
       li.appendChild(num);
       li.appendChild(text);
-      li.appendChild(btn);
       stepsList.appendChild(li);
     }
     
     const body = createElement('div', 'a2hs-body');
     body.appendChild(instructionTitle);
     body.appendChild(stepsList);
+    
+    if (hasNativePrompt) {
+      const btn = createElement('button', 'a2hs-btn');
+      btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
+      state.installButton = btn;
+      body.appendChild(btn);
+    }
     
     const card = createElement('div', 'a2hs-card');
     card.appendChild(header);
@@ -6316,6 +6318,18 @@ const initA2HS = (() => {
     }
   };
   
+  const setupInstallButton = () => {
+    if (!state.installButton || !state.deferredPrompt) return;
+    
+    state.installButton.addEventListener('click', async () => {
+      const success = await triggerInstall();
+      if (success) {
+        const modal = document.querySelector('.a2hs');
+        if (modal) closeModal(modal);
+      }
+    });
+  };
+  
   const showModal = () => {
     if (isInstalled() || isDismissed()) return;
     
@@ -6325,10 +6339,7 @@ const initA2HS = (() => {
     document.body.appendChild(container);
     
     if (state.promptReceived) {
-      state.installButton.addEventListener('click', async () => {
-        const success = await triggerInstall();
-        if (success) closeModal(container);
-      });
+      setupInstallButton();
     }
     
     closeBtn.addEventListener('click', () => closeModal(container), { once: true });
