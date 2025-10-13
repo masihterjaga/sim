@@ -5128,7 +5128,7 @@ const accordionManager = (() => {
       
       const onTransitionEnd = (e) => {
         if (e.target !== content) return;
-        if (e.propertyName !== 'max-height' && e.propertyName !== 'opacity') return;
+        if (e.propertyName !== 'max-height') return;
         
         EventManager.remove(transitionListenerId);
         transitionListenerId = null;
@@ -5139,55 +5139,52 @@ const accordionManager = (() => {
       transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
     };
     
-    const performAnimation = (initialHeight, initialOpacity, targetHeight, targetOpacity, onComplete) => {
-      applyStyles(content, initialHeight, initialOpacity, false);
-      forceReflow(content);
-      applyStyles(content, targetHeight, targetOpacity, true);
-      
-      setupTransitionListener(onComplete);
-    };
-    
     const animateOpen = () => {
       details.setAttribute('open', '');
       
+      applyStyles(content, '0px', 0.3, false);
+      forceReflow(content);
+      
+      const targetHeight = content.scrollHeight + 'px';
+      
       currentAnimation = requestAnimationFrame(() => {
-        const targetHeight = content.scrollHeight + 'px';
-        performAnimation('0px', 0.3, targetHeight, 1, () => {
+        applyStyles(content, targetHeight, 1, true);
+        
+        setupTransitionListener(() => {
           applyStyles(content, 'none', 1, true);
         });
       });
     };
     
     const animateClose = () => {
+      const currentHeight = content.scrollHeight + 'px';
+      
+      applyStyles(content, currentHeight, 1, false);
+      forceReflow(content);
+      
       currentAnimation = requestAnimationFrame(() => {
-        const currentHeight = content.scrollHeight + 'px';
-        performAnimation(currentHeight, 1, '0px', 0.3, () => {
+        applyStyles(content, '0px', 0.3, true);
+        
+        setupTransitionListener(() => {
           details.removeAttribute('open');
         });
       });
-    };
-    
-    const animate = (isOpening) => {
-      if (isAnimating) return;
-      
-      cleanup();
-      isAnimating = true;
-      
-      isOpening ? animateOpen() : animateClose();
     };
     
     const handleClick = (e) => {
       e.preventDefault();
       if (isAnimating) return;
       
+      cleanup();
+      isAnimating = true;
+      
       const isOpen = details.hasAttribute('open');
-      animate(!isOpen);
+      isOpen ? animateClose() : animateOpen();
     };
     
     EventManager.addNS(instanceNamespace, summary, 'click', handleClick);
     
     return {
-      animate,
       cleanup: () => {
         cleanup();
         EventManager.removeNS(instanceNamespace);
@@ -5231,6 +5228,7 @@ const accordionManager = (() => {
     const isOpen = details.hasAttribute('open');
     
     content.style.overflow = 'hidden';
+    content.style.willChange = 'max-height, opacity';
     applyStyles(content, isOpen ? 'none' : '0px', isOpen ? 1 : 0.3, false);
     forceReflow(content);
     content.style.transition = transition;
