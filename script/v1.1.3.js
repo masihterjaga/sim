@@ -5989,11 +5989,15 @@ if ('serviceWorker' in navigator) {
     };
     
     const checkCacheVersion = async () => {
-      if (updatePromptShown || pendingUpdate || isReloading) return false;
+      if (updatePromptShown || pendingUpdate || isReloading) {
+        return false;
+      }
       
       try {
         const cacheNames = await caches.keys();
+        
         const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
+        
         if (!currentCache) return false;
         
         const storedVersion = localStorage.getItem('app_cache_version');
@@ -6003,12 +6007,15 @@ if ('serviceWorker' in navigator) {
           return false;
         }
         
-        if (storedVersion === currentCache) return false;
+        if (storedVersion === currentCache) {
+          return false;
+        }
         
         pendingUpdate = true;
         showUpdatePrompt(currentCache);
         return true;
       } catch (e) {
+        console.error('[PWA] Check cache error:', e);
         return false;
       }
     };
@@ -6033,8 +6040,12 @@ if ('serviceWorker' in navigator) {
         scope: '/sim/',
         updateViaCache: 'none'
       })
-      .then(reg => IS_PWA && setupUpdateListener(reg))
-      .catch(() => {});
+      .then(reg => {
+        if (IS_PWA) setupUpdateListener(reg);
+      })
+      .catch((err) => {
+        console.error('[PWA] SW registration failed:', err);
+      });
     };
     
     const handleVisibilityChange = async () => {
@@ -6124,20 +6135,14 @@ const initA2HS = (() => {
     return el;
   };
   
-  const isInstalled = async () => {
-    if (IS_PWA) return true;
-    if ('serviceWorker' in navigator) {
-      try {
-        const reg = await navigator.serviceWorker.getRegistration('/sim/');
-        if (reg) return true;
-      } catch (e) {}
-    }
-    return false;
+  const isInstalled = () => {
+    // Only check if app is in standalone mode (installed to home screen)
+    return IS_PWA;
   };
   
   const detectDevice = () => {
     const ua = navigator.userAgent.toLowerCase();
-    return /iphone|ipad|ipod/.test(ua) ? 'ios' : /android/.test(ua) ? 'android' : 'desktop';
+    return /iphone|ipad|ipot/.test(ua) ? 'ios' : /android/.test(ua) ? 'android' : 'desktop';
   };
   
   const isDismissed = () => sessionStorage.getItem(CFG.storage) === '1';
@@ -6232,9 +6237,17 @@ const initA2HS = (() => {
   };
   
   // ===== INIT =====
-  const init = async () => {
-    if (await isInstalled()) return;
-    if (isDismissed()) return;
+  const init = () => {
+    const installed = isInstalled();
+    const dismissed = isDismissed();
+    
+    if (installed) {
+      return;
+    }
+    
+    if (dismissed) {
+      return;
+    }
     
     const device = detectDevice();
     const { container, btn, ol, closeBtn } = buildUI(device);
@@ -6249,12 +6262,16 @@ const initA2HS = (() => {
   // ===== START WITH DELAY =====
   const start = () => {
     const execute = () => {
+      // Listen for native prompt first
       window.addEventListener('beforeinstallprompt', (e) => {
         nativePromptTriggered = true;
         deferredPrompt = e;
-        if (promptCheckTimeout) clearTimeout(promptCheckTimeout);
+        if (promptCheckTimeout) {
+          clearTimeout(promptCheckTimeout);
+        }
       }, { once: true });
       
+      // Show custom modal after delay if native prompt didn't fire
       promptCheckTimeout = setTimeout(() => {
         if (!nativePromptTriggered && !isDismissed() && !IS_PWA) {
           init();
@@ -6262,9 +6279,11 @@ const initA2HS = (() => {
       }, CFG.delay);
     };
     
-    document.readyState === 'loading' ?
-      document.addEventListener('DOMContentLoaded', execute, { once: true }) :
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', execute, { once: true });
+    } else {
       execute();
+    }
   };
   
   start();
@@ -6412,7 +6431,6 @@ const PWAPersistenceInit = (() => {
     }
   };
 })();
-
 
 // ========== RESET SYSTEM ==========
 const ResetHelpers = {

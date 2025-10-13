@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.0.4';
+const CACHE_NAME = 'rox-calc-v1.0.3';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
@@ -24,9 +24,12 @@ const urlsToCache = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-    .then(cache => cache.addAll(urlsToCache))
-    .catch(err => console.error('Failed to cache:', err))
+    .then(cache => {
+      return cache.addAll(urlsToCache);
+    })
+    .catch(err => console.error('[SW] Failed to cache:', err))
   );
+  // REMOVED: self.skipWaiting() - let user control via message
 });
 
 self.addEventListener('fetch', event => {
@@ -48,13 +51,14 @@ self.addEventListener('fetch', event => {
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-    .then(names => Promise.all(
-      names.filter(name => name !== CACHE_NAME)
-      .map(name => {
-        console.log('Deleting old cache:', name);
-        return caches.delete(name);
-      })
-    ))
+    .then(names => {
+      return Promise.all(
+        names.filter(name => name !== CACHE_NAME)
+        .map(name => {
+          return caches.delete(name);
+        })
+      );
+    })
   );
   self.clients.claim();
 });
