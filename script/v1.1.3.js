@@ -2682,7 +2682,7 @@ class DropdownManager {
         dynamic: {
           vesper: {
             "48": "BRO?!",
-            "56": "REALY?!",
+            "56": "REALLY?!",
             "64": "Wake UP!",
             "72": "STOP Dreaming!",
             "80": "F2P DETECTED!"
