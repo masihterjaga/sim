@@ -27,7 +27,6 @@ self.addEventListener('install', event => {
     .then(cache => cache.addAll(urlsToCache))
     .catch(err => console.error('Failed to cache:', err))
   );
-  self.skipWaiting();
 });
 
 self.addEventListener('fetch', event => {

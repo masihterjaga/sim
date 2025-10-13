@@ -5935,6 +5935,7 @@ const mainButtonEvent = (() => {
 const isPWAMode = () => 
   window.matchMedia('(display-mode: standalone)').matches || 
   window.navigator.standalone === true;
+const IS_PWA = isPWAMode();
 const CONSTANTS = {
   PWA_STORAGE_KEY: 'pwa_snap',
   PWA_EXPIRY_MS: 691200000, // 8 days
@@ -5949,13 +5950,29 @@ if ('serviceWorker' in navigator) {
   const PWAServiceWorker = (() => {
     let updatePromptShown = false;
     let pendingUpdate = false;
+    let isReloading = false;
+    let waitingWorker = null;
     
-    const saveState = () => PWAPersistence?.snap?.();
+    const saveState = () => {
+      if (typeof AppState !== 'undefined' && AppState.get('isResultShown')) {
+        return PWAPersistence?.snap?.();
+      }
+      return false;
+    };
     
     const reloadApp = (cacheVersion) => {
+      if (isReloading) return;
+      isReloading = true;
+      
       localStorage.setItem('app_cache_version', cacheVersion);
       saveState();
-      window.location.reload(true);
+      
+      requestAnimationFrame(() => {
+        if (waitingWorker) {
+          waitingWorker.postMessage({ action: 'skipWaiting' });
+        }
+        window.location.reload();
+      });
     };
     
     const showUpdatePrompt = (newCache) => {
@@ -5966,12 +5983,13 @@ if ('serviceWorker' in navigator) {
       if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
         reloadApp(newCache);
       } else {
+        updatePromptShown = false;
         pendingUpdate = false;
       }
     };
     
     const checkCacheVersion = async () => {
-      if (updatePromptShown || pendingUpdate) return false;
+      if (updatePromptShown || pendingUpdate || isReloading) return false;
       
       try {
         const cacheNames = await caches.keys();
@@ -6000,6 +6018,7 @@ if ('serviceWorker' in navigator) {
       
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
+        waitingWorker = newWorker;
         
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
@@ -6014,7 +6033,7 @@ if ('serviceWorker' in navigator) {
         scope: '/sim/',
         updateViaCache: 'none'
       })
-      .then(reg => isPWAMode() && setupUpdateListener(reg))
+      .then(reg => IS_PWA && setupUpdateListener(reg))
       .catch(() => {});
     };
     
@@ -6035,7 +6054,7 @@ if ('serviceWorker' in navigator) {
     
     const init = () => {
       window.addEventListener('load', () => {
-        isPWAMode() ? initPWAMode() : registerSW();
+        IS_PWA ? initPWAMode() : registerSW();
       });
     };
     
@@ -6043,9 +6062,215 @@ if ('serviceWorker' in navigator) {
   })();
   
   PWAServiceWorker.init();
-};
+}
+const initA2HS = (() => {
+  // ===== CONFIG =====
+  const CFG = {
+    storage: 'a2hsDismissed',
+    animDur: 300,
+    delay: 2000,
+    app: {
+      name: 'RöX Calculator',
+      desc: 'Quick access, save stats & work offline',
+      icon: 'https://masihterjaga.github.io/sim/icons/a2hs.png'
+    },
+    devices: {
+      ios: {
+        title: 'Install this app on your iPhone:',
+        steps: [
+          'Tap the <strong>"Share" button <svg style="display:inline;width:14px;height:14px;vertical-align:middle" viewBox="0 0 50 50"><path fill="currentColor" d="M30.3 13.7L25 8.4l-5.3 5.3-1.4-1.4L25 5.6l6.7 6.7z"/><path fill="currentColor" d="M24 7h2v21h-2z"/><path fill="currentColor" d="M35 40H15c-1.7 0-3-1.3-3-3V19c0-1.7 1.3-3 3-3h7v2h-7c-.6 0-1 .4-1 1v18c0 .6.4 1 1 1h20c.6 0 1-.4 1-1V19c0-.6-.4-1-1-1h-7v-2h7c1.7 0 3 1.3 3 3v18c0 1.7-1.3 3-3 3z"/></svg></strong>',
+          'Scroll and tap <strong>"Add to Home Screen"</strong>',
+          'Tap <strong>"Add"</strong> to confirm'
+        ]
+      },
+      android: {
+        title: 'Install this app on your device:',
+        steps: [
+          'Tap the <strong>menu button "⋮"</strong>',
+          'Select <strong>"Add to Home Screen"</strong>',
+          'Tap <strong>"Add"</strong> or <strong>"Install"</strong>'
+        ]
+      },
+      desktop: {
+        title: 'Install this app for quick access:',
+        steps: [
+          'Click the <strong>browser menu "⋮" or "⋯"</strong>',
+          'Look for <strong>"Install"</strong> option',
+          'Follow the prompts to install'
+        ]
+      }
+    }
+  };
+  
+  // ===== STATE =====
+  let deferredPrompt = null;
+  let nativePromptTriggered = false;
+  let promptCheckTimeout = null;
+  
+  // ===== UTILS =====
+  const createElement = (tag, cls, attrs = {}) => {
+    const el = document.createElement(tag);
+    if (cls) el.className = cls;
+    Object.assign(el, attrs);
+    return el;
+  };
+  
+  const createEl = (tag, cls, content = '') => {
+    const el = createElement(tag, cls);
+    if (content) {
+      if (typeof content === 'string') el.textContent = content;
+      else el.appendChild(content);
+    }
+    return el;
+  };
+  
+  const isInstalled = async () => {
+    if (IS_PWA) return true;
+    if ('serviceWorker' in navigator) {
+      try {
+        const reg = await navigator.serviceWorker.getRegistration('/sim/');
+        if (reg) return true;
+      } catch (e) {}
+    }
+    return false;
+  };
+  
+  const detectDevice = () => {
+    const ua = navigator.userAgent.toLowerCase();
+    return /iphone|ipad|ipod/.test(ua) ? 'ios' : /android/.test(ua) ? 'android' : 'desktop';
+  };
+  
+  const isDismissed = () => sessionStorage.getItem(CFG.storage) === '1';
+  const setDismissed = () => sessionStorage.setItem(CFG.storage, '1');
+  
+  // ===== BUILD UI =====
+  const buildUI = (device) => {
+    const data = CFG.devices[device];
+    
+    // Header
+    const closeBtn = createElement('button', 'a2hs-close', { 'aria-label': 'Close', textContent: '×' });
+    
+    const img = createElement('img', '', {
+      src: CFG.app.icon,
+      alt: CFG.app.name,
+      loading: 'lazy'
+    });
+    const icon = createEl('div', 'a2hs-icon', img);
+    
+    const h2 = createEl('h2', '', CFG.app.name);
+    const p = createEl('p', '', CFG.app.desc);
+    const info = createElement('div', 'a2hs-info');
+    info.appendChild(h2);
+    info.appendChild(p);
+    
+    const top = createElement('div', 'a2hs-top');
+    top.appendChild(icon);
+    top.appendChild(info);
+    
+    const hdr = createElement('div', 'a2hs-hdr');
+    hdr.appendChild(closeBtn);
+    hdr.appendChild(top);
+    
+    // Body
+    const title = createEl('p', 'a2hs-title', data.title);
+    
+    const btn = createElement('button', 'a2hs-btn hide');
+    btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
+    
+    const ol = createElement('ol', 'a2hs-steps');
+    data.steps.forEach((step, i) => {
+      const span1 = createEl('span', '', (i + 1) + '.');
+      const span2 = createElement('span');
+      span2.innerHTML = step;
+      const li = createElement('li');
+      li.appendChild(span1);
+      li.appendChild(span2);
+      ol.appendChild(li);
+    });
+    
+    const body = createElement('div', 'a2hs-body');
+    body.appendChild(title);
+    body.appendChild(btn);
+    body.appendChild(ol);
+    
+    // Card
+    const card = createElement('div', 'a2hs-card');
+    card.appendChild(hdr);
+    card.appendChild(body);
+    
+    const container = createElement('div', 'a2hs');
+    container.appendChild(card);
+    
+    return { container, btn, ol, closeBtn };
+  };
+  
+  // ===== ACTIONS =====
+  const closePrompt = (container) => {
+    const card = container.firstElementChild;
+    card.classList.add('a2hs-closing');
+    setTimeout(() => container.remove(), CFG.animDur);
+    setDismissed();
+  };
+  
+  const installApp = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      const container = document.querySelector('.a2hs');
+      if (container) closePrompt(container);
+    }
+    deferredPrompt = null;
+  };
+  
+  const handleBeforeInstall = (e, btn, steps) => {
+    nativePromptTriggered = true;
+    deferredPrompt = e;
+    if (promptCheckTimeout) clearTimeout(promptCheckTimeout);
+    btn.classList.remove('hide');
+    steps.classList.add('hide');
+  };
+  
+  // ===== INIT =====
+  const init = async () => {
+    if (await isInstalled()) return;
+    if (isDismissed()) return;
+    
+    const device = detectDevice();
+    const { container, btn, ol, closeBtn } = buildUI(device);
+    
+    document.body.appendChild(container);
+    
+    closeBtn.addEventListener('click', () => closePrompt(container), { once: true });
+    btn.addEventListener('click', installApp);
+    window.addEventListener('beforeinstallprompt', (e) => handleBeforeInstall(e, btn, ol), { once: true });
+  };
+  
+  // ===== START WITH DELAY =====
+  const start = () => {
+    const execute = () => {
+      window.addEventListener('beforeinstallprompt', (e) => {
+        nativePromptTriggered = true;
+        deferredPrompt = e;
+        if (promptCheckTimeout) clearTimeout(promptCheckTimeout);
+      }, { once: true });
+      
+      promptCheckTimeout = setTimeout(() => {
+        if (!nativePromptTriggered && !isDismissed() && !IS_PWA) {
+          init();
+        }
+      }, CFG.delay);
+    };
+    
+    document.readyState === 'loading' ?
+      document.addEventListener('DOMContentLoaded', execute, { once: true }) :
+      execute();
+  };
+  
+  start();
+})();
 const preventPullToRefresh = (() => {
-  if (!isPWAMode()) return { cleanup: () => {} };
+  if (!IS_PWA) return { cleanup: () => {} };
   
   let lastY = 0;
   let shouldPrevent = false;
@@ -6084,12 +6309,21 @@ const preventPullToRefresh = (() => {
   return { cleanup };
 })();
 const PWAPersistenceInit = (() => {
-  if (!isPWAMode()) return;
+  if (!IS_PWA) return;
 
   const PWAPersistence = (() => {
+    let cachedElements = null;
+    
+    const getFormElements = () => {
+      if (!cachedElements) {
+        cachedElements = document.querySelectorAll(CONSTANTS.FORM_SELECTORS);
+      }
+      return cachedElements;
+    };
+    
     const collectFormValues = () => {
       const values = {};
-      document.querySelectorAll(CONSTANTS.FORM_SELECTORS).forEach(el => {
+      getFormElements().forEach(el => {
         if (el.id && el.value) values[el.id] = el.value;
       });
       return values;

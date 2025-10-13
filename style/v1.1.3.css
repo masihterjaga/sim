@@ -3053,3 +3053,217 @@ td.delta:hover {
     font-size: 14px;
   }
 }
+
+
+
+/* A2HS (Add to Home Screen) Styles */
+@media not all and (display-mode: standalone) {
+  .a2hs {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: calc(100% - 40px);
+    max-width: 420px;
+    z-index: 9999;
+    will-change: transform;
+  }
+
+  .a2hs-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.4), 0 0 40px rgba(0,0,0,.25);
+    overflow: hidden;
+    animation: a2hs-in .4s ease;
+    contain: layout style paint;
+  }
+
+  @keyframes a2hs-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+      will-change: transform, opacity;
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes a2hs-out {
+    to {
+      opacity: 0;
+      transform: translateY(20px);
+      will-change: transform, opacity;
+    }
+  }
+
+  .a2hs-closing {
+    animation: a2hs-out 0.3s ease;
+  }
+
+  .a2hs-hdr {
+    background: linear-gradient(135deg, #3b82f6, #7e3ff2);
+    padding: 24px;
+    color: #fff;
+    position: relative;
+    contain: layout style;
+  }
+
+  .a2hs-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255,255,255,.2);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #fff;
+    font-size: 20px;
+    line-height: 1;
+    transition: background .2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .a2hs-close:hover {
+    background: rgba(255,255,255,.3);
+  }
+
+  .a2hs-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    contain: layout style;
+  }
+
+  .a2hs-icon {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    min-height: 64px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,.1);
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    contain: layout style paint;
+  }
+
+  .a2hs-icon img {
+    width: 48px;
+    height: 48px;
+    min-width: 48px;
+    min-height: 48px;
+    object-fit: contain;
+    display: block;
+    border-radius: 8px;
+    contain: strict;
+    box-shadow: 0 4px 12px rgba(0,0,0,.3);
+  }
+
+  .a2hs-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .a2hs-info h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px;
+    contain: layout style;
+  }
+
+  .a2hs-info p {
+    font-size: 14px;
+    color: #bfdbfe;
+    margin: 0;
+    contain: layout style;
+  }
+
+  .a2hs-body {
+    padding: 24px;
+    contain: layout style;
+  }
+
+  .a2hs-title {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 16px;
+    font-weight: 500;
+    contain: layout style;
+  }
+
+  .a2hs-steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    contain: layout style;
+  }
+
+  .a2hs-steps li {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #374151;
+    line-height: 1.6;
+    contain: layout style;
+  }
+
+  .a2hs-steps span:first-child {
+    font-weight: 600;
+    min-width: 20px;
+    color: #3b82f6;
+    flex-shrink: 0;
+  }
+
+  .a2hs-btn {
+    width: 100%;
+    background: linear-gradient(135deg, #3b82f6, #9333ea);
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform .2s;
+    box-shadow: 0 4px 12px rgba(59,130,246,.3);
+    margin-bottom: 16px;
+    contain: layout style;
+    will-change: transform;
+  }
+
+  .a2hs-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(59,130,246,.4);
+  }
+
+  .a2hs-btn svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+  }
+
+  .hide {
+    display: none !important;
+  }
+
+  strong {
+    font-weight: 600;
+    color: #1f2937;
+  }
+}
