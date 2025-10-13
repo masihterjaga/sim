@@ -6331,6 +6331,7 @@ const initA2HS = (() => {
       
       const btn = this.create('button', 'a2hs-btn');
       btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
+      btn.style.display = 'block';
       
       state.installButton = btn;
       
@@ -6342,68 +6343,22 @@ const initA2HS = (() => {
       return li;
     },
     
-    createWarningMessage() {
-      const icon = this.create('div', 'a2hs-warning-icon');
-      icon.innerHTML = '⚠️';
-      
-      const title = this.create('h3', 'a2hs-warning-title');
-      title.textContent = 'Private Browsing Detected';
-      
-      const message = this.create('p', 'a2hs-warning-text');
-      message.innerHTML = 'You\'re currently in Private/Incognito mode.<br>App installation is not available in this mode.';
-      
-      const instructionTitle = this.create('p', 'a2hs-warning-subtitle');
-      instructionTitle.textContent = 'To install this app:';
-      
-      const instructions = this.create('ul', 'a2hs-warning-list');
-      const steps = [
-        'Close this private window',
-        'Open the link in normal browsing mode',
-        'Follow the installation steps'
-      ];
-      
-      steps.forEach(step => {
-        const li = this.create('li');
-        li.textContent = step;
-        instructions.appendChild(li);
-      });
-      
-      const copyBtn = this.create('button', 'a2hs-copy-btn');
-      copyBtn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;margin-right:8px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Link';
-      copyBtn.dataset.action = 'copy';
-      
-      const warning = this.create('div', 'a2hs-warning');
-      warning.appendChild(icon);
-      warning.appendChild(title);
-      warning.appendChild(message);
-      warning.appendChild(instructionTitle);
-      warning.appendChild(instructions);
-      warning.appendChild(copyBtn);
-      
-      return warning;
-    },
-    
-    buildModal(hasNativePrompt, isIncognito = false) {
+    buildModal(hasNativePrompt) {
       const { config } = deviceDetector.detect();
       const { header, closeBtn } = this.createHeader();
       
-      const body = this.create('div', 'a2hs-body');
+      const instructionTitle = this.create('p', 'a2hs-title');
+      instructionTitle.textContent = config.title;
       
-      if (isIncognito) {
-        body.appendChild(this.createWarningMessage());
-      } else {
-        const instructionTitle = this.create('p', 'a2hs-title');
-        instructionTitle.textContent = config.title;
-        
-        const stepsList = this.createSteps(config.steps);
-        
-        if (hasNativePrompt) {
-          stepsList.appendChild(this.createInstallButton());
-        }
-        
-        body.appendChild(instructionTitle);
-        body.appendChild(stepsList);
+      const stepsList = this.createSteps(config.steps);
+      
+      if (hasNativePrompt) {
+        stepsList.appendChild(this.createInstallButton());
       }
+      
+      const body = this.create('div', 'a2hs-body');
+      body.appendChild(instructionTitle);
+      body.appendChild(stepsList);
       
       const card = this.create('div', 'a2hs-card');
       card.appendChild(header);
@@ -6413,46 +6368,6 @@ const initA2HS = (() => {
       container.appendChild(card);
       
       return { container, closeBtn };
-    }
-  };
-
-  // Incognito Detection
-  const incognitoDetector = {
-    async detect() {
-      // Method 1: Storage Quota (most reliable for Chrome/Edge)
-      if ('storage' in navigator && 'estimate' in navigator.storage) {
-        try {
-          const { quota } = await navigator.storage.estimate();
-          if (quota && quota < 120000000) return true; // < 120MB likely incognito
-        } catch (e) {}
-      }
-      
-      // Method 2: IndexedDB (reliable for Safari)
-      try {
-        await new Promise((resolve, reject) => {
-          const db = indexedDB.open('test');
-          db.onerror = () => reject();
-          db.onsuccess = () => {
-            indexedDB.deleteDatabase('test');
-            resolve();
-          };
-        });
-      } catch (e) {
-        return true; // IndexedDB blocked = likely incognito
-      }
-      
-      // Method 3: FileSystem API (legacy Chrome)
-      if ('webkitRequestFileSystem' in window) {
-        try {
-          await new Promise((resolve, reject) => {
-            window.webkitRequestFileSystem(0, 0, resolve, reject);
-          });
-        } catch (e) {
-          return true;
-        }
-      }
-      
-      return false;
     }
   };
 
@@ -6482,29 +6397,6 @@ const initA2HS = (() => {
           }
         }, 100);
       });
-    },
-    
-    copyToClipboard(text) {
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        return navigator.clipboard.writeText(text);
-      }
-      
-      // Fallback for older browsers
-      const textarea = document.createElement('textarea');
-      textarea.value = text;
-      textarea.style.position = 'fixed';
-      textarea.style.opacity = '0';
-      document.body.appendChild(textarea);
-      textarea.select();
-      
-      try {
-        document.execCommand('copy');
-        document.body.removeChild(textarea);
-        return Promise.resolve();
-      } catch (e) {
-        document.body.removeChild(textarea);
-        return Promise.reject(e);
-      }
     }
   };
 
@@ -6517,12 +6409,6 @@ const initA2HS = (() => {
 
   // Modal Controller
   const modal = {
-    isIncognito: false,
-    
-    async init() {
-      this.isIncognito = await incognitoDetector.detect();
-    },
-    
     close() {
       if (!state.modalContainer) return;
       
@@ -6561,34 +6447,10 @@ const initA2HS = (() => {
       }
     },
     
-    async handleCopyLink() {
-      const copyBtn = state.modalContainer?.querySelector('[data-action="copy"]');
-      if (!copyBtn) return;
-      
-      try {
-        await utils.copyToClipboard(window.location.href);
-        const originalHTML = copyBtn.innerHTML;
-        copyBtn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;margin-right:8px"><polyline points="20 6 9 17 4 12"/></svg>Link Copied!';
-        copyBtn.disabled = true;
-        
-        setTimeout(() => {
-          copyBtn.innerHTML = originalHTML;
-          copyBtn.disabled = false;
-        }, 2000);
-      } catch (e) {
-        console.error('Failed to copy:', e);
-      }
-    },
-    
     attachEvents(closeBtn) {
       closeBtn.addEventListener('click', () => this.close(), { once: true });
       
-      if (this.isIncognito) {
-        const copyBtn = state.modalContainer?.querySelector('[data-action="copy"]');
-        if (copyBtn) {
-          copyBtn.addEventListener('click', () => this.handleCopyLink());
-        }
-      } else if (state.installButton) {
+      if (state.installButton) {
         state.installButton.addEventListener('click', async () => {
           const success = await this.triggerInstall();
           if (success) this.close();
@@ -6599,7 +6461,7 @@ const initA2HS = (() => {
     show() {
       if (!flowControl.canProceed()) return;
       
-      const { container, closeBtn } = dom.buildModal(state.promptReceived, this.isIncognito);
+      const { container, closeBtn } = dom.buildModal(state.promptReceived);
       document.body.appendChild(container);
       state.modalContainer = container;
       this.attachEvents(closeBtn);
@@ -6611,7 +6473,7 @@ const initA2HS = (() => {
         return;
       }
       
-      if (state.modalContainer && !state.installButton && !this.isIncognito) {
+      if (state.modalContainer && !state.installButton) {
         this.close();
         this.show();
       }
@@ -6648,8 +6510,6 @@ const initA2HS = (() => {
     if (!storage.isAvailable()) return;
     if (!flowControl.canProceed()) return;
     
-    await modal.init();
-    
     window.addEventListener('beforeinstallprompt', handlers.onBeforeInstallPrompt);
     window.addEventListener('appinstalled', handlers.onAppInstalled);
     
@@ -6657,10 +6517,8 @@ const initA2HS = (() => {
       await utils.delay(CFG.modalDelay);
       if (!flowControl.canProceed()) return;
       
-      if (!modal.isIncognito) {
-        await utils.pollUntil(() => state.promptReceived, CFG.promptTimeout);
-        if (!flowControl.canProceed()) return;
-      }
+      await utils.pollUntil(() => state.promptReceived, CFG.promptTimeout);
+      if (!flowControl.canProceed()) return;
       
       modal.show();
     };
