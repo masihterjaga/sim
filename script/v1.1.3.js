@@ -5815,17 +5815,30 @@ const CONSTANTS = {
 if ('serviceWorker' in navigator) {
   const PWAServiceWorker = (() => {
     let updatePromptShown = false;
+    let pendingUpdate = false;
     
     const saveState = () => PWAPersistence?.snap?.();
     
     const reloadApp = (cacheVersion) => {
-      if (cacheVersion) localStorage.setItem('app_cache_version', cacheVersion);
+      localStorage.setItem('app_cache_version', cacheVersion);
       saveState();
       window.location.reload(true);
     };
     
+    const showUpdatePrompt = (newCache) => {
+      if (updatePromptShown) return;
+      
+      updatePromptShown = true;
+      
+      if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
+        reloadApp(newCache);
+      } else {
+        pendingUpdate = false;
+      }
+    };
+    
     const checkCacheVersion = async () => {
-      if (updatePromptShown) return false;
+      if (updatePromptShown || pendingUpdate) return false;
       
       try {
         const cacheNames = await caches.keys();
@@ -5833,6 +5846,7 @@ if ('serviceWorker' in navigator) {
         if (!currentCache) return false;
         
         const storedVersion = localStorage.getItem('app_cache_version');
+        
         if (!storedVersion) {
           localStorage.setItem('app_cache_version', currentCache);
           return false;
@@ -5840,15 +5854,9 @@ if ('serviceWorker' in navigator) {
         
         if (storedVersion === currentCache) return false;
         
-        updatePromptShown = true;
-        
-        if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
-          reloadApp(currentCache);
-          return true;
-        }
-        
-        localStorage.setItem('app_cache_version', currentCache);
-        return false;
+        pendingUpdate = true;
+        showUpdatePrompt(currentCache);
+        return true;
       } catch (e) {
         return false;
       }
@@ -5870,11 +5878,11 @@ if ('serviceWorker' in navigator) {
     
     const registerSW = () => {
       navigator.serviceWorker.register('/sim/sw.js', {
-          scope: '/sim/',
-          updateViaCache: 'none'
-        })
-        .then(reg => isPWAMode() && setupUpdateListener(reg))
-        .catch(() => {});
+        scope: '/sim/',
+        updateViaCache: 'none'
+      })
+      .then(reg => isPWAMode() && setupUpdateListener(reg))
+      .catch(() => {});
     };
     
     const handleVisibilityChange = async () => {
@@ -5888,8 +5896,7 @@ if ('serviceWorker' in navigator) {
     };
     
     const initPWAMode = async () => {
-      const updated = await checkCacheVersion();
-      if (!updated) registerSW();
+      registerSW();
       document.addEventListener('visibilitychange', handleVisibilityChange);
     };
     
@@ -5901,6 +5908,7 @@ if ('serviceWorker' in navigator) {
     
     return { init };
   })();
+  
   PWAServiceWorker.init();
 };
 const preventPullToRefresh = (() => {
