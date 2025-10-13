@@ -6074,6 +6074,7 @@ if ('serviceWorker' in navigator) {
   
   PWAServiceWorker.init();
 }
+
 const initA2HS = (() => {
   const CFG = {
     storage: 'a2hsDismissed',
@@ -6114,8 +6115,7 @@ const initA2HS = (() => {
   };
   
   let deferredPrompt = null;
-  let nativePromptTriggered = false;
-  let promptCheckTimeout = null;
+  let installButton = null;
   
   const createElement = (tag, cls, attrs = {}) => {
     const el = document.createElement(tag);
@@ -6145,9 +6145,23 @@ const initA2HS = (() => {
   };
   
   const isInstalled = () => {
-    return window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true ||
-      document.referrer.includes('android-app://');
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      return true;
+    }
+    
+    if (window.navigator.standalone === true) {
+      return true;
+    }
+    
+    if (document.referrer.includes('android-app://')) {
+      return true;
+    }
+    
+    if (window.matchMedia('(display-mode: fullscreen)').matches) {
+      return true;
+    }
+    
+    return false;
   };
   
   const detectDevice = () => {
@@ -6157,7 +6171,7 @@ const initA2HS = (() => {
   
   const isDismissed = () => {
     if (!isLocalStorageAvailable()) {
-      return true;
+      return false;
     }
     
     try {
@@ -6174,7 +6188,7 @@ const initA2HS = (() => {
       
       return true;
     } catch (e) {
-      return true;
+      return false;
     }
   };
   
@@ -6234,6 +6248,8 @@ const initA2HS = (() => {
     const btn = createElement('button', 'a2hs-btn');
     btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
     
+    installButton = btn;
+    
     const body = createElement('div', 'a2hs-body');
     body.appendChild(title);
     body.appendChild(ol);
@@ -6257,10 +6273,13 @@ const initA2HS = (() => {
   };
   
   const installApp = async () => {
-    if (!deferredPrompt) return false;
+    if (!deferredPrompt) {
+      return false;
+    }
     
     try {
-      deferredPrompt.prompt();
+      await deferredPrompt.prompt();
+      
       const { outcome } = await deferredPrompt.userChoice;
       
       if (outcome === 'accepted') {
@@ -6269,80 +6288,70 @@ const initA2HS = (() => {
         return true;
       }
       
-      deferredPrompt = null;
       return false;
     } catch (err) {
       return false;
     }
   };
   
-  window.triggerA2HSInstall = async () => {
-    if (!deferredPrompt) {
-      console.warn('Install prompt not available');
-      return false;
+  const setupInstallButton = () => {
+    if (installButton && deferredPrompt) {
+      installButton.addEventListener('click', async () => {
+        const success = await installApp();
+        if (success) {
+          const container = document.querySelector('.a2hs');
+          if (container) {
+            closePrompt(container);
+          }
+        }
+      });
     }
-    return await installApp();
-  };
-  
-  window.canInstallA2HS = () => {
-    return deferredPrompt !== null;
-  };
-  
-  const handleBeforeInstall = (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
   };
   
   const showManualInstructions = () => {
+    if (isInstalled()) {
+      return;
+    }
+    
     const device = detectDevice();
-    const { container, btn, closeBtn } = buildUI(device);
+    const { container, closeBtn } = buildUI(device);
     
     document.body.appendChild(container);
     
-    if (deferredPrompt) {
-      btn.addEventListener('click', async () => {
-        const success = await installApp();
-        if (success) {
-          closePrompt(container);
-        }
-      });
-    } 
+    setupInstallButton();
     
     closeBtn.addEventListener('click', () => closePrompt(container), { once: true });
   };
   
-  const init = () => {
-    if (isInstalled() || isDismissed() || !isLocalStorageAvailable()) {
+  const start = () => {
+    if (isInstalled()) {
       return;
     }
     
-    showManualInstructions();
-  };
-  
-  const start = () => {
     window.addEventListener('beforeinstallprompt', (e) => {
-      handleBeforeInstall(e);
+      e.preventDefault();
+      deferredPrompt = e;
       
-      const existingBtn = document.querySelector('.a2hs-btn');
-      if (existingBtn) {
-        existingBtn.addEventListener('click', async () => {
-          const success = await installApp();
-          if (success) {
-            const container = document.querySelector('.a2hs');
-            if (container) closePrompt(container);
-          }
-        });
+      setupInstallButton();
+    });
+    
+    window.addEventListener('appinstalled', () => {
+      setDismissed();
+      
+      const container = document.querySelector('.a2hs');
+      if (container) {
+        closePrompt(container);
       }
     });
     
     const execute = () => {
-      if (!isLocalStorageAvailable() || isInstalled() || isDismissed()) {
+      if (isInstalled() || isDismissed()) {
         return;
       }
       
-      promptCheckTimeout = setTimeout(() => {
-        if (!isInstalled() && !isDismissed() && isLocalStorageAvailable()) {
-          init();
+      setTimeout(() => {
+        if (!isInstalled() && !isDismissed()) {
+          showManualInstructions();
         }
       }, CFG.delay);
     };
