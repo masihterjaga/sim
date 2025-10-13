@@ -3196,7 +3196,7 @@ td.delta:hover {
   }
 
   .a2hs-body {
-    padding: 24px;
+    padding: 24px 24px 10px 24px;
     contain: layout style;
   }
 

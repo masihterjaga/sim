@@ -6133,8 +6133,21 @@ const initA2HS = (() => {
     return el;
   };
   
+  const isLocalStorageAvailable = () => {
+    try {
+      const test = '__storage_test__';
+      localStorage.setItem(test, test);
+      localStorage.removeItem(test);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+  
   const isInstalled = () => {
-    return IS_PWA;
+    return window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone === true ||
+      document.referrer.includes('android-app://');
   };
   
   const detectDevice = () => {
@@ -6143,6 +6156,10 @@ const initA2HS = (() => {
   };
   
   const isDismissed = () => {
+    if (!isLocalStorageAvailable()) {
+      return true;
+    }
+    
     try {
       const data = localStorage.getItem(CFG.storage);
       if (!data) return false;
@@ -6157,18 +6174,21 @@ const initA2HS = (() => {
       
       return true;
     } catch (e) {
-      localStorage.removeItem(CFG.storage);
-      return false;
+      return true;
     }
   };
   
   const setDismissed = () => {
+    if (!isLocalStorageAvailable()) {
+      return;
+    }
+    
     try {
       localStorage.setItem(CFG.storage, JSON.stringify({
         timestamp: Date.now()
       }));
     } catch (e) {
-      sessionStorage.setItem(CFG.storage, '1');
+      return;
     }
   };
   
@@ -6200,9 +6220,6 @@ const initA2HS = (() => {
     
     const title = createEl('p', 'a2hs-title', data.title);
     
-    const btn = createElement('button', 'a2hs-btn hide');
-    btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
-    
     const ol = createElement('ol', 'a2hs-steps');
     data.steps.forEach((step, i) => {
       const span1 = createEl('span', '', (i + 1) + '.');
@@ -6214,10 +6231,13 @@ const initA2HS = (() => {
       ol.appendChild(li);
     });
     
+    const btn = createElement('button', 'a2hs-btn');
+    btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
+    
     const body = createElement('div', 'a2hs-body');
     body.appendChild(title);
-    body.appendChild(btn);
     body.appendChild(ol);
+    body.appendChild(btn);
     
     const card = createElement('div', 'a2hs-card');
     card.appendChild(hdr);
@@ -6226,7 +6246,7 @@ const initA2HS = (() => {
     const container = createElement('div', 'a2hs');
     container.appendChild(card);
     
-    return { container, btn, ol, closeBtn };
+    return { container, btn, closeBtn };
   };
   
   const closePrompt = (container) => {
@@ -6237,64 +6257,93 @@ const initA2HS = (() => {
   };
   
   const installApp = async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') {
-      const container = document.querySelector('.a2hs');
-      if (container) closePrompt(container);
+    if (!deferredPrompt) return false;
+    
+    try {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        setDismissed();
+        deferredPrompt = null;
+        return true;
+      }
+      
+      deferredPrompt = null;
+      return false;
+    } catch (err) {
+      return false;
     }
-    deferredPrompt = null;
   };
   
-  const handleBeforeInstall = (e, btn, steps) => {
-    nativePromptTriggered = true;
+  window.triggerA2HSInstall = async () => {
+    if (!deferredPrompt) {
+      console.warn('Install prompt not available');
+      return false;
+    }
+    return await installApp();
+  };
+  
+  window.canInstallA2HS = () => {
+    return deferredPrompt !== null;
+  };
+  
+  const handleBeforeInstall = (e) => {
+    e.preventDefault();
     deferredPrompt = e;
-    if (promptCheckTimeout) clearTimeout(promptCheckTimeout);
-    btn.classList.remove('hide');
-    steps.classList.add('hide');
   };
   
-  const init = () => {
-    const installed = isInstalled();
-    const dismissed = isDismissed();
-    
-    if (installed) {
-      return;
-    }
-    
-    if (dismissed) {
-      return;
-    }
-    
+  const showManualInstructions = () => {
     const device = detectDevice();
-    const { container, btn, ol, closeBtn } = buildUI(device);
+    const { container, btn, closeBtn } = buildUI(device);
     
     document.body.appendChild(container);
     
+    if (deferredPrompt) {
+      btn.addEventListener('click', async () => {
+        const success = await installApp();
+        if (success) {
+          closePrompt(container);
+        }
+      });
+    } 
+    
     closeBtn.addEventListener('click', () => closePrompt(container), { once: true });
-    btn.addEventListener('click', installApp);
-    window.addEventListener('beforeinstallprompt', (e) => handleBeforeInstall(e, btn, ol), { once: true });
+  };
+  
+  const init = () => {
+    if (isInstalled() || isDismissed() || !isLocalStorageAvailable()) {
+      return;
+    }
+    
+    showManualInstructions();
   };
   
   const start = () => {
-    const execute = () => {
-      // Test incognito mode
-      try {
-        localStorage.setItem('_test', '1');
-        localStorage.removeItem('_test');
-      } catch (e) {
-        return; // Incognito, stop
-      }
+    window.addEventListener('beforeinstallprompt', (e) => {
+      handleBeforeInstall(e);
       
-      // Jangan tampilkan kalau sudah installed atau dismissed
-      if (isInstalled() || isDismissed()) {
+      const existingBtn = document.querySelector('.a2hs-btn');
+      if (existingBtn) {
+        existingBtn.addEventListener('click', async () => {
+          const success = await installApp();
+          if (success) {
+            const container = document.querySelector('.a2hs');
+            if (container) closePrompt(container);
+          }
+        });
+      }
+    });
+    
+    const execute = () => {
+      if (!isLocalStorageAvailable() || isInstalled() || isDismissed()) {
         return;
       }
       
-      // Timeout untuk tampilkan modal
       promptCheckTimeout = setTimeout(() => {
-        init();
+        if (!isInstalled() && !isDismissed() && isLocalStorageAvailable()) {
+          init();
+        }
       }, CFG.delay);
     };
     
