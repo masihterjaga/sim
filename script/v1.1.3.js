@@ -6076,12 +6076,13 @@ if ('serviceWorker' in navigator) {
 }
 
 const initA2HS = (() => {
+  // Configuration
   const CFG = {
     storage: 'a2hsDismissed',
     animDur: 300,
     modalDelay: 3000,
     promptTimeout: 5000,
-    dismissExpiry: 259200000,
+    dismissExpiry: 3 * 24 * 60 * 60 * 1000, // 3 days in ms
     app: {
       name: 'RöX Calculator',
       desc: 'Quick access, save stats & work offline',
@@ -6114,290 +6115,368 @@ const initA2HS = (() => {
       }
     }
   };
-  
-  let state = {
+
+  // State Management
+  const state = {
     deferredPrompt: null,
     installButton: null,
     promptReceived: false,
-    lsAvailable: null
-  };
-  
-  const checkLocalStorage = () => {
-    if (state.lsAvailable !== null) return state.lsAvailable;
+    lsAvailable: null,
+    deviceConfig: null,
     
-    try {
-      const test = '__test__';
-      localStorage.setItem(test, test);
-      localStorage.removeItem(test);
-      state.lsAvailable = true;
-    } catch (e) {
-      state.lsAvailable = false;
+    get isReady() {
+      return this.promptReceived;
+    },
+    
+    get canShowModal() {
+      return !installCheckers.isInstalled() && !storage.isDismissed();
     }
-    
-    return state.lsAvailable;
   };
-  
-  const isInstalled = () => {
-    if (window.matchMedia('(display-mode: standalone)').matches) return true;
-    if (window.navigator.standalone === true) return true;
-    if (document.referrer.includes('android-app://')) return true;
-    if (window.matchMedia('(display-mode: fullscreen)').matches) return true;
-    if (window.matchMedia('(display-mode: minimal-ui)').matches) return true;
-    
-    if (checkLocalStorage()) {
+
+  // Storage Operations
+  const storage = {
+    isAvailable() {
+      if (state.lsAvailable !== null) return state.lsAvailable;
+      
       try {
-        return localStorage.getItem('app_installed') === 'true';
-      } catch (e) {}
-    }
-    
-    return false;
-  };
-  
-  const isDismissed = () => {
-    if (!checkLocalStorage()) return true;
-    
-    try {
-      const data = localStorage.getItem(CFG.storage);
-      if (!data) return false;
+        const test = '__test__';
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        state.lsAvailable = true;
+      } catch (e) {
+        state.lsAvailable = false;
+      }
       
-      const { timestamp } = JSON.parse(data);
-      const isExpired = Date.now() - timestamp > CFG.dismissExpiry;
-      
-      if (isExpired) {
-        localStorage.removeItem(CFG.storage);
+      return state.lsAvailable;
+    },
+    
+    get(key) {
+      if (!this.isAvailable()) return null;
+      try {
+        return localStorage.getItem(key);
+      } catch (e) {
+        return null;
+      }
+    },
+    
+    set(key, value) {
+      if (!this.isAvailable()) return false;
+      try {
+        localStorage.setItem(key, value);
+        return true;
+      } catch (e) {
         return false;
       }
+    },
+    
+    remove(key) {
+      if (!this.isAvailable()) return false;
+      try {
+        localStorage.removeItem(key);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+    
+    isDismissed() {
+      const data = this.get(CFG.storage);
+      if (!data) return false;
       
-      return true;
-    } catch (e) {
-      return false;
+      try {
+        const { timestamp } = JSON.parse(data);
+        const isExpired = Date.now() - timestamp > CFG.dismissExpiry;
+        
+        if (isExpired) {
+          this.remove(CFG.storage);
+          return false;
+        }
+        
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+    
+    setDismissed() {
+      this.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
+    },
+    
+    setInstalled() {
+      this.set('app_installed', 'true');
     }
   };
-  
-  const setDismissed = () => {
-    if (!checkLocalStorage()) return;
+
+  // Install Detection
+  const installCheckers = {
+    checks: [
+      () => window.matchMedia('(display-mode: standalone)').matches,
+      () => window.navigator.standalone === true,
+      () => document.referrer.includes('android-app://'),
+      () => window.matchMedia('(display-mode: fullscreen)').matches,
+      () => window.matchMedia('(display-mode: minimal-ui)').matches,
+      () => storage.get('app_installed') === 'true'
+    ],
     
-    try {
-      localStorage.setItem(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
-    } catch (e) {}
+    isInstalled() {
+      return this.checks.some(check => check());
+    }
   };
-  
-  const setInstalled = () => {
-    if (!checkLocalStorage()) return;
-    
-    try {
-      localStorage.setItem('app_installed', 'true');
-    } catch (e) {}
-  };
-  
-  const detectDevice = () => {
-    const ua = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(ua)) return 'ios';
-    if (/android/.test(ua)) return 'android';
-    return 'desktop';
-  };
-  
-  const createElement = (tag, className = '', attrs = {}) => {
-    const el = document.createElement(tag);
-    if (className) el.className = className;
-    Object.assign(el, attrs);
-    return el;
-  };
-  
-  const buildUI = (device, hasNativePrompt) => {
-    const data = CFG.devices[device];
-    
-    const closeBtn = createElement('button', 'a2hs-close', { 
-      'aria-label': 'Close', 
-      textContent: '×' 
-    });
-    
-    const img = createElement('img', '', {
-      src: CFG.app.icon,
-      alt: CFG.app.name,
-      loading: 'lazy'
-    });
-    
-    const icon = createElement('div', 'a2hs-icon');
-    icon.appendChild(img);
-    
-    const title = createElement('h2');
-    title.textContent = CFG.app.name;
-    
-    const desc = createElement('p');
-    desc.textContent = CFG.app.desc;
-    
-    const info = createElement('div', 'a2hs-info');
-    info.appendChild(title);
-    info.appendChild(desc);
-    
-    const top = createElement('div', 'a2hs-top');
-    top.appendChild(icon);
-    top.appendChild(info);
-    
-    const header = createElement('div', 'a2hs-hdr');
-    header.appendChild(closeBtn);
-    header.appendChild(top);
-    
-    const instructionTitle = createElement('p', 'a2hs-title');
-    instructionTitle.textContent = data.title;
-    
-    const stepsList = createElement('ol', 'a2hs-steps');
-    data.steps.forEach((step, i) => {
-      const num = createElement('span');
-      num.textContent = (i + 1) + '.';
+
+  // Device Detection
+  const deviceDetector = {
+    detect() {
+      if (state.deviceConfig) return state.deviceConfig;
       
-      const text = createElement('span');
-      text.innerHTML = step;
+      const ua = navigator.userAgent.toLowerCase();
+      let type = 'desktop';
       
-      const li = createElement('li');
-      li.appendChild(num);
-      li.appendChild(text);
-      stepsList.appendChild(li);
-    });
+      if (/iphone|ipad|ipod/.test(ua)) type = 'ios';
+      else if (/android/.test(ua)) type = 'android';
+      
+      state.deviceConfig = {
+        type,
+        config: CFG.devices[type]
+      };
+      
+      return state.deviceConfig;
+    }
+  };
+
+  // DOM Utilities
+  const dom = {
+    create(tag, className = '', attrs = {}) {
+      const el = document.createElement(tag);
+      if (className) el.className = className;
+      Object.assign(el, attrs);
+      return el;
+    },
     
-    if (hasNativePrompt) {
-      const num = createElement('span');
+    createIcon() {
+      const img = this.create('img', '', {
+        src: CFG.app.icon,
+        alt: CFG.app.name,
+        loading: 'lazy'
+      });
+      
+      const icon = this.create('div', 'a2hs-icon');
+      icon.appendChild(img);
+      return icon;
+    },
+    
+    createInfo() {
+      const title = this.create('h2');
+      title.textContent = CFG.app.name;
+      
+      const desc = this.create('p');
+      desc.textContent = CFG.app.desc;
+      
+      const info = this.create('div', 'a2hs-info');
+      info.appendChild(title);
+      info.appendChild(desc);
+      
+      return info;
+    },
+    
+    createHeader() {
+      const closeBtn = this.create('button', 'a2hs-close', { 
+        'aria-label': 'Close', 
+        textContent: '×' 
+      });
+      
+      const top = this.create('div', 'a2hs-top');
+      top.appendChild(this.createIcon());
+      top.appendChild(this.createInfo());
+      
+      const header = this.create('div', 'a2hs-hdr');
+      header.appendChild(closeBtn);
+      header.appendChild(top);
+      
+      return { header, closeBtn };
+    },
+    
+    createSteps(steps) {
+      const stepsList = this.create('ol', 'a2hs-steps');
+      
+      steps.forEach((step, i) => {
+        const num = this.create('span');
+        num.textContent = `${i + 1}.`;
+        
+        const text = this.create('span');
+        text.innerHTML = step;
+        
+        const li = this.create('li');
+        li.appendChild(num);
+        li.appendChild(text);
+        stepsList.appendChild(li);
+      });
+      
+      return stepsList;
+    },
+    
+    createInstallButton() {
+      const num = this.create('span');
       num.textContent = '4.';
       
-      const text = createElement('span');
+      const text = this.create('span');
       text.innerHTML = '<strong>Or tap the button below for quick install</strong>';
       
-      const li = createElement('li');
+      const btn = this.create('button', 'a2hs-btn');
+      btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
+      
+      state.installButton = btn;
+      
+      const li = this.create('li');
       li.appendChild(num);
       li.appendChild(text);
-      stepsList.appendChild(li);
-    }
-    
-    const body = createElement('div', 'a2hs-body');
-    body.appendChild(instructionTitle);
-    body.appendChild(stepsList);
-    
-    if (hasNativePrompt) {
-      const btn = createElement('button', 'a2hs-btn');
-      btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
-      state.installButton = btn;
-      body.appendChild(btn);
-    }
-    
-    const card = createElement('div', 'a2hs-card');
-    card.appendChild(header);
-    card.appendChild(body);
-    
-    const container = createElement('div', 'a2hs');
-    container.appendChild(card);
-    
-    return { container, closeBtn };
-  };
-  
-  const closeModal = (container) => {
-    const card = container.firstElementChild;
-    card.classList.add('a2hs-closing');
-    setTimeout(() => container.remove(), CFG.animDur);
-    setDismissed();
-  };
-  
-  const triggerInstall = async () => {
-    if (!state.deferredPrompt) return false;
-    
-    try {
-      await state.deferredPrompt.prompt();
-      const { outcome } = await state.deferredPrompt.userChoice;
+      li.appendChild(btn);
       
-      if (outcome === 'accepted') {
-        setDismissed();
-        setInstalled();
-        state.deferredPrompt = null;
-        return true;
+      return li;
+    },
+    
+    buildModal(hasNativePrompt) {
+      const { config } = deviceDetector.detect();
+      const { header, closeBtn } = this.createHeader();
+      
+      const instructionTitle = this.create('p', 'a2hs-title');
+      instructionTitle.textContent = config.title;
+      
+      const stepsList = this.createSteps(config.steps);
+      
+      if (hasNativePrompt) {
+        stepsList.appendChild(this.createInstallButton());
       }
       
-      return false;
-    } catch (err) {
-      return false;
+      const body = this.create('div', 'a2hs-body');
+      body.appendChild(instructionTitle);
+      body.appendChild(stepsList);
+      
+      const card = this.create('div', 'a2hs-card');
+      card.appendChild(header);
+      card.appendChild(body);
+      
+      const container = this.create('div', 'a2hs');
+      container.appendChild(card);
+      
+      return { container, closeBtn };
     }
   };
-  
-  const setupInstallButton = () => {
-    if (!state.installButton || !state.deferredPrompt) return;
+
+  // Timing Utilities
+  const utils = {
+    delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    },
     
-    state.installButton.addEventListener('click', async () => {
-      const success = await triggerInstall();
-      if (success) {
-        const modal = document.querySelector('.a2hs');
-        if (modal) closeModal(modal);
-      }
-    });
-  };
-  
-  const showModal = () => {
-    if (isInstalled() || isDismissed()) return;
-    
-    const device = detectDevice();
-    const { container, closeBtn } = buildUI(device, state.promptReceived);
-    
-    document.body.appendChild(container);
-    
-    if (state.promptReceived) {
-      setupInstallButton();
-    }
-    
-    closeBtn.addEventListener('click', () => closeModal(container), { once: true });
-  };
-  
-  const waitForPrompt = () => {
-    return new Promise((resolve) => {
-      if (state.promptReceived) {
-        resolve(true);
-        return;
-      }
-      
-      const timeout = setTimeout(() => resolve(false), CFG.promptTimeout);
-      
-      const checker = setInterval(() => {
-        if (state.promptReceived) {
-          clearTimeout(timeout);
-          clearInterval(checker);
+    pollUntil(condition, timeout) {
+      return new Promise((resolve) => {
+        if (condition()) {
           resolve(true);
+          return;
         }
-      }, 100);
-    });
+        
+        const timeoutId = setTimeout(() => {
+          clearInterval(intervalId);
+          resolve(false);
+        }, timeout);
+        
+        const intervalId = setInterval(() => {
+          if (condition()) {
+            clearTimeout(timeoutId);
+            clearInterval(intervalId);
+            resolve(true);
+          }
+        }, 100);
+      });
+    }
   };
-  
-  const shouldBlock = () => isInstalled() || isDismissed();
-  
-  const init = () => {
-    if (!checkLocalStorage() || isInstalled()) return;
+
+  // Modal Controller
+  const modal = {
+    close(container) {
+      const card = container.firstElementChild;
+      card.classList.add('a2hs-closing');
+      setTimeout(() => container.remove(), CFG.animDur);
+      storage.setDismissed();
+    },
     
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      state.deferredPrompt = e;
-      state.promptReceived = true;
+    async triggerInstall() {
+      if (!state.deferredPrompt) return false;
       
+      try {
+        await state.deferredPrompt.prompt();
+        const { outcome } = await state.deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+          storage.setDismissed();
+          storage.setInstalled();
+          state.deferredPrompt = null;
+          return true;
+        }
+        
+        return false;
+      } catch (err) {
+        return false;
+      }
+    },
+    
+    attachEvents(container, closeBtn) {
+      closeBtn.addEventListener('click', () => this.close(container), { once: true });
+      
+      if (state.installButton) {
+        state.installButton.addEventListener('click', async () => {
+          const success = await this.triggerInstall();
+          if (success) this.close(container);
+        });
+      }
+    },
+    
+    show() {
+      if (!state.canShowModal) return;
+      
+      const { container, closeBtn } = dom.buildModal(state.isReady);
+      document.body.appendChild(container);
+      this.attachEvents(container, closeBtn);
+    },
+    
+    refresh() {
       const existingModal = document.querySelector('.a2hs');
       if (existingModal && !state.installButton) {
         existingModal.remove();
-        showModal();
+        this.show();
       }
-    });
+    }
+  };
+
+  // Event Handlers
+  const handlers = {
+    onBeforeInstallPrompt(e) {
+      e.preventDefault();
+      state.deferredPrompt = e;
+      state.promptReceived = true;
+      modal.refresh();
+    },
     
-    window.addEventListener('appinstalled', () => {
-      setDismissed();
-      setInstalled();
+    onAppInstalled() {
+      storage.setDismissed();
+      storage.setInstalled();
       
-      const modal = document.querySelector('.a2hs');
-      if (modal) closeModal(modal);
-    });
+      const existingModal = document.querySelector('.a2hs');
+      if (existingModal) modal.close(existingModal);
+    }
+  };
+
+  // Initialization
+  const init = async () => {
+    if (!storage.isAvailable() || installCheckers.isInstalled()) return;
+    
+    window.addEventListener('beforeinstallprompt', handlers.onBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handlers.onAppInstalled);
     
     const execute = async () => {
-      if (shouldBlock()) return;
-      
-      await new Promise(resolve => setTimeout(resolve, CFG.modalDelay));
-      if (shouldBlock()) return;
-      
-      await waitForPrompt();
-      if (shouldBlock()) return;
-      
-      showModal();
+      await utils.delay(CFG.modalDelay);
+      await utils.pollUntil(() => state.promptReceived, CFG.promptTimeout);
+      modal.show();
     };
     
     if (document.readyState === 'loading') {
