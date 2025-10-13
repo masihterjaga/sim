@@ -1699,72 +1699,64 @@ const processMainCalculation = (() => {
 const NumberFormatter = {
   format(n, showFullPrecision) {
     const num = Number(n) || 0;
-    const isInteger = num % 1 === 0;
     const absNum = Math.abs(num);
-
+    const isInteger = num % 1 === 0;
+    
     if (showFullPrecision) {
-      if (absNum >= 99999) return Math.floor(num).toString();
-      if (isInteger) return num.toString();
-
+      if (absNum >= 99999 || isInteger) return isInteger ? num.toString() : Math.floor(num).toString();
+      
       const str = num.toFixed(6).replace(/(\.\d*?)0+$/, '$1');
-      if (str.endsWith('.')) return num.toFixed(2);
-
       const parts = str.split('.');
-      if (parts[1] && parts[1].length === 1) return num.toFixed(2);
-
-      return str;
+      
+      return str.endsWith('.') || (parts[1]?.length === 1) ? num.toFixed(2) : str;
     }
-
+    
     if (absNum > 99999) {
       const divisor = absNum >= 1e6 ? 1e6 : 1e3;
-      const suffix = divisor === 1e6 ? 'M' : 'K';
-      return `${Math.floor(num / divisor)}${suffix}`;
+      return `${Math.floor(num / divisor)}${divisor === 1e6 ? 'M' : 'K'}`;
     }
-
-    if (isInteger) return num.toString();
-    return num.toFixed(2);
+    
+    return isInteger ? num.toString() : num.toFixed(2);
   }
 };
 const PrecisionToggle = {
   create(resultContainer, onToggleCallback) {
     const showFullPrecision = resultContainer?.dataset?.showFullPrecision === "1";
-
+    
     const btn = document.createElement('button');
     btn.className = 'toggle-precision job-sim';
     btn.type = 'button';
     btn.textContent = showFullPrecision ? "hide" : "shown";
-
+    
     const listenerId = EventManager.add(btn, 'click', (e) => {
       e.preventDefault();
       e.stopPropagation();
+      
       if (!resultContainer?.dataset) return;
-
+      
       const newState = resultContainer.dataset.showFullPrecision === "1" ? "0" : "1";
+      const isPrecise = newState === "1";
+      
       resultContainer.dataset.showFullPrecision = newState;
-
-      btn.textContent = newState === "1" ? "hide" : "shown";
-
-      onToggleCallback(newState === "1");
-
+      btn.textContent = isPrecise ? "hide" : "shown";
+      
+      onToggleCallback(isPrecise);
+      
       typeof showSnackbar === 'function' &&
-        showSnackbar(newState === "1" ? "Precise numbers displayed" : "Rounded numbers displayed");
+        showSnackbar(`${isPrecise ? "Precise" : "Rounded"} numbers displayed`);
     });
-
+    
     btn.dataset.listenerId = listenerId;
     return btn;
   },
-
+  
   refreshNumbers(resultContainer, showFullPrecision) {
-    const fmt = (n) => NumberFormatter.format(n, showFullPrecision);
-
     resultContainer.querySelectorAll('[data-raw-value]').forEach(el => {
-      const rawValue = parseFloat(el.dataset.rawValue);
-      el.textContent = fmt(rawValue);
+      el.textContent = NumberFormatter.format(parseFloat(el.dataset.rawValue), showFullPrecision);
     });
-
+    
     resultContainer.querySelectorAll('code[data-raw-mult]').forEach(el => {
-      const rawMult = parseFloat(el.dataset.rawMult);
-      el.textContent = `\u00D7${fmt(rawMult)}`;
+      el.textContent = `\u00D7${NumberFormatter.format(parseFloat(el.dataset.rawMult), showFullPrecision)}`;
     });
   }
 };
@@ -5406,7 +5398,6 @@ const modalManager = (() => {
         return `<li>${item}</li>`;
       }
       if (item.category !== undefined) {
-        // Jika category kosong, render items langsung tanpa wrapper
         if (item.category === '') {
           return renderList(item.items);
         }
