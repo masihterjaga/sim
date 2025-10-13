@@ -3930,7 +3930,7 @@ class StickyHandler {
       resetRek: 'resetRekomenBtn',
       resetAll: 'resetAllBtn',
       swapBoss: 'breakdown-swap',
-      stickyStart: () => DOM_ELEMENTS?.hasil,
+      stickyStart: () => DOM_ELEMENTS?.stickyStart,
       testSpear: () => DOM_ELEMENTS?.testSpear,
       testReaper: () => DOM_ELEMENTS?.testReaper
     };
@@ -3962,12 +3962,10 @@ class StickyHandler {
     this.init();
   }
 
-  // === GUARD HELPER ===
   canOperate() {
     return this.state.isMobile && AppState.get('isResultShown') && this.state.isActive;
   }
 
-  // === ELEMENT MANAGEMENT ===
   initElements() {
     this.elements.clear();
 
@@ -4033,7 +4031,6 @@ class StickyHandler {
     return buttons;
   }
 
-  // === EVENT HANDLERS ===
   handleToggle = (e) => {
     e.preventDefault();
 
@@ -4077,7 +4074,6 @@ class StickyHandler {
     this.scheduleTimeout('resize', this.updateSticky.bind(this), this.config.RESIZE_DEBOUNCE);
   }
 
-  // === TIMEOUT MANAGEMENT ===
   scheduleTimeout(key, callback, delay) {
     const existing = this.timeouts.get(key);
     if (existing) clearTimeout(existing);
@@ -4091,7 +4087,6 @@ class StickyHandler {
     this.timeouts.clear();
   }
 
-  // === STICKY LOGIC ===
   updateMobileState() {
     const newIsMobile = window.innerWidth <= this.config.MOBILE_BREAKPOINT;
     const changed = newIsMobile !== this.state.isMobile;
@@ -4200,7 +4195,6 @@ class StickyHandler {
     }
   }
 
-  // === STATE PRESERVATION ===
   preserveSwapState() {
     const swapElement = this.elements.get('swapBoss');
     if (!swapElement || swapElement.tagName !== 'SELECT') return null;
@@ -4261,16 +4255,23 @@ class StickyHandler {
     this.boundListeners.clear();
   }
 
-  // === DOM OBSERVER ===
   setupDOMObserver() {
     if (typeof MutationObserver === 'undefined' || this.observer) return;
+    const hasilContainer = DOM_ELEMENTS?.hasil;
+    if (!hasilContainer) return;
 
     this.observer = new MutationObserver((mutations) => {
+      const hasAddedNodes = mutations.some(m => m.addedNodes.length > 0);
+      if (!hasAddedNodes) return;
+
       let swapReinjected = false;
 
       for (const mutation of mutations) {
+        if (mutation.type !== 'childList') continue;
+
         for (const node of mutation.addedNodes) {
-          if (node.id === 'breakdown-swap' || (node.nodeType === 1 && node.querySelector?.('#breakdown-swap'))) {
+          if (node.nodeType !== 1) continue;
+          if (node.id === 'breakdown-swap' || (node.querySelector?.('#breakdown-swap'))) {
             swapReinjected = true;
             break;
           }
@@ -4296,7 +4297,7 @@ class StickyHandler {
       }, this.config.OBSERVER_DEBOUNCE);
     });
 
-    this.observer.observe(document.body, {
+    this.observer.observe(hasilContainer, {
       childList: true,
       subtree: true
     });
@@ -4315,7 +4316,6 @@ class StickyHandler {
     });
   }
 
-  // === LIFECYCLE ===
   init() {
     const setup = () => {
       if (this.initialized) return;
