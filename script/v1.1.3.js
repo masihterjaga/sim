@@ -5814,43 +5814,58 @@ const CONSTANTS = {
 };
 if ('serviceWorker' in navigator) {
   const PWAServiceWorker = (() => {
+    let updatePromptShown = false;
+    
     const saveState = () => PWAPersistence?.snap?.();
     
-    const reloadApp = (cacheVersion = null) => {
-      if (cacheVersion) {
-        localStorage.setItem('app_cache_version', cacheVersion);
-      }
+    const reloadApp = (cacheVersion) => {
+      if (cacheVersion) localStorage.setItem('app_cache_version', cacheVersion);
       saveState();
       window.location.reload(true);
     };
     
     const checkCacheVersion = async () => {
-      if (!isPWAMode()) return false;
+      if (updatePromptShown) return false;
       
       try {
         const cacheNames = await caches.keys();
         const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
-        
         if (!currentCache) return false;
         
         const storedVersion = localStorage.getItem('app_cache_version');
-        
         if (!storedVersion) {
           localStorage.setItem('app_cache_version', currentCache);
           return false;
         }
         
-        if (storedVersion !== currentCache) {
-          if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
-            reloadApp(currentCache);
-            return true;
-          }
+        if (storedVersion === currentCache) return false;
+        
+        updatePromptShown = true;
+        
+        if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
+          reloadApp(currentCache);
+          return true;
         }
         
+        localStorage.setItem('app_cache_version', currentCache);
         return false;
       } catch (e) {
         return false;
       }
+    };
+    
+    const setupUpdateListener = (registration) => {
+      registration.update();
+      
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        
+        newWorker.addEventListener('statechange', () => {
+          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            checkCacheVersion();
+          }
+        });
+      });
     };
     
     const registerSW = () => {
@@ -5858,59 +5873,37 @@ if ('serviceWorker' in navigator) {
           scope: '/sim/',
           updateViaCache: 'none'
         })
-        .then(registration => {
-          if (!isPWAMode()) return;
-          
-          registration.update();
-          
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            
-            newWorker.addEventListener('statechange', () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                checkCacheVersion();
-              }
-            });
-          });
-        })
+        .then(reg => isPWAMode() && setupUpdateListener(reg))
         .catch(() => {});
     };
     
-    const init = () => {
-      window.addEventListener('load', async () => {
-        if (isPWAMode()) {
-          const updated = await checkCacheVersion();
-          if (!updated) registerSW();
-          
-          let refreshing = false;
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            if (refreshing) return;
-            refreshing = true;
-            window.location.reload();
-          });
-        } else {
-          registerSW();
-        }
-      });
+    const handleVisibilityChange = async () => {
+      if (document.hidden) return;
       
-      if (isPWAMode()) {
-        document.addEventListener('visibilitychange', async () => {
-          if (document.hidden) return;
-          
-          const reg = await navigator.serviceWorker.getRegistration('/sim/');
-          if (reg) {
-            await reg.update();
-            setTimeout(() => checkCacheVersion(), CONSTANTS.SW_UPDATE_CHECK_DELAY);
-          }
-        });
-      }
+      const reg = await navigator.serviceWorker.getRegistration('/sim/');
+      if (!reg) return;
+      
+      await reg.update();
+      setTimeout(checkCacheVersion, CONSTANTS.SW_UPDATE_CHECK_DELAY);
+    };
+    
+    const initPWAMode = async () => {
+      const updated = await checkCacheVersion();
+      if (!updated) registerSW();
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    };
+    
+    const init = () => {
+      window.addEventListener('load', () => {
+        isPWAMode() ? initPWAMode() : registerSW();
+      });
     };
     
     return { init };
   })();
   
   PWAServiceWorker.init();
-}
+};
 const preventPullToRefresh = (() => {
   if (!isPWAMode()) return { cleanup: () => {} };
   
