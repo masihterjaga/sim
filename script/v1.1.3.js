@@ -6082,7 +6082,7 @@ const initA2HS = (() => {
     animDur: 300,
     modalDelay: 3000,
     promptTimeout: 5000,
-    dismissExpiry: 3 * 24 * 60 * 60 * 1000, // 3 days in ms
+    dismissExpiry: 259200000, // 3 days in milliseconds
     app: {
       name: 'RöX Calculator',
       desc: 'Quick access, save stats & work offline',
@@ -6123,14 +6123,9 @@ const initA2HS = (() => {
     promptReceived: false,
     lsAvailable: null,
     deviceConfig: null,
-    
-    get isReady() {
-      return this.promptReceived;
-    },
-    
-    get canShowModal() {
-      return !installCheckers.isInstalled() && !storage.isDismissed();
-    }
+    installed: false,
+    dismissed: false,
+    modalContainer: null
   };
 
   // Storage Operations
@@ -6177,38 +6172,11 @@ const initA2HS = (() => {
       } catch (e) {
         return false;
       }
-    },
-    
-    isDismissed() {
-      const data = this.get(CFG.storage);
-      if (!data) return false;
-      
-      try {
-        const { timestamp } = JSON.parse(data);
-        const isExpired = Date.now() - timestamp > CFG.dismissExpiry;
-        
-        if (isExpired) {
-          this.remove(CFG.storage);
-          return false;
-        }
-        
-        return true;
-      } catch (e) {
-        return false;
-      }
-    },
-    
-    setDismissed() {
-      this.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
-    },
-    
-    setInstalled() {
-      this.set('app_installed', 'true');
     }
   };
 
-  // Install Detection
-  const installCheckers = {
+  // Install Status Management
+  const installStatus = {
     checks: [
       () => window.matchMedia('(display-mode: standalone)').matches,
       () => window.navigator.standalone === true,
@@ -6219,7 +6187,47 @@ const initA2HS = (() => {
     ],
     
     isInstalled() {
-      return this.checks.some(check => check());
+      if (state.installed) return true;
+      
+      const installed = this.checks.some(check => check());
+      if (installed) state.installed = true;
+      
+      return installed;
+    },
+    
+    setInstalled() {
+      state.installed = true;
+      storage.set('app_installed', 'true');
+    }
+  };
+
+  // Dismiss Status Management
+  const dismissStatus = {
+    isDismissed() {
+      if (state.dismissed) return true;
+      
+      const data = storage.get(CFG.storage);
+      if (!data) return false;
+      
+      try {
+        const { timestamp } = JSON.parse(data);
+        const isExpired = Date.now() - timestamp > CFG.dismissExpiry;
+        
+        if (isExpired) {
+          storage.remove(CFG.storage);
+          return false;
+        }
+        
+        state.dismissed = true;
+        return true;
+      } catch (e) {
+        return false;
+      }
+    },
+    
+    setDismissed() {
+      state.dismissed = true;
+      storage.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
     }
   };
 
@@ -6334,22 +6342,68 @@ const initA2HS = (() => {
       return li;
     },
     
-    buildModal(hasNativePrompt) {
+    createWarningMessage() {
+      const icon = this.create('div', 'a2hs-warning-icon');
+      icon.innerHTML = '⚠️';
+      
+      const title = this.create('h3', 'a2hs-warning-title');
+      title.textContent = 'Private Browsing Detected';
+      
+      const message = this.create('p', 'a2hs-warning-text');
+      message.innerHTML = 'You\'re currently in Private/Incognito mode.<br>App installation is not available in this mode.';
+      
+      const instructionTitle = this.create('p', 'a2hs-warning-subtitle');
+      instructionTitle.textContent = 'To install this app:';
+      
+      const instructions = this.create('ul', 'a2hs-warning-list');
+      const steps = [
+        'Close this private window',
+        'Open the link in normal browsing mode',
+        'Follow the installation steps'
+      ];
+      
+      steps.forEach(step => {
+        const li = this.create('li');
+        li.textContent = step;
+        instructions.appendChild(li);
+      });
+      
+      const copyBtn = this.create('button', 'a2hs-copy-btn');
+      copyBtn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;margin-right:8px"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>Copy Link';
+      copyBtn.dataset.action = 'copy';
+      
+      const warning = this.create('div', 'a2hs-warning');
+      warning.appendChild(icon);
+      warning.appendChild(title);
+      warning.appendChild(message);
+      warning.appendChild(instructionTitle);
+      warning.appendChild(instructions);
+      warning.appendChild(copyBtn);
+      
+      return warning;
+    },
+    
+    buildModal(hasNativePrompt, isIncognito = false) {
       const { config } = deviceDetector.detect();
       const { header, closeBtn } = this.createHeader();
       
-      const instructionTitle = this.create('p', 'a2hs-title');
-      instructionTitle.textContent = config.title;
-      
-      const stepsList = this.createSteps(config.steps);
-      
-      if (hasNativePrompt) {
-        stepsList.appendChild(this.createInstallButton());
-      }
-      
       const body = this.create('div', 'a2hs-body');
-      body.appendChild(instructionTitle);
-      body.appendChild(stepsList);
+      
+      if (isIncognito) {
+        body.appendChild(this.createWarningMessage());
+      } else {
+        const instructionTitle = this.create('p', 'a2hs-title');
+        instructionTitle.textContent = config.title;
+        
+        const stepsList = this.createSteps(config.steps);
+        
+        if (hasNativePrompt) {
+          stepsList.appendChild(this.createInstallButton());
+        }
+        
+        body.appendChild(instructionTitle);
+        body.appendChild(stepsList);
+      }
       
       const card = this.create('div', 'a2hs-card');
       card.appendChild(header);
@@ -6359,6 +6413,46 @@ const initA2HS = (() => {
       container.appendChild(card);
       
       return { container, closeBtn };
+    }
+  };
+
+  // Incognito Detection
+  const incognitoDetector = {
+    async detect() {
+      // Method 1: Storage Quota (most reliable for Chrome/Edge)
+      if ('storage' in navigator && 'estimate' in navigator.storage) {
+        try {
+          const { quota } = await navigator.storage.estimate();
+          if (quota && quota < 120000000) return true; // < 120MB likely incognito
+        } catch (e) {}
+      }
+      
+      // Method 2: IndexedDB (reliable for Safari)
+      try {
+        await new Promise((resolve, reject) => {
+          const db = indexedDB.open('test');
+          db.onerror = () => reject();
+          db.onsuccess = () => {
+            indexedDB.deleteDatabase('test');
+            resolve();
+          };
+        });
+      } catch (e) {
+        return true; // IndexedDB blocked = likely incognito
+      }
+      
+      // Method 3: FileSystem API (legacy Chrome)
+      if ('webkitRequestFileSystem' in window) {
+        try {
+          await new Promise((resolve, reject) => {
+            window.webkitRequestFileSystem(0, 0, resolve, reject);
+          });
+        } catch (e) {
+          return true;
+        }
+      }
+      
+      return false;
     }
   };
 
@@ -6388,16 +6482,63 @@ const initA2HS = (() => {
           }
         }, 100);
       });
+    },
+    
+    copyToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        return navigator.clipboard.writeText(text);
+      }
+      
+      // Fallback for older browsers
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      
+      try {
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        return Promise.resolve();
+      } catch (e) {
+        document.body.removeChild(textarea);
+        return Promise.reject(e);
+      }
+    }
+  };
+
+  // Flow Control
+  const flowControl = {
+    canProceed() {
+      return !installStatus.isInstalled() && !dismissStatus.isDismissed();
     }
   };
 
   // Modal Controller
   const modal = {
-    close(container) {
-      const card = container.firstElementChild;
+    isIncognito: false,
+    
+    async init() {
+      this.isIncognito = await incognitoDetector.detect();
+    },
+    
+    close() {
+      if (!state.modalContainer) return;
+      
+      const card = state.modalContainer.firstElementChild;
+      if (!card) return;
+      
       card.classList.add('a2hs-closing');
-      setTimeout(() => container.remove(), CFG.animDur);
-      storage.setDismissed();
+      
+      setTimeout(() => {
+        if (state.modalContainer && state.modalContainer.parentNode) {
+          state.modalContainer.remove();
+        }
+        state.modalContainer = null;
+      }, CFG.animDur);
+      
+      dismissStatus.setDismissed();
     },
     
     async triggerInstall() {
@@ -6408,8 +6549,8 @@ const initA2HS = (() => {
         const { outcome } = await state.deferredPrompt.userChoice;
         
         if (outcome === 'accepted') {
-          storage.setDismissed();
-          storage.setInstalled();
+          dismissStatus.setDismissed();
+          installStatus.setInstalled();
           state.deferredPrompt = null;
           return true;
         }
@@ -6420,37 +6561,75 @@ const initA2HS = (() => {
       }
     },
     
-    attachEvents(container, closeBtn) {
-      closeBtn.addEventListener('click', () => this.close(container), { once: true });
+    async handleCopyLink() {
+      const copyBtn = state.modalContainer?.querySelector('[data-action="copy"]');
+      if (!copyBtn) return;
       
-      if (state.installButton) {
+      try {
+        await utils.copyToClipboard(window.location.href);
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:18px;height:18px;margin-right:8px"><polyline points="20 6 9 17 4 12"/></svg>Link Copied!';
+        copyBtn.disabled = true;
+        
+        setTimeout(() => {
+          copyBtn.innerHTML = originalHTML;
+          copyBtn.disabled = false;
+        }, 2000);
+      } catch (e) {
+        console.error('Failed to copy:', e);
+      }
+    },
+    
+    attachEvents(closeBtn) {
+      closeBtn.addEventListener('click', () => this.close(), { once: true });
+      
+      if (this.isIncognito) {
+        const copyBtn = state.modalContainer?.querySelector('[data-action="copy"]');
+        if (copyBtn) {
+          copyBtn.addEventListener('click', () => this.handleCopyLink());
+        }
+      } else if (state.installButton) {
         state.installButton.addEventListener('click', async () => {
           const success = await this.triggerInstall();
-          if (success) this.close(container);
+          if (success) this.close();
         });
       }
     },
     
     show() {
-      if (!state.canShowModal) return;
+      if (!flowControl.canProceed()) return;
       
-      const { container, closeBtn } = dom.buildModal(state.isReady);
+      const { container, closeBtn } = dom.buildModal(state.promptReceived, this.isIncognito);
       document.body.appendChild(container);
-      this.attachEvents(container, closeBtn);
+      state.modalContainer = container;
+      this.attachEvents(closeBtn);
     },
     
     refresh() {
-      const existingModal = document.querySelector('.a2hs');
-      if (existingModal && !state.installButton) {
-        existingModal.remove();
+      if (!flowControl.canProceed()) {
+        this.close();
+        return;
+      }
+      
+      if (state.modalContainer && !state.installButton && !this.isIncognito) {
+        this.close();
         this.show();
       }
+    },
+    
+    cleanup() {
+      this.close();
+      state.deferredPrompt = null;
+      state.promptReceived = false;
+      state.installButton = null;
     }
   };
 
   // Event Handlers
   const handlers = {
     onBeforeInstallPrompt(e) {
+      if (!flowControl.canProceed()) return;
+      
       e.preventDefault();
       state.deferredPrompt = e;
       state.promptReceived = true;
@@ -6458,24 +6637,31 @@ const initA2HS = (() => {
     },
     
     onAppInstalled() {
-      storage.setDismissed();
-      storage.setInstalled();
-      
-      const existingModal = document.querySelector('.a2hs');
-      if (existingModal) modal.close(existingModal);
+      installStatus.setInstalled();
+      dismissStatus.setDismissed();
+      modal.cleanup();
     }
   };
 
   // Initialization
   const init = async () => {
-    if (!storage.isAvailable() || installCheckers.isInstalled()) return;
+    if (!storage.isAvailable()) return;
+    if (!flowControl.canProceed()) return;
+    
+    await modal.init();
     
     window.addEventListener('beforeinstallprompt', handlers.onBeforeInstallPrompt);
     window.addEventListener('appinstalled', handlers.onAppInstalled);
     
     const execute = async () => {
       await utils.delay(CFG.modalDelay);
-      await utils.pollUntil(() => state.promptReceived, CFG.promptTimeout);
+      if (!flowControl.canProceed()) return;
+      
+      if (!modal.isIncognito) {
+        await utils.pollUntil(() => state.promptReceived, CFG.promptTimeout);
+        if (!flowControl.canProceed()) return;
+      }
+      
       modal.show();
     };
     
