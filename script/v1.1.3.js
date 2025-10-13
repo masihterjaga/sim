@@ -3358,70 +3358,42 @@ class ValidationSSoT {
 
   canShowSnackbar(elementId) {
     if (this.snackbarCooldowns.has(elementId)) return false;
-
     this.snackbarCooldowns.add(elementId);
     setTimeout(() => this.snackbarCooldowns.delete(elementId), 2000);
     return true;
   }
 
-  // Validation helpers
   getDropdownForRelated(element) {
     return element.id === 'race' ? DOM_ELEMENTS.tRace : DOM_ELEMENTS.tAttr;
   }
 
   validateRelatedNumeric(element, value) {
     const dropdown = this.getDropdownForRelated(element);
-
-    if (!dropdown?.value && !value) {
-      return {
-        isValid: true,
-        reason: 'related_empty'
-      };
-    }
-
-    if (dropdown?.value && !value) {
-      return {
-        isValid: false,
-        reason: 'related_required'
-      };
-    }
-
+    if (!dropdown?.value && !value) return { isValid: true, reason: 'related_empty' };
+    if (dropdown?.value && !value) return { isValid: false, reason: 'related_required' };
     return null;
   }
 
-  validateMinValue(element, numValue, showMessages) {
-    const min = element.getAttribute('min');
-    if (min === null || min === '') return null;
+  validateBoundary(element, numValue, showMessages, boundType) {
+    const bound = element.getAttribute(boundType);
+    if (bound === null || bound === '') return null;
 
-    const minVal = +min;
-    if (numValue >= minVal) return null;
-
-    if (showMessages && this.canShowSnackbar(element.id)) {
-      const fieldName = element.getAttribute('data-field-name') || element.id || 'Field';
-      this.showMessage(`${fieldName} must be at least ${minVal}`);
-    }
-
-    return {
-      isValid: false,
-      reason: 'below_min'
-    };
-  }
-
-  validateMaxValue(element, numValue, showMessages) {
-    const max = element.getAttribute('max');
-    if (max === null || max === '') return null;
-
-    const maxVal = +max;
-    if (numValue <= maxVal) return null;
+    const boundVal = +bound;
+    const isMin = boundType === 'min';
+    const isValid = isMin ? numValue >= boundVal : numValue <= boundVal;
+    
+    if (isValid) return null;
 
     if (showMessages && this.canShowSnackbar(element.id)) {
-      this.showMessage('what are you doing?');
+      if (isMin) {
+        const fieldName = element.getAttribute('data-field-name') || element.id || 'Field';
+        this.showMessage(`${fieldName} must be at least ${boundVal}`);
+      } else {
+        this.showMessage('what are you doing?');
+      }
     }
 
-    return {
-      isValid: false,
-      reason: 'above_max'
-    };
+    return { isValid: false, reason: isMin ? 'below_min' : 'above_max' };
   }
 
   validateThreshold(element, numValue, showMessages) {
@@ -3439,52 +3411,36 @@ class ValidationSSoT {
       this.showMessage(`Need at least ${minRequired} ${fieldType} vs ${targetLabel}`);
     }
 
-    return {
-      isValid: false,
-      reason: 'threshold_not_met'
-    };
+    return { isValid: false, reason: 'threshold_not_met' };
   }
 
   validateField(element, showMessages = false) {
     const value = element.value?.trim() || '';
 
-    // Check related numeric fields first
     if (this.isRelatedNumeric(element)) {
       const result = this.validateRelatedNumeric(element, value);
       if (result) return result;
     }
 
-    // Empty check
-    if (!value) return {
-      isValid: false,
-      reason: 'empty'
-    };
+    if (!value) return { isValid: false, reason: 'empty' };
 
-    // Number format check
     if (this.isNumeric(element) && !this.isValidNumber(value)) {
-      return {
-        isValid: false,
-        reason: 'invalid_number'
-      };
+      return { isValid: false, reason: 'invalid_number' };
     }
 
     const numValue = +value;
+    const validators = [
+      () => this.validateBoundary(element, numValue, showMessages, 'min'),
+      () => this.validateBoundary(element, numValue, showMessages, 'max'),
+      () => this.validateThreshold(element, numValue, showMessages)
+    ];
 
-    // Min validation
-    const minResult = this.validateMinValue(element, numValue, showMessages);
-    if (minResult) return minResult;
+    for (const validator of validators) {
+      const result = validator();
+      if (result) return result;
+    }
 
-    // Max validation
-    const maxResult = this.validateMaxValue(element, numValue, showMessages);
-    if (maxResult) return maxResult;
-
-    // Threshold validation (pen/dmg specific)
-    const thresholdResult = this.validateThreshold(element, numValue, showMessages);
-    if (thresholdResult) return thresholdResult;
-
-    return {
-      isValid: true
-    };
+    return { isValid: true };
   }
 
   updateFieldState(element, isValid, force = false) {
@@ -3496,55 +3452,36 @@ class ValidationSSoT {
     if (!element || !this.isNumeric(element)) return;
 
     const normalized = this.normalizeInput(element.value);
-    if (normalized !== element.value) {
-      element.value = normalized;
-    }
+    if (normalized !== element.value) element.value = normalized;
 
     const result = this.validateField(element, this.touchedFields.has(element.id));
     this.updateFieldState(element, result.isValid, true);
   }
 
-  // Event handlers
-  createValidateHandler(element) {
-    return (showMessages = false) => {
+  setupField(element) {
+    const validateHandler = (showMessages = false) => {
       const result = this.validateField(element, showMessages);
       this.updateFieldState(element, result.isValid);
     };
-  }
 
-  createNormalizeHandler(element) {
-    return () => {
+    const normalizeHandler = () => {
       if (!this.isNumeric(element)) return;
-
       const normalized = this.normalizeInput(element.value);
-      if (normalized !== element.value) {
-        element.value = normalized;
-      }
+      if (normalized !== element.value) element.value = normalized;
     };
-  }
 
-  setupField(element) {
-    const validateHandler = this.createValidateHandler(element);
-    const normalizeHandler = this.createNormalizeHandler(element);
-
-    // Simpan initial value
     this.fieldLastValues.set(element.id, element.value);
 
-    EventManager.addNS(this.namespace, element, 'focus', () => {
-      this.touchedFields.add(element.id);
-    });
+    const eventHandlers = {
+      focus: () => this.touchedFields.add(element.id),
+      input: () => { normalizeHandler(); validateHandler(false); },
+      blur: () => validateHandler(true),
+      change: () => validateHandler(true),
+      paste: () => this.isNumeric(element) && setTimeout(() => this.normalizeElement(element), 0)
+    };
 
-    EventManager.addNS(this.namespace, element, 'input', () => {
-      normalizeHandler();
-      validateHandler(false);
-    });
-
-    EventManager.addNS(this.namespace, element, 'blur', () => validateHandler(true));
-    EventManager.addNS(this.namespace, element, 'change', () => validateHandler(true));
-
-    EventManager.addNS(this.namespace, element, 'paste', () => {
-      if (!this.isNumeric(element)) return;
-      setTimeout(() => this.normalizeElement(element), 0);
+    Object.entries(eventHandlers).forEach(([event, handler]) => {
+      EventManager.addNS(this.namespace, element, event, handler);
     });
   }
 
@@ -3553,7 +3490,7 @@ class ValidationSSoT {
 
     EventManager.addNS(this.namespace, DOM_ELEMENTS.tDef, 'change', () => {
       [DOM_ELEMENTS.pen, DOM_ELEMENTS.dmg]
-      .filter(el => el?.value.trim())
+        .filter(el => el?.value.trim())
         .forEach(el => {
           const result = this.validateField(el, this.canShowSnackbar(el.id));
           this.updateFieldState(el, result.isValid);
@@ -3562,25 +3499,20 @@ class ValidationSSoT {
   }
 
   startWatchingTouchedFields() {
+    const el = DOM_ELEMENTS.tSize;
+    if (!el) return;
+
     setInterval(() => {
-      if (this.touchedFields.size === 0) return;
+      if (!this.touchedFields.has(el.id) || !el.classList.contains(this.INVALID_CLASS)) return;
 
-      this.touchedFields.forEach(fieldId => {
-        const el = document.getElementById(fieldId);
-        if (!el) return;
+      const lastValue = this.fieldLastValues.get(el.id);
+      const currentValue = el.value;
 
-        // Skip kalau field ga invalid
-        if (!el.classList.contains(this.INVALID_CLASS)) return;
+      if (lastValue === currentValue) return;
 
-        const lastValue = this.fieldLastValues.get(fieldId);
-        const currentValue = el.value;
-
-        if (lastValue === currentValue) return;
-
-        this.fieldLastValues.set(fieldId, currentValue);
-        const result = this.validateField(el, false);
-        this.updateFieldState(el, result.isValid, true);
-      });
+      this.fieldLastValues.set(el.id, currentValue);
+      const result = this.validateField(el, false);
+      this.updateFieldState(el, result.isValid, true);
     }, 200);
   }
 
@@ -3589,18 +3521,14 @@ class ValidationSSoT {
   init() {
     if (this.isInitialized || !this.checkReady()) return false;
 
-    // Setup all field validations
     ['atkType', 'weapon', 'wElem', 'tDef', 'tSize', 'pen', 'crit', 'dmg',
       'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'
     ]
-    .map(key => DOM_ELEMENTS[key])
+      .map(key => DOM_ELEMENTS[key])
       .filter(Boolean)
       .forEach(element => this.setupField(element));
 
-    // Setup defense change handler
     this.setupDefenseChangeHandler();
-
-    // Start watching for programmatic value changes
     this.startWatchingTouchedFields();
 
     this.isInitialized = true;
@@ -3610,103 +3538,50 @@ class ValidationSSoT {
   autoInit() {
     if (this.isInitialized) return;
 
-    const initHandler = () => {
-      if (!this.isInitialized) this.init();
-    };
+    const initHandler = () => !this.isInitialized && this.init();
+    const isDomLoading = document.readyState === 'loading' || document.readyState === 'interactive';
 
-    if (document.readyState === 'loading' || document.readyState === 'interactive') {
-      document.addEventListener('DOMContentLoaded', initHandler, {
-        once: true
-      });
+    if (isDomLoading) {
+      document.addEventListener('DOMContentLoaded', initHandler, { once: true });
     } else {
       this.init();
     }
 
-    window.addEventListener('load', initHandler, {
-      once: true
-    });
+    window.addEventListener('load', initHandler, { once: true });
   }
 
-  // Field definitions
   getRequiredFields() {
-    return [{
-        el: DOM_ELEMENTS.atkType,
-        name: 'Attack Type'
-      },
-      {
-        el: DOM_ELEMENTS.weapon,
-        name: 'Weapon Type'
-      },
-      {
-        el: DOM_ELEMENTS.wElem,
-        name: 'Weapon Attribute'
-      },
-      {
-        el: DOM_ELEMENTS.tDef,
-        name: 'Target Boss'
-      },
-      {
-        el: DOM_ELEMENTS.tSize,
-        name: 'Target Size'
-      },
-      {
-        el: DOM_ELEMENTS.pen,
-        name: 'Final P M PEN %',
-        condition: () => DOM_ELEMENTS.atkType?.value === 'pen'
-      },
-      {
-        el: DOM_ELEMENTS.crit,
-        name: 'Critical DMG Bonus %',
-        condition: () => DOM_ELEMENTS.atkType?.value === 'crit'
-      },
-      {
-        el: DOM_ELEMENTS.dmg,
-        name: 'Final P M DMG Bonus %'
-      },
-      {
-        el: DOM_ELEMENTS.elemEnh,
-        name: 'Element Enhance %'
-      },
-      {
-        el: DOM_ELEMENTS.sizeEnh,
-        name: 'DMG to Size %'
-      },
-      {
-        el: DOM_ELEMENTS.race,
-        name: 'DMG to Race %',
-        condition: () => DOM_ELEMENTS.race && !DOM_ELEMENTS.race.disabled
-      },
-      {
-        el: DOM_ELEMENTS.attr,
-        name: 'DMG to Attribute %',
-        condition: () => DOM_ELEMENTS.attr && !DOM_ELEMENTS.attr.disabled
-      },
-      {
-        el: DOM_ELEMENTS.dmgStack,
-        name: 'Final DMG Bonus %'
-      }
+    return [
+      { el: DOM_ELEMENTS.atkType, name: 'Attack Type' },
+      { el: DOM_ELEMENTS.weapon, name: 'Weapon Type' },
+      { el: DOM_ELEMENTS.wElem, name: 'Weapon Attribute' },
+      { el: DOM_ELEMENTS.tDef, name: 'Target Boss' },
+      { el: DOM_ELEMENTS.tSize, name: 'Target Size' },
+      { el: DOM_ELEMENTS.pen, name: 'Final P M PEN %', condition: () => DOM_ELEMENTS.atkType?.value === 'pen' },
+      { el: DOM_ELEMENTS.crit, name: 'Critical DMG Bonus %', condition: () => DOM_ELEMENTS.atkType?.value === 'crit' },
+      { el: DOM_ELEMENTS.dmg, name: 'Final P M DMG Bonus %' },
+      { el: DOM_ELEMENTS.elemEnh, name: 'Element Enhance %' },
+      { el: DOM_ELEMENTS.sizeEnh, name: 'DMG to Size %' },
+      { el: DOM_ELEMENTS.race, name: 'DMG to Race %', condition: () => DOM_ELEMENTS.race && !DOM_ELEMENTS.race.disabled },
+      { el: DOM_ELEMENTS.attr, name: 'DMG to Attribute %', condition: () => DOM_ELEMENTS.attr && !DOM_ELEMENTS.attr.disabled },
+      { el: DOM_ELEMENTS.dmgStack, name: 'Final DMG Bonus %' }
     ];
   }
 
   shouldValidateField(field) {
-    if (!field.el) return false;
-    if (!field.condition) return true;
-    return field.condition();
+    return field.el && (!field.condition || field.condition());
   }
 
-  validateSingleField(field) {
+  processFieldValidation(field, shouldScroll = true) {
     this.touchedFields.add(field.el.id);
     const result = this.validateField(field.el, this.canShowSnackbar(field.el.id));
     this.updateFieldState(field.el, result.isValid, true);
 
-    if (!result.isValid) {
-      if (typeof scrollAndFocusElement === 'function') {
-        scrollAndFocusElement(field.el);
-      }
-      return false;
+    if (!result.isValid && shouldScroll && typeof scrollAndFocusElement === 'function') {
+      scrollAndFocusElement(field.el);
     }
 
-    return true;
+    return result.isValid;
   }
 
   validateAllRequired() {
@@ -3714,7 +3589,7 @@ class ValidationSSoT {
 
     for (const field of fields) {
       if (!this.shouldValidateField(field)) continue;
-      if (!this.validateSingleField(field)) return false;
+      if (!this.processFieldValidation(field)) return false;
     }
 
     return true;
@@ -3722,42 +3597,21 @@ class ValidationSSoT {
 
   getStatsElements(state) {
     const elements = [];
-
     if (state?.atkType?.toLowerCase() === 'pen' && DOM_ELEMENTS.pen) {
       elements.push(DOM_ELEMENTS.pen);
     }
-
-    if (DOM_ELEMENTS.dmg) {
-      elements.push(DOM_ELEMENTS.dmg);
-    }
-
+    if (DOM_ELEMENTS.dmg) elements.push(DOM_ELEMENTS.dmg);
     return elements;
-  }
-
-  shouldFocusElement(element, focusedElement) {
-    return focusedElement === element || !focusedElement;
-  }
-
-  validateStatsElement(element, focusedElement) {
-    this.touchedFields.add(element.id);
-    const result = this.validateField(element, this.canShowSnackbar(element.id));
-    this.updateFieldState(element, result.isValid, true);
-
-    if (!result.isValid && this.shouldFocusElement(element, focusedElement)) {
-      if (typeof scrollAndFocusElement === 'function') {
-        scrollAndFocusElement(element);
-      }
-      return false;
-    }
-
-    return true;
   }
 
   validateStats(state, focusedElement = null) {
     const elements = this.getStatsElements(state);
 
     for (const element of elements) {
-      if (!this.validateStatsElement(element, focusedElement)) {
+      const shouldScroll = focusedElement === element || !focusedElement;
+      const fieldObject = { el: element };
+      
+      if (!this.processFieldValidation(fieldObject, shouldScroll)) {
         return false;
       }
     }
