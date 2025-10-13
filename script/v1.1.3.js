@@ -5938,7 +5938,7 @@ const isPWAMode = () =>
 const IS_PWA = isPWAMode();
 const CONSTANTS = {
   PWA_STORAGE_KEY: 'pwa_snap',
-  PWA_EXPIRY_MS: 691200000, // 8 days
+  PWA_EXPIRY_MS: 691200000,
   PWA_RESTORE_DELAY_MS: 200,
   PWA_NAMESPACE: 'pwa_persistence',
   FORM_SELECTORS: 'select, input[type="number"]',
@@ -6075,11 +6075,11 @@ if ('serviceWorker' in navigator) {
   PWAServiceWorker.init();
 }
 const initA2HS = (() => {
-  // ===== CONFIG =====
   const CFG = {
     storage: 'a2hsDismissed',
     animDur: 300,
-    delay: 2000,
+    delay: 8000,
+    dismissExpiry: 259200000,
     app: {
       name: 'RöX Calculator',
       desc: 'Quick access, save stats & work offline',
@@ -6113,12 +6113,10 @@ const initA2HS = (() => {
     }
   };
   
-  // ===== STATE =====
   let deferredPrompt = null;
   let nativePromptTriggered = false;
   let promptCheckTimeout = null;
   
-  // ===== UTILS =====
   const createElement = (tag, cls, attrs = {}) => {
     const el = document.createElement(tag);
     if (cls) el.className = cls;
@@ -6136,23 +6134,47 @@ const initA2HS = (() => {
   };
   
   const isInstalled = () => {
-    // Only check if app is in standalone mode (installed to home screen)
     return IS_PWA;
   };
   
   const detectDevice = () => {
     const ua = navigator.userAgent.toLowerCase();
-    return /iphone|ipad|ipot/.test(ua) ? 'ios' : /android/.test(ua) ? 'android' : 'desktop';
+    return /iphone|ipad|ipod/.test(ua) ? 'ios' : /android/.test(ua) ? 'android' : 'desktop';
   };
   
-  const isDismissed = () => sessionStorage.getItem(CFG.storage) === '1';
-  const setDismissed = () => sessionStorage.setItem(CFG.storage, '1');
+  const isDismissed = () => {
+    try {
+      const data = localStorage.getItem(CFG.storage);
+      if (!data) return false;
+      
+      const { timestamp } = JSON.parse(data);
+      const now = Date.now();
+      
+      if (now - timestamp > CFG.dismissExpiry) {
+        localStorage.removeItem(CFG.storage);
+        return false;
+      }
+      
+      return true;
+    } catch (e) {
+      localStorage.removeItem(CFG.storage);
+      return false;
+    }
+  };
   
-  // ===== BUILD UI =====
+  const setDismissed = () => {
+    try {
+      localStorage.setItem(CFG.storage, JSON.stringify({
+        timestamp: Date.now()
+      }));
+    } catch (e) {
+      sessionStorage.setItem(CFG.storage, '1');
+    }
+  };
+  
   const buildUI = (device) => {
     const data = CFG.devices[device];
     
-    // Header
     const closeBtn = createElement('button', 'a2hs-close', { 'aria-label': 'Close', textContent: '×' });
     
     const img = createElement('img', '', {
@@ -6176,7 +6198,6 @@ const initA2HS = (() => {
     hdr.appendChild(closeBtn);
     hdr.appendChild(top);
     
-    // Body
     const title = createEl('p', 'a2hs-title', data.title);
     
     const btn = createElement('button', 'a2hs-btn hide');
@@ -6198,7 +6219,6 @@ const initA2HS = (() => {
     body.appendChild(btn);
     body.appendChild(ol);
     
-    // Card
     const card = createElement('div', 'a2hs-card');
     card.appendChild(hdr);
     card.appendChild(body);
@@ -6209,7 +6229,6 @@ const initA2HS = (() => {
     return { container, btn, ol, closeBtn };
   };
   
-  // ===== ACTIONS =====
   const closePrompt = (container) => {
     const card = container.firstElementChild;
     card.classList.add('a2hs-closing');
@@ -6236,7 +6255,6 @@ const initA2HS = (() => {
     steps.classList.add('hide');
   };
   
-  // ===== INIT =====
   const init = () => {
     const installed = isInstalled();
     const dismissed = isDismissed();
@@ -6259,10 +6277,8 @@ const initA2HS = (() => {
     window.addEventListener('beforeinstallprompt', (e) => handleBeforeInstall(e, btn, ol), { once: true });
   };
   
-  // ===== START WITH DELAY =====
   const start = () => {
     const execute = () => {
-      // Listen for native prompt first
       window.addEventListener('beforeinstallprompt', (e) => {
         nativePromptTriggered = true;
         deferredPrompt = e;
@@ -6271,7 +6287,6 @@ const initA2HS = (() => {
         }
       }, { once: true });
       
-      // Show custom modal after delay if native prompt didn't fire
       promptCheckTimeout = setTimeout(() => {
         if (!nativePromptTriggered && !isDismissed() && !IS_PWA) {
           init();
