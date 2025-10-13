@@ -6079,7 +6079,8 @@ const initA2HS = (() => {
   const CFG = {
     storage: 'a2hsDismissed',
     animDur: 300,
-    delay: 8000,
+    modalDelay: 8000,        // Delay sebelum modal muncul
+    promptTimeout: 10000,    // Max waktu tunggu native prompt
     dismissExpiry: 259200000,
     app: {
       name: 'RöX Calculator',
@@ -6116,6 +6117,8 @@ const initA2HS = (() => {
   
   let deferredPrompt = null;
   let installButton = null;
+  let promptReceived = false;
+  let waitingForPrompt = false;
   
   const createElement = (tag, cls, attrs = {}) => {
     const el = document.createElement(tag);
@@ -6161,6 +6164,16 @@ const initA2HS = (() => {
       return true;
     }
     
+    if (window.matchMedia('(display-mode: minimal-ui)').matches) {
+      return true;
+    }
+    
+    try {
+      if (localStorage.getItem('app_installed') === 'true') {
+        return true;
+      }
+    } catch (e) {}
+    
     return false;
   };
   
@@ -6201,12 +6214,10 @@ const initA2HS = (() => {
       localStorage.setItem(CFG.storage, JSON.stringify({
         timestamp: Date.now()
       }));
-    } catch (e) {
-      return;
-    }
+    } catch (e) {}
   };
   
-  const buildUI = (device) => {
+  const buildUI = (device, hasNativePrompt) => {
     const data = CFG.devices[device];
     
     const closeBtn = createElement('button', 'a2hs-close', { 'aria-label': 'Close', textContent: '×' });
@@ -6232,28 +6243,32 @@ const initA2HS = (() => {
     hdr.appendChild(closeBtn);
     hdr.appendChild(top);
     
-    const title = createEl('p', 'a2hs-title', data.title);
-    
-    const ol = createElement('ol', 'a2hs-steps');
-    data.steps.forEach((step, i) => {
-      const span1 = createEl('span', '', (i + 1) + '.');
-      const span2 = createElement('span');
-      span2.innerHTML = step;
-      const li = createElement('li');
-      li.appendChild(span1);
-      li.appendChild(span2);
-      ol.appendChild(li);
-    });
-    
-    const btn = createElement('button', 'a2hs-btn');
-    btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
-    
-    installButton = btn;
-    
     const body = createElement('div', 'a2hs-body');
-    body.appendChild(title);
-    body.appendChild(ol);
-    body.appendChild(btn);
+    
+    // Jika ada native prompt, tampilkan tombol Install
+    if (hasNativePrompt) {
+      const btn = createElement('button', 'a2hs-btn');
+      btn.innerHTML = '<svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Install App';
+      installButton = btn;
+      body.appendChild(btn);
+    } else {
+      // Jika tidak ada native prompt, tampilkan instruksi manual
+      const title = createEl('p', 'a2hs-title', data.title);
+      
+      const ol = createElement('ol', 'a2hs-steps');
+      data.steps.forEach((step, i) => {
+        const span1 = createEl('span', '', (i + 1) + '.');
+        const span2 = createElement('span');
+        span2.innerHTML = step;
+        const li = createElement('li');
+        li.appendChild(span1);
+        li.appendChild(span2);
+        ol.appendChild(li);
+      });
+      
+      body.appendChild(title);
+      body.appendChild(ol);
+    }
     
     const card = createElement('div', 'a2hs-card');
     card.appendChild(hdr);
@@ -6262,7 +6277,7 @@ const initA2HS = (() => {
     const container = createElement('div', 'a2hs');
     container.appendChild(card);
     
-    return { container, btn, closeBtn };
+    return { container, closeBtn };
   };
   
   const closePrompt = (container) => {
@@ -6274,6 +6289,7 @@ const initA2HS = (() => {
   
   const installApp = async () => {
     if (!deferredPrompt) {
+      console.log('No install prompt available');
       return false;
     }
     
@@ -6283,60 +6299,129 @@ const initA2HS = (() => {
       const { outcome } = await deferredPrompt.userChoice;
       
       if (outcome === 'accepted') {
+        console.log('User accepted install');
         setDismissed();
+        
+        try {
+          localStorage.setItem('app_installed', 'true');
+        } catch (e) {}
+        
         deferredPrompt = null;
         return true;
       }
       
+      console.log('User dismissed install');
       return false;
     } catch (err) {
+      console.error('Install failed:', err);
       return false;
     }
   };
   
   const setupInstallButton = () => {
-    if (installButton && deferredPrompt) {
-      installButton.addEventListener('click', async () => {
-        const success = await installApp();
-        if (success) {
-          const container = document.querySelector('.a2hs');
-          if (container) {
-            closePrompt(container);
-          }
+    if (!installButton || !deferredPrompt) return;
+    
+    installButton.addEventListener('click', async () => {
+      console.log('Install button clicked');
+      const success = await installApp();
+      if (success) {
+        const container = document.querySelector('.a2hs');
+        if (container) {
+          closePrompt(container);
         }
-      });
-    }
+      }
+    });
+    
+    console.log('Install button ready');
   };
   
-  const showManualInstructions = () => {
-    if (isInstalled()) {
+  const showPrompt = () => {
+    if (isInstalled() || isDismissed()) {
+      console.log('Skipping prompt - installed or dismissed');
       return;
     }
     
     const device = detectDevice();
-    const { container, closeBtn } = buildUI(device);
+    const hasNativePrompt = promptReceived;
+    
+    console.log('Showing prompt - Native:', hasNativePrompt, 'Device:', device);
+    
+    const { container, closeBtn } = buildUI(device, hasNativePrompt);
     
     document.body.appendChild(container);
     
-    setupInstallButton();
+    if (hasNativePrompt) {
+      setupInstallButton();
+    }
     
     closeBtn.addEventListener('click', () => closePrompt(container), { once: true });
   };
   
+  // ✅ KUNCI: Tunggu native prompt dengan timeout
+  const waitForNativePrompt = () => {
+    return new Promise((resolve) => {
+      if (promptReceived) {
+        resolve(true);
+        return;
+      }
+      
+      waitingForPrompt = true;
+      
+      const timeout = setTimeout(() => {
+        console.log('Native prompt timeout - showing manual instructions');
+        waitingForPrompt = false;
+        resolve(false);
+      }, CFG.promptTimeout);
+      
+      // Jika prompt muncul sebelum timeout
+      const checkPrompt = setInterval(() => {
+        if (promptReceived) {
+          console.log('Native prompt received before timeout');
+          clearTimeout(timeout);
+          clearInterval(checkPrompt);
+          waitingForPrompt = false;
+          resolve(true);
+        }
+      }, 100);
+    });
+  };
+  
   const start = () => {
-    if (isInstalled()) {
+    // Jangan jalankan di incognito
+    if (!isLocalStorageAvailable()) {
+      console.log('Incognito mode detected, A2HS disabled');
       return;
     }
     
+    if (isInstalled()) {
+      console.log('App already installed');
+      return;
+    }
+    
+    // Setup beforeinstallprompt listener
     window.addEventListener('beforeinstallprompt', (e) => {
+      console.log('beforeinstallprompt event fired');
       e.preventDefault();
       deferredPrompt = e;
+      promptReceived = true;
       
-      setupInstallButton();
+      // Jika modal sudah muncul dengan instruksi manual, update ke tombol install
+      const existingModal = document.querySelector('.a2hs');
+      if (existingModal && !installButton) {
+        console.log('Updating modal to show install button');
+        existingModal.remove();
+        showPrompt();
+      }
     });
     
+    // Handle app installation
     window.addEventListener('appinstalled', () => {
+      console.log('App installed successfully');
       setDismissed();
+      
+      try {
+        localStorage.setItem('app_installed', 'true');
+      } catch (e) {}
       
       const container = document.querySelector('.a2hs');
       if (container) {
@@ -6344,16 +6429,27 @@ const initA2HS = (() => {
       }
     });
     
-    const execute = () => {
+    const execute = async () => {
+      if (isInstalled() || isDismissed()) {
+        console.log('Skipping - installed or dismissed');
+        return;
+      }
+      
+      // Tunggu delay modal
+      await new Promise(resolve => setTimeout(resolve, CFG.modalDelay));
+      
       if (isInstalled() || isDismissed()) {
         return;
       }
       
-      setTimeout(() => {
-        if (!isInstalled() && !isDismissed()) {
-          showManualInstructions();
-        }
-      }, CFG.delay);
+      // ✅ KUNCI: Tunggu native prompt dengan timeout
+      console.log('Waiting for native prompt...');
+      await waitForNativePrompt();
+      
+      // Tampilkan modal sesuai hasil
+      if (!isInstalled() && !isDismissed()) {
+        showPrompt();
+      }
     };
     
     if (document.readyState === 'loading') {
