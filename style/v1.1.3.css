@@ -48,6 +48,7 @@ html {
   font-size: 100%;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
+  scrollbar-width: none;
 }
 
 body {
@@ -64,6 +65,12 @@ body {
   -webkit-overflow-scrolling: touch;
   -webkit-tap-highlight-color: transparent;
   -ms-scroll-chaining: none;
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar,  
+body::-webkit-scrollbar {
+  display: none;
 }
 
 /* Typography */
@@ -1571,6 +1578,11 @@ td.delta:hover {
   transition: .3s;
   -webkit-animation: .3s fadeInUp;
   animation: .3s fadeInUp;
+  scrollbar-width: none;
+}
+
+.changelog::-webkit-scrollbar {
+  display: none;
 }
 
 #log .changelog:hover {
