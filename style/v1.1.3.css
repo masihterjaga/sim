@@ -1336,6 +1336,7 @@ td.delta:hover {
   transform: translateX(-50%) translateY(0);
   -webkit-animation: .4s snackbarBounce;
   animation: .4s snackbarBounce;
+  z-index: 999999999;
 }
 
 /* Tooltip */
