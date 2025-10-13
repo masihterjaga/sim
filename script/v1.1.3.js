@@ -6278,25 +6278,23 @@ const initA2HS = (() => {
   };
   
   const start = () => {
-    try {
-      localStorage.setItem('incognito', '1');
-      localStorage.removeItem('incognito');
-    } catch (e) {
-      return;
-    }
     const execute = () => {
-      window.addEventListener('beforeinstallprompt', (e) => {
-        nativePromptTriggered = true;
-        deferredPrompt = e;
-        if (promptCheckTimeout) {
-          clearTimeout(promptCheckTimeout);
-        }
-      }, { once: true });
+      // Test incognito mode
+      try {
+        localStorage.setItem('_test', '1');
+        localStorage.removeItem('_test');
+      } catch (e) {
+        return; // Incognito, stop
+      }
       
+      // Jangan tampilkan kalau sudah installed atau dismissed
+      if (isInstalled() || isDismissed()) {
+        return;
+      }
+      
+      // Timeout untuk tampilkan modal
       promptCheckTimeout = setTimeout(() => {
-        if (!nativePromptTriggered) {
-          init();
-        }
+        init();
       }, CFG.delay);
     };
     
