@@ -6278,7 +6278,7 @@ function resetAllData() {
     RandomGenerator.reset();
   }
   
-  clearPWAStorage();
+  localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
   
   AppState.reset();
   ResetHelpers.clearDebounceTimers();
