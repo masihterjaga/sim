@@ -6171,23 +6171,18 @@ const initA2HS = (() => {
     if (window.matchMedia('(display-mode: standalone)').matches) {
       result = true;
     }
-    
     else if (window.navigator.standalone === true) {
       result = true;
     }
-    
     else if (document.referrer.includes('android-app://')) {
       result = true;
     }
-    
     else if (window.matchMedia('(display-mode: fullscreen)').matches) {
       result = true;
     }
-    
     else if (window.matchMedia('(display-mode: minimal-ui)').matches) {
       result = true;
     }
-    
     else if (isLocalStorageAvailable()) {
       try {
         if (localStorage.getItem('app_installed') === 'true') {
@@ -6360,10 +6355,6 @@ const initA2HS = (() => {
   };
   
   const showPrompt = () => {
-    if (isInstalled() || isDismissed()) {
-      return;
-    }
-    
     const device = detectDevice();
     const hasNativePrompt = promptReceived;
     
@@ -6442,31 +6433,19 @@ const initA2HS = (() => {
     });
     
     const execute = async () => {
-      if (isInstalled()) {
-        return;
-      }
-      
-      if (isDismissed()) {
+      if (isInstalled() || isDismissed()) {
         return;
       }
       
       await new Promise(resolve => setTimeout(resolve, CFG.modalDelay));
       
-      if (isInstalled()) {
-        return;
-      }
-      
-      if (isDismissed()) {
+      if (isInstalled() || isDismissed()) {
         return;
       }
       
       await waitForNativePrompt();
       
-      if (isInstalled()) {
-        return;
-      }
-      
-      if (isDismissed()) {
+      if (isInstalled() || isDismissed()) {
         return;
       }
       
