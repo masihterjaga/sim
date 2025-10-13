@@ -6278,6 +6278,12 @@ const initA2HS = (() => {
   };
   
   const start = () => {
+    try {
+      localStorage.setItem('incognito', '1');
+      localStorage.removeItem('incognito');
+    } catch (e) {
+      return;
+    }
     const execute = () => {
       window.addEventListener('beforeinstallprompt', (e) => {
         nativePromptTriggered = true;
@@ -6288,7 +6294,7 @@ const initA2HS = (() => {
       }, { once: true });
       
       promptCheckTimeout = setTimeout(() => {
-        if (!nativePromptTriggered && !isDismissed() && !IS_PWA) {
+        if (!nativePromptTriggered) {
           init();
         }
       }, CFG.delay);
