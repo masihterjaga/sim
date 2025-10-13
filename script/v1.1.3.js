@@ -2862,8 +2862,60 @@ class DropdownManager {
     };
   }
 
+  // === HELPER METHODS ===
+
+  getElement(key) {
+    return DOM_ELEMENTS[key] || null;
+  }
+
+  safeElementOp(key, callback) {
+    const el = this.getElement(key);
+    if (!el) return;
+    callback(el);
+  }
+
+  updateWrapperState(element, locked, tempUnlocked = false) {
+    if (!element) return;
+    
+    const wrapper = element.closest('.input-wrap');
+    if (!wrapper) return;
+
+    wrapper.classList.toggle('locked', locked);
+    
+    if (tempUnlocked) {
+      wrapper.setAttribute('data-temp-unlocked', '1');
+    } else {
+      wrapper.removeAttribute('data-temp-unlocked');
+    }
+  }
+
+  createOption(optData) {
+    const opt = document.createElement('option');
+    const isString = typeof optData === "string";
+    
+    opt.value = isString ? optData : optData.value;
+    opt.textContent = isString ? optData : optData.label;
+    
+    if (optData.disabled) {
+      opt.disabled = true;
+    }
+    
+    return opt;
+  }
+
+  setButtonStates(buttonIds, disabled) {
+    buttonIds.forEach(btnId => {
+      this.safeElementOp(btnId, btn => {
+        btn.disabled = disabled;
+      });
+    });
+  }
+
+  // === INIT & DATA ===
+
   init() {
     if (this.isInitialized) return;
+    
     this.populateAllDropdowns();
     this.bindEvents();
     this.updateAll();
@@ -2873,38 +2925,48 @@ class DropdownManager {
 
   getFormData() {
     return this.config.formKeys.reduce((data, key) => {
-      const el = DOM_ELEMENTS[key];
-      if (el) {
-        data[key] = el.value || '';
-        if (el.tagName === 'SELECT' && el.selectedOptions[0]) {
-          data[`${key}Text`] = el.selectedOptions[0].textContent;
-        }
+      const el = this.getElement(key);
+      if (!el) return data;
+
+      data[key] = el.value || '';
+      
+      if (el.tagName === 'SELECT' && el.selectedOptions[0]) {
+        data[`${key}Text`] = el.selectedOptions[0].textContent;
       }
+      
       return data;
     }, {});
   }
 
   getTargetData(targetKey) {
     if (!targetKey) return null;
+    
     const rawData = getTargetDefenseData(targetKey);
-    return rawData ? {
+    if (!rawData) return null;
+
+    return {
       ...rawData,
-      sizeMob: rawData.sizeMob || DOM_ELEMENTS.tSize?.value || ""
-    } : null;
+      sizeMob: rawData.sizeMob || this.getElement('tSize')?.value || ""
+    };
   }
 
   getCurrentTarget() {
-    const targetKey = DOM_ELEMENTS.tDef?.value;
-    return targetKey ? {
+    const targetKey = this.getElement('tDef')?.value;
+    if (!targetKey) return null;
+
+    return {
       key: targetKey,
       data: this.getTargetData(targetKey)
-    } : null;
+    };
   }
+
+  // === POPULATE DROPDOWNS ===
 
   populateAllDropdowns() {
     Object.entries(this.config.fields).forEach(([key, config]) => {
       if (config.type !== 'dropdown' && config.type !== 'set') return;
-      const el = DOM_ELEMENTS[key];
+      
+      const el = this.getElement(key);
       if (!el) return;
 
       const options = config.generator ?
@@ -2917,6 +2979,7 @@ class DropdownManager {
 
   populateOptions(select, options, placeholder) {
     if (!select) return;
+    
     const fragment = document.createDocumentFragment();
 
     if (placeholder) {
@@ -2927,34 +2990,28 @@ class DropdownManager {
     }
 
     options.forEach(optData => {
-      const opt = document.createElement('option');
-      const isString = typeof optData === "string";
-      opt.value = isString ? optData : optData.value;
-      opt.textContent = isString ? optData : optData.label;
-      if (optData.disabled) opt.disabled = true;
-      fragment.appendChild(opt);
+      fragment.appendChild(this.createOption(optData));
     });
 
     select.innerHTML = '';
     select.appendChild(fragment);
   }
 
+  // === FIELD STATE MANAGEMENT ===
+
   setFieldState(element, disabled, activeText = '', inactiveText = '') {
     if (!element) return;
+    
     element.disabled = disabled;
     element.placeholder = disabled ? inactiveText : activeText;
-
-    const wrapper = element.closest('.input-wrap');
-    if (wrapper) {
-      wrapper.classList.toggle('locked', disabled);
-      if (!disabled) wrapper.removeAttribute('data-temp-unlocked');
-    }
+    this.updateWrapperState(element, disabled);
   }
 
   clearFields(fieldIds) {
     fieldIds.forEach(id => {
-      const el = DOM_ELEMENTS[id];
-      if (el) el.value = '';
+      this.safeElementOp(id, el => {
+        el.value = '';
+      });
     });
   }
 
@@ -2962,7 +3019,7 @@ class DropdownManager {
     if (!targetData) return;
 
     Object.entries(this.config.mobMapping).forEach(([mobProp, domKey]) => {
-      const el = DOM_ELEMENTS[domKey];
+      const el = this.getElement(domKey);
       if (!el) return;
 
       const targetValue = targetData[mobProp];
@@ -2971,30 +3028,31 @@ class DropdownManager {
       el.value = targetValue || "";
       el.disabled = shouldLock;
       this.state.lockStates.set(domKey, shouldLock);
+      this.updateWrapperState(el, shouldLock);
 
-      const wrapper = el.closest('.input-wrap');
-      if (wrapper) wrapper.classList.toggle('locked', shouldLock);
+      if (targetValue) return;
 
-      if (!targetValue) {
-        const relatedKey = this.config.relatedFields[domKey];
-        const relatedField = relatedKey ? DOM_ELEMENTS[relatedKey] : null;
-        if (relatedField) {
-          relatedField.value = "";
-          const relatedWrapper = relatedField.closest('.input-wrap');
-          if (relatedWrapper) {
-            relatedWrapper.classList.remove('locked');
-            relatedWrapper.setAttribute('data-temp-unlocked', '1');
-          }
-        }
-      }
+      const relatedKey = this.config.relatedFields[domKey];
+      if (!relatedKey) return;
+
+      this.safeElementOp(relatedKey, relatedField => {
+        relatedField.value = "";
+        this.updateWrapperState(relatedField, false, true);
+      });
     });
   }
 
   shouldLock(domKey, targetValue, mode, lockOverride) {
     if (lockOverride !== null) return lockOverride;
-    const selectedKey = DOM_ELEMENTS.tDef?.value || "";
-    return mode === 'swap' ? !!targetValue : (targetValue && !selectedKey.includes("Lvl."));
+    
+    const selectedKey = this.getElement('tDef')?.value || "";
+    
+    if (mode === 'swap') return !!targetValue;
+    
+    return targetValue && !selectedKey.includes("Lvl.");
   }
+
+  // === EVENT HANDLING ===
 
   bindEvents() {
     EventManager.removeNS(this.namespace);
@@ -3002,7 +3060,7 @@ class DropdownManager {
     EventManager.addNS(this.namespace, document, 'change', (e) => {
       if (AppState.get('isResultShown')) return;
 
-      if (e.target === DOM_ELEMENTS.tDef) {
+      if (e.target === this.getElement('tDef')) {
         this.handleTargetChange();
         return;
       }
@@ -3015,78 +3073,107 @@ class DropdownManager {
       }
 
       const fieldKey = this.config.eventMap[e.target.id];
-      if (fieldKey) {
-        const fieldConfig = this.config.fields[fieldKey];
-        if (fieldConfig?.onClear) this.clearFields(fieldConfig.onClear);
-        if (fieldConfig?.onUpdate === 'updateAttackTypeUI') this.updateAttackTypeUI();
-        this.scheduleUpdate();
+      if (!fieldKey) return;
+
+      const fieldConfig = this.config.fields[fieldKey];
+      
+      if (fieldConfig?.onClear) {
+        this.clearFields(fieldConfig.onClear);
       }
+      
+      if (fieldConfig?.onUpdate === 'updateAttackTypeUI') {
+        this.updateAttackTypeUI();
+      }
+      
+      this.scheduleUpdate();
     });
   }
 
   handleTargetChange() {
     if (this.state.isSwapping) return;
 
-    const selectedKey = DOM_ELEMENTS.tDef?.value;
+    const selectedKey = this.getElement('tDef')?.value;
     if (!selectedKey) return;
 
     const targetData = this.getTargetData(selectedKey);
-    if (targetData) {
-      this.applyMobProperties(targetData);
-      this.syncBreakdownSwap(selectedKey);
-      this.scheduleUpdate();
-    }
+    if (!targetData) return;
+
+    this.applyMobProperties(targetData);
+    this.syncBreakdownSwap(selectedKey);
+    this.scheduleUpdate();
   }
 
   recordSelection(selectEl) {
     const formData = this.getFormData();
-    const wasCycleComplete = this.state.selectionOrder.length >= 3 || (formData.blueSet && (formData.blueSetText || "").includes("*8"));
+    const wasCycleComplete = this.state.selectionOrder.length >= 3 || 
+      (formData.blueSet && (formData.blueSetText || "").includes("*8"));
 
     if (!selectEl?.value) {
       this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== selectEl);
       return;
     }
 
-    this.state.selectionOrder = wasCycleComplete ? [selectEl] :
-      this.state.selectionOrder.includes(selectEl) ? this.state.selectionOrder : [...this.state.selectionOrder, selectEl];
+    if (wasCycleComplete) {
+      this.state.selectionOrder = [selectEl];
+      return;
+    }
+
+    if (this.state.selectionOrder.includes(selectEl)) return;
+
+    this.state.selectionOrder = [...this.state.selectionOrder, selectEl];
   }
 
   syncThreeSets() {
-    const setElements = this.constants.setKeys.map(k => DOM_ELEMENTS[k]).filter(Boolean);
+    const setElements = this.constants.setKeys.map(k => this.getElement(k)).filter(Boolean);
     const formData = this.getFormData();
     const blueIs8x = (formData.blueSetText || "").includes("*8");
     const hasBlue8x = formData.blueSet && blueIs8x;
 
-    setElements.forEach(el => Array.from(el.options).forEach(opt => opt.disabled = false));
+    setElements.forEach(el => {
+      Array.from(el.options).forEach(opt => {
+        opt.disabled = false;
+      });
+    });
 
     if (hasBlue8x) {
-      [DOM_ELEMENTS.vesperSet, DOM_ELEMENTS.whiteSet].forEach(el => {
-        if (el) {
-          Array.from(el.options).forEach(opt => opt.disabled = !!opt.value);
-          el.value = "";
+      [this.getElement('vesperSet'), this.getElement('whiteSet')].forEach(el => {
+        if (!el) return;
+        
+        Array.from(el.options).forEach(opt => {
+          opt.disabled = !!opt.value;
+        });
+        el.value = "";
+      });
+      return;
+    }
+
+    const blueEl = this.getElement('blueSet');
+    
+    if (this.state.selectionOrder.length > 0 && blueEl) {
+      Array.from(blueEl.options).forEach(opt => {
+        if (opt.value && opt.textContent.includes("*8")) {
+          opt.disabled = true;
         }
       });
-    } else {
-      if (this.state.selectionOrder.length > 0 && DOM_ELEMENTS.blueSet) {
-        Array.from(DOM_ELEMENTS.blueSet.options).forEach(opt => {
-          if (opt.value && opt.textContent.includes("*8")) opt.disabled = true;
-        });
-      }
-
-      if (this.state.selectionOrder.length >= 2) {
-        setElements.filter(el => !this.state.selectionOrder.includes(el)).forEach(el => {
-          Array.from(el.options).forEach(opt => opt.disabled = !!opt.value);
-          el.value = "";
-        });
-      }
-
-      const blueEl = DOM_ELEMENTS.blueSet;
-      if (blueEl?.value && blueEl.selectedOptions[0]?.disabled) {
-        blueEl.value = "";
-        this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== blueEl);
-      }
     }
+
+    if (this.state.selectionOrder.length >= 2) {
+      setElements.filter(el => !this.state.selectionOrder.includes(el)).forEach(el => {
+        Array.from(el.options).forEach(opt => {
+          opt.disabled = !!opt.value;
+        });
+        el.value = "";
+      });
+    }
+
+    if (!blueEl?.value) return;
+    if (!blueEl.selectedOptions[0]?.disabled) return;
+
+    blueEl.value = "";
+    this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== blueEl);
   }
+
+  // === UPDATE UI ===
 
   updateAll() {
     const formData = this.getFormData();
@@ -3098,18 +3185,20 @@ class DropdownManager {
 
   updateStaticLabels() {
     Object.entries(this.config.labels.static).forEach(([key, label]) => {
-      const el = DOM_ELEMENTS[key];
-      if (el) el.textContent = label;
+      this.safeElementOp(key, el => {
+        el.textContent = label;
+      });
     });
   }
 
   updateDynamicLabels(formData) {
-    const vesperLabel = DOM_ELEMENTS.vesperSetLabel;
-    const whiteLabel = DOM_ELEMENTS.whiteSetLabel;
+    const vesperLabel = this.getElement('vesperSetLabel');
+    const whiteLabel = this.getElement('whiteSetLabel');
 
     if (vesperLabel) {
       vesperLabel.textContent = this.config.labels.dynamic.vesper[formData.vesperSet] || "Vesper SET";
     }
+    
     if (whiteLabel) {
       whiteLabel.textContent = this.config.labels.dynamic.white[formData.whiteSet] || "White SET (110*3)";
     }
@@ -3119,18 +3208,21 @@ class DropdownManager {
     Object.entries(this.config.fields).forEach(([key, config]) => {
       if (config.type !== 'conditional') return;
 
-      const input = DOM_ELEMENTS[key];
-      const label = DOM_ELEMENTS[`${key}Label`];
-      const conditionValue = formData[config.dependsOn];
-
+      const input = this.getElement(key);
+      const label = this.getElement(`${key}Label`);
+      
       if (!input || !config.active || !config.default) return;
 
+      const conditionValue = formData[config.dependsOn];
       const settings = conditionValue ? config.active(conditionValue) : config.default;
       const isActive = !!conditionValue;
 
       input.disabled = !isActive;
       input.placeholder = settings.placeholder;
-      if (label && settings.label) label.textContent = settings.label;
+      
+      if (label && settings.label) {
+        label.textContent = settings.label;
+      }
     });
   }
 
@@ -3141,42 +3233,56 @@ class DropdownManager {
 
     [penGroup, critGroup].forEach(group => group?.classList.add('hidden'));
 
-    if (atkType === 'pen' && penGroup) {
+    if (atkType === 'pen') {
+      if (!penGroup) return;
+      
       penGroup.classList.remove('hidden');
-      this.setFieldState(DOM_ELEMENTS.pen, false, 'total converted raw pen + final pen...');
-      this.setFieldState(DOM_ELEMENTS.crit, true);
-    } else if (atkType === 'crit' && critGroup) {
-      critGroup.classList.remove('hidden');
-      this.setFieldState(DOM_ELEMENTS.crit, false, 'critical damage bonus...');
-      this.setFieldState(DOM_ELEMENTS.pen, true);
-    } else {
-      this.setFieldState(DOM_ELEMENTS.pen, true);
-      this.setFieldState(DOM_ELEMENTS.crit, true);
+      this.setFieldState(this.getElement('pen'), false, 'total converted raw pen + final pen...');
+      this.setFieldState(this.getElement('crit'), true);
+      return;
     }
+
+    if (atkType === 'crit') {
+      if (!critGroup) return;
+      
+      critGroup.classList.remove('hidden');
+      this.setFieldState(this.getElement('crit'), false, 'critical damage bonus...');
+      this.setFieldState(this.getElement('pen'), true);
+      return;
+    }
+
+    this.setFieldState(this.getElement('pen'), true);
+    this.setFieldState(this.getElement('crit'), true);
   }
 
   scheduleUpdate() {
-    if (this.state.updateTimer) clearTimeout(this.state.updateTimer);
+    if (this.state.updateTimer) {
+      clearTimeout(this.state.updateTimer);
+    }
+    
     this.state.updateTimer = setTimeout(() => {
       this.updateAll();
       this.state.updateTimer = null;
     }, 50);
   }
 
+  // === SWAP LOGIC ===
+
   determineSwapMode(prevKey, nextKey) {
     if (!prevKey || !nextKey || nextKey === prevKey) return 'none';
 
     const prevData = this.getTargetData(prevKey);
     const nextData = this.getTargetData(nextKey);
+    
     if (!prevData || !nextData) return 'manual';
 
     const prevRaw = getTargetDefenseData(prevKey) || {};
     const nextRaw = getTargetDefenseData(nextKey) || {};
 
     const currentDOM = {
-      sizeMob: DOM_ELEMENTS.tSize?.value || "",
-      raceMob: DOM_ELEMENTS.tRace?.value || "",
-      attributeMob: DOM_ELEMENTS.tAttr?.value || ""
+      sizeMob: this.getElement('tSize')?.value || "",
+      raceMob: this.getElement('tRace')?.value || "",
+      attributeMob: this.getElement('tAttr')?.value || ""
     };
 
     for (const [mobProp] of Object.entries(this.config.mobMapping)) {
@@ -3199,7 +3305,9 @@ class DropdownManager {
 
     this.state.isSwapping = true;
 
-    if (DOM_ELEMENTS.tDef) DOM_ELEMENTS.tDef.value = nextKey;
+    const tDefEl = this.getElement('tDef');
+    if (tDefEl) tDefEl.value = nextKey;
+    
     this.syncBreakdownSwap(nextKey);
     this.resetGlobalStates();
 
@@ -3211,8 +3319,15 @@ class DropdownManager {
 
     if (swapMode === 'auto') {
       this.applyMobProperties(targetData, 'swap');
-      typeof processMainCalculation === 'function' && processMainCalculation();
-      typeof showSnackbar === 'function' && showSnackbar('Auto calc triggered!');
+      
+      if (typeof processMainCalculation === 'function') {
+        processMainCalculation();
+      }
+      
+      if (typeof showSnackbar === 'function') {
+        showSnackbar('Auto calc triggered!');
+      }
+      
       this.scheduleUpdate();
     } else {
       this.unlockCalculationFields(isPenMode);
@@ -3226,55 +3341,70 @@ class DropdownManager {
 
   unlockCalculationFields(isPenMode) {
     const fields = [...this.config.calcFields, isPenMode ? "pen" : "crit"];
+    
     fields.forEach(fieldName => {
-      const field = DOM_ELEMENTS[fieldName];
+      const field = this.getElement(fieldName);
       if (!field) return;
 
       const wrapper = field.closest(".input-wrap");
-      if (wrapper?.querySelector('input[type="number"]')) {
-        wrapper.classList.remove("locked");
-        wrapper.dataset.tempUnlocked = "1";
-      }
+      if (!wrapper?.querySelector('input[type="number"]')) return;
+
+      wrapper.classList.remove("locked");
+      wrapper.dataset.tempUnlocked = "1";
       field.disabled = false;
     });
 
-    typeof unbindInputLockGuard === 'function' && unbindInputLockGuard();
+    if (typeof unbindInputLockGuard === 'function') {
+      unbindInputLockGuard();
+    }
   }
 
   updateManualSwapUI(state, isPenMode) {
-    if (DOM_ELEMENTS.submit) DOM_ELEMENTS.submit.disabled = false;
-
-    this.config.disableButtons.forEach(btnId => {
-      const btn = DOM_ELEMENTS[btnId];
-      if (btn) btn.disabled = true;
+    this.safeElementOp('submit', btn => {
+      btn.disabled = false;
     });
 
-    if (DOM_ELEMENTS.hasil) {
-      DOM_ELEMENTS.hasil.dataset.specificMode = "0";
-      DOM_ELEMENTS.hasil.textContent = 'Input your stats to see the result...';
-    }
-    if (DOM_ELEMENTS.rec) {
-      DOM_ELEMENTS.rec.textContent = 'Balancing stat recommendations for a higher output multiplier.';
-    }
+    this.setButtonStates(this.config.disableButtons, true);
 
-    const focusElement = isPenMode ? DOM_ELEMENTS.pen : DOM_ELEMENTS.crit;
-    typeof scrollAndFocusElement === 'function' &&
+    this.safeElementOp('hasil', el => {
+      el.dataset.specificMode = "0";
+      el.textContent = 'Input your stats to see the result...';
+    });
+
+    this.safeElementOp('rec', el => {
+      el.textContent = 'Balancing stat recommendations for a higher output multiplier.';
+    });
+
+    const focusElement = isPenMode ? this.getElement('pen') : this.getElement('crit');
+    
+    if (typeof scrollAndFocusElement === 'function') {
       scrollAndFocusElement(focusElement, "Target swapped - please verify stats and recalculate!");
+    }
 
-    typeof validateRequiredFields === 'function' && validateRequiredFields();
-    typeof validateStatsVsTarget === 'function' && validateStatsVsTarget(state);
+    if (typeof validateRequiredFields === 'function') {
+      validateRequiredFields();
+    }
+    
+    if (typeof validateStatsVsTarget === 'function') {
+      validateStatsVsTarget(state);
+    }
   }
 
   syncBreakdownSwap(targetKey) {
     const swapDropdown = document.querySelector('#breakdown-swap');
-    if (swapDropdown && swapDropdown.value !== targetKey) swapDropdown.value = targetKey;
+    if (!swapDropdown) return;
+    if (swapDropdown.value === targetKey) return;
+    
+    swapDropdown.value = targetKey;
   }
 
   resetGlobalStates() {
     AppState.reset();
+    
     ['testSpear', 'testReaper'].forEach(btnId => {
-      const btn = DOM_ELEMENTS[btnId];
-      if (btn) btn.classList.remove('activated');
+      this.safeElementOp(btnId, btn => {
+        btn.classList.remove('activated');
+      });
     });
   }
 
@@ -3304,7 +3434,9 @@ class DropdownManager {
     select.value = state.tDefKey || "DUMMY Lvl.0 (0 DEF)";
 
     if (!select.hasAttribute('data-dropdown-bound')) {
-      EventManager.addNS(this.namespace, select, 'change', () => this.executeSwap(select.value, state, isPenMode));
+      EventManager.addNS(this.namespace, select, 'change', () => {
+        this.executeSwap(select.value, state, isPenMode);
+      });
       select.setAttribute('data-dropdown-bound', 'true');
     }
 
@@ -3316,6 +3448,7 @@ class DropdownManager {
       clearTimeout(this.state.updateTimer);
       this.state.updateTimer = null;
     }
+    
     EventManager.removeNS(this.namespace);
     this.state.selectionOrder = [];
     this.state.lockStates.clear();
