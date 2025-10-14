@@ -6259,51 +6259,52 @@ const initA2HS = (() => {
     if (!deviceType || (deviceType === 'android' && !state.promptReceived)) return;
     
     const { container, closeBtn } = buildModal(deviceType);
-    const namespace = 'a2hs-modal';
     
     document.body.appendChild(container);
     
+    console.log('[A2HS] Modal shown, closeBtn:', closeBtn);
+    
     // Wait for DOM to be ready
-    requestAnimationFrame(() => {
+    setTimeout(() => {
+      console.log('[A2HS] Setting up listeners');
+      
       // Close button handler - DISMISS (3 days)
       const closeBtnHandler = (e) => {
+        console.log('[A2HS] Close button clicked!');
         e.preventDefault();
         e.stopPropagation();
         closeModalDismiss(container);
-        EventManager.removeNS(namespace);
       };
-      EventManager.addNS(namespace, closeBtn, 'click', closeBtnHandler);
-      EventManager.addNS(namespace, closeBtn, 'touchend', closeBtnHandler);
+      
+      closeBtn.addEventListener('click', closeBtnHandler);
+      closeBtn.addEventListener('touchend', closeBtnHandler);
+      
+      console.log('[A2HS] Close button listeners attached');
       
       // Install button handler
       if (state.installButton) {
-        EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
+        state.installButton.addEventListener('click', async (e) => {
+          console.log('[A2HS] Install button clicked!');
           e.preventDefault();
           e.stopPropagation();
           if (await triggerInstall()) {
-            EventManager.removeNS(namespace);
             closeModalVisual(container);
           }
         });
+        console.log('[A2HS] Install button listener attached');
       }
       
       // Backdrop handler - CLOSE visual only (no dismiss)
-      EventManager.addNS(namespace, container, 'mousedown', (e) => {
+      container.addEventListener('click', (e) => {
+        console.log('[A2HS] Container clicked, target:', e.target, 'container:', container);
         if (e.target === container) {
-          e.preventDefault();
-          EventManager.removeNS(namespace);
+          console.log('[A2HS] Backdrop clicked! Closing...');
           closeModalVisual(container);
         }
       });
       
-      EventManager.addNS(namespace, container, 'touchstart', (e) => {
-        if (e.target === container) {
-          e.preventDefault();
-          EventManager.removeNS(namespace);
-          closeModalVisual(container);
-        }
-      });
-    });
+      console.log('[A2HS] Backdrop listener attached');
+    }, 100);
   };
   
   // Events
