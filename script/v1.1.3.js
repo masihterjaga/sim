@@ -6265,15 +6265,21 @@ const initA2HS = (() => {
     
     // Wait for DOM to be ready
     requestAnimationFrame(() => {
-      // Install button handler
-      if (state.installButton) {
-        EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
+      // Backdrop handler - CLOSE visual only (no dismiss)
+      EventManager.addNS(namespace, container, 'click', (e) => {
+        if (e.target === container) {
           e.preventDefault();
           e.stopPropagation();
-          if (await triggerInstall()) {
-            const modal = document.querySelector('.a2hs');
-            if (modal) closeModalVisual(modal);
-          }
+          closeModalVisual(container);
+          EventManager.removeNS(namespace);
+        }
+      });
+      
+      // Prevent card clicks from bubbling to backdrop
+      const card = container.querySelector('.a2hs-card');
+      if (card) {
+        EventManager.addNS(namespace, card, 'click', (e) => {
+          e.stopPropagation();
         });
       }
       
@@ -6285,13 +6291,17 @@ const initA2HS = (() => {
         EventManager.removeNS(namespace);
       });
       
-      // Backdrop handler - CLOSE visual only (no dismiss)
-      EventManager.addNS(namespace, container, 'click', (e) => {
-        if (e.target === container) {
-          closeModalVisual(container);
-          EventManager.removeNS(namespace);
-        }
-      });
+      // Install button handler
+      if (state.installButton) {
+        EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (await triggerInstall()) {
+            const modal = document.querySelector('.a2hs');
+            if (modal) closeModalVisual(modal);
+          }
+        });
+      }
     });
   };
   
