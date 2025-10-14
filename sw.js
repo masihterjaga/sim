@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.0';
+const CACHE_NAME = 'rox-calc-v1.1';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
@@ -24,42 +24,48 @@ const urlsToCache = [
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-    .then(cache => {
-      return cache.addAll(urlsToCache);
-    })
-    .catch(err => console.error('[SW] Failed to cache:', err))
-  );
-});
-
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request)
-    .then(response => response || fetch(event.request).then(fetchResponse => {
-      if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-        return fetchResponse;
-      }
-      
-      const responseToCache = fetchResponse.clone();
-      caches.open(CACHE_NAME).then(cache => cache.put(event.request, responseToCache));
-      
-      return fetchResponse;
-    }))
+    .then(cache => cache.addAll(urlsToCache))
   );
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys()
-    .then(names => {
-      return Promise.all(
-        names.filter(name => name !== CACHE_NAME)
-        .map(name => {
-          return caches.delete(name);
+    .then(names => Promise.all(
+      names.filter(name => name !== CACHE_NAME)
+      .map(name => caches.delete(name))
+    ))
+    .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
+    return;
+  }
+  
+  event.respondWith(
+    caches.match(event.request)
+    .then(response => {
+      if (response) return response;
+      
+      return fetch(event.request)
+        .then(fetchResponse => {
+          if (!fetchResponse || fetchResponse.status !== 200) {
+            return fetchResponse;
+          }
+          
+          if (fetchResponse.type === 'basic' || fetchResponse.type === 'cors') {
+            const responseToCache = fetchResponse.clone();
+            caches.open(CACHE_NAME)
+              .then(cache => cache.put(event.request, responseToCache));
+          }
+          
+          return fetchResponse;
         })
-      );
+        .catch(() => caches.match(event.request));
     })
   );
-  self.clients.claim();
 });
 
 self.addEventListener('message', event => {
