@@ -5932,10 +5932,9 @@ const mainButtonEvent = (() => {
   });
 })();
 
-// ========== PWA ==========
-const isPWAMode = () => 
-  window.matchMedia('(display-mode: standalone)').matches || 
-  window.navigator.standalone === true;
+// ======== PWA ========
+const PWA_MEDIA = window.matchMedia('(display-mode: standalone)');
+const isPWAMode = () => PWA_MEDIA.matches || window.navigator.standalone === true;
 const IS_PWA = isPWAMode();
 const CONSTANTS = {
   PWA_STORAGE_KEY: 'pwa_snap',
@@ -5943,16 +5942,54 @@ const CONSTANTS = {
   PWA_RESTORE_DELAY_MS: 200,
   PWA_NAMESPACE: 'pwa_persistence',
   FORM_SELECTORS: 'select, input[type="number"]',
-  SCROLL_OFFSET: 80,
-  SNACKBAR_DELAY: 300,
   SW_UPDATE_CHECK_DELAY: 500
 };
+const PWAUtils = (() => {
+  const scheduleTask = (fn, delay = 0) => {
+    if ('requestIdleCallback' in window && delay === 0) {
+      requestIdleCallback(fn, { timeout: 100 });
+    } else {
+      setTimeout(fn, delay);
+    }
+  };
+
+  const safeJSONParse = (str, fallback = null) => {
+    try {
+      return JSON.parse(str);
+    } catch {
+      return fallback;
+    }
+  };
+
+  const safeJSONStringify = (obj) => {
+    try {
+      return JSON.stringify(obj);
+    } catch {
+      return null;
+    }
+  };
+
+  const checkDisplayMode = (modes) => 
+    modes.some(mode => window.matchMedia(`(display-mode: ${mode})`).matches);
+
+  const debounce = (fn, ms) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => fn(...args), ms);
+    };
+  };
+
+  return { scheduleTask, safeJSONParse, safeJSONStringify, checkDisplayMode, debounce };
+})();
 if ('serviceWorker' in navigator) {
   const PWAServiceWorker = (() => {
-    let updatePromptShown = false;
-    let pendingUpdate = false;
-    let isReloading = false;
-    let waitingWorker = null;
+    const state = {
+      updatePromptShown: false,
+      pendingUpdate: false,
+      isReloading: false,
+      waitingWorker: null
+    };
     
     const saveState = () => 
       typeof AppState !== 'undefined' && AppState.get('isResultShown') 
@@ -5960,34 +5997,32 @@ if ('serviceWorker' in navigator) {
         : false;
     
     const reloadApp = (cacheVersion) => {
-      if (isReloading) return;
-      isReloading = true;
+      if (state.isReloading) return;
+      state.isReloading = true;
       
       localStorage.setItem('app_cache_version', cacheVersion);
       saveState();
       
       requestAnimationFrame(() => {
-        if (waitingWorker) {
-          waitingWorker.postMessage({ action: 'skipWaiting' });
-        }
+        state.waitingWorker?.postMessage({ action: 'skipWaiting' });
         window.location.reload();
       });
     };
     
     const showUpdatePrompt = (newCache) => {
-      if (updatePromptShown) return;
-      updatePromptShown = true;
+      if (state.updatePromptShown) return;
+      state.updatePromptShown = true;
       
       if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
         reloadApp(newCache);
       } else {
-        updatePromptShown = false;
-        pendingUpdate = false;
+        state.updatePromptShown = false;
+        state.pendingUpdate = false;
       }
     };
     
     const checkCacheVersion = async () => {
-      if (updatePromptShown || pendingUpdate || isReloading) return false;
+      if (state.updatePromptShown || state.pendingUpdate || state.isReloading) return false;
       
       try {
         const cacheNames = await caches.keys();
@@ -6002,7 +6037,7 @@ if ('serviceWorker' in navigator) {
         
         if (storedVersion === currentCache) return false;
         
-        pendingUpdate = true;
+        state.pendingUpdate = true;
         showUpdatePrompt(currentCache);
         return true;
       } catch (e) {
@@ -6016,7 +6051,7 @@ if ('serviceWorker' in navigator) {
       
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
-        waitingWorker = newWorker;
+        state.waitingWorker = newWorker;
         
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
@@ -6039,25 +6074,25 @@ if ('serviceWorker' in navigator) {
       });
     };
     
-    const handleVisibilityChange = async () => {
+    const handleVisibilityChange = PWAUtils.debounce(async () => {
       if (document.hidden) return;
       
       const reg = await navigator.serviceWorker.getRegistration('/sim/');
       if (!reg) return;
       
       await reg.update();
-      setTimeout(checkCacheVersion, CONSTANTS.SW_UPDATE_CHECK_DELAY);
-    };
+      PWAUtils.scheduleTask(() => checkCacheVersion(), CONSTANTS.SW_UPDATE_CHECK_DELAY);
+    }, 300);
     
-    const initPWAMode = async () => {
+    const initPWAMode = () => {
       registerSW();
-      document.addEventListener('visibilitychange', handleVisibilityChange);
+      document.addEventListener('visibilitychange', handleVisibilityChange, { passive: true });
     };
     
     const init = () => {
       window.addEventListener('load', () => {
         IS_PWA ? initPWAMode() : registerSW();
-      });
+      }, { passive: true });
     };
     
     return { init };
@@ -6112,7 +6147,8 @@ const initA2HS = (() => {
     deferredPrompt: null,
     installButton: null,
     promptReceived: false,
-    lsAvailable: null
+    lsAvailable: null,
+    dismissCache: null
   };
   
   const checkStorage = () => {
@@ -6134,34 +6170,44 @@ const initA2HS = (() => {
   };
   
   const isInstalled = () => 
-    ['standalone', 'fullscreen', 'minimal-ui'].some(mode =>
-      window.matchMedia(`(display-mode: ${mode})`).matches
-    ) || window.navigator.standalone === true ||
+    PWAUtils.checkDisplayMode(['standalone', 'fullscreen', 'minimal-ui']) ||
+    window.navigator.standalone === true ||
     document.referrer.includes('android-app://') ||
-    storage.get('app_installed') === 'true';
+    (storage.get('app_installed') ?? false) === 'true';
   
   const isDismissed = () => {
+    const now = Date.now();
+    
+    if (state.dismissCache && now - state.dismissCache.checkedAt < 60000) {
+      return state.dismissCache.value;
+    }
+    
     const data = storage.get(CFG.storage);
-    if (!data) return false;
-    try {
-      const { timestamp } = JSON.parse(data);
-      if (Date.now() - timestamp > CFG.dismissExpiry) {
-        storage.remove(CFG.storage);
-        return false;
-      }
-      return true;
-    } catch {
+    if (!data) {
+      state.dismissCache = { value: false, checkedAt: now };
       return false;
     }
+    
+    const parsed = PWAUtils.safeJSONParse(data);
+    if (!parsed?.timestamp) {
+      state.dismissCache = { value: false, checkedAt: now };
+      return false;
+    }
+    
+    if (now - parsed.timestamp > CFG.dismissExpiry) {
+      storage.remove(CFG.storage);
+      state.dismissCache = { value: false, checkedAt: now };
+      return false;
+    }
+    
+    state.dismissCache = { value: true, checkedAt: now };
+    return true;
   };
   
   const detectDevice = () => {
     const ua = navigator.userAgent.toLowerCase();
-    const isIPhone = /iphone|ipod/.test(ua);
-    const isAndroid = /android/.test(ua);
-    
-    if (isIPhone) return 'ios';
-    if (isAndroid && window.innerWidth < CFG.mobileBreakpoint) return 'android';
+    if (/iphone|ipod/.test(ua)) return 'ios';
+    if (/android/.test(ua) && window.innerWidth < CFG.mobileBreakpoint) return 'android';
     return null;
   };
   
@@ -6213,18 +6259,19 @@ const initA2HS = (() => {
     const container = create('div', 'a2hs');
     container.appendChild(card);
     
-    return { container, closeBtn };
+    return { container, closeBtn, card };
   };
   
   const closeModalVisual = (container) => {
     if (!container?.isConnected) return;
     container.firstElementChild?.classList.add('a2hs-closing');
-    setTimeout(() => container.remove(), CFG.animDur);
+    PWAUtils.scheduleTask(() => container.remove(), CFG.animDur);
   };
   
   const closeModalDismiss = (container) => {
     closeModalVisual(container);
-    storage.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
+    const timestamp = PWAUtils.safeJSONStringify({ timestamp: Date.now() });
+    if (timestamp) storage.set(CFG.storage, timestamp);
   };
   
   const triggerInstall = async () => {
@@ -6233,7 +6280,8 @@ const initA2HS = (() => {
       await state.deferredPrompt.prompt();
       const { outcome } = await state.deferredPrompt.userChoice;
       if (outcome === 'accepted') {
-        storage.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
+        const timestamp = PWAUtils.safeJSONStringify({ timestamp: Date.now() });
+        if (timestamp) storage.set(CFG.storage, timestamp);
         storage.set('app_installed', 'true');
         state.deferredPrompt = null;
         return true;
@@ -6244,42 +6292,47 @@ const initA2HS = (() => {
     }
   };
   
+  const setupModalEvents = (container, closeBtn, card, namespace) => {
+    EventManager.addNS(namespace, closeBtn, 'click', (e) => {
+      e.stopPropagation();
+      EventManager.removeNS(namespace);
+      closeModalDismiss(container);
+    });
+    
+    if (state.installButton) {
+      EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
+        e.stopPropagation();
+        if (await triggerInstall()) {
+          EventManager.removeNS(namespace);
+          closeModalVisual(container);
+        }
+      });
+    }
+    
+    EventManager.addNS(namespace, card, 'click', (e) => e.stopPropagation());
+    
+    EventManager.addNS(namespace, DOM_ELEMENTS.altSim, 'click', () => {
+      EventManager.removeNS(namespace);
+      closeModalVisual(container);
+    }, { once: true });
+  };
+  
   const showModal = () => {
     const deviceType = detectDevice();
-    if (!deviceType) return;
-    if (deviceType === 'android' && !state.promptReceived) return;
+    if (!deviceType || (deviceType === 'android' && !state.promptReceived)) return;
     
-    const { container, closeBtn } = buildModal(deviceType);
+    const { container, closeBtn, card } = buildModal(deviceType);
     const namespace = 'a2hs-modal';
     
     document.body.appendChild(container);
     
-    setTimeout(() => {
-      const card = container.querySelector('.a2hs-card');
-      
-      EventManager.addNS(namespace, closeBtn, 'click', (e) => {
-        e.stopPropagation();
-        EventManager.removeNS(namespace);
-        closeModalDismiss(container);
-      });
-      
-      if (state.installButton) {
-        EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
-          e.stopPropagation();
-          if (await triggerInstall()) {
-            EventManager.removeNS(namespace);
-            closeModalVisual(container);
-          }
-        });
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        setupModalEvents(container, closeBtn, card, namespace);
+        observer.disconnect();
       }
-      
-      EventManager.addNS(namespace, card, 'click', (e) => e.stopPropagation());
-      
-      EventManager.addNS(namespace, DOM_ELEMENTS.altSim, 'click', () => {
-        EventManager.removeNS(namespace);
-        closeModalVisual(container);
-      }, { once: true });
-    }, 100);
+    });
+    observer.observe(container);
   };
   
   EventManager.add(window, 'beforeinstallprompt', (e) => {
@@ -6290,12 +6343,13 @@ const initA2HS = (() => {
     const existingModal = document.querySelector('.a2hs');
     if (existingModal && !state.installButton) {
       closeModalVisual(existingModal);
-      setTimeout(showModal, CFG.animDur + 100);
+      PWAUtils.scheduleTask(showModal, CFG.animDur + 100);
     }
   });
   
   EventManager.add(window, 'appinstalled', () => {
-    storage.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
+    const timestamp = PWAUtils.safeJSONStringify({ timestamp: Date.now() });
+    if (timestamp) storage.set(CFG.storage, timestamp);
     storage.set('app_installed', 'true');
     const modal = document.querySelector('.a2hs');
     if (modal) closeModalVisual(modal);
@@ -6304,7 +6358,7 @@ const initA2HS = (() => {
   const init = async () => {
     if (!checkStorage() || isInstalled() || !detectDevice() || isDismissed()) return;
     
-    await new Promise(resolve => setTimeout(resolve, CFG.modalDelay));
+    await new Promise(resolve => PWAUtils.scheduleTask(resolve, CFG.modalDelay));
     
     if (!state.promptReceived) {
       await Promise.race([
@@ -6316,7 +6370,7 @@ const initA2HS = (() => {
             }
           }, 100);
         }),
-        new Promise(resolve => setTimeout(resolve, CFG.promptTimeout))
+        new Promise(resolve => PWAUtils.scheduleTask(resolve, CFG.promptTimeout))
       ]);
     }
     
@@ -6324,47 +6378,48 @@ const initA2HS = (() => {
   };
   
   document.readyState === 'loading' 
-    ? document.addEventListener('DOMContentLoaded', init, { once: true })
+    ? document.addEventListener('DOMContentLoaded', init, { once: true, passive: true })
     : init();
 })();
 const preventPullToRefresh = (() => {
-  if (!IS_PWA) return { cleanup: () => {} };
+  if (!IS_PWA) return;
   
-  let lastY = 0;
-  let shouldPrevent = false;
+  const style = document.createElement('style');
+  style.textContent = 'body { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }';
+  document.head.appendChild(style);
+  
+  const testDiv = document.createElement('div');
+  testDiv.style.overscrollBehaviorY = 'contain';
+  const cssSupported = testDiv.style.overscrollBehaviorY === 'contain';
+  
+  if (cssSupported) return;
+  
+  const namespace = 'pull-to-refresh';
+  const state = { lastY: 0, shouldPrevent: false };
   
   const touchStartHandler = (e) => {
     if (e.touches.length !== 1) return;
-    lastY = e.touches[0].clientY;
-    shouldPrevent = window.scrollY === 0;
+    state.lastY = e.touches[0].clientY;
+    state.shouldPrevent = window.scrollY === 0;
   };
   
   const touchMoveHandler = (e) => {
-    if (!shouldPrevent) return;
+    if (!state.shouldPrevent) return;
     
-    const deltaY = e.touches[0].clientY - lastY;
-    lastY = e.touches[0].clientY;
+    const deltaY = e.touches[0].clientY - state.lastY;
+    state.lastY = e.touches[0].clientY;
     
     if (deltaY > 0 && e.cancelable) {
       e.preventDefault();
     }
   };
 
-  const passiveOpt = { passive: false };
-  document.addEventListener('touchstart', touchStartHandler, passiveOpt);
-  document.addEventListener('touchmove', touchMoveHandler, passiveOpt);
+  EventManager.addNS(namespace, document, 'touchstart', touchStartHandler, { passive: false });
+  EventManager.addNS(namespace, document, 'touchmove', touchMoveHandler, { passive: false });
   
-  const style = document.createElement('style');
-  style.textContent = 'body { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }';
-  document.head.appendChild(style);
-  
-  return { 
-    cleanup: () => {
-      document.removeEventListener('touchstart', touchStartHandler);
-      document.removeEventListener('touchmove', touchMoveHandler);
-      style?.remove();
-    }
-  };
+  EventManager.addNS(namespace, window, 'pagehide', () => {
+    EventManager.removeNS(namespace);
+  }, { once: true, capture: true });
 })();
 const PWAPersistenceInit = (() => {
   if (!IS_PWA) return;
@@ -6374,7 +6429,7 @@ const PWAPersistenceInit = (() => {
     
     const getFormElements = () => {
       if (!cachedElements) {
-        cachedElements = document.querySelectorAll(CONSTANTS.FORM_SELECTORS);
+        cachedElements = Array.from(document.querySelectorAll(CONSTANTS.FORM_SELECTORS));
       }
       return cachedElements;
     };
@@ -6388,14 +6443,18 @@ const PWAPersistenceInit = (() => {
     };
     
     const snap = () => {
+      const data = PWAUtils.safeJSONStringify({
+        form: collectFormValues(),
+        isResultShown: true,
+        ts: Date.now()
+      });
+      
+      if (!data) return false;
+      
       try {
-        localStorage.setItem(CONSTANTS.PWA_STORAGE_KEY, JSON.stringify({
-          form: collectFormValues(),
-          isResultShown: true,
-          ts: Date.now()
-        }));
+        localStorage.setItem(CONSTANTS.PWA_STORAGE_KEY, data);
         return true;
-      } catch (e) {
+      } catch {
         return false;
       }
     };
@@ -6405,7 +6464,11 @@ const PWAPersistenceInit = (() => {
         const saved = localStorage.getItem(CONSTANTS.PWA_STORAGE_KEY);
         if (!saved) return false;
         
-        const state = JSON.parse(saved);
+        const state = PWAUtils.safeJSONParse(saved);
+        if (!state) {
+          localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
+          return false;
+        }
         
         if (Date.now() - state.ts > CONSTANTS.PWA_EXPIRY_MS) {
           localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
@@ -6418,11 +6481,11 @@ const PWAPersistenceInit = (() => {
         });
         
         if (state.isResultShown && typeof processMainCalculation === 'function') {
-          setTimeout(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
+          PWAUtils.scheduleTask(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
         }
         
         return true;
-      } catch (e) {
+      } catch {
         localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
         return false;
       }
@@ -6445,9 +6508,7 @@ const PWAPersistenceInit = (() => {
     const captureOpt = { capture: true };
 
     EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'visibilitychange', () => {
-      if (document.hidden) {
-        handlePWAExit();
-      }
+      if (document.hidden) handlePWAExit();
     }, captureOpt);
     
     EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', handlePWAExit, captureOpt);
@@ -6458,14 +6519,14 @@ const PWAPersistenceInit = (() => {
     if (typeof dropdownManager !== 'undefined' && dropdownManager.init) {
       dropdownManager.scheduleUpdate();
     }
-  });
+  }, { passive: true });
   
   window.clearPWAStorage = () => {
     try {
       localStorage.removeItem(CONSTANTS.PWA_STORAGE_KEY);
       EventManager.removeNS(CONSTANTS.PWA_NAMESPACE);
       return true;
-    } catch (e) {
+    } catch {
       return false;
     }
   };
