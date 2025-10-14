@@ -6394,7 +6394,6 @@ const preventPullToRefresh = (() => {
   
   if (cssSupported) return;
   
-  const namespace = 'pull-to-refresh';
   const state = { lastY: 0, shouldPrevent: false };
   
   const touchStartHandler = (e) => {
@@ -6413,13 +6412,10 @@ const preventPullToRefresh = (() => {
       e.preventDefault();
     }
   };
-
-  EventManager.addNS(namespace, document, 'touchstart', touchStartHandler, { passive: false });
-  EventManager.addNS(namespace, document, 'touchmove', touchMoveHandler, { passive: false });
   
-  EventManager.addNS(namespace, window, 'pagehide', () => {
-    EventManager.removeNS(namespace);
-  }, { once: true, capture: true });
+  const passiveOpt = { passive: false };
+  document.addEventListener('touchstart', touchStartHandler, passiveOpt);
+  document.addEventListener('touchmove', touchMoveHandler, passiveOpt);
 })();
 const PWAPersistenceInit = (() => {
   if (!IS_PWA) return;
