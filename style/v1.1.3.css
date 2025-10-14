@@ -3237,6 +3237,7 @@ td.delta:hover {
     background: linear-gradient(135deg, #3b82f6, #9333ea);
     color: #fff;
     border: none;
+    margin-top: 10px;
     padding: 14px;
     border-radius: 10px;
     font-weight: 600;
