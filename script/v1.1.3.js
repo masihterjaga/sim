@@ -6265,31 +6265,15 @@ const initA2HS = (() => {
     
     // Wait for DOM to be ready
     requestAnimationFrame(() => {
-      // Backdrop handler - CLOSE visual only (no dismiss)
-      EventManager.addNS(namespace, container, 'click', (e) => {
-        if (e.target === container) {
-          e.preventDefault();
-          e.stopPropagation();
-          closeModalVisual(container);
-          EventManager.removeNS(namespace);
-        }
-      });
-      
-      // Prevent card clicks from bubbling to backdrop
-      const card = container.querySelector('.a2hs-card');
-      if (card) {
-        EventManager.addNS(namespace, card, 'click', (e) => {
-          e.stopPropagation();
-        });
-      }
-      
-      // Close button handler - DISMISS permanent
-      EventManager.addNS(namespace, closeBtn, 'click', (e) => {
+      // Close button handler - DISMISS (3 days)
+      const closeBtnHandler = (e) => {
         e.preventDefault();
         e.stopPropagation();
         closeModalDismiss(container);
         EventManager.removeNS(namespace);
-      });
+      };
+      EventManager.addNS(namespace, closeBtn, 'click', closeBtnHandler);
+      EventManager.addNS(namespace, closeBtn, 'touchend', closeBtnHandler);
       
       // Install button handler
       if (state.installButton) {
@@ -6297,11 +6281,28 @@ const initA2HS = (() => {
           e.preventDefault();
           e.stopPropagation();
           if (await triggerInstall()) {
-            const modal = document.querySelector('.a2hs');
-            if (modal) closeModalVisual(modal);
+            EventManager.removeNS(namespace);
+            closeModalVisual(container);
           }
         });
       }
+      
+      // Backdrop handler - CLOSE visual only (no dismiss)
+      EventManager.addNS(namespace, container, 'mousedown', (e) => {
+        if (e.target === container) {
+          e.preventDefault();
+          EventManager.removeNS(namespace);
+          closeModalVisual(container);
+        }
+      });
+      
+      EventManager.addNS(namespace, container, 'touchstart', (e) => {
+        if (e.target === container) {
+          e.preventDefault();
+          EventManager.removeNS(namespace);
+          closeModalVisual(container);
+        }
+      });
     });
   };
   
