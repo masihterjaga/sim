@@ -6263,32 +6263,35 @@ const initA2HS = (() => {
     
     document.body.appendChild(container);
     
-    // Install button handler
-    if (state.installButton) {
-      EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
+    // Wait for DOM to be ready
+    requestAnimationFrame(() => {
+      // Install button handler
+      if (state.installButton) {
+        EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (await triggerInstall()) {
+            const modal = document.querySelector('.a2hs');
+            if (modal) closeModalVisual(modal);
+          }
+        });
+      }
+      
+      // Close button handler - DISMISS permanent
+      EventManager.addNS(namespace, closeBtn, 'click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        if (await triggerInstall()) {
-          const modal = document.querySelector('.a2hs');
-          if (modal) closeModalVisual(modal);
+        closeModalDismiss(container);
+        EventManager.removeNS(namespace);
+      });
+      
+      // Backdrop handler - CLOSE visual only (no dismiss)
+      EventManager.addNS(namespace, container, 'click', (e) => {
+        if (e.target === container) {
+          closeModalVisual(container);
+          EventManager.removeNS(namespace);
         }
       });
-    }
-    
-    // Close button handler - DISMISS permanent
-    EventManager.addNS(namespace, closeBtn, 'click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      closeModalDismiss(container);
-      EventManager.removeNS(namespace);
-    });
-    
-    // Backdrop handler - CLOSE visual only (no dismiss)
-    EventManager.addNS(namespace, container, 'click', (e) => {
-      if (e.target === container) {
-        closeModalVisual(container);
-        EventManager.removeNS(namespace);
-      }
     });
   };
   
