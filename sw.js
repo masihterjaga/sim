@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.1';
+const CACHE_NAME = 'rox-calc-v1.0';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
@@ -16,9 +16,7 @@ const urlsToCache = [
   '/sim/icons/favicon.ico',
   '/sim/icons/favicon.svg',
   '/sim/icons/web-app-manifest-192x192.png',
-  '/sim/icons/web-app-manifest-512x512.png',
-  '/sim/icons/any-192x192.png',
-  '/sim/icons/any-512x512.png'
+  '/sim/icons/web-app-manifest-512x512.png'
 ];
 
 self.addEventListener('install', event => {
