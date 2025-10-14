@@ -1101,7 +1101,6 @@ const AppState = (() => {
     isTestReaperActive: false,
     isTestSpearActive: false,
     isFlashActive: false,
-    keyboardListenersAdded: false,
     currentAnimatingWeapon: null
   };
   const listeners = new Set();
@@ -4510,15 +4509,17 @@ function triggerPulseFlash() {
 
   AppState.set('isFlashActive', true);
 
+  const flash = document.createElement('div');
+  const lightning = document.createElement('div');
+  flash.className = 'lightning-flash-overlay';
+  lightning.className = 'lightning-icon';
+  flash.appendChild(lightning);
+
   requestAnimationFrame(() => {
-    const flash = document.createElement('div');
-    const lightning = document.createElement('div');
-    flash.className = 'lightning-flash-overlay';
-    lightning.className = 'lightning-icon';
-    flash.appendChild(lightning);
+    const container = DOM_ELEMENTS.altSim;
 
     try {
-      document.body.appendChild(flash);
+      container.appendChild(flash);
     } catch (e) {
       console.warn('Flash DOM insertion failed', e);
       AppState.set('isFlashActive', false);
