@@ -4,6 +4,7 @@
 // ========== DOM CACHE ==========
 const DOM_ELEMENTS = {
   topOfPage: document.getElementById('top'),
+  altSim: document.getElementById('altsim'),
   atkType: document.getElementById('penCritSelect'),
   weapon: document.getElementById('weaponSelect'),
   wElem: document.getElementById('weaponElementSelect'),
@@ -5953,12 +5954,10 @@ if ('serviceWorker' in navigator) {
     let isReloading = false;
     let waitingWorker = null;
     
-    const saveState = () => {
-      if (typeof AppState !== 'undefined' && AppState.get('isResultShown')) {
-        return PWAPersistence?.snap?.();
-      }
-      return false;
-    };
+    const saveState = () => 
+      typeof AppState !== 'undefined' && AppState.get('isResultShown') 
+        ? PWAPersistence?.snap?.() || false 
+        : false;
     
     const reloadApp = (cacheVersion) => {
       if (isReloading) return;
@@ -5977,7 +5976,6 @@ if ('serviceWorker' in navigator) {
     
     const showUpdatePrompt = (newCache) => {
       if (updatePromptShown) return;
-      
       updatePromptShown = true;
       
       if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
@@ -5989,27 +5987,20 @@ if ('serviceWorker' in navigator) {
     };
     
     const checkCacheVersion = async () => {
-      if (updatePromptShown || pendingUpdate || isReloading) {
-        return false;
-      }
+      if (updatePromptShown || pendingUpdate || isReloading) return false;
       
       try {
         const cacheNames = await caches.keys();
-        
         const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
-        
         if (!currentCache) return false;
         
         const storedVersion = localStorage.getItem('app_cache_version');
-        
         if (!storedVersion) {
           localStorage.setItem('app_cache_version', currentCache);
           return false;
         }
         
-        if (storedVersion === currentCache) {
-          return false;
-        }
+        if (storedVersion === currentCache) return false;
         
         pendingUpdate = true;
         showUpdatePrompt(currentCache);
@@ -6073,9 +6064,12 @@ if ('serviceWorker' in navigator) {
   })();
   
   PWAServiceWorker.init();
-};
+}
 const initA2HS = (() => {
-  // Config
+  if (typeof EventManager === 'undefined') {
+    console.error('[A2HS] EventManager not found! Using fallback native listeners.');
+  }
+  
   const CFG = {
     storage: 'a2hsDismissed',
     animDur: 300,
@@ -6114,7 +6108,6 @@ const initA2HS = (() => {
     }
   };
   
-  // State
   const state = {
     deferredPrompt: null,
     installButton: null,
@@ -6122,7 +6115,6 @@ const initA2HS = (() => {
     lsAvailable: null
   };
   
-  // Storage
   const checkStorage = () => {
     if (state.lsAvailable !== null) return state.lsAvailable;
     try {
@@ -6141,7 +6133,6 @@ const initA2HS = (() => {
     remove: (key) => checkStorage() && localStorage.removeItem(key)
   };
   
-  // Status
   const isInstalled = () => 
     ['standalone', 'fullscreen', 'minimal-ui'].some(mode =>
       window.matchMedia(`(display-mode: ${mode})`).matches
@@ -6164,19 +6155,19 @@ const initA2HS = (() => {
     }
   };
   
-  // Device
-  const isMobile = () => window.innerWidth < CFG.mobileBreakpoint;
-  
   const detectDevice = () => {
     const ua = navigator.userAgent.toLowerCase();
-    return /iphone|ipad|ipod/.test(ua) ? 'ios' : /android/.test(ua) ? 'android' : null;
+    const isIPhone = /iphone|ipod/.test(ua);
+    const isAndroid = /android/.test(ua);
+    
+    if (isIPhone) return 'ios';
+    if (isAndroid && window.innerWidth < CFG.mobileBreakpoint) return 'android';
+    return null;
   };
   
-  // DOM
   const create = (tag, className = '', attrs = {}) => 
     Object.assign(document.createElement(tag), { className, ...attrs });
   
-  // UI
   const buildModal = (deviceType) => {
     const deviceData = CFG.devices[deviceType];
     
@@ -6225,7 +6216,6 @@ const initA2HS = (() => {
     return { container, closeBtn };
   };
   
-  // Modal actions
   const closeModalVisual = (container) => {
     if (!container?.isConnected) return;
     container.firstElementChild?.classList.add('a2hs-closing');
@@ -6256,27 +6246,25 @@ const initA2HS = (() => {
   
   const showModal = () => {
     const deviceType = detectDevice();
-    if (!deviceType || (deviceType === 'android' && !state.promptReceived)) return;
+    if (!deviceType) return;
+    if (deviceType === 'android' && !state.promptReceived) return;
     
     const { container, closeBtn } = buildModal(deviceType);
     const namespace = 'a2hs-modal';
     
     document.body.appendChild(container);
     
-    // Wait for DOM to be ready
     setTimeout(() => {
-      // Close button handler - DISMISS (3 days)
+      const card = container.querySelector('.a2hs-card');
+      
       EventManager.addNS(namespace, closeBtn, 'click', (e) => {
-        e.preventDefault();
         e.stopPropagation();
         EventManager.removeNS(namespace);
         closeModalDismiss(container);
       });
       
-      // Install button handler
       if (state.installButton) {
         EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
-          e.preventDefault();
           e.stopPropagation();
           if (await triggerInstall()) {
             EventManager.removeNS(namespace);
@@ -6285,17 +6273,15 @@ const initA2HS = (() => {
         });
       }
       
-      // Backdrop handler - CLOSE visual only (no dismiss)
-      EventManager.addNS(namespace, container, 'click', (e) => {
-        if (e.target === container) {
-          EventManager.removeNS(namespace);
-          closeModalVisual(container);
-        }
-      });
+      EventManager.addNS(namespace, card, 'click', (e) => e.stopPropagation());
+      
+      EventManager.addNS(namespace, DOM_ELEMENTS.altSim, 'click', () => {
+        EventManager.removeNS(namespace);
+        closeModalVisual(container);
+      }, { once: true });
     }, 100);
   };
   
-  // Events
   EventManager.add(window, 'beforeinstallprompt', (e) => {
     e.preventDefault();
     state.deferredPrompt = e;
@@ -6315,9 +6301,8 @@ const initA2HS = (() => {
     if (modal) closeModalVisual(modal);
   });
   
-  // Init
   const init = async () => {
-    if (!checkStorage() || isInstalled() || !isMobile() || !detectDevice() || isDismissed()) return;
+    if (!checkStorage() || isInstalled() || !detectDevice() || isDismissed()) return;
     
     await new Promise(resolve => setTimeout(resolve, CFG.modalDelay));
     
@@ -6373,13 +6358,13 @@ const preventPullToRefresh = (() => {
   style.textContent = 'body { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }';
   document.head.appendChild(style);
   
-  const cleanup = () => {
-    document.removeEventListener('touchstart', touchStartHandler);
-    document.removeEventListener('touchmove', touchMoveHandler);
-    style?.remove();
+  return { 
+    cleanup: () => {
+      document.removeEventListener('touchstart', touchStartHandler);
+      document.removeEventListener('touchmove', touchMoveHandler);
+      style?.remove();
+    }
   };
-  
-  return { cleanup };
 })();
 const PWAPersistenceInit = (() => {
   if (!IS_PWA) return;

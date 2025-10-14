@@ -3134,6 +3134,7 @@ td.delta:hover {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index:88;
   }
 
   .a2hs-close:hover {
