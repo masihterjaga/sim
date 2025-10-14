@@ -6259,51 +6259,39 @@ const initA2HS = (() => {
     if (!deviceType || (deviceType === 'android' && !state.promptReceived)) return;
     
     const { container, closeBtn } = buildModal(deviceType);
+    const namespace = 'a2hs-modal';
     
     document.body.appendChild(container);
     
-    console.log('[A2HS] Modal shown, closeBtn:', closeBtn);
-    
     // Wait for DOM to be ready
     setTimeout(() => {
-      console.log('[A2HS] Setting up listeners');
-      
       // Close button handler - DISMISS (3 days)
-      const closeBtnHandler = (e) => {
-        console.log('[A2HS] Close button clicked!');
+      EventManager.addNS(namespace, closeBtn, 'click', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        EventManager.removeNS(namespace);
         closeModalDismiss(container);
-      };
-      
-      closeBtn.addEventListener('click', closeBtnHandler);
-      closeBtn.addEventListener('touchend', closeBtnHandler);
-      
-      console.log('[A2HS] Close button listeners attached');
+      });
       
       // Install button handler
       if (state.installButton) {
-        state.installButton.addEventListener('click', async (e) => {
-          console.log('[A2HS] Install button clicked!');
+        EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
           e.preventDefault();
           e.stopPropagation();
           if (await triggerInstall()) {
+            EventManager.removeNS(namespace);
             closeModalVisual(container);
           }
         });
-        console.log('[A2HS] Install button listener attached');
       }
       
       // Backdrop handler - CLOSE visual only (no dismiss)
-      container.addEventListener('click', (e) => {
-        console.log('[A2HS] Container clicked, target:', e.target, 'container:', container);
+      EventManager.addNS(namespace, container, 'click', (e) => {
         if (e.target === container) {
-          console.log('[A2HS] Backdrop clicked! Closing...');
+          EventManager.removeNS(namespace);
           closeModalVisual(container);
         }
       });
-      
-      console.log('[A2HS] Backdrop listener attached');
     }, 100);
   };
   
