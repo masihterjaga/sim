@@ -6074,9 +6074,6 @@ if ('serviceWorker' in navigator) {
   
   PWAServiceWorker.init();
 };
-
-
-
 const initA2HS = (() => {
   // Config
   const CFG = {
@@ -6129,39 +6126,28 @@ const initA2HS = (() => {
   const checkStorage = () => {
     if (state.lsAvailable !== null) return state.lsAvailable;
     try {
-      const test = '__test__';
-      localStorage.setItem(test, test);
-      localStorage.removeItem(test);
-      state.lsAvailable = true;
+      const testKey = '__test__';
+      localStorage.setItem(testKey, testKey);
+      localStorage.removeItem(testKey);
+      return state.lsAvailable = true;
     } catch {
-      state.lsAvailable = false;
+      return state.lsAvailable = false;
     }
-    return state.lsAvailable;
   };
   
   const storage = {
-    get: (key) => {
-      if (!checkStorage()) return null;
-      try { return localStorage.getItem(key); } catch { return null; }
-    },
-    set: (key, value) => {
-      if (!checkStorage()) return false;
-      try { localStorage.setItem(key, value); return true; } catch { return false; }
-    },
-    remove: (key) => {
-      if (!checkStorage()) return;
-      try { localStorage.removeItem(key); } catch {}
-    }
+    get: (key) => checkStorage() && localStorage.getItem(key),
+    set: (key, value) => checkStorage() && (localStorage.setItem(key, value), true),
+    remove: (key) => checkStorage() && localStorage.removeItem(key)
   };
   
   // Status
-  const isInstalled = () => {
-    return ['standalone', 'fullscreen', 'minimal-ui'].some(m =>
-        window.matchMedia(`(display-mode: ${m})`).matches
-      ) || window.navigator.standalone === true ||
-      document.referrer.includes('android-app://') ||
-      storage.get('app_installed') === 'true';
-  };
+  const isInstalled = () => 
+    ['standalone', 'fullscreen', 'minimal-ui'].some(mode =>
+      window.matchMedia(`(display-mode: ${mode})`).matches
+    ) || window.navigator.standalone === true ||
+    document.referrer.includes('android-app://') ||
+    storage.get('app_installed') === 'true';
   
   const isDismissed = () => {
     const data = storage.get(CFG.storage);
@@ -6183,28 +6169,23 @@ const initA2HS = (() => {
   
   const detectDevice = () => {
     const ua = navigator.userAgent.toLowerCase();
-    if (/iphone|ipad|ipod/.test(ua)) return 'ios';
-    if (/android/.test(ua)) return 'android';
-    return null;
+    return /iphone|ipad|ipod/.test(ua) ? 'ios' : /android/.test(ua) ? 'android' : null;
   };
   
   // DOM
-  const create = (tag, className = '', attrs = {}) => {
-    const el = document.createElement(tag);
-    if (className) el.className = className;
-    Object.assign(el, attrs);
-    return el;
-  };
+  const create = (tag, className = '', attrs = {}) => 
+    Object.assign(document.createElement(tag), { className, ...attrs });
   
   // UI
   const buildModal = (deviceType) => {
-    const data = CFG.devices[deviceType];
+    const deviceData = CFG.devices[deviceType];
     
-    // Close button
-    const closeBtn = create('button', 'a2hs-close', { type: 'button', 'aria-label': 'Close' });
-    closeBtn.innerHTML = '×';
+    const closeBtn = create('button', 'a2hs-close', { 
+      type: 'button', 
+      'aria-label': 'Close', 
+      innerHTML: '×' 
+    });
     
-    // Header
     const icon = create('div', 'a2hs-icon');
     icon.innerHTML = `<img src="${CFG.app.icon}" alt="${CFG.app.name}" loading="lazy">`;
     
@@ -6217,26 +6198,24 @@ const initA2HS = (() => {
     const header = create('div', 'a2hs-hdr');
     header.append(closeBtn, top);
     
-    // Body
     const body = create('div', 'a2hs-body');
-    body.innerHTML = `<p class="a2hs-title">${data.title}</p>`;
+    body.innerHTML = `<p class="a2hs-title">${deviceData.title}</p>`;
     
     const stepsList = create('ol', 'a2hs-steps');
-    data.steps.forEach((step, i) => {
-      const li = create('li');
-      li.innerHTML = `<span>${i + 1}.</span><span>${step}</span>`;
-      stepsList.appendChild(li);
+    deviceData.steps.forEach((step, index) => {
+      const listItem = create('li');
+      listItem.innerHTML = `<span>${index + 1}.</span><span>${step}</span>`;
+      stepsList.appendChild(listItem);
     });
     body.appendChild(stepsList);
     
-    if (state.promptReceived && data.button) {
-      const btn = create('button', 'a2hs-btn', { type: 'button' });
-      btn.innerHTML = `${data.button.icon}${data.button.text}`;
-      state.installButton = btn;
-      body.appendChild(btn);
+    if (state.promptReceived && deviceData.button) {
+      const installBtn = create('button', 'a2hs-btn', { type: 'button' });
+      installBtn.innerHTML = `${deviceData.button.icon}${deviceData.button.text}`;
+      state.installButton = installBtn;
+      body.appendChild(installBtn);
     }
     
-    // Container
     const card = create('div', 'a2hs-card');
     card.append(header, body);
     
@@ -6247,26 +6226,22 @@ const initA2HS = (() => {
   };
   
   // Modal actions
-  const closeModal = (container) => {
+  const closeModalVisual = (container) => {
     if (!container?.isConnected) return;
-    
-    const card = container.firstElementChild;
-    if (card) card.classList.add('a2hs-closing');
-    
-    setTimeout(() => {
-      if (container.isConnected) container.remove();
-    }, CFG.animDur);
-    
+    container.firstElementChild?.classList.add('a2hs-closing');
+    setTimeout(() => container.remove(), CFG.animDur);
+  };
+  
+  const closeModalDismiss = (container) => {
+    closeModalVisual(container);
     storage.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
   };
   
   const triggerInstall = async () => {
     if (!state.deferredPrompt) return false;
-    
     try {
       await state.deferredPrompt.prompt();
       const { outcome } = await state.deferredPrompt.userChoice;
-      
       if (outcome === 'accepted') {
         storage.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
         storage.set('app_installed', 'true');
@@ -6280,85 +6255,89 @@ const initA2HS = (() => {
   };
   
   const showModal = () => {
-    if (!isMobile() || isInstalled() || isDismissed()) return;
-    
     const deviceType = detectDevice();
     if (!deviceType || (deviceType === 'android' && !state.promptReceived)) return;
     
     const { container, closeBtn } = buildModal(deviceType);
+    const namespace = 'a2hs-modal';
+    
     document.body.appendChild(container);
     
+    // Install button handler
     if (state.installButton) {
-      state.installButton.addEventListener('click', async (e) => {
+      EventManager.addNS(namespace, state.installButton, 'click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
         if (await triggerInstall()) {
-          const m = document.querySelector('.a2hs');
-          if (m) closeModal(m);
+          const modal = document.querySelector('.a2hs');
+          if (modal) closeModalVisual(modal);
         }
-      }, { once: true });
+      });
     }
     
-    const handleClose = (e) => {
+    // Close button handler - DISMISS permanent
+    EventManager.addNS(namespace, closeBtn, 'click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      closeModal(container);
-    };
+      closeModalDismiss(container);
+      EventManager.removeNS(namespace);
+    });
     
-    closeBtn.addEventListener('click', handleClose);
-    closeBtn.addEventListener('touchend', handleClose);
-    container.addEventListener('click', (e) => {
-      if (e.target === container) closeModal(container);
+    // Backdrop handler - CLOSE visual only (no dismiss)
+    EventManager.addNS(namespace, container, 'click', (e) => {
+      if (e.target === container) {
+        closeModalVisual(container);
+        EventManager.removeNS(namespace);
+      }
     });
   };
   
   // Events
-  window.addEventListener('beforeinstallprompt', (e) => {
+  EventManager.add(window, 'beforeinstallprompt', (e) => {
     e.preventDefault();
     state.deferredPrompt = e;
     state.promptReceived = true;
     
-    const existing = document.querySelector('.a2hs');
-    if (existing && !state.installButton) {
-      closeModal(existing);
+    const existingModal = document.querySelector('.a2hs');
+    if (existingModal && !state.installButton) {
+      closeModalVisual(existingModal);
       setTimeout(showModal, CFG.animDur + 100);
     }
   });
   
-  window.addEventListener('appinstalled', () => {
+  EventManager.add(window, 'appinstalled', () => {
     storage.set(CFG.storage, JSON.stringify({ timestamp: Date.now() }));
     storage.set('app_installed', 'true');
-    
-    const m = document.querySelector('.a2hs');
-    if (m) closeModal(m);
+    const modal = document.querySelector('.a2hs');
+    if (modal) closeModalVisual(modal);
   });
   
   // Init
   const init = async () => {
-    if (!checkStorage() || isInstalled() || !isMobile() || !detectDevice()) return;
+    if (!checkStorage() || isInstalled() || !isMobile() || !detectDevice() || isDismissed()) return;
     
-    await new Promise(r => setTimeout(r, CFG.modalDelay));
+    await new Promise(resolve => setTimeout(resolve, CFG.modalDelay));
     
-    await new Promise((resolve) => {
-      if (state.promptReceived) return resolve();
-      const timeout = setTimeout(resolve, CFG.promptTimeout);
-      const checker = setInterval(() => {
-        if (state.promptReceived) {
-          clearTimeout(timeout);
-          clearInterval(checker);
-          resolve();
-        }
-      }, 100);
-    });
+    if (!state.promptReceived) {
+      await Promise.race([
+        new Promise(resolve => {
+          const checker = setInterval(() => {
+            if (state.promptReceived) {
+              clearInterval(checker);
+              resolve();
+            }
+          }, 100);
+        }),
+        new Promise(resolve => setTimeout(resolve, CFG.promptTimeout))
+      ]);
+    }
     
     showModal();
   };
   
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
-  }
+  document.readyState === 'loading' 
+    ? document.addEventListener('DOMContentLoaded', init, { once: true })
+    : init();
 })();
 const preventPullToRefresh = (() => {
   if (!IS_PWA) return { cleanup: () => {} };
