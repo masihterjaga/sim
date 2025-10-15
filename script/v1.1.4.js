@@ -5973,9 +5973,12 @@ const PWAUtils = (() => {
 if ('serviceWorker' in navigator) {
   const PWAServiceWorker = (() => {
     let currentRegistration = null;
+    let updateCheckTimer = null;
     
     const checkForUpdatesOnStart = (registration) => {
-      PWAUtils.scheduleTask(() => {
+      if (updateCheckTimer) clearTimeout(updateCheckTimer);
+      
+      updateCheckTimer = setTimeout(() => {
         registration.update().catch(() => {});
       }, CONSTANTS.SW_UPDATE_CHECK_DELAY);
     };
@@ -5985,16 +5988,17 @@ if ('serviceWorker' in navigator) {
         const newWorker = registration.installing;
         if (!newWorker) return;
         
+        window.dispatchEvent(new CustomEvent('sw-update-found', {
+          detail: { worker: newWorker, registration }
+        }));
+        
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            // Notify manual update checker
-            if (window.PWAManualUpdate) {
-              window.PWAManualUpdate.onUpdateFound(newWorker);
-            }
-            // Auto skip waiting jika bukan manual update
-            else {
-              newWorker.postMessage({ action: 'skipWaiting' });
-            }
+            setTimeout(() => {
+              if (!window.PWAManualUpdate || !window.PWAManualUpdate.isUpdatePending()) {
+                newWorker.postMessage({ action: 'skipWaiting' });
+              }
+            }, 5000);
           }
         });
       });
@@ -6009,6 +6013,10 @@ if ('serviceWorker' in navigator) {
           currentRegistration = reg;
           checkForUpdatesOnStart(reg);
           setupUpdateListener(reg);
+          
+          setInterval(() => {
+            reg.update().catch(() => {});
+          }, 3600000);
         })
         .catch(() => {});
     };
@@ -6017,9 +6025,19 @@ if ('serviceWorker' in navigator) {
       window.addEventListener('DOMContentLoaded', registerSW, { passive: true });
     };
     
-    return {
+    const cleanup = () => {
+      if (updateCheckTimer) {
+        clearTimeout(updateCheckTimer);
+        updateCheckTimer = null;
+      }
+    };
+    
+    window.addEventListener('beforeunload', cleanup, { passive: true });
+    
+    return { 
       init,
-      getRegistration: () => currentRegistration
+      getRegistration: () => currentRegistration,
+      cleanup
     };
   })();
   
@@ -6033,7 +6051,10 @@ if (!IS_PWA) {
     const state = {
       isChecking: false,
       updateAvailable: false,
-      newWorker: null
+      newWorker: null,
+      registration: null,
+      updateFoundListener: null,
+      controllerChangeListener: null
     };
     
     const setButtonState = (isChecking, updateAvailable) => {
@@ -6056,6 +6077,37 @@ if (!IS_PWA) {
       }
     };
     
+    const resetState = () => {
+      state.updateAvailable = false;
+      state.newWorker = null;
+      state.registration = null;
+      setButtonState(false, false);
+    };
+    
+    const waitForWorkerState = (worker, targetState, timeout = 10000) => {
+      return new Promise((resolve, reject) => {
+        if (worker.state === targetState) {
+          resolve();
+          return;
+        }
+        
+        const timer = setTimeout(() => {
+          worker.removeEventListener('statechange', handler);
+          reject(new Error('Timeout waiting for worker state'));
+        }, timeout);
+        
+        const handler = () => {
+          if (worker.state === targetState) {
+            clearTimeout(timer);
+            worker.removeEventListener('statechange', handler);
+            resolve();
+          }
+        };
+        
+        worker.addEventListener('statechange', handler);
+      });
+    };
+    
     const checkForUpdates = async () => {
       if (state.isChecking || !('serviceWorker' in navigator)) return;
       
@@ -6063,65 +6115,113 @@ if (!IS_PWA) {
       setButtonState(true, false);
       
       try {
-        const reg = PWAServiceWorker?.getRegistration() ||
-          await navigator.serviceWorker.getRegistration('/sim/');
+        const reg = PWAServiceWorker?.getRegistration() || 
+                    await navigator.serviceWorker.getRegistration('/sim/');
         
         if (!reg) {
-          SnackbarManager.show('❌ Service worker not registered');
-          state.isChecking = false;
-          setButtonState(false, false);
+          throw new Error('Service worker not registered');
+        }
+        
+        if (reg.waiting) {
+          state.newWorker = reg.waiting;
+          state.registration = reg;
+          state.updateAvailable = true;
+          SnackbarManager.show('Update found! Click button to install');
+          setButtonState(false, true);
           return;
         }
         
-        // Force update
-        await reg.update();
+        if (reg.installing) {
+          state.newWorker = reg.installing;
+          state.registration = reg;
+          
+          try {
+            await waitForWorkerState(reg.installing, 'installed', 15000);
+            state.updateAvailable = true;
+            SnackbarManager.show('Update found! Click button to install');
+            setButtonState(false, true);
+          } catch (err) {
+            throw new Error('Update timeout');
+          }
+          return;
+        }
         
-        // Check untuk installing/waiting worker
-        await new Promise(r => setTimeout(r, 2000));
+        const updateFoundPromise = new Promise((resolve) => {
+          const timeout = setTimeout(() => resolve(false), 15000);
+          
+          const updateHandler = () => {
+            clearTimeout(timeout);
+            const newWorker = reg.installing;
+            
+            if (newWorker) {
+              state.newWorker = newWorker;
+              state.registration = reg;
+              
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed') {
+                  state.updateAvailable = true;
+                  resolve(true);
+                }
+              });
+            } else {
+              resolve(false);
+            }
+          };
+          
+          reg.addEventListener('updatefound', updateHandler, { once: true });
+          
+          reg.update().catch(() => {
+            clearTimeout(timeout);
+            resolve(false);
+          });
+        });
         
-        const freshReg = await navigator.serviceWorker.getRegistration('/sim/');
-        const hasUpdate = freshReg?.installing || freshReg?.waiting;
+        const hasUpdate = await updateFoundPromise;
         
         if (hasUpdate) {
-          state.newWorker = freshReg.installing || freshReg.waiting;
-          state.updateAvailable = true;
-          SnackbarManager.show('✅ Update found! Click button to install');
+          SnackbarManager.show('Update found! Click button to install');
+          setButtonState(false, true);
         } else {
-          SnackbarManager.show('✅ You have the latest version');
+          SnackbarManager.show('You have the latest version');
+          resetState();
         }
         
       } catch (err) {
-        SnackbarManager.show('❌ Check failed: ' + (err.message || 'Unknown error'));
+        SnackbarManager.show('Check failed: ' + (err.message || 'Unknown error'));
+        resetState();
       } finally {
         state.isChecking = false;
-        setButtonState(false, state.updateAvailable);
       }
     };
     
     const installUpdate = () => {
-      if (!state.newWorker) return;
+      if (!state.newWorker || !state.updateAvailable) {
+        SnackbarManager.show('No update available');
+        return;
+      }
       
       SnackbarManager.show('Installing update...');
       
-      // Setup reload handler sebelum skipWaiting
-      let reloaded = false;
-      const reloadHandler = () => {
-        if (reloaded) return;
-        reloaded = true;
+      const performReload = () => {
         SnackbarManager.show('Reloading...');
+        cleanup();
         setTimeout(() => window.location.reload(), 300);
       };
       
-      navigator.serviceWorker.addEventListener('controllerchange', reloadHandler, { once: true });
+      state.controllerChangeListener = performReload;
       
-      // Fallback jika controllerchange tidak trigger
-      state.newWorker.addEventListener('statechange', () => {
-        if (state.newWorker.state === 'activated') {
-          setTimeout(reloadHandler, 100);
-        }
-      });
+      navigator.serviceWorker.addEventListener(
+        'controllerchange', 
+        state.controllerChangeListener,
+        { once: true }
+      );
       
-      state.newWorker.postMessage({ action: 'skipWaiting' });
+      try {
+        state.newWorker.postMessage({ action: 'skipWaiting' });
+      } catch (err) {
+        SnackbarManager.show('Failed to install update');
+        resetState();
+      }
     };
     
     const handleClick = () => {
@@ -6129,11 +6229,32 @@ if (!IS_PWA) {
       state.updateAvailable ? installUpdate() : checkForUpdates();
     };
     
-    const onUpdateFound = (newWorker) => {
-      state.newWorker = newWorker;
-      state.updateAvailable = true;
-      setButtonState(false, true);
-      SnackbarManager.show('Update available! Click button to install');
+    const onUpdateFound = (event) => {
+      const { worker, registration } = event.detail;
+      if (!worker) return;
+      
+      state.newWorker = worker;
+      state.registration = registration;
+      
+      worker.addEventListener('statechange', () => {
+        if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+          state.updateAvailable = true;
+          setButtonState(false, true);
+          SnackbarManager.show('Update available! Click button to install');
+        }
+      });
+    };
+    
+    const cleanup = () => {
+      if (state.updateFoundListener) {
+        window.removeEventListener('sw-update-found', state.updateFoundListener);
+        state.updateFoundListener = null;
+      }
+      
+      if (state.controllerChangeListener) {
+        navigator.serviceWorker.removeEventListener('controllerchange', state.controllerChangeListener);
+        state.controllerChangeListener = null;
+      }
     };
     
     const init = () => {
@@ -6142,6 +6263,9 @@ if (!IS_PWA) {
       
       EventManager.add(btn, 'click', handleClick);
       setButtonState(false, false);
+      
+      state.updateFoundListener = onUpdateFound;
+      window.addEventListener('sw-update-found', state.updateFoundListener);
       
       if (!document.getElementById('pwa-update-styles')) {
         const s = document.createElement('style');
@@ -6156,21 +6280,25 @@ if (!IS_PWA) {
         `;
         document.head.appendChild(s);
       }
+      
+      window.addEventListener('beforeunload', cleanup, { passive: true });
     };
     
     document.readyState === 'loading' ?
       document.addEventListener('DOMContentLoaded', init, { once: true, passive: true }) :
       init();
     
-    return {
-      checkForUpdates,
+    return { 
+      checkForUpdates, 
       installUpdate,
-      onUpdateFound
+      isUpdatePending: () => state.updateAvailable,
+      onUpdateFound,
+      cleanup
     };
   })();
   
   window.PWAManualUpdate = PWAManualUpdate;
-};
+}
 const initA2HS = (() => {
   const CFG = {
     storage: 'a2hsDismissed',
