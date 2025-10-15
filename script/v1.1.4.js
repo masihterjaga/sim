@@ -6351,8 +6351,8 @@ if (!IS_PWA) {
 const initA2HS = (() => {
   const CFG = {
     app: {
-      name: 'RöX Calculator',
-      desc: 'Quick access, save stats & work offline',
+      name: 'RöX Calculator APP',
+      desc: 'Access instantly. Your stats save automatically. Full functionality without internet!',
       icon: 'https://masihterjaga.github.io/sim/icons/a2hs.png'
     },
     devices: {
@@ -6384,7 +6384,8 @@ const initA2HS = (() => {
   const state = {
     deferredPrompt: null,
     installButton: null,
-    promptReceived: false
+    promptReceived: false,
+    hasShownModal: false
   };
   
   const isInstalled = () => 
@@ -6509,13 +6510,26 @@ const initA2HS = (() => {
   
   const showModal = () => {
     const deviceType = detectDevice();
-    if (!deviceType || (deviceType === 'android' && !state.promptReceived)) return;
+    if (!deviceType) return;
+    
+    if (deviceType === 'android' && !state.promptReceived) return;
     
     const { container, closeBtn, card } = buildModal(deviceType);
     const ns = 'a2hs-modal';
     
     document.body.appendChild(container);
     requestAnimationFrame(() => setupModalEvents(container, closeBtn, card, ns));
+  };
+  
+  const checkAndShowOnSubmit = () => {
+    if (state.hasShownModal) return;
+    
+    const isResultShown = AppState?.get?.('isResultShown');
+    if (!isResultShown) return;
+    if (isInstalled() || !detectDevice() || isDismissed()) return;
+    
+    state.hasShownModal = true;
+    showModal();
   };
   
   EventManager.add(window, 'beforeinstallprompt', (e) => {
@@ -6538,13 +6552,16 @@ const initA2HS = (() => {
     if (modal) closeModalVisual(modal);
   });
   
+  const setupSubmitListener = () => {
+    if (!DOM_ELEMENTS?.submit) return;
+    
+    EventManager.add(DOM_ELEMENTS.submit, 'click', () => {
+      PWAUtils.scheduleTask(checkAndShowOnSubmit, 100);
+    });
+  };
+  
   const init = async () => {
-    if (isInstalled() || !detectDevice() || isDismissed()) return;
-    
-    await new Promise(resolve => PWAUtils.scheduleTask(resolve, CONSTANTS.A2HS_MODAL_DELAY));
-    await new Promise(r => setTimeout(r, CONSTANTS.A2HS_PROMPT_TIMEOUT));
-    
-    if (state.promptReceived || detectDevice() === 'ios') showModal();
+    setupSubmitListener();
   };
   
   document.readyState === 'loading' 
