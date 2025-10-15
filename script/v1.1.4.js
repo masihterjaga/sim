@@ -5945,7 +5945,7 @@ const CONSTANTS = {
   PWA_RESTORE_DELAY_MS: 200,
   PWA_NAMESPACE: 'pwa_persistence',
   FORM_SELECTORS: 'select, input[type="number"]',
-  SW_UPDATE_CHECK_DELAY: 1234
+  SW_UPDATE_CHECK_DELAY: 234
 };
 const PWAUtils = (() => {
   const scheduleTask = (fn, delay = 0) => {
