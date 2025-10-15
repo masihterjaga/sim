@@ -6271,7 +6271,7 @@ const preventPullToRefresh = (() => {
   };
 })();
 const PWAPersistenceInit = (() => {
-  if (IS_PWA) return;
+  if (!IS_PWA) return;
 
   const PWAPersistence = (() => {
     let cachedElements = null;
