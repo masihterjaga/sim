@@ -6022,7 +6022,148 @@ if ('serviceWorker' in navigator) {
   })();
   
   PWAServiceWorker.init();
-}
+};
+if (!IS_PWA) {
+  DOM_ELEMENTS.checkUpdateBtn?.remove();
+} else {
+  const PWAManualUpdate = (() => {
+    const state = {
+      isChecking: false,
+      updateAvailable: false,
+      newWorker: null
+    };
+    
+    const setButtonState = (isChecking, updateAvailable) => {
+      const btn = DOM_ELEMENTS.checkUpdateBtn;
+      if (!btn) return;
+      
+      btn.disabled = isChecking;
+      
+      if (isChecking) {
+        btn.textContent = 'Checking...';
+        btn.classList.add('checking');
+        btn.classList.remove('update-available');
+      } else if (updateAvailable) {
+        btn.textContent = 'Update Available - Click to Install';
+        btn.classList.add('update-available');
+        btn.classList.remove('checking');
+      } else {
+        btn.textContent = 'Check for Updates';
+        btn.classList.remove('checking', 'update-available');
+      }
+    };
+    
+    const checkForUpdates = async () => {
+      if (state.isChecking || !('serviceWorker' in navigator)) return;
+      
+      state.isChecking = true;
+      setButtonState(true, false);
+      
+      try {
+        const reg = PWAServiceWorker?.getRegistration() ||
+          await navigator.serviceWorker.getRegistration('/sim/');
+        
+        if (!reg) {
+          SnackbarManager.show('Service worker not found');
+          state.isChecking = false;
+          setButtonState(false, false);
+          return;
+        }
+        
+        await reg.update();
+        
+        await new Promise(r => setTimeout(r, 2000));
+        
+        const hasUpdate = reg.installing || reg.waiting;
+        
+        if (hasUpdate) {
+          state.newWorker = reg.installing || reg.waiting;
+          state.updateAvailable = true;
+          SnackbarManager.show('Update found! Click button to install');
+        } else {
+          SnackbarManager.show('You have the latest version');
+        }
+        
+      } catch (err) {
+        console.error('Update check failed:', err);
+        SnackbarManager.show('Failed to check for updates');
+      } finally {
+        state.isChecking = false;
+        setButtonState(false, state.updateAvailable);
+      }
+    };
+    
+    const installUpdate = () => {
+      if (!state.newWorker) return;
+      
+      SnackbarManager.show('Installing update...');
+      
+      let reloaded = false;
+      const reloadHandler = () => {
+        if (reloaded) return;
+        reloaded = true;
+        SnackbarManager.show('Reloading...');
+        setTimeout(() => window.location.reload(), 300);
+      };
+      
+      navigator.serviceWorker.addEventListener('controllerchange', reloadHandler, { once: true });
+      
+      state.newWorker.addEventListener('statechange', () => {
+        if (state.newWorker.state === 'activated') {
+          setTimeout(reloadHandler, 100);
+        }
+      });
+      
+      state.newWorker.postMessage({ action: 'skipWaiting' });
+    };
+    
+    const handleClick = () => {
+      if (state.isChecking) return;
+      state.updateAvailable ? installUpdate() : checkForUpdates();
+    };
+    
+    const onUpdateFound = (newWorker) => {
+      state.newWorker = newWorker;
+      state.updateAvailable = true;
+      setButtonState(false, true);
+      SnackbarManager.show('Update available! Click button to install');
+    };
+    
+    const init = () => {
+      const btn = DOM_ELEMENTS.checkUpdateBtn;
+      if (!btn) return;
+      
+      EventManager.add(btn, 'click', handleClick);
+      setButtonState(false, false);
+      
+      if (!document.getElementById('pwa-update-styles')) {
+        const s = document.createElement('style');
+        s.id = 'pwa-update-styles';
+        s.textContent = `
+          .checking { opacity: 0.7; pointer-events: none; }
+          .update-available { animation: pulse 2s infinite; }
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+          }
+        `;
+        document.head.appendChild(s);
+      }
+    };
+    
+    document.readyState === 'loading' ?
+      document.addEventListener('DOMContentLoaded', init, { once: true, passive: true }) :
+      init();
+    
+    return {
+      checkForUpdates,
+      installUpdate,
+      onUpdateFound
+    };
+  })();
+  
+  window.PWAManualUpdate = PWAManualUpdate;
+};
 const initA2HS = (() => {
   const CFG = {
     storage: 'a2hsDismissed',
@@ -6378,135 +6519,7 @@ const PWAPersistenceInit = (() => {
     return true;
   };
 })();
-if (!IS_PWA) {
-  DOM_ELEMENTS.checkUpdateBtn?.remove();
-} else {
-  const PWAManualUpdate = (() => {
-    const state = {
-      isChecking: false,
-      updateAvailable: false,
-      newWorker: null
-    };
-    
-    const setButtonState = (isChecking, updateAvailable) => {
-      const btn = DOM_ELEMENTS.checkUpdateBtn;
-      if (!btn) return;
-      
-      btn.disabled = isChecking;
-      
-      if (isChecking) {
-        btn.textContent = 'Checking...';
-        btn.classList.add('checking');
-      } else if (updateAvailable) {
-        btn.textContent = 'Update Available - Click to Install';
-        btn.classList.add('update-available');
-        btn.classList.remove('checking');
-      } else {
-        btn.textContent = 'Check for Updates';
-        btn.classList.remove('checking', 'update-available');
-      }
-    };
-    
-    const checkForUpdates = async () => {
-      if (state.isChecking || !('serviceWorker' in navigator)) return;
-      
-      state.isChecking = true;
-      setButtonState(true, false);
-      
-      try {
-        const reg = PWAServiceWorker?.getRegistration() ||
-          await navigator.serviceWorker.getRegistration('/sim/');
-        
-        if (!reg) {
-          SnackbarManager.show('Service worker not found');
-          state.isChecking = false;
-          setButtonState(false, false);
-          return;
-        }
-        await reg.update();
-        await new Promise(r => setTimeout(r, 2000));
-        
-        const hasUpdate = reg.installing || reg.waiting;
-        
-        if (hasUpdate) {
-          state.newWorker = reg.installing || reg.waiting;
-          state.updateAvailable = true;
-          SnackbarManager.show('Update found! Click button to install');
-        } else {
-          SnackbarManager.show('You have the latest version');
-        }
-        
-      } catch (err) {
-        console.error('Update check failed:', err);
-        SnackbarManager.show('Failed to check for updates');
-      } finally {
-        state.isChecking = false;
-        setButtonState(false, state.updateAvailable);
-      }
-    };
-    
-    const installUpdate = () => {
-      if (!state.newWorker) return;
-      
-      SnackbarManager.show('Installing update...');
-      state.newWorker.postMessage({ action: 'skipWaiting' });
-      
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        SnackbarManager.show('Update installed! Reloading...');
-        setTimeout(() => window.location.reload(), 500);
-      }, { once: true });
-    };
-    
-    const handleClick = () => {
-      if (state.isChecking) return;
-      state.updateAvailable ? installUpdate() : checkForUpdates();
-    };
-    
-    const onUpdateFound = (newWorker) => {
-      state.newWorker = newWorker;
-      state.updateAvailable = true;
-      setButtonState(false, true);
-      SnackbarManager.show('Update available! Click button to install');
-    };
-    
-    const init = () => {
-      const btn = DOM_ELEMENTS.checkUpdateBtn;
-      if (!btn) return;
-      
-      EventManager.add(btn, 'click', handleClick);
-      setButtonState(false, false);
-      
-      if (!document.getElementById('pwa-update-styles')) {
-        const s = document.createElement('style');
-        s.id = 'pwa-update-styles';
-        s.textContent = `
-          .checking { opacity: 0.7; pointer-events: none; }
-          .update-available {
-            background: #28a745 !important;
-            animation: pulse 2s infinite;
-          }
-          @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
-          }
-        `;
-        document.head.appendChild(s);
-      }
-    };
-    
-    document.readyState === 'loading' ?
-      document.addEventListener('DOMContentLoaded', init, { once: true, passive: true }) :
-      init();
-    
-    return {
-      checkForUpdates,
-      installUpdate,
-      onUpdateFound
-    };
-  })();
-  
-  window.PWAManualUpdate = PWAManualUpdate;
-}
+
 
 // ========== RESET SYSTEM ==========
 const ResetHelpers = {
