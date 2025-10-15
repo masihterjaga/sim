@@ -5987,9 +5987,11 @@ if ('serviceWorker' in navigator) {
         
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+            // Notify manual update checker
             if (window.PWAManualUpdate) {
               window.PWAManualUpdate.onUpdateFound(newWorker);
             }
+            // Auto skip waiting jika bukan manual update
             else {
               newWorker.postMessage({ action: 'skipWaiting' });
             }
@@ -6022,7 +6024,8 @@ if ('serviceWorker' in navigator) {
   })();
   
   PWAServiceWorker.init();
-};
+}
+
 if (!IS_PWA) {
   DOM_ELEMENTS.checkUpdateBtn?.remove();
 } else {
@@ -6064,29 +6067,31 @@ if (!IS_PWA) {
           await navigator.serviceWorker.getRegistration('/sim/');
         
         if (!reg) {
-          SnackbarManager.show('Service worker not found');
+          SnackbarManager.show('❌ Service worker not registered');
           state.isChecking = false;
           setButtonState(false, false);
           return;
         }
         
+        // Force update
         await reg.update();
         
+        // Check untuk installing/waiting worker
         await new Promise(r => setTimeout(r, 2000));
         
-        const hasUpdate = reg.installing || reg.waiting;
+        const freshReg = await navigator.serviceWorker.getRegistration('/sim/');
+        const hasUpdate = freshReg?.installing || freshReg?.waiting;
         
         if (hasUpdate) {
-          state.newWorker = reg.installing || reg.waiting;
+          state.newWorker = freshReg.installing || freshReg.waiting;
           state.updateAvailable = true;
-          SnackbarManager.show('Update found! Click button to install');
+          SnackbarManager.show('✅ Update found! Click button to install');
         } else {
-          SnackbarManager.show('You have the latest version');
+          SnackbarManager.show('✅ You have the latest version');
         }
         
       } catch (err) {
-        console.error('Update check failed:', err);
-        SnackbarManager.show('Failed to check for updates');
+        SnackbarManager.show('❌ Check failed: ' + (err.message || 'Unknown error'));
       } finally {
         state.isChecking = false;
         setButtonState(false, state.updateAvailable);
@@ -6098,6 +6103,7 @@ if (!IS_PWA) {
       
       SnackbarManager.show('Installing update...');
       
+      // Setup reload handler sebelum skipWaiting
       let reloaded = false;
       const reloadHandler = () => {
         if (reloaded) return;
@@ -6108,6 +6114,7 @@ if (!IS_PWA) {
       
       navigator.serviceWorker.addEventListener('controllerchange', reloadHandler, { once: true });
       
+      // Fallback jika controllerchange tidak trigger
       state.newWorker.addEventListener('statechange', () => {
         if (state.newWorker.state === 'activated') {
           setTimeout(reloadHandler, 100);
