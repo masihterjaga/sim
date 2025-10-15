@@ -8,10 +8,10 @@
           "category": "Added",
           "items": [
             {
-              "text": "Progressive Web Application",
+              "text": "PWA support",
               "items": [
-                "Can install to home screen",
-                "Auto save calculated stats",
+                "Install to home screen",
+                "Auto-save calculated stats",
                 "Offline mode"
               ]
             }
@@ -21,11 +21,11 @@
           "category": "Improved",
           "items": [
             {
-              "text": "Edit, Clear & Reset button always enable",
+              "text": "Edit, Clear & Reset always enabled",
               "items": [
-                "Edit stats: unlock all option select and numeric field",
-                "Clear cache: just clear cache",
-                "Reset all: reset input + clear cache"
+                "Edit: unlocks all selects + numeric fields",
+                "Clear cache: clears cache only",
+                "Reset: resets input + clears cache"
               ]
             }
           ]
@@ -40,21 +40,21 @@
         {
           "category": "Added",
           "items": [
-            "Lightbox Image Gallery"
+            "Lightbox image gallery"
           ]
         },
         {
           "category": "Update",
           "items": [
-            "Divinity flash use original value for calculation",
-            "flash bonus contribution (normalize to 100% uptime)"
+            "Divinity flash uses original value for calc",
+            "Flash bonus normalized to 100% uptime"
           ]
         },
         {
           "category": "Improved",
           "items": [
-            "Breakdown with tooltip",
-            "performance"
+            "Breakdown with tooltips",
+            "Performance"
           ]
         }
       ]
@@ -72,8 +72,8 @@
         {
           "category": "Improved",
           "items": [
-            "micro animation n transition",
-            "structure code"
+            "Micro animations & transitions",
+            "Code structure"
           ]
         }
       ]
@@ -85,18 +85,18 @@
         {
           "category": "Added",
           "items": [
-            "Tooltips (help) for inputing data"
+            "Tooltips for data input"
           ]
         },
         {
           "category": "Improved",
           "items": [
             "Input validation",
-            "optimize flow n logic 3 eq set selection",
+            "3 eq set selection flow & logic",
             "Button feedback",
-            "push your stats to table",
-            "ui/ux (mobile prior)",
-            "cross-browser compatibility"
+            "Push stats to table",
+            "UI/UX (mobile-first)",
+            "Cross-browser compatibility"
           ]
         }
       ]
@@ -108,9 +108,9 @@
         {
           "category": "Added",
           "items": [
-            "Welcome dark theme",
+            "Dark theme",
             {
-              "text": "Equipment SET",
+              "text": "Equipment sets",
               "items": [
                 "Vesper",
                 "Blue",
@@ -119,7 +119,7 @@
             },
             "Final DMG Bonus field",
             {
-              "text": "Simulate \"Interactive\" Divinity Flash",
+              "text": "Interactive Divinity Flash sim",
               "items": [
                 "Spear of Eternity",
                 "Reaper Scythe"
@@ -130,7 +130,7 @@
         {
           "category": "Updated",
           "items": [
-            "Calculation Formula"
+            "Calc formula"
           ]
         },
         {
@@ -140,7 +140,7 @@
               "text": "UI/UX",
               "items": [
                 "Input validation tips",
-                "each button has its own feedback"
+                "Button feedback"
               ]
             }
           ]
@@ -155,12 +155,12 @@
           "category": "Added",
           "items": [
             {
-              "text": "All MVP/MINI Lv. 140 & Lv. 150 includes",
+              "text": "All MVP/MINI Lv. 140 & 150",
               "items": [
                 "DEF stats",
                 "Size",
                 "Race",
-                "and Attribute"
+                "Attribute"
               ]
             }
           ]
@@ -168,7 +168,7 @@
         {
           "category": "Updated",
           "items": [
-            "\"How to Use\" section"
+            "How to Use section"
           ]
         },
         {
@@ -177,23 +177,23 @@
             {
               "text": "Results",
               "items": [
-                "more precise stats calc",
-                "show/hide precise nums"
+                "Precise stat calc",
+                "Show/hide precise numbers"
               ]
             },
             {
-              "text": "Balancing recommendations",
+              "text": "Recommendation balance",
               "items": [
-                "better logic for race and/or attr",
-                "extra cats when race & attr too low"
+                "Better logic for race/attribute",
+                "Extra categories when race & attribute too low"
               ]
             },
-            "Sticky \"smooth\" button",
+            "Sticky smooth button",
             {
               "text": "Swap Boss",
               "items": [
-                "stats editable after swap",
-                "can skip race / attr field (set to 0)"
+                "Editable stats after swap",
+                "Skip race/attribute field (set to 0)"
               ]
             }
           ]
@@ -208,9 +208,9 @@
           "category": "Added",
           "items": [
             "Changelog",
-            "\"How to Use\" section at top of page",
+            "How to Use section",
             {
-              "text": "Target DEF dropdown (used in calc)",
+              "text": "Target DEF dropdown",
               "items": [
                 "Dummy (0 DEF)",
                 "Avg. MVP/MINI Lv. 130",
@@ -229,7 +229,7 @@
             {
               "text": "Calc formula",
               "items": [
-                "added counter DEF"
+                "DEF counter added"
               ]
             }
           ]
@@ -237,11 +237,11 @@
         {
           "category": "Improved",
           "items": [
-            "cross-browser support",
-            "main flow + logic",
-            "input validation",
-            "results breakdown by factor",
-            "recommendation table logic"
+            "Cross-browser support",
+            "Main flow & logic",
+            "Input validation",
+            "Results breakdown by factor",
+            "Recommendation table logic"
           ]
         }
       ]
@@ -259,7 +259,7 @@
                 "6 dropdowns + 6 numeric inputs",
                 "3 buttons",
                 "Result card",
-                "randomize stats in rec table"
+                "Randomized stats in rec table"
               ]
             }
           ]

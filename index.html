@@ -48,109 +48,107 @@
           <span>How to Use</span>
         </summary>
         <div class="body">
-          <ol>
-            <li>
-              <strong>Dropdowns</strong>
-              <ul>
-                <li>Set <strong>Attack Type</strong>, <strong>Weapon</strong>, and <strong>Weapon Attribute</strong>.</li>
-                <li>
-                  For <strong>MVP/MINI</strong>:
-                  <ul>
-                    <li>
-                      Selecting a specific MVP/Mini will auto <strong>sync and lock</strong> its <strong>size, race, and attribute</strong>.
-                      <em>(Example: <strong>Phreeoni = Large / Brute / Neutral</strong>. The fields stay fixed and you’ll need to fill the related numbers.)</em>
-                      <ul>
-                        <li>
-                          If you only have a <strong>Race enchant (or only Attribute)</strong>, just set the other field to <code>0</code>.
-                          <ul>
-                            <li>Example: <strong>Brute 0 / Neutral 20</strong></li>
-                            <li>Example: <strong>Brute 30 / Neutral 0</strong></li>
-                          </ul>
-                        </li>
-                      </ul>
-                    </li>
-                    <li>Selecting an <strong>Average Lv.</strong> can skip or set target race/attribute manually.</li>
-                    <li><em>If you don’t have race and/or attribute enchants, better go with <strong>Average Lv. Boss</strong> and skip those.</em></li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-            <li>
-              Equipment
-              <ul>
-                <li>Choose the set you’re using <strong>(Vesper / Blue / White)</strong>.</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Stat Inputs</strong>
-              <ul>
-                <li>Enter your stats exactly as shown in game.</li>
-                <li>
-                  Extra: <strong>Final DMG Bonus %</strong>
-                  <ul>
-                    <li>
-                      <strong><s>F. P/M DMG BONUS</s></strong>
-                      <ul>
-                        <li>Shown in <strong>detailed stats</strong> as <strong>Final Damage Stack / Final Damage Bonus</strong>. Make sure <strong>no buffs</strong> are on. If you don’t see it, set <strong>0</strong>.</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </li>
-                <li>Only <strong>numbers</strong>, don’t type <strong><s>“%”</s></strong>.</li>
-                <li><strong>Decimals</strong> are fine. <em>(Example: <strong>888.88</strong>)</em></li>
-              </ul>
-            </li>
-            <li>
-              <strong>Calculate</strong>
-              <ul>
-                <li>Once everything is filled, hit <strong>Calculate</strong>.</li>
-              </ul>
-            </li>
-            <li>
-              <strong>Results</strong>
-              <ul>
-                <li>You’ll see <strong>base multiplier</strong> and a breakdown of your stats.</li>
-              </ul>
-            </li>
-            <li>
-              Simulate Flash
-              <ul>
-                <li>
-                  <strong>Spear of Eternity</strong> and <strong>Reaper Scythe</strong>.
-                  <ul>
-                    <li><em>Each has 10s duration / 20s cooldown with <strong>+84% or +28%</strong> bonus. This tool normalize <strong>to 42</strong> and <strong>14</strong> for <strong>100% uptime</strong>(?) in flash bonus contribution. But still using original value for calculation.</em></li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <strong>Swap Target</strong>
-              <ul>
-                <li>Lets you <strong>switch bosses</strong> without starting over.</li>
-                <li>If the new boss has <strong>different size/race/element</strong>, the inputs unlock and you’ll need to <strong>re-input stats</strong>.</li>
-                <li>
-                  If it’s the
-                  <strong>
-                  same type</strong>, the calc <strong>updates instantly</strong>.
-                </li>
-                <li>
-                  <em>Examples:</em>
-                  <ul>
-                    <li><strong>Phreeoni 140 → Deviling 150</strong> → re-enter <strong>Medium / Demon / Shadow</strong>.</li>
-                    <li><strong>Phreeoni 140 → Phreeoni 150</strong> → auto updates, no changes.</li>
-                    <li><strong>Phreeoni 150 → Avg. 140</strong> → race/element are <strong>cleared</strong>, treated as average <strong>Large Boss Lv.140</strong>.</li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <strong>Recommendations</strong>
-              <ul>
-                <li>At the bottom you’ll see a table with recommended <strong><s>ratios</s></strong> stat allocations.</li>
-                <li>Hit <strong>Refresh</strong> to roll new sets until you see one you can actually use.</li>
-              </ul>
-            </li>
-          </ol>
+<ol>
+  <li>
+    <strong>Dropdowns</strong>
+    <ul>
+      <li>Set <strong>Attack Type</strong>, <strong>Weapon</strong>, and <strong>Weapon Attribute</strong>.</li>
+      <li>
+        For <strong>MVP/MINI</strong>:
+        <ul>
+          <li>
+            Picking a specific MVP/Mini will auto <strong>sync and lock</strong> its <strong>size, race, and attribute</strong>.
+            <em>(Example: <strong>Phreeoni = Large / Brute / Neutral</strong>. Fields stay fixed, just fill in the related numbers.)</em>
+            <ul>
+              <li>
+                If you only have a <strong>Race enchant (or only Attribute)</strong>, just set the other field to <code>0</code>.
+                <ul>
+                  <li>Example: <strong>Brute 0 / Neutral 20</strong></li>
+                  <li>Example: <strong>Brute 30 / Neutral 0</strong></li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>Picking <strong>Average Lv.</strong> lets you skip or set target race/attribute manually.</li>
+          <li><em>If you don't have race and/or attribute enchants, just go with <strong>Average Lv. Boss</strong> and skip those.</em></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    Equipment
+    <ul>
+      <li>Pick the set you're using <strong>(Vesper / Blue / White)</strong>.</li>
+    </ul>
+  </li>
+  <li>
+    <strong>Stat Inputs</strong>
+    <ul>
+      <li>Put in your stats exactly as shown in game.</li>
+      <li>
+        Extra: <strong>Final DMG Bonus %</strong>
+        <ul>
+          <li>
+            <strong><s>F. P/M DMG BONUS</s></strong>
+            <ul>
+              <li>Check <strong>detailed stats</strong> for <strong>Final Damage Stack / Final Damage Bonus</strong>. Make sure <strong>no buffs</strong> are active. If you don't see it, just set <strong>0</strong>.</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li>Only <strong>numbers</strong>, don't type <strong><s>"%"</s></strong>.</li>
+      <li><strong>Decimals</strong> are fine. <em>(Example: <strong>888.88</strong>)</em></li>
+    </ul>
+  </li>
+  <li>
+    <strong>Calculate</strong>
+    <ul>
+      <li>Once everything's filled, hit <strong>Calculate</strong>.</li>
+    </ul>
+  </li>
+  <li>
+    <strong>Results</strong>
+    <ul>
+      <li>You'll see <strong>base multiplier</strong> and a breakdown of your stats.</li>
+    </ul>
+  </li>
+  <li>
+    Simulate Flash
+    <ul>
+      <li>
+        <strong>Spear of Eternity</strong> and <strong>Reaper Scythe</strong>.
+        <ul>
+          <li><em>Each has 10s duration / 20s cooldown with <strong>+84% or +28%</strong> bonus. This tool normalizes <strong>to 42</strong> and <strong>14</strong> for <strong>100% uptime</strong>(?) in flash bonus contribution. But still uses original value for calculation.</em></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <strong>Swap Target</strong>
+    <ul>
+      <li>Lets you <strong>switch bosses</strong> without starting over.</li>
+      <li>If the new boss has <strong>different size/race/element</strong>, inputs unlock and you'll need to <strong>re-input stats</strong>.</li>
+      <li>
+        If it's the <strong>same type</strong>, calc <strong>updates instantly</strong>.
+      </li>
+      <li>
+        <em>Examples:</em>
+        <ul>
+          <li><strong>Phreeoni 140 → Deviling 150</strong> → re-enter <strong>Medium / Demon / Shadow</strong>.</li>
+          <li><strong>Phreeoni 140 → Phreeoni 150</strong> → auto updates, no changes.</li>
+          <li><strong>Phreeoni 150 → Avg. 140</strong> → race/element are <strong>cleared</strong>, treated as average <strong>Large Boss Lv.140</strong>.</li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <strong>Recommendations</strong>
+    <ul>
+      <li>At the bottom you'll see a table with recommended <strong><s>ratios</s></strong> stat allocations.</li>
+      <li>Hit <strong>Refresh</strong> to roll new sets until you find one you can actually use.</li>
+    </ul>
+  </li>
+</ol>
         </div>
       </details>
       <div class="form-row">
