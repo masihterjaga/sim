@@ -706,7 +706,7 @@ td.delta:hover {
   background-color: grey;
 }
 #testSpear.sticky.activated {
-  background-color: #c27d00;
+  background-color: #c27d00; 
 }
 #testReaper.sticky.activated {
   background-color: #7439e0;
