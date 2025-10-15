@@ -6056,37 +6056,42 @@ if (!IS_PWA) {
       newWorker: null,
       registration: null,
       updateFoundListener: null,
-      controllerChangeListener: null
+      controllerChangeListener: null,
+      currentPhase: 'idle' // idle, checking, downloading, installing, ready
     };
     
-    const setButtonState = (isChecking, updateAvailable) => {
+    const UI_TEXT = {
+      idle: 'Check for Updates',
+      checking: 'Checking for updates...',
+      downloading: 'Downloading update...',
+      installing: 'Installing update...',
+      ready: 'Update Available - Click to Install',
+      applying: 'Applying update...',
+      reloading: 'Reloading app...'
+    };
+    
+    const setButtonState = (phase) => {
       const btn = DOM_ELEMENTS.checkUpdateBtn;
       if (!btn) return;
       
-      btn.disabled = isChecking;
+      state.currentPhase = phase;
+      const isProcessing = ['checking', 'downloading', 'installing', 'applying', 'reloading'].includes(phase);
       
-      if (isChecking) {
-        btn.textContent = 'Checking...';
-        btn.classList.add('checking');
-        btn.classList.remove('update-available');
-      } else if (updateAvailable) {
-        btn.textContent = 'Update Available - Click to Install';
-        btn.classList.add('update-available');
-        btn.classList.remove('checking');
-      } else {
-        btn.textContent = 'Check for Updates';
-        btn.classList.remove('checking', 'update-available');
-      }
+      btn.disabled = isProcessing;
+      btn.textContent = UI_TEXT[phase] || UI_TEXT.idle;
+      
+      btn.classList.toggle('checking', isProcessing);
+      btn.classList.toggle('update-available', phase === 'ready');
     };
     
     const resetState = () => {
       state.updateAvailable = false;
       state.newWorker = null;
       state.registration = null;
-      setButtonState(false, false);
+      setButtonState('idle');
     };
     
-    const waitForWorkerState = (worker, targetState, timeout = 10000) => {
+    const waitForWorkerState = (worker, targetState, timeout = 5000) => {
       return new Promise((resolve, reject) => {
         if (worker.state === targetState) {
           resolve();
@@ -6114,7 +6119,8 @@ if (!IS_PWA) {
       if (state.isChecking || !('serviceWorker' in navigator)) return;
       
       state.isChecking = true;
-      setButtonState(true, false);
+      setButtonState('checking');
+      SnackbarManager.show('Checking for updates...');
       
       try {
         const reg = PWAServiceWorker?.getRegistration() || 
@@ -6124,32 +6130,40 @@ if (!IS_PWA) {
           throw new Error('Service worker not registered');
         }
         
+        // Cek jika ada worker yang menunggu
         if (reg.waiting) {
           state.newWorker = reg.waiting;
           state.registration = reg;
           state.updateAvailable = true;
-          SnackbarManager.show('Update found! Click button to install');
-          setButtonState(false, true);
+          setButtonState('ready');
+          SnackbarManager.show('Update ready! Click to install');
+          state.isChecking = false;
           return;
         }
         
+        // Cek jika sedang installing
         if (reg.installing) {
           state.newWorker = reg.installing;
           state.registration = reg;
           
+          setButtonState('downloading');
+          SnackbarManager.show('Downloading update...');
+          
           try {
-            await waitForWorkerState(reg.installing, 'installed', 15000);
+            await waitForWorkerState(reg.installing, 'installed', 8000);
             state.updateAvailable = true;
-            SnackbarManager.show('Update found! Click button to install');
-            setButtonState(false, true);
+            setButtonState('ready');
+            SnackbarManager.show('Update ready! Click to install');
           } catch (err) {
-            throw new Error('Update timeout');
+            throw new Error('Download timeout');
           }
+          state.isChecking = false;
           return;
         }
         
+        // Trigger network check
         const updateFoundPromise = new Promise((resolve) => {
-          const timeout = setTimeout(() => resolve(false), 15000);
+          const timeout = setTimeout(() => resolve(false), 10000);
           
           const updateHandler = () => {
             clearTimeout(timeout);
@@ -6159,10 +6173,18 @@ if (!IS_PWA) {
               state.newWorker = newWorker;
               state.registration = reg;
               
+              setButtonState('downloading');
+              SnackbarManager.show('Downloading update...');
+              
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed') {
                   state.updateAvailable = true;
+                  setButtonState('ready');
+                  SnackbarManager.show('Update ready! Click to install');
                   resolve(true);
+                } else if (newWorker.state === 'installing') {
+                  setButtonState('installing');
+                  SnackbarManager.show('Installing update...');
                 }
               });
             } else {
@@ -6180,11 +6202,8 @@ if (!IS_PWA) {
         
         const hasUpdate = await updateFoundPromise;
         
-        if (hasUpdate) {
-          SnackbarManager.show('Update found! Click button to install');
-          setButtonState(false, true);
-        } else {
-          SnackbarManager.show('You have the latest version');
+        if (!hasUpdate) {
+          SnackbarManager.show('Already up to date');
           resetState();
         }
         
@@ -6202,12 +6221,14 @@ if (!IS_PWA) {
         return;
       }
       
-      SnackbarManager.show('Installing update...');
+      setButtonState('applying');
+      SnackbarManager.show('Applying update...');
       
       const performReload = () => {
-        SnackbarManager.show('Reloading...');
+        setButtonState('reloading');
+        SnackbarManager.show('Reloading app...');
         cleanup();
-        setTimeout(() => window.location.reload(), 300);
+        setTimeout(() => window.location.reload(), 500);
       };
       
       state.controllerChangeListener = performReload;
@@ -6221,7 +6242,7 @@ if (!IS_PWA) {
       try {
         state.newWorker.postMessage({ action: 'skipWaiting' });
       } catch (err) {
-        SnackbarManager.show('Failed to install update');
+        SnackbarManager.show('Failed to apply update');
         resetState();
       }
     };
@@ -6233,16 +6254,22 @@ if (!IS_PWA) {
     
     const onUpdateFound = (event) => {
       const { worker, registration } = event.detail;
-      if (!worker) return;
+      if (!worker || state.isChecking) return;
       
       state.newWorker = worker;
       state.registration = registration;
       
+      setButtonState('downloading');
+      SnackbarManager.show('Update detected, downloading...');
+      
       worker.addEventListener('statechange', () => {
-        if (worker.state === 'installed' && navigator.serviceWorker.controller) {
+        if (worker.state === 'installing') {
+          setButtonState('installing');
+          SnackbarManager.show('Installing update...');
+        } else if (worker.state === 'installed' && navigator.serviceWorker.controller) {
           state.updateAvailable = true;
-          setButtonState(false, true);
-          SnackbarManager.show('Update available! Click button to install');
+          setButtonState('ready');
+          SnackbarManager.show('Update ready! Click to install');
         }
       });
     };
@@ -6264,7 +6291,7 @@ if (!IS_PWA) {
       if (!btn) return;
       
       EventManager.add(btn, 'click', handleClick);
-      setButtonState(false, false);
+      setButtonState('idle');
       
       state.updateFoundListener = onUpdateFound;
       window.addEventListener('sw-update-found', state.updateFoundListener);
@@ -6300,7 +6327,7 @@ if (!IS_PWA) {
   })();
   
   window.PWAManualUpdate = PWAManualUpdate;
-}
+};
 const initA2HS = (() => {
   const CFG = {
     storage: 'a2hsDismissed',
