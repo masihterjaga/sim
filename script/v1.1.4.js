@@ -5970,8 +5970,10 @@ const PWAUtils = (() => {
 
   return { scheduleTask, safeJSONParse, safeJSONStringify, debounce };
 })();
-if ('serviceWorker' in navigator) {
-  const PWAServiceWorker = (() => {
+const PWAServiceWorker = (() => {
+  if (!('serviceWorker' in navigator)) return null;
+  
+  return (() => {
     let currentRegistration = null;
     let updateCheckTimer = null;
     
@@ -6040,9 +6042,9 @@ if ('serviceWorker' in navigator) {
       cleanup
     };
   })();
-  
-  PWAServiceWorker.init();
-}
+})();
+
+if (PWAServiceWorker) PWAServiceWorker.init();
 
 if (!IS_PWA) {
   DOM_ELEMENTS.checkUpdateBtn?.remove();
