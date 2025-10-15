@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.0.2';
+const CACHE_NAME = 'rox-calc-v1.0';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
@@ -20,7 +20,6 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
-  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME)
     .then(cache => cache.addAll(urlsToCache))

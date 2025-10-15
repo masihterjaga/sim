@@ -5993,16 +5993,6 @@ const PWAServiceWorker = (() => {
         window.dispatchEvent(new CustomEvent('sw-update-found', {
           detail: { worker: newWorker, registration }
         }));
-        
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            setTimeout(() => {
-              if (!window.PWAManualUpdate || !window.PWAManualUpdate.isUpdatePending()) {
-                newWorker.postMessage({ action: 'skipWaiting' });
-              }
-            }, 5000);
-          }
-        });
       });
     };
     
@@ -6221,6 +6211,17 @@ if (!IS_PWA) {
         return;
       }
       
+      // Confirm jika user sudah melakukan kalkulasi
+      if (AppState.get('isResultShown')) {
+        const confirmed = confirm(
+          "You've already done some calculations, but don't worry - your stats are safe and will be preserved!"
+        );
+        
+        if (!confirmed) {
+          return; // User stays on current version
+        }
+      }
+      
       setButtonState('applying');
       SnackbarManager.show('Applying update...');
       
@@ -6231,7 +6232,18 @@ if (!IS_PWA) {
         setTimeout(() => window.location.reload(), 500);
       };
       
-      state.controllerChangeListener = performReload;
+      // Fallback timeout jika controllerchange tidak terpicu
+      const fallbackTimer = setTimeout(() => {
+        console.warn('controllerchange timeout, force reload');
+        performReload();
+      }, 3000);
+      
+      const controllerChangeHandler = () => {
+        clearTimeout(fallbackTimer);
+        performReload();
+      };
+      
+      state.controllerChangeListener = controllerChangeHandler;
       
       navigator.serviceWorker.addEventListener(
         'controllerchange', 
@@ -6239,9 +6251,35 @@ if (!IS_PWA) {
         { once: true }
       );
       
+      // Cek state worker sebelum postMessage
+      if (state.newWorker.state === 'activated') {
+        // Jika sudah activated, langsung reload
+        clearTimeout(fallbackTimer);
+        performReload();
+        return;
+      }
+      
+      // Monitor state change sebagai backup
+      const stateChangeHandler = () => {
+        if (state.newWorker.state === 'activated') {
+          clearTimeout(fallbackTimer);
+          state.newWorker.removeEventListener('statechange', stateChangeHandler);
+          // Beri waktu sebentar untuk controller change
+          setTimeout(() => {
+            if (navigator.serviceWorker.controller === state.newWorker) {
+              performReload();
+            }
+          }, 100);
+        }
+      };
+      
+      state.newWorker.addEventListener('statechange', stateChangeHandler);
+      
       try {
         state.newWorker.postMessage({ action: 'skipWaiting' });
       } catch (err) {
+        clearTimeout(fallbackTimer);
+        state.newWorker.removeEventListener('statechange', stateChangeHandler);
         SnackbarManager.show('Failed to apply update');
         resetState();
       }
@@ -6327,7 +6365,7 @@ if (!IS_PWA) {
   })();
   
   window.PWAManualUpdate = PWAManualUpdate;
-};
+}
 const initA2HS = (() => {
   const CFG = {
     storage: 'a2hsDismissed',
