@@ -6033,9 +6033,7 @@ const PWAServiceWorker = (() => {
     };
   })();
 })();
-
 if (PWAServiceWorker) PWAServiceWorker.init();
-
 if (!IS_PWA) {
   DOM_ELEMENTS.checkUpdateBtn?.remove();
 } else {
@@ -6211,7 +6209,6 @@ if (!IS_PWA) {
         return;
       }
       
-      // Confirm jika user sudah melakukan kalkulasi
       if (AppState.get('isResultShown')) {
         const confirmed = confirm(
           "You've already done some calculations, but don't worry - your stats are safe and will be preserved!"
@@ -6232,7 +6229,6 @@ if (!IS_PWA) {
         setTimeout(() => window.location.reload(), 500);
       };
       
-      // Fallback timeout jika controllerchange tidak terpicu
       const fallbackTimer = setTimeout(() => {
         console.warn('controllerchange timeout, force reload');
         performReload();
@@ -6251,20 +6247,16 @@ if (!IS_PWA) {
         { once: true }
       );
       
-      // Cek state worker sebelum postMessage
       if (state.newWorker.state === 'activated') {
-        // Jika sudah activated, langsung reload
         clearTimeout(fallbackTimer);
         performReload();
         return;
       }
       
-      // Monitor state change sebagai backup
       const stateChangeHandler = () => {
         if (state.newWorker.state === 'activated') {
           clearTimeout(fallbackTimer);
           state.newWorker.removeEventListener('statechange', stateChangeHandler);
-          // Beri waktu sebentar untuk controller change
           setTimeout(() => {
             if (navigator.serviceWorker.controller === state.newWorker) {
               performReload();
@@ -6365,7 +6357,7 @@ if (!IS_PWA) {
   })();
   
   window.PWAManualUpdate = PWAManualUpdate;
-}
+};
 const initA2HS = (() => {
   const CFG = {
     storage: 'a2hsDismissed',
