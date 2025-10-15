@@ -704,14 +704,11 @@ td.delta:hover {
 #testSpear.sticky,
 #testReaper.sticky {
   background-color: grey;
-  transition: background-color 2s;
 }
 #testSpear.sticky.activated {
-  transition: background-color 2s;
   background-color: #c27d00;
 }
 #testReaper.sticky.activated {
-  transition: background-color 2s;
   background-color: #7439e0;
 }
 
