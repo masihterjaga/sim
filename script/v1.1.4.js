@@ -6002,7 +6002,7 @@ if ('serviceWorker' in navigator) {
     };
     
     const init = () => {
-      window.addEventListener('load', registerSW, { passive: true });
+      window.addEventListener('DOMContentLoaded', registerSW, { passive: true });
     };
     
     return { init };
