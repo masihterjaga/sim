@@ -301,6 +301,32 @@ select.invalid-value:focus {
   background: #4752c4;
 }
 
+#editBtn {
+  background: #208fa3;
+}
+
+#editBtn:hover {
+  background: #1a7a8a;
+}
+
+#editBtn:active,
+#editBtn:focus {
+  background: #156571;
+}
+
+#cacheBtn {
+  background: #4a9b5e;
+}
+
+#cacheBtn:hover {
+  background: #3f8550;
+}
+
+#cacheBtn:active,
+#cacheBtn:focus {
+  background: #356f43;
+}
+
 #submitBtn:hover {
   background: #3c45a5;
 }
