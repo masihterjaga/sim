@@ -301,32 +301,6 @@ select.invalid-value:focus {
   background: #4752c4;
 }
 
-#editBtn {
-  background: #208fa3;
-}
-
-#editBtn:hover {
-  background: #1a7a8a;
-}
-
-#editBtn:active,
-#editBtn:focus {
-  background: #156571;
-}
-
-#cacheBtn {
-  background: #4a9b5e;
-}
-
-#cacheBtn:hover {
-  background: #3f8550;
-}
-
-#cacheBtn:active,
-#cacheBtn:focus {
-  background: #356f43;
-}
-
 #submitBtn:hover {
   background: #3c45a5;
 }
@@ -336,57 +310,96 @@ select.invalid-value:focus {
   background: #343a8f;
 }
 
+#editBtn {
+  background: #1e7a8f;
+}
+
+#editBtn:hover {
+  background: #196778;
+}
+
+#editBtn:active,
+#editBtn:focus {
+  background: #145461;
+}
+
+#cacheBtn {
+  background: #3d8b52;
+}
+
+#cacheBtn:hover {
+  background: #357745;
+}
+
+#cacheBtn:active,
+#cacheBtn:focus {
+  background: #2d6339;
+}
+
 #resetRekomenBtn,
 #resetRekomenBtn.sticky {
-  background: #5a6069;
+  background: #4a4d54;
 }
 
 #resetRekomenBtn:hover {
-  background: #646b75;
+  background: #55585f;
 }
 
 #resetRekomenBtn:active,
 #resetRekomenBtn:focus {
-  background: #6e7681;
+  background: #60636a;
 }
 
 #resetAllBtn {
-  background: #c13537;
+  background: #b8383a;
 }
 
 #resetAllBtn:hover {
-  background: #a82d2f;
+  background: #a03133;
 }
 
 #resetAllBtn:active,
 #resetAllBtn:focus {
-  background: #8f2527;
+  background: #882a2c;
 }
 
 #testSpear {
-  background: #cc8400;
+  background: #c27d00;
 }
 
 #testSpear:hover {
-  background: #b37400;
+  background: #a96d00;
 }
 
 #testSpear:active,
 #testSpear:focus {
-  background: #996300;
+  background: #8f5c00;
 }
 
 #testReaper {
-  background: #7e3ff2;
+  background: #7439e0;
 }
 
 #testReaper:hover {
-  background: #6931d9;
+  background: #632ec7;
 }
 
 #testReaper:active,
 #testReaper:focus {
-  background: #5625b0;
+  background: #5224a8;
+}
+
+#checkBtn {
+  background: #2a2d33;
+}
+
+#checkBtn:hover {
+  background: #1f2226;
+}
+
+#checkBtn:active,
+#checkBtn:focus {
+  background: #16181b;
 }
 
 button:disabled {
@@ -671,12 +684,12 @@ td.delta:hover {
 }
 
 #testSpear.sticky {
-  background-color: #cc8400;
+  background-color: #c27d00;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M17 10h-3.61l2.28 2.28zm0-8H7v1.61l6.13 6.13zm-13.59.86L2 4.27l5 5V13h3v9l3.58-6.15L17.73 20l1.41-1.41z'/%3E%3C/svg%3E");
 }
 
 #testReaper.sticky {
-  background-color: #7e3ff2;
+  background-color: #7439e0;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'%3E%3Cpath fill='%23fff' d='M17 10h-3.61l2.28 2.28zm0-8H7v1.61l6.13 6.13zm-13.59.86L2 4.27l5 5V13h3v9l3.58-6.15L17.73 20l1.41-1.41z'/%3E%3C/svg%3E");
 }
 
@@ -695,11 +708,11 @@ td.delta:hover {
 }
 #testSpear.sticky.activated {
   transition: background-color 2s;
-  background-color: #cc8400;
+  background-color: #c27d00;
 }
 #testReaper.sticky.activated {
   transition: background-color 2s;
-  background-color: #7e3ff2;
+  background-color: #7439e0;
 }
 
 #testSpear.sticky.activated::before,
@@ -815,7 +828,7 @@ td.delta:hover {
   min-width: 48px;
   padding: 0;
   color: transparent;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='white' viewBox='0 -960 960 960'%3E%3Cpath d='M769-88 645-212l-88 88-43-43q-17-17-17-42t17-42l199-199q17-17 42-17t42 17l43 43-88 88 123 124q9 9 9 21t-9 21l-64 65q-9 9-21 9t-21-9Zm111-636L427-271l19 20q17 17 17 42t-17 42l-43 43-88-88L191-88q-9 9-21 9t-21-9l-65-65q-9-9-9-21t9-21l124-124-88-88 43-43q-17-17 42-17t42 17l20 19 453-453h160v160ZM320-568l38-38 38-38-38 38-38 38Zm-42 42L80-724v-160h160l198 198-42 42-181-180h-75v75l180 181-42 42Zm105 212 437-435v-75h-75L308-389l75 75Zm0 0-37-38-38-37 38 37 37 38Z'/%3E%3C/svg%3E") center / 24px no-repeat #c13537;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' fill='white' viewBox='0 -960 960 960'%3E%3Cpath d='M769-88 645-212l-88 88-43-43q-17-17-17-42t17-42l199-199q17-17 42-17t42 17l43 43-88 88 123 124q9 9 9 21t-9 21l-64 65q-9 9-21 9t-21-9Zm111-636L427-271l19 20q17 17 17 42t-17 42l-43 43-88-88L191-88q-9 9-21 9t-21-9l-65-65q-9-9-9-21t9-21l124-124-88-88 43-43q-17-17 42-17t42 17l20 19 453-453h160v160ZM320-568l38-38 38-38-38 38-38 38Zm-42 42L80-724v-160h160l198 198-42 42-181-180h-75v75l180 181-42 42Zm105 212 437-435v-75h-75L308-389l75 75Zm0 0-37-38-38-37 38 37 37 38Z'/%3E%3C/svg%3E") center / 24px no-repeat #b8383a;
   text-shadow: none;
   text-indent: -9999px;
   appearance: none;
@@ -830,7 +843,7 @@ td.delta:hover {
 }
 
 #backToHasilBtn.sticky {
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 24 24'%3E%3Cpath d='M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59.58L20 12l-8-8z'/%3E%3C/svg%3E") center / 24px no-repeat #4a9b5e;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23fff' viewBox='0 0 24 24'%3E%3Cpath d='M4 12l1.41 1.41L11 7.83V20h2V7.83l5.59.58L20 12l-8-8z'/%3E%3C/svg%3E") center / 24px no-repeat #3d8b52;
 }
 
 #toggleStickyBtn.sticky {

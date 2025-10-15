@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.0.1';
+const CACHE_NAME = 'rox-calc-v2';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
@@ -20,6 +20,8 @@ const urlsToCache = [
 ];
 
 self.addEventListener('install', event => {
+  self.skipWaiting(); // Force install langsung tanpa tunggu tab ditutup
+  
   event.waitUntil(
     caches.open(CACHE_NAME)
     .then(cache => cache.addAll(urlsToCache))
@@ -33,7 +35,7 @@ self.addEventListener('activate', event => {
       names.filter(name => name !== CACHE_NAME)
       .map(name => caches.delete(name))
     ))
-    .then(() => self.clients.claim())
+    .then(() => self.clients.claim()) // Ambil alih semua tabs
   );
 });
 
