@@ -5991,16 +5991,14 @@ if ('serviceWorker' in navigator) {
     
     const registerSW = () => {
       navigator.serviceWorker.register('/sim/sw.js', {
-        scope: '/sim/',
-        updateViaCache: 'none'
-      })
-      .then(reg => {
-        if (IS_PWA) {
+          scope: '/sim/',
+          updateViaCache: 'none'
+        })
+        .then(reg => {
           checkForUpdatesOnStart(reg);
           setupUpdateListener(reg);
-        }
-      })
-      .catch(() => {});
+        })
+        .catch(() => {});
     };
     
     const init = () => {
