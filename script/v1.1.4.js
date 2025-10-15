@@ -1611,8 +1611,7 @@ const processMainCalculation = (() => {
   };
 
   const enableResultButtons = () => {
-    [DOM_ELEMENTS.testReaper, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.resetRek, 
-      DOM_ELEMENTS.edit]
+    [DOM_ELEMENTS.testReaper, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.resetRek]
     .forEach(btn => {
       if (btn) btn.disabled = false;
     });
@@ -3938,15 +3937,15 @@ class StickyHandler {
 
     this.selectors = {
       resetRek: 'resetRekomenBtn',
-      resetAll: 'resetAllBtn',
+      edit: 'editBtn',
       swapBoss: 'breakdown-swap',
       stickyStart: () => DOM_ELEMENTS?.stickyStart,
       testSpear: () => DOM_ELEMENTS?.testSpear,
       testReaper: () => DOM_ELEMENTS?.testReaper
     };
 
-    this.buttonOrder = ['toggleBtn', 'swapBoss', 'testSpear', 'testReaper', 'resetRek', 'resetAll', 'backBtn'];
-    this.textButtons = new Set(['resetRek', 'resetAll', 'testSpear', 'testReaper']);
+    this.buttonOrder = ['toggleBtn', 'swapBoss', 'testSpear', 'testReaper', 'resetRek', 'edit', 'backBtn'];
+    this.textButtons = new Set(['resetRek', 'edit', 'testSpear', 'testReaper']);
     this.controlButtons = [{
         id: 'toggleStickyBtn',
         class: 'sticky-toggle',
@@ -5901,7 +5900,6 @@ const mainButtonEvent = (() => {
   window._eventsAlreadyBound = true;
   
   const editStats = () => {
-    if (!AppState.get('isResultShown')) return;
     if (!confirm('Editing will clear the results. Sure?')) return;
     AppState.reset();
     ResetHelpers.resetButtons();
@@ -5910,7 +5908,6 @@ const mainButtonEvent = (() => {
     unlockAllInputs();
     dropdownManager.scheduleUpdate();
     scrollAndFocusElement(DOM_ELEMENTS.atkType);
-    DOM_ELEMENTS.edit.disabled = true
   };
   
   const buttonBindings = new Map([
@@ -5948,7 +5945,7 @@ const CONSTANTS = {
   PWA_RESTORE_DELAY_MS: 200,
   PWA_NAMESPACE: 'pwa_persistence',
   FORM_SELECTORS: 'select, input[type="number"]',
-  SW_UPDATE_CHECK_DELAY: 500
+  SW_UPDATE_CHECK_DELAY: 1234
 };
 const PWAUtils = (() => {
   const scheduleTask = (fn, delay = 0) => {
@@ -5974,90 +5971,40 @@ const PWAUtils = (() => {
 })();
 if ('serviceWorker' in navigator) {
   const PWAServiceWorker = (() => {
-    const state = {
-      status: 'idle',
-      waitingWorker: null
-    };
-    
-    const reloadApp = (cacheVersion) => {
-      if (state.status === 'reloading') return;
-      state.status = 'reloading';
-      
-      localStorage.setItem('app_cache_version', cacheVersion);
-      state.waitingWorker?.postMessage({ action: 'skipWaiting' });
-      window.location.reload();
-    };
-    
-    const showUpdatePrompt = (newCache) => {
-      if (state.status === 'pending') return;
-      state.status = 'pending';
-      
-      if (confirm('Update Available!\nDont worry, your calculated stats wont get reset!')) {
-        reloadApp(newCache);
-      } else {
-        state.status = 'idle';
-        state.waitingWorker = null;
-      }
-    };
-    
-    const checkCacheVersion = async () => {
-      if (state.status !== 'idle') return false;
-      
-      const cacheNames = await caches.keys();
-      const currentCache = cacheNames.find(name => name.startsWith('rox-calc-v'));
-      if (!currentCache) return false;
-      
-      const storedVersion = localStorage.getItem('app_cache_version');
-      if (!storedVersion) {
-        localStorage.setItem('app_cache_version', currentCache);
-        return false;
-      }
-      
-      if (storedVersion === currentCache) return false;
-      
-      showUpdatePrompt(currentCache);
-      return true;
+    const checkForUpdatesOnStart = (registration) => {
+      PWAUtils.scheduleTask(() => {
+        registration.update();
+      }, CONSTANTS.SW_UPDATE_CHECK_DELAY);
     };
     
     const setupUpdateListener = (registration) => {
-      PWAUtils.scheduleTask(async () => {
-        await registration.update();
-        checkCacheVersion();
-      }, CONSTANTS.SW_UPDATE_CHECK_DELAY);
-      
       registration.addEventListener('updatefound', () => {
         const newWorker = registration.installing;
-        state.waitingWorker = newWorker;
         
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            checkCacheVersion();
+            newWorker.postMessage({ action: 'skipWaiting' });
           }
         });
       });
     };
-    
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (state.status === 'reloading') window.location.reload();
-    });
     
     const registerSW = () => {
       navigator.serviceWorker.register('/sim/sw.js', {
         scope: '/sim/',
         updateViaCache: 'none'
       })
-      .then(reg => IS_PWA && setupUpdateListener(reg))
+      .then(reg => {
+        if (IS_PWA) {
+          checkForUpdatesOnStart(reg);
+          setupUpdateListener(reg);
+        }
+      })
       .catch(() => {});
     };
     
-    const initPWAMode = () => {
-      registerSW();
-    };
-    
     const init = () => {
-      window.addEventListener('load', () => {
-        IS_PWA ? initPWAMode() : registerSW();
-      }, { passive: true });
+      window.addEventListener('load', registerSW, { passive: true });
     };
     
     return { init };
@@ -6324,7 +6271,7 @@ const preventPullToRefresh = (() => {
   };
 })();
 const PWAPersistenceInit = (() => {
-  if (!IS_PWA) return;
+  if (IS_PWA) return;
 
   const PWAPersistence = (() => {
     let cachedElements = null;
@@ -6520,8 +6467,7 @@ const ResetHelpers = {
       DOM_ELEMENTS.submit.textContent = "Calculate";
     }
 
-    [DOM_ELEMENTS.edit,
- DOM_ELEMENTS.resetRek, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.testReaper]
+    [DOM_ELEMENTS.resetRek, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.testReaper]
       .forEach(btn => {
         if (btn) {
           btn.disabled = true;
@@ -6640,16 +6586,24 @@ function clearCache() {
   cache.rewarm();
   RandomGenerator.reset();
   
-  localStorage.removeItem('app_cache_version');
-  localStorage.removeItem('pwa_snap');
+  caches.keys().then(keys => {
+  keys.forEach(key => caches.delete(key))
+  })
   
   showSnackbar('Cache Cleared!');
 };
 function resetAllData() {
-  if (!confirm('Reset all data and inputs?')) return;
+  if (!confirm('Reset all data and inputs (including cache)?')) return;
 
-  localStorage.clear();
+  cache.clear();
+  cache.rewarm();
+  RandomGenerator.reset();
   
+  caches.keys().then(keys => {
+    keys.forEach(key => caches.delete(key))
+  })
+  
+  localStorage.clear();
   AppState.reset();
   ResetHelpers.clearDebounceTimers();
   ResetHelpers.resetDropdownManager();

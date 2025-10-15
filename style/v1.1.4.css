@@ -791,50 +791,19 @@ td.delta:hover {
   animation: .6s ease-out spinOnce;
 }
 
-#resetAllBtn.sticky::before {
+#editBtn.sticky::before {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
   width: 24px;
   height: 24px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 -960 960 960'%3E%3Cpath fill='%23fff' d='M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z'/%3E%3C/svg%3E") center / 24px no-repeat;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 -960 960 960'%3E%3Cpath fill='%23fff' d='M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z'/%3E%3C/svg%3E") center / 24px no-repeat;
   opacity: 1;
   z-index: 1;
   transform: translate(-50%, -50%) scale(1);
 }
 
-#resetAllBtn.sticky::after {
-  content: '';
-  position: absolute;
-  top: -100%;
-  left: 50%;
-  width: 24px;
-  height: 24px;
-  background: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24'%20fill='white'%20viewBox='0%20-960%20960%20960'%20width='24'%3E%3Cpath%20d='M600-240v-80h160v80H600Zm0-320v-80h280v80H600Zm0%20160v-80h240v80H600ZM120-640H80v-80h160v-60h160v60h160v80h-40v360q0%2033-23.5%2056.5T440-200H200q-33%200-56.5-23.5T120-280v-360Zm80%200v360h240v-360H200Zm0%200v360-360Z'/%3E%3C/svg%3E") center / contain no-repeat;
-  opacity: 0;
-  z-index: 0;
-  transform: translate(-50%, -50%) scale(0);
-}
-
-#resetAllBtn.sticky:active::before,
-#resetAllBtn.sticky:active::after {
-  transition: opacity .2s, transform .2s, top .2s;
-}
-
-#resetAllBtn.sticky:active::before {
-  top: -100%;
-  opacity: 0;
-  z-index: 0;
-  transform: translate(-50%, -50%) scale(0);
-}
-
-#resetAllBtn.sticky:active::after {
-  top: 50%;
-  opacity: 1;
-  z-index: 2;
-  transform: translate(-50%, -50%) scale(1.11);
-}
 
 #breakdown-swap.sticky {
   width: 48px;
