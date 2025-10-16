@@ -6140,7 +6140,7 @@ const PWAServiceWorker = (() => {
   };
 })();
 if (PWAServiceWorker) PWAServiceWorker.init();
-if (IS_PWA) {
+if (!IS_PWA) {
   DOM_ELEMENTS.checkUpdateBtn?.remove();
 } else {
   const PWAManualUpdate = (() => {
@@ -6694,7 +6694,7 @@ const preventPullToRefresh = (() => {
   };
 })();
 const PWAPersistenceInit = (() => {
-  if (IS_PWA) return;
+  if (!IS_PWA) return;
 
   let cachedElements = null;
   let restoreInProgress = false;
