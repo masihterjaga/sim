@@ -6454,7 +6454,7 @@ const initA2HS = (() => {
   const CFG = {
     app: {
       name: 'RöX Calculator APP',
-      desc: 'Access instantly. Auto-save calculated stats. Full functionality without internet!',
+      desc: 'Access instantly, Auto-save calculated stats, and Full functionality without internet!',
       icon: 'https://masihterjaga.github.io/sim/icons/a2hs.png'
     },
     devices: {
