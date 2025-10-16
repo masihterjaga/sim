@@ -5942,6 +5942,7 @@ const mainButtonEvent = (() => {
   const editStats = () => {
     if (!confirm('Editing will clear the results. Sure?')) return;
     AppState.reset();
+    localStorage.removeItem('pwa_snap');
     ResetHelpers.resetButtons();
     ResetHelpers.resetDisplayContainers();
     unbindInputLockGuard();
