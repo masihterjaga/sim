@@ -4726,7 +4726,6 @@ const TooltipManager = (() => {
 
   const CONFIG = {
     HIDE_DELAY: 300,
-    THROTTLE_DELAY: 16,
     MARGIN: 16,
     OFFSET: 12,
     TRANSITION_DURATION: 200,
@@ -4916,12 +4915,19 @@ const TooltipManager = (() => {
 
     let isVisible = false;
     let hideTimer = null;
+    let rafId = null;
+    let cachedSize = null;
     const namespace = `tooltip-active-${Date.now()}-${Math.random()}`;
 
     const cleanup = () => {
       if (hideTimer) {
         clearTimeout(hideTimer);
         hideTimer = null;
+      }
+
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
       }
 
       EventManager.removeNS(namespace);
@@ -4943,8 +4949,11 @@ const TooltipManager = (() => {
       const scrollX = window.pageXOffset;
       const scrollY = window.pageYOffset;
 
-      const { width: tooltipWidth, height: tooltipHeight } = calculateTooltipSize(tooltip);
-      const { left, top, isFlipped } = calculatePosition(rect, scrollX, scrollY, tooltipWidth, tooltipHeight);
+      if (!cachedSize) {
+        cachedSize = calculateTooltipSize(tooltip);
+      }
+
+      const { left, top, isFlipped } = calculatePosition(rect, scrollX, scrollY, cachedSize.width, cachedSize.height);
 
       tooltip.classList.toggle('flipped', isFlipped);
       tooltip.style.transform = `translate(${left}px, ${top}px)`;
@@ -4993,18 +5002,13 @@ const TooltipManager = (() => {
       if (e.key === "Escape" && isVisible) hide();
     };
 
-    const throttledPosition = () => {
-      if (!isVisible) return;
-
-      if (hideTimer) {
-        clearTimeout(hideTimer);
-        hideTimer = null;
-      }
-
-      hideTimer = setTimeout(() => {
+    const smoothReposition = () => {
+      if (!isVisible || rafId) return;
+      
+      rafId = requestAnimationFrame(() => {
         updatePosition();
-        hideTimer = null;
-      }, CONFIG.THROTTLE_DELAY);
+        rafId = null;
+      });
     };
 
     const passiveOpt = { passive: true };
@@ -5012,8 +5016,8 @@ const TooltipManager = (() => {
     EventManager.addNS(namespace, document, "click", handleOutsideInteraction);
     EventManager.addNS(namespace, document, "touchend", handleOutsideInteraction, passiveOpt);
     EventManager.addNS(namespace, document, "keydown", handleKeydown);
-    EventManager.addNS(namespace, window, 'resize', throttledPosition, passiveOpt);
-    EventManager.addNS(namespace, window, 'scroll', throttledPosition, passiveOpt);
+    EventManager.addNS(namespace, window, 'resize', smoothReposition, passiveOpt);
+    EventManager.addNS(namespace, window, 'scroll', smoothReposition, passiveOpt);
 
     activeTooltips.set(triggerElement, { tooltip, cleanup, namespace });
 
@@ -5122,7 +5126,7 @@ setupTooltips({
 const accordionManager = (() => {
   const duration = 320;
   const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
-  const transition = `max-height ${duration}ms ${easing}, opacity ${duration}ms ease-out`;
+  const transition = `max-height ${duration}ms ${easing}, opacity ${duration}ms ${easing}`;
   const instances = new Map();
   const namespace = 'accordion-manager';
   let observer = null;
@@ -5131,9 +5135,13 @@ const accordionManager = (() => {
   const forceReflow = (element) => void element.offsetHeight;
   
   const applyStyles = (content, maxHeight, opacity, enableTransition) => {
-    content.style.transition = enableTransition ? transition : 'none';
-    content.style.maxHeight = maxHeight;
-    content.style.opacity = opacity.toString();
+    content.style.cssText = `
+      overflow: hidden;
+      will-change: max-height, opacity;
+      transition: ${enableTransition ? transition : 'none'};
+      max-height: ${maxHeight};
+      opacity: ${opacity};
+    `;
   };
   
   const createInstance = (details, summary, content) => {
@@ -5160,8 +5168,7 @@ const accordionManager = (() => {
       }
       
       const onTransitionEnd = (e) => {
-        if (e.target !== content) return;
-        if (e.propertyName !== 'max-height') return;
+        if (e.target !== content || e.propertyName !== 'max-height') return;
         
         EventManager.remove(transitionListenerId);
         transitionListenerId = null;
@@ -5175,24 +5182,26 @@ const accordionManager = (() => {
     const animateOpen = () => {
       details.setAttribute('open', '');
       
+      const targetHeight = content.scrollHeight;
+      
       applyStyles(content, '0px', 0.3, false);
       forceReflow(content);
       
-      const targetHeight = content.scrollHeight + 'px';
-      
       currentAnimation = requestAnimationFrame(() => {
-        applyStyles(content, targetHeight, 1, true);
+        applyStyles(content, `${targetHeight}px`, 1, true);
         
         setupTransitionListener(() => {
           applyStyles(content, 'none', 1, true);
         });
+        
+        currentAnimation = null;
       });
     };
     
     const animateClose = () => {
-      const currentHeight = content.scrollHeight + 'px';
+      const currentHeight = content.scrollHeight;
       
-      applyStyles(content, currentHeight, 1, false);
+      applyStyles(content, `${currentHeight}px`, 1, false);
       forceReflow(content);
       
       currentAnimation = requestAnimationFrame(() => {
@@ -5201,6 +5210,8 @@ const accordionManager = (() => {
         setupTransitionListener(() => {
           details.removeAttribute('open');
         });
+        
+        currentAnimation = null;
       });
     };
     
@@ -5260,11 +5271,9 @@ const accordionManager = (() => {
     
     const isOpen = details.hasAttribute('open');
     
-    content.style.overflow = 'hidden';
-    content.style.willChange = 'max-height, opacity';
     applyStyles(content, isOpen ? 'none' : '0px', isOpen ? 1 : 0.3, false);
     forceReflow(content);
-    content.style.transition = transition;
+    applyStyles(content, isOpen ? 'none' : '0px', isOpen ? 1 : 0.3, true);
     
     instances.set(details, createInstance(details, summary, content));
   };
@@ -5365,24 +5374,25 @@ const modalManager = (() => {
   const namespace = 'modal-manager';
   
   const transition = `${duration}ms ${easing}`;
-  const baseStyles = {
-    modal: {
-      display: 'none',
-      transition: `opacity ${transition}, transform ${transition}, backdrop-filter ${transition}`,
-      transformOrigin: 'center'
-    },
-    content: content ? {
-      transition: `transform ${transition}, opacity ${transition}`
-    } : null
-  };
   
-  Object.assign(log.style, baseStyles.modal);
-  if (content) Object.assign(content.style, baseStyles.content);
+  log.style.cssText = `
+    display: none;
+    transition: opacity ${transition}, transform ${transition}, backdrop-filter ${transition};
+    transform-origin: center;
+  `;
+  
+  if (content) {
+    content.style.cssText = `
+      transition: transform ${transition}, opacity ${transition};
+    `;
+  }
   
   let isVisible = false;
   let animationId = null;
   let hideTimeout = null;
   let changelogLoaded = false;
+  
+  const forceReflow = (element) => void element.offsetHeight;
   
   const clearTimers = () => {
     if (animationId) {
@@ -5395,32 +5405,40 @@ const modalManager = (() => {
     }
   };
   
-  const applyStyles = (isShowing) => {
-    const modalStyles = isShowing ? {
-      opacity: '1',
-      transform: 'scale(1)',
-      backdropFilter: 'blur(6px)',
-      backgroundColor: 'rgba(0, 0, 0, 0.3)'
-    } : {
-      opacity: '0',
-      transform: 'scale(0.96)',
-      backdropFilter: 'blur(0px)',
-      backgroundColor: 'transparent'
-    };
-    
-    const contentStyles = content ? (isShowing ? {
-      transform: 'translateY(0) scale(1)',
-      opacity: '1'
-    } : {
-      transform: 'translateY(-8px) scale(0.98)',
-      opacity: '0.5'
-    }) : null;
-    
-    Object.assign(log.style, modalStyles);
-    if (contentStyles) Object.assign(content.style, contentStyles);
+  const applyModalStyles = (isShowing) => {
+    if (isShowing) {
+      log.style.cssText += `
+        opacity: 1;
+        transform: scale(1);
+        backdrop-filter: blur(6px);
+        background-color: rgba(0, 0, 0, 0.3);
+      `;
+    } else {
+      log.style.cssText += `
+        opacity: 0;
+        transform: scale(0.96);
+        backdrop-filter: blur(0px);
+        background-color: transparent;
+      `;
+    }
   };
   
-  // Render nested list items
+  const applyContentStyles = (isShowing) => {
+    if (!content) return;
+    
+    if (isShowing) {
+      content.style.cssText += `
+        transform: translateY(0) scale(1);
+        opacity: 1;
+      `;
+    } else {
+      content.style.cssText += `
+        transform: translateY(-8px) scale(0.98);
+        opacity: 0.5;
+      `;
+    }
+  };
+  
   const renderList = (items) => {
     if (!Array.isArray(items)) return '';
     
@@ -5446,7 +5464,6 @@ const modalManager = (() => {
     }).join('');
   };
   
-  // Load changelog from JSON
   const loadChangelog = async () => {
     if (changelogLoaded) return;
     
@@ -5456,12 +5473,10 @@ const modalManager = (() => {
       
       const data = await response.json();
       
-      // Clear existing content except header
       const header = changelog.querySelector('.header-log');
       changelog.innerHTML = '';
       if (header) changelog.appendChild(header);
       
-      // Render versions
       data.versions.forEach(version => {
         const versionDiv = document.createElement('div');
         versionDiv.className = 'version';
@@ -5476,7 +5491,6 @@ const modalManager = (() => {
     } catch (error) {
       console.error('Error loading changelog:', error);
       
-      // Show error message
       const errorDiv = document.createElement('div');
       errorDiv.className = 'version';
       errorDiv.innerHTML = '<p style="color: #ff6b6b;">Failed to load changelog. Please try again later.</p>';
@@ -5489,7 +5503,9 @@ const modalManager = (() => {
     
     isVisible = false;
     clearTimers();
-    applyStyles(false);
+    
+    applyModalStyles(false);
+    applyContentStyles(false);
     
     hideTimeout = setTimeout(() => {
       if (!isVisible) {
@@ -5498,20 +5514,22 @@ const modalManager = (() => {
     }, duration);
   };
   
-  const show = async () => {
+  const show = () => {
     if (isVisible) return;
     
     isVisible = true;
     clearTimers();
     
     log.style.display = 'flex';
-    
-    // Lazy load changelog
-    await loadChangelog();
+    forceReflow(log);
     
     animationId = requestAnimationFrame(() => {
-      applyStyles(true);
+      applyModalStyles(true);
+      applyContentStyles(true);
+      animationId = null;
     });
+    
+    loadChangelog();
   };
   
   const handleOpen = (e) => {
