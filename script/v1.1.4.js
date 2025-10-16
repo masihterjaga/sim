@@ -88,8 +88,6 @@ const BLUE_SET = {
     130: 30,
     140: 32.5,
     150: 35
-  /**
-   * 
   },
   8: {
     30: 5,
@@ -105,7 +103,7 @@ const BLUE_SET = {
     130: 55,
     140: 60,
     150: 65
-   */
+
   }
 };
 const WHITE_SET = {
@@ -2839,7 +2837,9 @@ class DropdownManager {
         }, ...Object.entries(BLUE_SET).flatMap(([multiplier, levels]) =>
           Object.entries(levels).map(([lvl, val]) => ({
             value: val,
-            label: `Level ${lvl}*${multiplier}`
+            label: `Level ${lvl}*${multiplier}`,
+            // temporary 
+            disabled: multiplier === '8'
           })))]
       },
 
@@ -3123,6 +3123,8 @@ class DropdownManager {
 
     setElements.forEach(el => {
       Array.from(el.options).forEach(opt => {
+        // temp
+        if (opt.textContent.includes("*8") && opt.value) return;
         opt.disabled = false;
       });
     });
@@ -5107,12 +5109,13 @@ const setupTooltips = (config) => {
   });
 };
 setupTooltips({
-  "weaponTips": "If you're a physical suno or meister, you can choose weapons that don't have a size penalty, e.g. GS, Shuriken, Book. (because weapon Perfection passive)",
+  "#weaponTips": "If you're a physical suno or meister, you can choose weapons that don't have a size penalty, e.g. GS, Shuriken, Book. (Weapon Perfection passive)",
   "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are two <strong>different</strong> things! Look for it in your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set 0.",
   "#targetRaceTips": "Specific MVP/MINi will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target spesific race!",
   "#targetAttrTips": "also same with race.",
   "#dmgRaceTips": "Unlocked when target race selected, minimum valid value is 0.",
   "#dmgAttrTips": "same condition with dmg to race",
+  "#blueTips":"Blue*8 in testing^^",
   "#mvpminiTips": "DUMMY have no defense stat. Avg 130, Necro, Ogre, Ktul defs less accurate than others!",
   "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>But, dont expect to much! This tool calculates RNG buffs from equipment sets, flashes, and doesn't include flat or percentage damage bonuses.",
   "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20 second cooldown.",
