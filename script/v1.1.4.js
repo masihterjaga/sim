@@ -5107,6 +5107,7 @@ const setupTooltips = (config) => {
   });
 };
 setupTooltips({
+  "weaponTips": "If you're a physical suno or meister, you can choose weapons that don't have a size penalty, e.g. GS, Shuriken, Book. (because weapon Perfection passive)",
   "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are two <strong>different</strong> things! Look for it in your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set 0.",
   "#targetRaceTips": "Specific MVP/MINi will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target spesific race!",
   "#targetAttrTips": "also same with race.",
