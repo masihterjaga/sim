@@ -6200,7 +6200,9 @@ if (!IS_PWA) {
       state.updateAvailable = true;
       state.isChecking = false;
       setButtonState('ready');
-      SnackbarQueue.add('Update ready! Click to install');
+      if (state.isChecking) {
+        SnackbarQueue.add('Update ready! Click to install');
+      }
     };
     
     const waitForWorkerState = (worker, targetState, timeout = TIMEOUTS.WORKER_STATE) => {
