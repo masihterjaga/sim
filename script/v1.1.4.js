@@ -5109,21 +5109,21 @@ const setupTooltips = (config) => {
   });
 };
 setupTooltips({
-  "#weaponTips": "If you're a physical suno or meister, you can choose weapons that don't have a size penalty, e.g. GS, Shuriken, Book. (Weapon Perfection passive)",
-  "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are two <strong>different</strong> things! Look for it in your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set 0.",
-  "#targetRaceTips": "Specific MVP/MINi will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target spesific race!",
-  "#targetAttrTips": "also same with race.",
-  "#dmgRaceTips": "Unlocked when target race selected, minimum valid value is 0.",
-  "#dmgAttrTips": "same condition with dmg to race",
-  "#blueTips":"Blue*8 in testing^^",
-  "#mvpminiTips": "DUMMY have no defense stat. Avg 130, Necro, Ogre, Ktul defs less accurate than others!",
-  "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>But, dont expect to much! This tool calculates RNG buffs from equipment sets, flashes, and doesn't include flat or percentage damage bonuses.",
-  "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20 second cooldown.",
-  "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn't have 100% uptime since it only lasts 10 seconds with a 20-second cooldown, and the final result shown below represents the highest output during the buff's active period.",
+  "#weaponTips": "If you're a physical suno or meister, you can choose weapons without size penalty, such as GS, Shuriken, or Book. (Weapon Perfection passive)",
+  "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are <strong>different</strong>! Check your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set it to 0.",
+  "#targetRaceTips": "Specific MVP/Mini will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target a specific race!",
+  "#targetAttrTips": "Same applies to race.",
+  "#dmgRaceTips": "Unlocked when target race is selected, minimum valid value is 0.",
+  "#dmgAttrTips": "Same condition as dmg to race.",
+  "#blueTips": "Blue*8 in testing^^",
+  "#mvpminiTips": "DUMMY has no defense stat. Avg 130, Necro, Ogre, Ktul defs are less accurate than others!",
+  "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>However, don't expect too much! This tool calculates RNG buffs from equipment sets, flashes, and also doesn't include flat or percentage damage bonuses.",
+  "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20-second cooldown.",
+  "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn't have 100% uptime since it only lasts 10 seconds with a 20-second cooldown. The final result shown below represents the highest output during the buff's active period.",
   "#spearTips": "This bonus doesn't have 100% uptime because it only lasts 10 seconds while the cooldown is 20 seconds. The final result shown below represents the highest output during the buff's active period.",
-  "#elemCtrTips": "Tools assume target Neutral if you're not targeting any attribute.",
-  "#breakdownTips": "Values shown to two decimal places for readability. The final result is computed with full precision, so it may differ slightly if you recompute using the displayed (rounded) numbers.",
-  "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward means lower."
+  "#elemCtrTips": "Tool assumes target is Neutral if you're not targeting any attribute.",
+  "#breakdownTips": "Values are shown to two decimal places for readability. The final result is computed with full precision, so it may differ slightly if you recompute using the displayed (rounded) numbers.",
+  "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward arrow means lower."
 });
 
 // ========== ACCORDION SYSTEM ==========
@@ -6915,14 +6915,14 @@ const ResetHelpers = {
   resetDisplayContainers() {
     if (DOM_ELEMENTS.hasil) {
       DOM_ELEMENTS.hasil.innerHTML = '';
-      DOM_ELEMENTS.hasil.textContent = 'Input your stats to see the result...';
+      DOM_ELEMENTS.hasil.textContent = 'Enter your stats to see the results...';
       delete DOM_ELEMENTS.hasil.dataset.showFullPrecision;
       delete DOM_ELEMENTS.hasil.dataset.specificMode;
     }
 
     if (DOM_ELEMENTS.rec) {
       DOM_ELEMENTS.rec.innerHTML = '';
-      DOM_ELEMENTS.rec.textContent = 'Balancing stat recommendations for a higher output multiplier.';
+      DOM_ELEMENTS.rec.textContent = 'Recommended stat allocations will appear here. This tool uses your current stats as a base, then randomizes the numbers to find better combinations for higher damage output.';
     }
   },
 
