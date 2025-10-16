@@ -3283,7 +3283,8 @@ td.delta:hover {
     font-weight: 600;
     color: #1f2937;
   }
-  
+}
+
 .pwa-overlay {
   position: fixed;
   inset: 0;
@@ -3329,9 +3330,3 @@ td.delta:hover {
   50% { opacity: 0.8; }
 }
 
-body {
-  overscroll-behavior-y: contain;
-  -webkit-overflow-scrolling: touch;
-}
-  
-}
