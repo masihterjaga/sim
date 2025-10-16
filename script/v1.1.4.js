@@ -5984,6 +5984,7 @@ const CONSTANTS = Object.freeze({
   PWA_EXPIRY_MS: 691200000,
   PWA_RESTORE_DELAY_MS: 200,
   PWA_NAMESPACE: 'pwa_persistence',
+  PWA_UPDATE_MARKER: 'pwa_updating',
   FORM_SELECTORS: 'select, input[type="number"]',
   SW_UPDATE_CHECK_DELAY: 234,
   SW_SCOPE: '/sim/',
@@ -5994,7 +5995,8 @@ const CONSTANTS = Object.freeze({
   A2HS_MODAL_DELAY: 3000,
   A2HS_PROMPT_TIMEOUT: 5000,
   A2HS_DISMISS_EXPIRY: 259200000,
-  A2HS_MOBILE_BP: 480
+  A2HS_MOBILE_BP: 480,
+  OVERLAY_TRANSITION_MS: 200
 });
 const PWAUtils = {
   scheduleTask: (fn, delay = 0) => {
@@ -6028,6 +6030,63 @@ const PWAUtils = {
     try { localStorage.removeItem(k); } catch {}
   }
 };
+const OverlayManager = (() => {
+  let element = null;
+  
+  const create = () => {
+    if (element) return element;
+    
+    element = document.createElement('div');
+    element.className = 'pwa-overlay';
+    element.innerHTML = '<div class="pwa-spinner"></div>';
+    document.body.appendChild(element);
+    
+    return element;
+  };
+  
+  const removeElement = () => {
+    if (!element) return;
+    element.remove();
+    element = null;
+  };
+  
+  return {
+    show: () => {
+      const overlay = create();
+      SnackbarQueue.setOverlayState(true);
+      requestAnimationFrame(() => overlay.classList.add('active'));
+    },
+    
+    hide: () => {
+      if (!element) return;
+      element.classList.remove('active');
+      setTimeout(() => {
+        SnackbarQueue.setOverlayState(false);
+        removeElement();
+      }, CONSTANTS.OVERLAY_TRANSITION_MS);
+    }
+  };
+})();
+const SnackbarQueue = (() => {
+  let pending = [];
+  let overlayActive = false;
+  
+  return {
+    setOverlayState: (active) => {
+      overlayActive = active;
+      if (!active && pending.length > 0) {
+        SnackbarManager.show(pending.pop());
+        pending = [];
+      }
+    },
+    
+    add: (message) => {
+      overlayActive ? pending.push(message) : SnackbarManager.show(message);
+    },
+    
+    clear: () => { pending = []; }
+  };
+})();
 const PWAServiceWorker = (() => {
   if (!('serviceWorker' in navigator)) return null;
   
@@ -6081,7 +6140,7 @@ const PWAServiceWorker = (() => {
   };
 })();
 if (PWAServiceWorker) PWAServiceWorker.init();
-if (!IS_PWA) {
+if (IS_PWA) {
   DOM_ELEMENTS.checkUpdateBtn?.remove();
 } else {
   const PWAManualUpdate = (() => {
@@ -6109,20 +6168,17 @@ if (!IS_PWA) {
       UPDATE_CHECK: 10000,
       WORKER_STATE: 8000,
       CONTROLLER_CHANGE: 3000,
-      RELOAD_DELAY: 500,
       CONTROLLER_VERIFY: 100
     };
     
     const PROCESSING_PHASES = ['checking', 'downloading', 'installing', 'applying', 'reloading'];
-    
-    const isProcessingPhase = (phase) => PROCESSING_PHASES.includes(phase);
     
     const setButtonState = (phase) => {
       const btn = DOM_ELEMENTS.checkUpdateBtn;
       if (!btn) return;
       
       state.currentPhase = phase;
-      const processing = isProcessingPhase(phase);
+      const processing = PROCESSING_PHASES.includes(phase);
       
       btn.disabled = processing;
       btn.textContent = UI_TEXT[phase] || UI_TEXT.idle;
@@ -6131,18 +6187,25 @@ if (!IS_PWA) {
     };
     
     const resetState = () => {
-      state.updateAvailable = false;
-      state.newWorker = null;
-      state.registration = null;
+      Object.assign(state, {
+        updateAvailable: false,
+        newWorker: null,
+        registration: null,
+        isChecking: false
+      });
       setButtonState('idle');
+    };
+    
+    const markUpdateReady = () => {
+      state.updateAvailable = true;
+      state.isChecking = false;
+      setButtonState('ready');
+      SnackbarQueue.add('Update ready! Click to install');
     };
     
     const waitForWorkerState = (worker, targetState, timeout = TIMEOUTS.WORKER_STATE) => {
       return new Promise((resolve, reject) => {
-        if (worker.state === targetState) {
-          resolve();
-          return;
-        }
+        if (worker.state === targetState) return resolve();
         
         const timer = setTimeout(() => {
           worker.removeEventListener('statechange', handler);
@@ -6164,28 +6227,21 @@ if (!IS_PWA) {
     const handleWaitingWorker = (reg) => {
       state.newWorker = reg.waiting;
       state.registration = reg;
-      state.updateAvailable = true;
-      state.isChecking = false;
-      setButtonState('ready');
-      SnackbarManager.show('Update ready! Click to install');
+      markUpdateReady();
     };
     
     const handleInstallingWorker = async (reg) => {
       state.newWorker = reg.installing;
       state.registration = reg;
       setButtonState('downloading');
-      SnackbarManager.show('Downloading update...');
+      SnackbarQueue.add('Downloading update...');
       
       try {
         await waitForWorkerState(reg.installing, 'installed', TIMEOUTS.WORKER_STATE);
-        state.updateAvailable = true;
-        setButtonState('ready');
-        SnackbarManager.show('Update ready! Click to install');
+        markUpdateReady();
       } catch {
         throw new Error('Download timeout');
       }
-      
-      state.isChecking = false;
     };
     
     const getRegistration = async () => {
@@ -6196,26 +6252,20 @@ if (!IS_PWA) {
     const setupUpdateListener = (reg, resolve) => {
       const updateHandler = () => {
         const newWorker = reg.installing;
-        
-        if (!newWorker) {
-          resolve(false);
-          return;
-        }
+        if (!newWorker) return resolve(false);
         
         state.newWorker = newWorker;
         state.registration = reg;
         setButtonState('downloading');
-        SnackbarManager.show('Downloading update...');
+        SnackbarQueue.add('Downloading update...');
         
         newWorker.addEventListener('statechange', () => {
           if (newWorker.state === 'installed') {
-            state.updateAvailable = true;
-            setButtonState('ready');
-            SnackbarManager.show('Update ready! Click to install');
+            markUpdateReady();
             resolve(true);
           } else if (newWorker.state === 'installing') {
             setButtonState('installing');
-            SnackbarManager.show('Installing update...');
+            SnackbarQueue.add('Installing update...');
           }
         });
       };
@@ -6244,70 +6294,56 @@ if (!IS_PWA) {
       
       state.isChecking = true;
       setButtonState('checking');
-      SnackbarManager.show('Checking for updates...');
+      SnackbarQueue.add('Checking for updates...');
       
       try {
         const reg = await getRegistration();
-        
         if (!reg) throw new Error('Service worker not registered');
         
-        if (reg.waiting) {
-          handleWaitingWorker(reg);
-          return;
-        }
-        
-        if (reg.installing) {
-          await handleInstallingWorker(reg);
-          return;
-        }
+        if (reg.waiting) return handleWaitingWorker(reg);
+        if (reg.installing) return await handleInstallingWorker(reg);
         
         const hasUpdate = await waitForUpdate(reg);
-        
         if (!hasUpdate) {
-          SnackbarManager.show('Already up to date');
+          SnackbarQueue.add('Already up to date');
           resetState();
         }
         
       } catch (err) {
-        SnackbarManager.show('Check failed: ' + (err.message || 'Unknown error'));
+        SnackbarQueue.add('Check failed: ' + (err.message || 'Unknown error'));
         resetState();
-      } finally {
-        state.isChecking = false;
       }
     };
     
     const performReload = () => {
       setButtonState('reloading');
-      SnackbarManager.show('Reloading app...');
       cleanup();
-      setTimeout(() => window.location.reload(), TIMEOUTS.RELOAD_DELAY);
+      window.location.reload();
     };
     
     const setupControllerChangeListener = (fallbackTimer) => {
-      const controllerChangeHandler = () => {
+      const handler = () => {
         clearTimeout(fallbackTimer);
         performReload();
       };
       
-      state.controllerChangeListener = controllerChangeHandler;
-      navigator.serviceWorker.addEventListener('controllerchange', state.controllerChangeListener, { once: true });
+      state.controllerChangeListener = handler;
+      navigator.serviceWorker.addEventListener('controllerchange', handler, { once: true });
     };
     
     const setupStateChangeListener = (fallbackTimer) => {
-      const stateChangeHandler = () => {
+      const handler = () => {
         if (state.newWorker.state !== 'activated') return;
         
         clearTimeout(fallbackTimer);
-        state.newWorker.removeEventListener('statechange', stateChangeHandler);
+        state.newWorker.removeEventListener('statechange', handler);
         
         setTimeout(() => {
-          if (navigator.serviceWorker.controller === state.newWorker) {
-            performReload();
-          }
+          if (navigator.serviceWorker.controller === state.newWorker) performReload();
         }, TIMEOUTS.CONTROLLER_VERIFY);
       };
       
-      state.newWorker.addEventListener('statechange', stateChangeHandler);
+      state.newWorker.addEventListener('statechange', handler);
     };
     
     const skipWaiting = (fallbackTimer) => {
@@ -6315,36 +6351,36 @@ if (!IS_PWA) {
         state.newWorker.postMessage({ action: 'skipWaiting' });
       } catch {
         clearTimeout(fallbackTimer);
-        showSnackbar('Failed to apply update');
+        OverlayManager.hide();
+        SnackbarQueue.add('Failed to apply update');
         resetState();
       }
     };
     
     const installUpdate = () => {
       if (!state.newWorker || !state.updateAvailable) {
-        SnackbarManager.show('No update available');
-        return;
+        return SnackbarQueue.add('No update available');
       }
       
       if (AppState.get('isResultShown')) {
         const confirmed = confirm("You've already done some calculations, but don't worry - your stats are safe and will be preserved!");
-        if (!confirmed) return;
+        if (!confirmed) {
+          SnackbarQueue.clear();
+          return;
+        }
       }
       
+      PWAUtils.storageSet(CONSTANTS.PWA_UPDATE_MARKER, 'true');
+      OverlayManager.show();
       setButtonState('applying');
-      SnackbarManager.show('Applying update...');
       
-      const fallbackTimer = setTimeout(() => {
-        console.warn('controllerchange timeout, force reload');
-        performReload();
-      }, TIMEOUTS.CONTROLLER_CHANGE);
+      const fallbackTimer = setTimeout(() => performReload(), TIMEOUTS.CONTROLLER_CHANGE);
       
       setupControllerChangeListener(fallbackTimer);
       
       if (state.newWorker.state === 'activated') {
         clearTimeout(fallbackTimer);
-        performReload();
-        return;
+        return performReload();
       }
       
       setupStateChangeListener(fallbackTimer);
@@ -6356,8 +6392,7 @@ if (!IS_PWA) {
         if (worker.state === 'installing') {
           setButtonState('installing');
         } else if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-          state.updateAvailable = true;
-          setButtonState('ready');
+          markUpdateReady();
         }
       });
     };
@@ -6384,16 +6419,7 @@ if (!IS_PWA) {
       }
     };
     
-    const injectStyles = () => {
-      if (document.getElementById('pwa-update-styles')) return;
-      
-      const style = document.createElement('style');
-      style.id = 'pwa-update-styles';
-      style.textContent = '.checking{opacity:0.7;pointer-events:none}.update-available{animation:pulse 2s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.8}}';
-      document.head.appendChild(style);
-    };
-    
-    const setupButtonListener = () => {
+    const init = () => {
       const btn = DOM_ELEMENTS.checkUpdateBtn;
       if (!btn) return;
       
@@ -6401,29 +6427,17 @@ if (!IS_PWA) {
         if (state.isChecking) return;
         state.updateAvailable ? installUpdate() : checkForUpdates();
       });
-    };
-    
-    const init = () => {
-      const btn = DOM_ELEMENTS.checkUpdateBtn;
-      if (!btn) return;
       
-      setupButtonListener();
       setButtonState('idle');
       
       state.updateFoundListener = onUpdateFound;
       window.addEventListener('sw-update-found', state.updateFoundListener);
       window.addEventListener('beforeunload', cleanup, { passive: true });
-      
-      injectStyles();
     };
     
-    const initWhenReady = () => {
-      document.readyState === 'loading' ?
-        document.addEventListener('DOMContentLoaded', init, { once: true, passive: true }) :
-        init();
-    };
-    
-    initWhenReady();
+    document.readyState === 'loading' ?
+      document.addEventListener('DOMContentLoaded', init, { once: true, passive: true }) :
+      init();
     
     return { 
       checkForUpdates, 
@@ -6559,8 +6573,10 @@ const initA2HS = (() => {
   
   const triggerInstall = async () => {
     if (!state.deferredPrompt) return false;
+    
     await state.deferredPrompt.prompt();
     const { outcome } = await state.deferredPrompt.userChoice;
+    
     if (outcome === 'accepted') {
       const ts = PWAUtils.safeJSONStringify({ timestamp: Date.now() });
       if (ts) PWAUtils.storageSet(CONSTANTS.A2HS_STORAGE, ts);
@@ -6568,6 +6584,7 @@ const initA2HS = (() => {
       state.deferredPrompt = null;
       return true;
     }
+    
     return false;
   };
   
@@ -6669,22 +6686,18 @@ const preventPullToRefresh = (() => {
   document.addEventListener('touchend', touchEndHandler, optsEnd);
   document.addEventListener('touchcancel', touchEndHandler, optsEnd);
   
-  const style = document.createElement('style');
-  style.textContent = 'body{overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch}';
-  document.head.appendChild(style);
-  
   return () => {
     document.removeEventListener('touchstart', touchStartHandler, opts);
     document.removeEventListener('touchmove', touchMoveHandler, opts);
     document.removeEventListener('touchend', touchEndHandler, optsEnd);
     document.removeEventListener('touchcancel', touchEndHandler, optsEnd);
-    style.remove();
   };
 })();
 const PWAPersistenceInit = (() => {
-  if (!IS_PWA) return;
+  if (IS_PWA) return;
 
   let cachedElements = null;
+  let restoreInProgress = false;
   
   const getFormElements = () => {
     if (!cachedElements) {
@@ -6711,42 +6724,61 @@ const PWAPersistenceInit = (() => {
     return data ? PWAUtils.storageSet(CONSTANTS.PWA_STORAGE_KEY, data) : false;
   };
   
-  const restore = () => {
+  const shouldRestore = () => {
     const saved = PWAUtils.storageGet(CONSTANTS.PWA_STORAGE_KEY);
-    if (!saved) return false;
+    if (!saved) return null;
     
     const state = PWAUtils.safeJSONParse(saved);
     if (!state) {
       PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
-      return false;
+      return null;
     }
     
     if (Date.now() - state.ts > CONSTANTS.PWA_EXPIRY_MS) {
       PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
-      return false;
+      return null;
     }
     
+    return state;
+  };
+  
+  const finalizeRestore = () => {
+    setTimeout(() => {
+      OverlayManager.hide();
+      SnackbarQueue.add('Data restored successfully');
+      restoreInProgress = false;
+    }, 150);
+  };
+  
+  const checkCalculationDone = () => {
+    requestAnimationFrame(() => {
+      AppState.get('isResultShown') ? finalizeRestore() : checkCalculationDone();
+    });
+  };
+  
+  const performRestore = (state) => {
     Object.entries(state.form).forEach(([id, val]) => {
       const el = document.getElementById(id);
       if (el) el.value = val;
     });
     
-    if (state.isResultShown) {
-      PWAUtils.scheduleTask(processMainCalculation, CONSTANTS.PWA_RESTORE_DELAY_MS);
+    if (!state.isResultShown) {
+      OverlayManager.hide();
+      restoreInProgress = false;
+      return;
     }
     
-    return true;
+    PWAUtils.scheduleTask(() => {
+      processMainCalculation();
+      checkCalculationDone();
+    }, CONSTANTS.PWA_RESTORE_DELAY_MS);
   };
-  
-  window.PWAPersistence = { snap, restore };
   
   const handlePWAExit = () => {
     if (AppState.get('isResultShown')) snap();
   };
   
   const init = () => {
-    restore();
-    
     const opts = { capture: true };
     EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'visibilitychange', () => {
       if (document.hidden) handlePWAExit();
@@ -6755,14 +6787,41 @@ const PWAPersistenceInit = (() => {
     EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', handlePWAExit, opts);
   };
   
+  const state = shouldRestore();
+  const isUpdating = PWAUtils.storageGet(CONSTANTS.PWA_UPDATE_MARKER) === 'true';
+  
+  if (state || isUpdating) {
+    OverlayManager.show();
+    restoreInProgress = true;
+    
+    if (isUpdating) PWAUtils.storageRemove(CONSTANTS.PWA_UPDATE_MARKER);
+  }
+  
   document.addEventListener('DOMContentLoaded', () => {
     init();
-    dropdownManager.scheduleUpdate();
+    
+    if (state) {
+      performRestore(state);
+    } else if (isUpdating) {
+      setTimeout(() => {
+        OverlayManager.hide();
+        SnackbarQueue.add('Update completed successfully');
+        restoreInProgress = false;
+      }, 300);
+    }
+    
+    dropdownManager?.scheduleUpdate();
   }, { passive: true });
+  
+  window.PWAPersistence = { 
+    snap, 
+    isRestoring: () => restoreInProgress 
+  };
   
   window.clearPWAStorage = () => {
     PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
     EventManager.removeNS(CONSTANTS.PWA_NAMESPACE);
+    restoreInProgress = false;
     return true;
   };
 })();
