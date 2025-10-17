@@ -22,12 +22,12 @@
     <meta name="msapplication-TileImage" content="/sim/icons/web-app-manifest-192x192.png">
     <meta name="msapplication-TileColor" content="#36393f">
     <meta name="google" content="notranslate">
-    <link rel="stylesheet" href="style/v1.1.4.css">
+    <link rel="stylesheet" href="style/v1.1.5.css">
   </head>
   <body>
     <div id="top"></div>
     <div class="container" id="altsim">
-      <div id="version">
+      <header id="version">
         <p class="discord-server">
           <a href="https://discord.gg/9j2WnTAnMu" target="_blank">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 512 512">
@@ -41,112 +41,159 @@
             <span>RöX University</span>
           </a>
         </p>
-        <p class="calc-ver"><i>v1.1.4</i> [<button id="openLog" type="button">Changelog</button>]</p>
+        <p class="calc-ver"><i>v1.1.5</i> [<button id="openLog" type="button">Changelog</button>]</p>
+      </header>
+<div id="altsim-card">
+  <div class="altsim-card">
+    <div class="altsim-card-header">
+      <span class="altsim-header-title">About</span>
+      <div class="altsim-btns">
+        <span class="altsim-btn altsim-btn-arrow"></span>
       </div>
+    </div>
+    <div class="altsim-card-body">
+      <p>A free web-based tool designed for Ragnarok X: Next Generation players to calculate base multipliers and optimize stat distribution for maximum DPS output.</p>
+      <strong>Why was this created?</strong>
+      <p>The <a href="https://docs.google.com/spreadsheets/d/1ePXRvfGJbsLJQgY8HnroCUnxUeVIvk51WhZveuKpz9c/" target="_blank">community spreadsheet</a> was solid for quick checks, but only covered 3 stats. I added the remaining in-game stats for more accurate calculations that better match actual damage output<button type="button" id="calcTips" class="tooltip-button"></button></p>
+      <strong>What are the features?</strong>
+      <ul>
+        <li>Base Multiplier Calculator</li>
+        <li>
+          Multi-Target
+          <ul>
+            <li>Specific MVP/Mini</li>
+            <li>Average boss level per size</li>
+          </ul>
+        </li>
+        <li>Stat Optimization Engine with randomized recommendations based on your stats</li>
+        <li>Equipment Set Bonuses including Vesper, Blue, and White sets</li>
+        <li>Flash Simulation for Spear of Eternity and Reaper Scythe</li>
+        <li>
+          Progressive Web App with exclusive features when added to your home screen:
+          <ul>
+            <li>Quick access with a single tap from your home screen</li>
+            <li>Automatic saving of your calculated stats</li>
+            <li>Complete offline functionality</li>
+          </ul>
+        </li>
+      </ul>
+      <strong>Is it safe?</strong>
+      <p>This tool runs locally in your browser for instant results and complete privacy. No data ever leaves your device—no registration, no servers, no tracking.</p>
+      <p>The code is open source and available on the <a href="https://github.com/masihterjaga/sim" target="_blank">GitHub repository</a> for full transparency.</p>
+      <strong>Credits</strong>
+      <p>This tool is entirely AI-generated using <a href="https://claude.ai/" target="_blank">Claude Sonnet 4.5</a>, including the code and all the text you see in the interface.</p>
+      <p>Thanks to everyone who has visited and used this tool. Special thanks to all members of the <a href="https://discord.gg/9j2WnTAnMu" target="_blank">RöX University</a> Discord Server, especially <u>Nila</u> for confirming the damage formulas and providing accurate defense stat data that made this calculator possible.</p>
+      <p>This is a community tool and is not affiliated with Nuverse or Ragnarok X: Next Generation. Released under the MIT License.</p>
+      <p>- Silja [Odin - Nastia]</p>
+    </div>
+  </div>
+</div>
+<main id="main-calc">
       <details id="howto">
         <summary>
           <span>How to Use</span>
         </summary>
         <div class="body">
-<ol>
-  <li>
-    <strong>Dropdowns</strong>
-    <ul>
-      <li>Select your <strong>Attack Type</strong>, <strong>Weapon</strong>, and <strong>Weapon Attribute</strong>.</li>
-      <li>
-        For <strong>MVP/MINI</strong>:
-        <ul>
-          <li>
-            Choosing a specific MVP/Mini will automatically <strong>sync and lock</strong> its <strong>size, race, and attribute</strong>.
-            <em>(For example: <strong>Phreeoni = Large / Brute / Neutral</strong>. These fields stay locked, you just need to fill in the numbers.)</em>
-            <ul>
-              <li>
-                If you only have a <strong>Race enchant (or only Attribute)</strong>, set the other field to <code>0</code>.
-                <ul>
-                  <li>Example: <strong>Brute 0 / Neutral 20</strong></li>
-                  <li>Example: <strong>Brute 30 / Neutral 0</strong></li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li>Choosing <strong>Average Lv.</strong> lets you manually set or skip the target race/attribute.</li>
-          <li><em>If you don't have race and/or attribute enchants, just go with <strong>Average Lv. Boss</strong> and skip those fields.</em></li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <strong>Equipment</strong>
-    <ul>
-      <li>Select equipment set you're using <strong>(Vesper / Blue / White)</strong>.</li>
-    </ul>
-  </li>
-  <li>
-    <strong>Stat Inputs</strong>
-    <ul>
-      <li>Enter your stats exactly as they appear in-game.</li>
-      <li>
-        Extra: <strong>Final DMG Bonus %</strong>
-        <ul>
-          <li>
-            <strong><s>F. P/M DMG BONUS</s></strong>
-            <ul>
-              <li>Check <strong>detailed stats</strong> for <strong>Final Damage Stack / Final Damage Bonus</strong>. Make sure <strong>no buffs</strong> are active. If you don't see it, just set it to <strong>0</strong>.</li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>Only <strong>numbers</strong>, don't type <strong><s>"%"</s></strong>.</li>
-      <li><strong>Decimals</strong> are fine. <em>(Example: <strong>888.88</strong>)</em></li>
-    </ul>
-  </li>
-  <li>
-    <strong>Calculate</strong>
-    <ul>
-      <li>Once everything's filled in, hit <strong>Calculate</strong>.</li>
-    </ul>
-  </li>
-  <li>
-    <strong>Results</strong>
-    <ul>
-      <li>You'll see the <strong>base multiplier</strong> and a breakdown of your stats.</li>
-    </ul>
-  </li>
-  <li>
-    <strong>Simulate Flash</strong>
-    <ul>
-      <li>
-        <strong>Spear of Eternity</strong> and <strong>Reaper Scythe</strong>.
-        <ul>
-          <li><em>Each has 10s duration / 20s cooldown with <strong>+84% or +28%</strong> bonus. This tool normalizes them to <strong>42</strong> and <strong>14</strong> for <strong>100% uptime</strong> in flash bonus contribution. But it still uses the original values for calculations.</em></li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <strong>Swap Target</strong>
-    <ul>
-      <li>Lets you <strong>switch bosses</strong> without starting over.</li>
-      <li>If the new boss has <strong>different size/race/element</strong>, the inputs unlock and you'll need to <strong>re-enter your stats</strong>.</li>
-      <li>If it's the <strong>same type</strong>, the calculation <strong>updates instantly</strong>.</li>
-      <li>
-        <em>Examples:</em>
-        <ul>
-          <li><strong>Phreeoni 140 → Deviling 150</strong> → re-enter <strong>Medium / Demon / Shadow</strong>.</li>
-          <li><strong>Phreeoni 140 → Phreeoni 150</strong> → auto updates, no changes needed.</li>
-          <li><strong>Phreeoni 150 → Avg. 140</strong> → race/element are <strong>cleared</strong>, treated as average <strong>Large Boss Lv.140</strong>.</li>
-        </ul>
-      </li>
-    </ul>
-  </li>
-  <li>
-    <strong>Recommendations</strong>
-    <ul>
-      <li>At the bottom you'll see a table with recommended stat allocations.</li>
-      <li>Hit <strong>Refresh</strong> to generate new sets until you find one that works for you.</li>
-    </ul>
-  </li>
-</ol>        </div>
+          <ol>
+            <li>
+              <strong>Dropdowns</strong>
+              <ul>
+                <li>Select your <strong>Attack Type</strong>, <strong>Weapon</strong>, and <strong>Weapon Attribute</strong>.</li>
+                <li>
+                  For <strong>MVP/MINI</strong>:
+                  <ul>
+                    <li>
+                      Choosing a specific MVP/Mini will automatically <strong>sync and lock</strong> its <strong>size, race, and attribute</strong>.
+                      <em>(For example: <strong>Phreeoni = Large / Brute / Neutral</strong>. These fields stay locked, you just need to fill in the numbers.)</em>
+                      <ul>
+                        <li>
+                          If you only have a <strong>Race enchant (or only Attribute)</strong>, set the other field to <code>0</code>.
+                          <ul>
+                            <li>Example: <strong>Brute 0 / Neutral 20</strong></li>
+                            <li>Example: <strong>Brute 30 / Neutral 0</strong></li>
+                          </ul>
+                        </li>
+                      </ul>
+                    </li>
+                    <li>Choosing <strong>Average Lv.</strong> lets you manually set or skip the target race/attribute.</li>
+                    <li><em>If you don't have race and/or attribute enchants, just go with <strong>Average Lv. Boss</strong> and skip those fields.</em></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>Equipment</strong>
+              <ul>
+                <li>Select equipment set you're using <strong>(Vesper / Blue / White)</strong>.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Stat Inputs</strong>
+              <ul>
+                <li>Enter your stats exactly as they appear in-game.</li>
+                <li>
+                  Extra: <strong>Final DMG Bonus %</strong>
+                  <ul>
+                    <li>
+                      <strong><s>F. P/M DMG BONUS</s></strong>
+                      <ul>
+                        <li>Check <strong>detailed stats</strong> for <strong>Final Damage Stack / Final Damage Bonus</strong>. Make sure <strong>no buffs</strong> are active. If you don't see it, just set it to <strong>0</strong>.</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li>Only <strong>numbers</strong>, don't type <strong><s>"%"</s></strong>.</li>
+                <li><strong>Decimals</strong> are fine. <em>(Example: <strong>888.88</strong>)</em></li>
+              </ul>
+            </li>
+            <li>
+              <strong>Calculate</strong>
+              <ul>
+                <li>Once everything's filled in, hit <strong>Calculate</strong>.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Results</strong>
+              <ul>
+                <li>You'll see the <strong>base multiplier</strong> and a breakdown of your stats.</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Simulate Flash</strong>
+              <ul>
+                <li>
+                  <strong>Spear of Eternity</strong> and <strong>Reaper Scythe</strong>.
+                  <ul>
+                    <li><em>Each has 10s duration / 20s cooldown with <strong>+84% or +28%</strong> bonus. This tool normalizes them to <strong>42</strong> and <strong>14</strong> for <strong>100% uptime</strong> in flash bonus contribution. But it still uses the original values for calculations.</em></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>Swap Target</strong>
+              <ul>
+                <li>Lets you <strong>switch bosses</strong> without starting over.</li>
+                <li>If the new boss has <strong>different size/race/element</strong>, the inputs unlock and you'll need to <strong>re-enter your stats</strong>.</li>
+                <li>If it's the <strong>same type</strong>, the calculation <strong>updates instantly</strong>.</li>
+                <li>
+                  <em>Examples:</em>
+                  <ul>
+                    <li><strong>Phreeoni 140 → Deviling 150</strong> → re-enter <strong>Medium / Demon / Shadow</strong>.</li>
+                    <li><strong>Phreeoni 140 → Phreeoni 150</strong> → auto updates, no changes needed.</li>
+                    <li><strong>Phreeoni 150 → Avg. 140</strong> → race/element are <strong>cleared</strong>, treated as average <strong>Large Boss Lv.140</strong>.</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <strong>Recommendations</strong>
+              <ul>
+                <li>At the bottom you'll see a table with recommended stat allocations.</li>
+                <li>Hit <strong>Refresh</strong> to generate new sets until you find one that works for you.</li>
+              </ul>
+            </li>
+          </ol>
+        </div>
       </details>
       <div class="form-row">
         <div class="form-group">
@@ -293,6 +340,8 @@
           </div>
         </div>
       </div>
+      </main>
+      <aside id="aside-calc">
       <div class="btn-row" id="btn-row">
         <button id="submitBtn" type="button">Calculate</button>
         <button id="testSpear" type="button" disabled>Simulate Spear</button>
@@ -304,16 +353,17 @@
         <button id="checkBtn" type="button">Check Update</button>
       </div>
       <div id="stickyStart"></div>
-<div id="hasil">
-  Enter your stats to see the results...
-</div>
-<div id="recommendations">
-  Recommended stat allocations will appear here. This tool uses your current stats as a base, then randomizes the numbers to find better combinations for higher damage output.
-</div>
-      <div class="footer">
+      <div id="hasil">
+        Enter your stats to see the results...
+      </div>
+      <div id="recommendations">
+        Recommended stat allocations will appear here. This tool uses your current stats as a base, then randomizes the numbers to find better combinations for higher damage output.
+      </div>
+      </aside>
+      <footer class="footer">
         <i>Have an issue? hit me in game^^</i><br/>
         Silja [Odin-Nastia] 
-      </div>
+      </footer>
     </div>
     <div class="log" id="log">
       <div class="changelog" id="changelog">
@@ -350,6 +400,6 @@
         data-lightbox-image="https://masihterjaga.github.io/sim/img/Calc_vs_Ingame-4.jpg" 
         data-caption="Spear + 5 Stack Vesper (P ATTK 352793)"></div>
     </div>
-    <script src="script/v1.1.4.js"></script>
+    <script src="script/v1.1.5.js"></script>
   </body>
 </html>

@@ -2086,7 +2086,7 @@ function renderMultiplierBreakdown(calculationState) {
       <hr class="separ">
       <div class="breakdown-swap-wrapper" id="swap-wrapper"></div>
       <p class="sum-head">Your base multiplier to <i>${targetInfo} (${tDefKey})</i></p>
-      <div class="last-calc">${multiplierParts.join(" ")}<br>\u2248<code data-raw-mult="${mult}">\u00D7${fmt(mult)}</code><button type="button" id="attackTips" class="tooltip-button"></button></div>
+      <div class="last-calc">${multiplierParts.join(" ")}<br>\u2248<code data-raw-mult="${mult}">\u00D7${fmt(mult)}</code><button type="button" id="attackTips" class="calcTips tooltip-button"></button></div>
       <blockquote class="noted">Only base multipliers! Real output depends on class, skills, buffs (vesper, blue, or white stack), and more. More accurate? Just use <a class="job-sim" target="_blank" href="//discord.com/channels/784407151342256148/909016309218541568/1407521807459811328">job sim!</a></blockquote>
     </div>`;
 
@@ -5117,6 +5117,8 @@ setupTooltips({
   "#dmgAttrTips": "Same condition as dmg to race.",
   "#blueTips": "Blue*8 in testing^^",
   "#mvpminiTips": "DUMMY has no defense stat. Avg 130, Necro, Ogre, Ktul defs are less accurate than others!",
+  "#calcTips": "Don't expect too much! This tool calculates some RNG stats and buffs from equipment sets and flashes and also doesn't include flat or percentage damage bonuses (<a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).",
+
   "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>However, don't expect too much! This tool calculates RNG buffs from equipment sets, flashes, and also doesn't include flat or percentage damage bonuses.",
   "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20-second cooldown.",
   "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn't have 100% uptime since it only lasts 10 seconds with a 20-second cooldown. The final result shown below represents the highest output during the buff's active period.",
@@ -5126,6 +5128,40 @@ setupTooltips({
   "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward arrow means lower."
 });
 
+// ======== ABOUT CARD ========
+const aboutCard = (() => {
+  const card = document.querySelector('.altsim-card');
+  const cardBody = document.querySelector('.altsim-card-body');
+  const arrowBtn = document.querySelector('.altsim-btn-arrow');
+  
+  let isCollapsed = false;
+  
+  const toggleCollapse = () => {
+    isCollapsed = !isCollapsed;
+    
+    if (isCollapsed) {
+      cardBody.style.maxHeight = cardBody.scrollHeight + 'px';
+      cardBody.offsetHeight;
+      cardBody.style.maxHeight = '0px';
+      card.classList.add('collapsed');
+    } else {
+      cardBody.style.maxHeight = cardBody.scrollHeight + 'px';
+      card.classList.remove('collapsed');
+      
+      const handleTransitionEnd = () => {
+        if (!isCollapsed) {
+          cardBody.style.maxHeight = 'none';
+        }
+        cardBody.removeEventListener('transitionend', handleTransitionEnd);
+      };
+      cardBody.addEventListener('transitionend', handleTransitionEnd);
+    }
+  };
+  
+  if (arrowBtn) {
+    arrowBtn.addEventListener('click', toggleCollapse);
+  }
+})();
 // ========== ACCORDION SYSTEM ==========
 const accordionManager = (() => {
   const duration = 320;

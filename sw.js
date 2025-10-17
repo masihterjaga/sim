@@ -1,9 +1,9 @@
-const CACHE_NAME = 'rox-calc-v1.1.4.8951';
+const CACHE_NAME = 'rox-calc-v1.1.5.8951';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
-  '/sim/style/v1.1.4.css',
-  '/sim/script/v1.1.4.js',
+  '/sim/style/v1.1.5.css',
+  '/sim/script/v1.1.5.js',
   '/sim/manifest.json',
   '/sim/changelog.json',
   '/sim/img/Calc_vs_Ingame-0.jpg',

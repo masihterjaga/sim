@@ -1,6 +1,30 @@
 {
   "versions": [
     {
+      "version": "1.1.5",
+      "date": "17 Oct, 2025",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            {
+              "text": "About section"
+            }
+          ]
+        },
+        {
+          "category": "Update",
+          "items": [
+            {
+              "text": "Simplified UI"
+            }
+          ]
+        }
+
+      ]
+    }, 
+
+    {
       "version": "1.1.4",
       "date": "14 Oct, 2025",
       "changes": [
