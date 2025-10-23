@@ -27,6 +27,9 @@ const DOM_ELEMENTS = {
   tRaceLabel: document.getElementById('tRaceLabel'),
   tAttrLabel: document.getElementById('tAttrLabel'),
   attack: document.getElementById('attack'),
+  // experimental
+  flatDmgBns: document.getElementById('flatDmgBns'),
+  percentageDmgBns: document.getElementById('percentageDmgBns'),
   pen: document.getElementById('pen'),
   crit: document.getElementById('crit'),
   dmgStack: document.getElementById('dmgStack'),
@@ -38,6 +41,9 @@ const DOM_ELEMENTS = {
   attr: document.getElementById('attr'),
   penLabel: document.getElementById('penLabel'),
   critLabel: document.getElementById('critLabel'),
+  atkLabel: document.getElementById('atkLabel'),
+  flatDmgBnsLabel: document.getElementById('flatDmgBnsLabel'),
+  percentageDmgBnsLabel: document.getElementById('percentageDmgBnsLabel'),
   dmgLabel: document.getElementById('dmgLabel'),
   elemEnhLabel: document.getElementById('elemEnhLabel'),
   sizeEnhLabel: document.getElementById('sizeLabel'),
@@ -317,12 +323,12 @@ const WEAPON_SIZE_MODIFIER_TABLE = {
     Small: 0.75
   },
   "One-Handed Axe": {
-    Large: 0.75,
+    Large: 1,
     Medium: 0.75,
     Small: 0.75
   },
   "Two-Handed Axe": {
-    Large: 0.5,
+    Large: 1,
     Medium: 0.75,
     Small: 0.75
   },
@@ -457,57 +463,57 @@ const DEFENSE_TABLE = {
     sizeMob: "Large"
   },
   "Phreeoni Lv.140": {
-    def: 106.98,
-    dmgred: 204.60,
+    def: 106.98,//106.98,
+    dmgred: 204.60,//204.60,
     sizeMob: "Large",
     raceMob: "Brute",
     attributeMob: "Neutral"
   },
   "Mistress Lv.140": {
-    def: 130.18,
-    dmgred: 272.80,
+    def: 130.18,//130.18,
+    dmgred: 272.8023999999994,//272.80,
     sizeMob: "Small",
     raceMob: "Insect",
     attributeMob: "Wind"
   },
   "Eddga Lv.140": {
-    def: 106.98,
-    dmgred: 204.60,
+    def: 106.98040000000002,//106.98,
+    dmgred: 204.60080000000002,//204.60,
     sizeMob: "Large",
     raceMob: "Brute",
     attributeMob: "Fire"
   },
   "Kraken Lv.140": {
-    def: 130.18,
-    dmgred: 272.80,
+    def: 130.18360000000013,//130.18,
+    dmgred: 272.8001,//272.80,
     sizeMob: "Large",
     raceMob: "Fish",
     attributeMob: "Water"
   },
   "Maya Lv.140": {
-    def: 98.97,
-    dmgred: 136.40,
+    def: 98.97150000000005,//98.97,
+    dmgred: 136.4031000000001,//136.40,
     sizeMob: "Large",
     raceMob: "Insect",
     attributeMob: "Earth"
   },
   "Orc Hero Lv.140": {
-    def: 82.47,
-    dmgred: 136.40,
+    def: 82.47030000000001,//82.47,
+    dmgred: 136.40400000000014,//136.40,
     sizeMob: "Large",
     raceMob: "Demi-Human",
     attributeMob: "Earth"
   },
   "Pharaoh Lv.140": {
-    def: 98.97,
-    dmgred: 136.40,
+    def: 98.97380000000013,//98.97,
+    dmgred: 136.40120000000005,//136.40,
     sizeMob: "Large",
     raceMob: "Demi-Human",
     attributeMob: "Shadow"
   },
   "Orc Lord Lv.140": {
-    def: 82.47,
-    dmgred: 136.40,
+    def: 82.47030000000001,//82.47,
+    dmgred: 136.40400000000014,//136.40,
     sizeMob: "Large",
     raceMob: "Demi-Human",
     attributeMob: "Earth"
@@ -569,8 +575,8 @@ const DEFENSE_TABLE = {
     attributeMob: "Shadow"
   },
   "Arc Angeling Lv.140": {
-    def: 164.97,
-    dmgred: 136.40,
+    def: 164.9684,//164.97,
+    dmgred: 136.4008000000001,//136.40,
     sizeMob: "Medium",
     raceMob: "Angel",
     attributeMob: "Holy"
@@ -765,15 +771,15 @@ const DEFENSE_TABLE = {
     attributeMob: "Holy"
   },
   "Phreeoni Lv.150": {
-    def: 136.62,
-    dmgred: 311.20,
+    def: 136.61930000000004,//136.62,
+    dmgred: 311.1982999999999,//311.20019999999994,//311.20,
     sizeMob: "Large",
     raceMob: "Brute",
     attributeMob: "Neutral"
   },
   "Mistress Lv.150": {
-    def: 161.98,
-    dmgred: 361.00,
+    def: 161.9804,//161.98,
+    dmgred: 361.0001,//361.00,
     sizeMob: "Small",
     raceMob: "Insect",
     attributeMob: "Wind"
@@ -786,22 +792,22 @@ const DEFENSE_TABLE = {
     attributeMob: "Fire"
   },
   "Kraken Lv.150": {
-    def: 161.98,
-    dmgred: 361.00,
+    def: 161.98029000000008,//161.98,
+    dmgred: 361.00016999999957,//361.00,
     sizeMob: "Large",
     raceMob: "Fish",
     attributeMob: "Water"
   },
   "Maya Lv.150": {
-    def: 118.76,
-    dmgred: 186.70,
+    def: 118.76800000000033,//118.76,
+    dmgred: 186.69310000000044,//186.70,
     sizeMob: "Large",
     raceMob: "Insect",
     attributeMob: "Earth"
   },
   "Orc Hero Lv.150": {
-    def: 110.67,
-    dmgred: 261.40,
+    def: 110.66980000000007,//110.67,
+    dmgred: 261.3984999999999,//261.40,
     sizeMob: "Large",
     raceMob: "Demi-Human",
     attributeMob: "Earth"
@@ -814,9 +820,8 @@ const DEFENSE_TABLE = {
     attributeMob: "Shadow"
   },
   "Orc Lord Lv.150": {
-    def: 110.67,
-    dmgred: 261.40,
-    sizeMob: "Large",
+    def: 110.66980000000007, //110.67,
+    dmgred: 261.3984999999999, //261.40,    sizeMob: "Large",
     raceMob: "Demi-Human",
     attributeMob: "Earth"
   },
@@ -877,8 +882,8 @@ const DEFENSE_TABLE = {
     attributeMob: "Shadow"
   },
   "Arc Angeling Lv.150": {
-    def: 196.76,
-    dmgred: 186.70,
+    def: 196.75721000000007,//196.76,
+    dmgred: 186.697,//186.70,
     sizeMob: "Medium",
     raceMob: "Angel",
     attributeMob: "Holy"
@@ -954,8 +959,8 @@ const DEFENSE_TABLE = {
     attributeMob: "Water"
   },
   "King Dramoh Lv.150": {
-    def: 110.67,
-    dmgred: 261.40,
+    def: 110.66960000000016,//110.67,
+    dmgred: 261.37909999975295,//261.40,
     sizeMob: "Large",
     raceMob: "Fish",
     attributeMob: "Water"
@@ -1073,28 +1078,6 @@ const DEFENSE_TABLE = {
     attributeMob: "Holy"
   }
 };
-const cache = (() => {
-  const stores = {
-    weaponSize: new Map(),
-    elementCounter: new Map(),
-    defenseData: new Map()
-  };
-
-  const warm = () => {
-    Object.entries(WEAPON_SIZE_MODIFIER_TABLE).forEach(([w, sizes]) =>
-      Object.entries(sizes).forEach(([s, v]) => stores.weaponSize.set(`${w}:${s}`, v)));
-    Object.entries(ELEMENT_COUNTER_TABLE).forEach(([w, targets]) =>
-      Object.entries(targets).forEach(([t, v]) => stores.elementCounter.set(`${w}:${t}`, v)));
-    Object.entries(DEFENSE_TABLE).forEach(([k, v]) => stores.defenseData.set(k, v));
-  };
-
-  warm();
-  return {
-    get: (type, key) => stores[type]?.get(key),
-    clear: (type) => type ? stores[type]?.clear() : Object.values(stores).forEach(s => s.clear()),
-    rewarm: warm
-  };
-})();
 
 // ========== CENTRALIZED STATE ==========
 const AppState = (() => {
@@ -1270,121 +1253,184 @@ const EventManager = (() => {
 })();
 
 // ========== CALCULATION CORE ==========
-const getWeaponSizeModifier = (weapon, size) => weapon === 'all' || !weapon ? WEAPON_SIZE_MODIFIER_TABLE : cache.get('weaponSize', `${weapon}:${size}`) ?? 1.0;
-const getElementCounter = (weaponElem, targetElem) => weaponElem === 'all' || !weaponElem ? ELEMENT_COUNTER_TABLE : cache.get('elementCounter', `${weaponElem}:${targetElem || 'Neutral'}`) ?? 1.0;
-const getTargetDefenseData = (key) => !key ? DEFENSE_TABLE : cache.get('defenseData', key) || DEFENSE_TABLE["DUMMY Lvl.0 (0 DEF)"];
+const getWeaponSizeModifier = (weapon, size) => {
+  if (weapon === 'all' || !weapon) return WEAPON_SIZE_MODIFIER_TABLE;
+  return WEAPON_SIZE_MODIFIER_TABLE[weapon]?.[size] ?? 1.0;
+};
+const getElementCounter = (weaponElem, targetElem) => {
+  if (weaponElem === 'all' || !weaponElem) return ELEMENT_COUNTER_TABLE;
+  return ELEMENT_COUNTER_TABLE[weaponElem]?.[targetElem || 'Neutral'] ?? 1.0;
+};
+const getTargetDefenseData = (key) => {
+  if (!key) return DEFENSE_TABLE;
+  return DEFENSE_TABLE[key] || DEFENSE_TABLE["DUMMY Lvl.0 (0 DEF)"];
+};
+
+// ======== CALCULATION  ========
+const processMainCalculation = (() => {
+  let timeoutId = null;
+  let calculationRAF = null;
+  let isProcessing = false;
+  let executionId = 0;
+
+  const updateUIState = (disabled, text) => {
+    DOM_ELEMENTS.submit.disabled = disabled;
+    DOM_ELEMENTS.submit.textContent = text;
+  };
+
+  const cleanup = () => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      timeoutId = null;
+    }
+    if (calculationRAF !== null) {
+      cancelAnimationFrame(calculationRAF);
+      calculationRAF = null;
+    }
+  };
+
+  const enableResultButtons = () => {
+    [DOM_ELEMENTS.testReaper, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.resetRek].forEach(btn => {
+      if (btn) btn.disabled = false;
+    });
+  };
+
+  const performCalculation = (calculationState) => {
+    AppState.set('isResultShown', true);
+    lockAllInputs();
+    bindInputLockGuard();
+    renderMultiplierBreakdown(calculationState);
+    generateRecommendationTable(calculationState);
+    enableResultButtons();
+  };
+
+  const handleCalculationError = (error) => {
+    console.error('Calculation error:', error);
+    updateUIState(false, "Calculate");
+    typeof showSnackbar === 'function' && showSnackbar('Calculation failed. Please check your inputs.');
+  };
+
+  return () => {
+    if (isProcessing) return;
+
+    cleanup();
+
+    if (!validateRequiredFields()) {
+      updateUIState(false, "Calculate");
+      return;
+    }
+
+    isProcessing = true;
+    executionId++;
+    const currentId = executionId;
+
+    updateUIState(true, "Calculating...");
+
+    timeoutId = setTimeout(() => {
+      timeoutId = null;
+      if (currentId !== executionId) return;
+
+      calculationRAF = requestAnimationFrame(() => {
+        calculationRAF = null;
+        if (currentId !== executionId) return;
+
+        try {
+          const calculationState = getCurrentCalculationState();
+
+          if (!validateStatsVsTarget(calculationState)) {
+            updateUIState(false, "Calculate");
+            return;
+          }
+
+          performCalculation(calculationState);
+          updateUIState(true, "Calculate");
+
+        } catch (error) {
+          handleCalculationError(error);
+        } finally {
+          if (currentId === executionId) {
+            isProcessing = false;
+          }
+        }
+      });
+    }, 300);
+  };
+})();
 function getCurrentCalculationState() {
   const safeNum = (el) => el ? (Number(el.value) || 0) : 0;
   const safeStr = (el) => el?.value || '';
-
-  const atkType = safeStr(DOM_ELEMENTS.atkType);
-  const weapon = safeStr(DOM_ELEMENTS.weapon);
-  const wElem = safeStr(DOM_ELEMENTS.wElem);
-
-  const tDefKey = safeStr(DOM_ELEMENTS.tDef);
-  const tSize = safeStr(DOM_ELEMENTS.tSize);
-  const tRace = safeStr(DOM_ELEMENTS.tRace);
-  const tAttr = safeStr(DOM_ELEMENTS.tAttr);
-
-  const vesper = safeNum(DOM_ELEMENTS.vesperSet);
-  const vesperTier = vesper ? ((vesper - 8) / 8) : -1;
-
-  let blue3 = 0,
-    blue8 = 0;
-  const blueSet = DOM_ELEMENTS.blueSet;
-  if (blueSet?.selectedIndex >= 0) {
-    const selectedOption = blueSet.options[blueSet.selectedIndex];
-    if (selectedOption) {
-      const blueValue = safeNum(blueSet);
-      const optionText = selectedOption.textContent;
-      if (optionText.includes('*3')) {
-        blue3 = blueValue;
-      } else if (optionText.includes('*8')) {
-        blue8 = blueValue;
-      }
-    }
-  }
-
-  const white = safeNum(DOM_ELEMENTS.whiteSet);
-
-  const baseAttack = safeNum(DOM_ELEMENTS.attack);
-  const pen = safeNum(DOM_ELEMENTS.pen);
-  const crit = safeNum(DOM_ELEMENTS.crit);
-  const dmg = safeNum(DOM_ELEMENTS.dmg);
-  const elemEnh = safeNum(DOM_ELEMENTS.elemEnh);
-  const sizeEnh = safeNum(DOM_ELEMENTS.sizeEnh);
-  const race = safeNum(DOM_ELEMENTS.race);
-  const attr = safeNum(DOM_ELEMENTS.attr);
-  const dmgStack = safeNum(DOM_ELEMENTS.dmgStack);
-
+  
+  const { vesperSet, blueSet, whiteSet, wElem, tAttr } = DOM_ELEMENTS;
+  const selectedOption = blueSet.options[blueSet.selectedIndex];
+  const blueValue = safeNum(blueSet);
+  const optionText = (selectedOption.textContent || '').trim();
+  
   const isReaperActive = AppState.get('isTestReaperActive');
-  const reaperValue = isReaperActive ? ((wElem === tAttr) || (wElem === "Neutral" && !tAttr) ? 84 : 28) : 0;
-
   const isSpearActive = AppState.get('isTestSpearActive');
-  const spearValue = isSpearActive ? 84 : 0;
-
+  
+  const wElemValue = safeStr(wElem);
+  const tAttrValue = safeStr(tAttr);
+  
   const state = {
-    baseAttack,
-    atkType,
-    pen,
-    crit,
-    dmg,
-    sizeEnh,
-    elemEnh,
-    race,
-    attr,
-    weapon,
-    tSize,
-    wElem,
-    tAttr,
-    tRace,
-    tDefKey,
-    vesper,
-    white,
-    dmgStack,
-    blue3,
-    blue8,
-    reaperValue,
-    spearValue
+    atkType: safeStr(DOM_ELEMENTS.atkType),
+    weapon: safeStr(DOM_ELEMENTS.weapon),
+    wElem: wElemValue,
+    tDefKey: safeStr(DOM_ELEMENTS.tDef),
+    tSize: safeStr(DOM_ELEMENTS.tSize),
+    tRace: safeStr(DOM_ELEMENTS.tRace),
+    tAttr: tAttrValue,
+    vesper: safeNum(vesperSet),
+    blue3: optionText.includes('*3') ? blueValue : 0,
+    blue8: optionText.includes('*8') ? blueValue : 0,
+    white: safeNum(whiteSet),
+    baseAttack: safeNum(DOM_ELEMENTS.attack),
+    flatDmg: safeNum(DOM_ELEMENTS.flatDmgBns),
+    percentageDmg: safeNum(DOM_ELEMENTS.percentageDmgBns),
+    pen: safeNum(DOM_ELEMENTS.pen),
+    crit: safeNum(DOM_ELEMENTS.crit),
+    dmg: safeNum(DOM_ELEMENTS.dmg),
+    elemEnh: safeNum(DOM_ELEMENTS.elemEnh),
+    sizeEnh: safeNum(DOM_ELEMENTS.sizeEnh),
+    race: safeNum(DOM_ELEMENTS.race),
+    attr: safeNum(DOM_ELEMENTS.attr),
+    dmgStack: safeNum(DOM_ELEMENTS.dmgStack),
+    reaperValue: isReaperActive ? ((wElemValue === tAttrValue) || (wElemValue === "Neutral" && !tAttrValue) ? 84 : 28) : 0,
+    spearValue: isSpearActive ? 84 : 0
   };
-
-  const result = calculateMultiplier({
-    ...state,
-    extras: {
-      vesper: state.vesper,
-      white: state.white,
-      dmgStack: state.dmgStack,
-      blue3: state.blue3,
-      blue8: state.blue8,
-      reaperValue: state.reaperValue,
-      spearValue: state.spearValue
-    }
-  });
-
-  return {
-    ...state,
-    ...result
-  };
+  
+  const result = calculateMultiplier(state);
+  
+  return { ...state, ...result };
 };
-function calculateMultiplier(params={}) {
-  const { baseAttack,
-    atkType,
-    pen,
-    crit,
-    dmg,
-    sizeEnh,
-    elemEnh,
-    race,
-    attr,
-    weapon,
-    tSize,
-    wElem,
-    tAttr,
-    tRace,
-    tDefKey,
-    extras = {}
-  } = params;
-
+function calculateMultiplier(state) {
+  const {
+    atkType = '',
+      weapon = '',
+      wElem = '',
+      tDefKey = '',
+      tSize = '',
+      tRace = '',
+      tAttr = '',
+      baseAttack = 0,
+      flatDmg = 0,
+      percentageDmg = 0,
+      pen = 0,
+      crit = 0,
+      dmg = 0,
+      elemEnh = 0,
+      sizeEnh = 0,
+      race = 0,
+      attr = 0,
+      vesper = 0,
+      blue3 = 0,
+      blue8 = 0,
+      white = 0,
+      dmgStack = 0,
+      reaperValue = 0,
+      spearValue = 0
+  } = state;
+  
+  const toPercent = (val) => val / 100;
   
   const EXTRA_LABELS = {
     vesper: 'Vesper',
@@ -1392,46 +1438,41 @@ function calculateMultiplier(params={}) {
     white: 'White',
     dmgStack: 'Final DMG Bonus',
     reaperValue: 'Reaper',
-    blue8: 'BlueGroup8',
-    spearValue: 'Spear'
+    spearValue: 'Spear',
+    blue8: 'BlueGroup8'
   };
-
-
-  const {
-    def,
-    dmgred
-  } = getTargetDefenseData(tDefKey);
-
-  let atkF = 0;
-  if (atkType === 'crit') {
-    atkF = (crit || 0) / 100;
-  } else if (atkType === 'pen') {
-    const rawPen = (pen || 0) - (def || 0);
-    if (rawPen > 0) {
-      atkF = (rawPen >= 150 ? (rawPen * 2 - 150) : rawPen) / 100;
+  
+  const { def, dmgred } = getTargetDefenseData(tDefKey);
+  const isPenMode = atkType === 'pen';
+  
+  const calculateAttackFactor = () => {
+    if (atkType === 'crit') return toPercent(crit);
+    
+    if (isPenMode) {
+      const rawPen = pen - def;
+      if (rawPen > 0) {
+        return 1 + toPercent(rawPen >= 150 ? (rawPen * 2 - 150) : rawPen);
+      }
     }
-  }
-
+    
+    return 0;
+  };
+  
+  const atkF = calculateAttackFactor();
   const effDmgVal = dmg - dmgred;
   const sizeMod = getWeaponSizeModifier(weapon, tSize);
   const elemCtr = getElementCounter(wElem, tAttr);
-
-  const baseMult = (baseAttack || 1) *
-    (1 + atkF) *
-    (1 + effDmgVal / 100) *
-    (sizeMod + sizeEnh / 100) *
-    (elemCtr + elemEnh / 100) *
-    (1 + (tAttr ? attr / 100 : 0)) *
-    (1 + (tRace ? race / 100 : 0));
-
-  const processExtras = (keys, type) => {
+  
+  const pctSpearVal = toPercent(spearValue);
+  const pctReaperVal = toPercent(reaperValue);
+  
+  const processExtras = (extrasMap, type) => {
     const items = [];
     const rawValues = [];
-
-    keys.forEach(key => {
-      const value = extras[key] || 0;
+    
+    Object.entries(extrasMap).forEach(([key, value]) => {
       if (value > 0) {
-        const normalized = value / 100;
+        const normalized = toPercent(value);
         items.push({
           key: EXTRA_LABELS[key],
           type,
@@ -1440,119 +1481,80 @@ function calculateMultiplier(params={}) {
         rawValues.push(normalized);
       }
     });
-
+    
     const sum = rawValues.reduce((acc, val) => acc + val, 0);
-    return {
-      items,
-      sum,
-      factor: 1 + sum
-    };
+    return { items, sum, factor: 1 + sum };
   };
-
-  const extra1 = processExtras(['vesper', 'blue3', 'white', 'dmgStack', 'reaperValue'], 'extra1');
-  const extra2 = processExtras(['blue8', 'spearValue'], 'extra2');
-  const mult = baseMult * extra1.factor * extra2.factor; 
-  // ===== COMPARISON CALCULATIONS =====
-  const spearVal = (extras.spearValue || 0) / 100;
-  const reaperVal = (extras.reaperValue || 0) / 100;
-
-  const extra1FactorNoReaper = 1 + (extra1.sum - reaperVal);
-  const extra2FactorNoSpear = 1 + (extra2.sum - spearVal);
-
-  const multNoSpear = baseMult * extra1.factor * extra2FactorNoSpear;
-  const multNoReaper = baseMult * extra1FactorNoReaper * extra2.factor;
-  const multNoReaperSpear = baseMult * extra1FactorNoReaper * extra2FactorNoSpear;
-
-  const pctSpear = multNoSpear > 0 ? ((mult - multNoSpear) / multNoSpear * 100) : 0;
-  const pctReaper = multNoReaper > 0 ? ((mult - multNoReaper) / multNoReaper * 100) : 0;
-  const pctReaperSpear = multNoReaperSpear > 0 ? ((mult - multNoReaperSpear) / multNoReaperSpear * 100) : 0;
-
-  const resultGroups = [...extra1.items];
-  extra1.sum > 0 && resultGroups.push({
-    type: 'extra1',
-    sum: extra1.sum,
-    factor: extra1.factor
+  
+  const extra1 = processExtras({ vesper, blue3, white, dmgStack, reaperValue }, 'extra1');
+  const extra2 = processExtras({ spearValue }, 'extra2');
+  const extra3 = processExtras({ blue8 }, 'extra3');
+  
+  const step1 = baseAttack * atkF + (flatDmg * (percentageDmg ? 1 + toPercent(percentageDmg) : 1));
+  const step2 = step1 * (1 + toPercent(effDmgVal));
+  
+  const calcSteps = (e1Factor, e2Factor, e3Factor) => {
+    const s3 = step2 * (elemCtr + toPercent(elemEnh));
+    const s4 = s3 * (1 + (tAttr ? toPercent(attr) : 0));
+    const s5 = s4 * (1 + (tRace ? toPercent(race) : 0));
+    const s6 = s5 * e1Factor;
+    const s7 = s6 * e2Factor;
+    const s8 = s7 * e3Factor;
+    return s8 * (sizeMod + toPercent(sizeEnh));
+  };
+  
+  const mult = calcSteps(extra1.factor, extra2.factor, extra3.factor);
+  
+  const extra1FactorNoReaper = 1 + (extra1.sum - pctReaperVal);
+  const extra2FactorNoSpear = 1 + (extra2.sum - pctSpearVal);
+  
+  const multNoSpear = calcSteps(extra1.factor, extra2FactorNoSpear, extra3.factor);
+  const multNoReaper = calcSteps(extra1FactorNoReaper, extra2.factor, extra3.factor);
+  const multNoReaperSpear = calcSteps(extra1FactorNoReaper, extra2FactorNoSpear, extra3.factor);
+  
+  const calculatePct = (base, comparison) =>
+    comparison > 0 ? ((base - comparison) / comparison * 100) : 0;
+  
+  const pctSpear = calculatePct(mult, multNoSpear);
+  const pctReaper = calculatePct(mult, multNoReaper);
+  const pctReaperSpear = calculatePct(mult, multNoReaperSpear);
+  
+  const resultGroups = [];
+  [extra1, extra2, extra3].forEach((extra) => {
+    resultGroups.push(...extra.items);
+    if (extra.sum > 0) {
+      resultGroups.push({ type: extra.items[0]?.type, sum: extra.sum, factor: extra.factor });
+    }
   });
-  resultGroups.push(...extra2.items);
-  extra2.sum > 0 && resultGroups.push({
-    type: 'extra2',
-    sum: extra2.sum,
-    factor: extra2.factor
-  });
-
-  const isPenMode = atkType === 'pen';
+  
   const includeRace = !!(tRace && race > 0);
   const includeAttr = !!(tAttr && attr > 0);
   const includeExtra = extra1.sum > 0;
   const includeExtraTwo = extra2.sum > 0;
-
-  const factorList = [{
-      key: 'baseAtk',
-      label: 'Attack',
-      val: baseAttack,
-      mult: baseAttack || 1
-    },
-    {
-      key: 'main',
-      label: isPenMode ? 'Type (PEN)' : 'Type (CRIT)',
-      val: isPenMode ? pen : crit,
-      mult: 1 + atkF
-    },
-    {
-      key: 'dmg',
-      label: 'Final P/M DMG BNS',
-      val: dmg,
-      mult: 1 + effDmgVal / 100
-    },
-    {
-      key: 'elem',
-      label: 'Element',
-      val: elemEnh,
-      mult: elemCtr + elemEnh / 100,
-      extra: `counter ${elemCtr}`
-    },
-    {
-      key: 'size',
-      label: 'Size',
-      val: sizeEnh,
-      mult: sizeMod + sizeEnh / 100,
-      extra: `mod ${sizeMod}`
-    },
-    {
-      key: 'race',
-      label: 'Race',
-      val: race,
-      mult: 1 + race / 100,
-      show: includeRace
-    },
-    {
-      key: 'attr',
-      label: 'Attribute',
-      val: attr,
-      mult: 1 + attr / 100,
-      show: includeAttr
-    },
-    {
-      key: 'extra',
-      label: 'Extra#1',
-      val: extra1.sum,
-      mult: extra1.factor,
-      show: includeExtra
-    },
-    {
-      key: 'extraTwo',
-      label: 'Extra#2',
-      val: extra2.sum,
-      mult: extra2.factor,
-      show: includeExtraTwo
-    },
-    {
-      key: 'contribution',
-      label: 'Flash Contribution',
-      show: pctSpear > 0 || pctReaper > 0
-    }
+  const includeExtraThree = extra3.sum > 0;
+  
+  const buildFactorItem = (key, label, val, mult, options = {}) => ({
+    key,
+    label,
+    val,
+    mult,
+    ...options
+  });
+  
+  const factorList = [
+    buildFactorItem('attackAndType', isPenMode ? 'Attack + Type (PEN)' : 'Attack + Type (CRIT)', { baseAttack, flatDmg, percentageDmg, typeVal: isPenMode ? pen : crit, atkF, def }, step1, { isPenMode }),
+    buildFactorItem('dmg', 'Final P/M DMG BNS', dmg, 1 + toPercent(effDmgVal)),
+    buildFactorItem('elem', 'Element', elemEnh, elemCtr + toPercent(elemEnh), { extra: `counter ${elemCtr}` }),
+    buildFactorItem('size', 'Size', sizeEnh, sizeMod + toPercent(sizeEnh), { extra: `mod ${sizeMod}` }),
+    buildFactorItem('attr', 'Attribute', attr, 1 + toPercent(attr), { show: includeAttr }),
+    buildFactorItem('race', 'Race', race, 1 + toPercent(race), { show: includeRace }),
+    buildFactorItem('extra', 'Extra#1', extra1.sum, extra1.factor, { show: includeExtra }),
+    buildFactorItem('extraTwo', 'Extra#2', extra2.sum, extra2.factor, { show: includeExtraTwo }),
+    buildFactorItem('extraThree', 'Extra#3', extra3.sum, extra3.factor, { show: includeExtraThree }),
+    buildFactorItem('contribution', 'Flash Contribution', undefined, undefined, { show: pctSpear > 0 || pctReaper > 0 })
   ];
-
+  
+  
   return {
     mult,
     pctSpear,
@@ -1570,120 +1572,21 @@ function calculateMultiplier(params={}) {
       includeRace,
       includeAttr,
       includeExtra,
-      includeExtraTwo
+      includeExtraTwo,
+      includeExtraThree
     },
     parts: {
-      baseMult,
+      baseMult: mult,
       extraGroups: resultGroups,
       extra1Factor: extra1.factor,
       extra2Factor: extra2.factor,
+      extra3Factor: extra3.factor,
       extra1Sum: extra1.sum,
-      extra2Sum: extra2.sum
+      extra2Sum: extra2.sum,
+      extra3Sum: extra3.sum
     }
   };
 };
-const processMainCalculation = (() => {
-  let timeoutId = null;
-  let calculationRAF = null;
-  let isProcessing = false;
-  let executionId = 0;
-
-  const resetUI = () => {
-    DOM_ELEMENTS.submit.disabled = false;
-    DOM_ELEMENTS.submit.textContent = "Calculate";
-  };
-
-  const setCalculatingUI = () => {
-    DOM_ELEMENTS.submit.disabled = true;
-    DOM_ELEMENTS.submit.textContent = "Calculating...";
-  };
-
-  const cleanup = () => {
-    if (timeoutId !== null) {
-      clearTimeout(timeoutId);
-      timeoutId = null;
-    }
-    if (calculationRAF !== null) {
-      cancelAnimationFrame(calculationRAF);
-      calculationRAF = null;
-    }
-  };
-
-  const enableResultButtons = () => {
-    [DOM_ELEMENTS.testReaper, DOM_ELEMENTS.testSpear, DOM_ELEMENTS.resetRek]
-    .forEach(btn => {
-      if (btn) btn.disabled = false;
-    });
-  };
-
-  const performCalculation = (calculationState) => {
-    AppState.set('isResultShown', true);
-    lockAllInputs();
-    bindInputLockGuard();
-    renderMultiplierBreakdown(calculationState);
-    generateRecommendationTable(calculationState);
-    enableResultButtons();
-  };
-
-  const handleCalculationError = (error) => {
-    console.error('Calculation error:', error);
-    resetUI();
-
-    if (typeof showSnackbar === 'function') {
-      showSnackbar('Calculation failed. Please check your inputs.');
-    }
-  };
-
-  return () => {
-    if (isProcessing) return;
-
-    cleanup();
-
-    if (!validateRequiredFields()) {
-      resetUI();
-      return;
-    }
-
-    isProcessing = true;
-    executionId++;
-    const currentId = executionId;
-
-    setCalculatingUI();
-
-    timeoutId = setTimeout(() => {
-      timeoutId = null;
-
-      if (currentId !== executionId) return;
-
-      calculationRAF = requestAnimationFrame(() => {
-        calculationRAF = null;
-
-        if (currentId !== executionId) return;
-
-        try {
-          const calculationState = getCurrentCalculationState();
-
-          if (!validateStatsVsTarget(calculationState)) {
-            resetUI();
-            return;
-          }
-
-          performCalculation(calculationState);
-
-          DOM_ELEMENTS.submit.disabled = true;
-          DOM_ELEMENTS.submit.textContent = "Calculate";
-
-        } catch (error) {
-          handleCalculationError(error);
-        } finally {
-          if (currentId === executionId) {
-            isProcessing = false;
-          }
-        }
-      });
-    }, 300);
-  };
-})();
 
 // ======== BREAKDOWN ========
 const NumberFormatter = {
@@ -1693,12 +1596,8 @@ const NumberFormatter = {
     const isInteger = num % 1 === 0;
     
     if (showFullPrecision) {
-      if (absNum >= 99999 || isInteger) return isInteger ? num.toString() : Math.floor(num).toString();
-      
-      const str = num.toFixed(6).replace(/(\.\d*?)0+$/, '$1');
-      const parts = str.split('.');
-      
-      return str.endsWith('.') || (parts[1]?.length === 1) ? num.toFixed(2) : str;
+      if (isInteger || absNum >= 99999) return num.toString();
+      return num.toFixed(6).replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
     }
     
     if (absNum > 99999) {
@@ -1706,47 +1605,70 @@ const NumberFormatter = {
       return `${Math.floor(num / divisor)}${divisor === 1e6 ? 'M' : 'K'}`;
     }
     
-    return isInteger ? num.toString() : num.toFixed(2);
+    return isInteger ? num.toString() : (Math.floor(num * 100) / 100).toString();
   }
 };
 const PrecisionToggle = {
+  formatters: {
+    basic: (n, showFull) => NumberFormatter.format(n, showFull),
+    withData: (n, showFull) => `<span data-raw-value="${n}">${NumberFormatter.format(n, showFull)}</span>`,
+    withBase: (n, showFull) => {
+      const display = showFull ? NumberFormatter.format(n, showFull) : Math.floor(n).toString();
+      return `<span data-raw-value="${n}" data-is-base="true">${display}</span>`;
+    },
+    withMult: (n, showFull) => `<span data-raw-mult="${n}">${NumberFormatter.format(n, showFull)}</span>`,
+    finalMult: (n, showFull) => {
+      const display = showFull ? Math.floor(n).toString() : NumberFormatter.format(n, showFull);
+      return `<span data-raw-mult="${n}" data-is-final="true">${display}</span>`;
+    }
+  },
+
   create(resultContainer, onToggleCallback) {
     const showFullPrecision = resultContainer?.dataset?.showFullPrecision === "1";
-    
     const btn = document.createElement('button');
     btn.className = 'toggle-precision job-sim';
     btn.type = 'button';
     btn.textContent = showFullPrecision ? "hide" : "shown";
-    
+
     const listenerId = EventManager.add(btn, 'click', (e) => {
       e.preventDefault();
       e.stopPropagation();
-      
+
       if (!resultContainer?.dataset) return;
-      
+
       const newState = resultContainer.dataset.showFullPrecision === "1" ? "0" : "1";
       const isPrecise = newState === "1";
-      
+
       resultContainer.dataset.showFullPrecision = newState;
       btn.textContent = isPrecise ? "hide" : "shown";
-      
       onToggleCallback(isPrecise);
-      
-      typeof showSnackbar === 'function' &&
+
+      if (typeof showSnackbar === 'function') {
         showSnackbar(`${isPrecise ? "Precise" : "Rounded"} numbers displayed`);
+      }
     });
-    
+
     btn.dataset.listenerId = listenerId;
     return btn;
   },
-  
-  refreshNumbers(resultContainer, showFullPrecision) {
-    resultContainer.querySelectorAll('[data-raw-value]').forEach(el => {
-      el.textContent = NumberFormatter.format(parseFloat(el.dataset.rawValue), showFullPrecision);
+
+  refreshNumbers(container, showFullPrecision) {
+    if (!container) return;
+    
+    container.querySelectorAll('[data-raw-value]').forEach(el => {
+      const rawVal = parseFloat(el.dataset.rawValue);
+      el.textContent = el.dataset.isBase === "true" && !showFullPrecision ?
+        Math.floor(rawVal).toString() :
+        NumberFormatter.format(rawVal, showFullPrecision);
     });
     
-    resultContainer.querySelectorAll('code[data-raw-mult]').forEach(el => {
-      el.textContent = `\u00D7${NumberFormatter.format(parseFloat(el.dataset.rawMult), showFullPrecision)}`;
+    container.querySelectorAll('[data-raw-mult]').forEach(el => {
+      const rawVal = parseFloat(el.dataset.rawMult);
+      const isFinal = el.dataset.isFinal === "true";
+      
+      el.textContent = isFinal && showFullPrecision ?
+        Math.floor(rawVal).toString() :
+        NumberFormatter.format(rawVal, showFullPrecision);
     });
   }
 };
@@ -1755,42 +1677,18 @@ function renderMultiplierBreakdown(calculationState) {
 
   const resultContainer = DOM_ELEMENTS.hasil;
   const showFullPrecision = resultContainer?.dataset?.showFullPrecision === "1";
+  const fmt = PrecisionToggle.formatters;
+  const wrapCode = (content) => `<code>${content}</code>`;
+  const buildFormula = (parts, result) => `${parts} → ${wrapCode(result)}`;
 
-  // Format helpers
-  const fmt = (n) => NumberFormatter.format(n, showFullPrecision);
-  const fmtWithData = (n) => `<span data-raw-value="${n}">${fmt(n)}</span>`;
-
-  // Destructure state
   const {
-    mult,
-    def,
-    dmgred,
-    pen,
-    crit,
-    dmg,
-    wElem,
-    tAttr,
-    tSize,
-    weapon,
-    atkType,
-    tRace,
-    vesper,
-    blue3,
-    blue8,
-    white,
-    tDefKey,
-    elementCounter,
-    sizeModifier,
-    parts = {},
-    breakdownData = {}
+    mult, def, dmgred, wElem, tAttr, tSize, weapon, tRace, vesper, blue3, blue8, white,
+    tDefKey, elementCounter, sizeModifier, percentageDmg, flatDmg, baseAttack,
+    parts = {}, breakdownData = {}
   } = calculationState;
 
-  const {
-    extraGroups = [], extra1Factor = 1, extra2Factor = 1
-  } = parts;
-  const {
-    factorList = [], isPenMode = false
-  } = breakdownData;
+  const { extraGroups = [], extra1Factor = 1, extra2Factor = 1, extra3Factor = 1 } = parts;
+  const { factorList = [], isPenMode = false } = breakdownData;
 
   const LABELS = {
     'Vesper': 'Vesper SET',
@@ -1801,16 +1699,10 @@ function renderMultiplierBreakdown(calculationState) {
     'Spear': 'Divinity#1 Flash: Spear of Eternity'
   };
 
-  // Group extras by type
   const extras = {
-    extra1: {
-      items: [],
-      factor: extra1Factor
-    },
-    extra2: {
-      items: [],
-      factor: extra2Factor
-    }
+    extra1: { items: [], factor: extra1Factor },
+    extra2: { items: [], factor: extra2Factor },
+    extra3: { items: [], factor: extra3Factor }
   };
 
   extraGroups.forEach(group => {
@@ -1822,28 +1714,25 @@ function renderMultiplierBreakdown(calculationState) {
     }
   });
 
-  // Check if line is a note
   const isNote = (text) =>
     text.includes('Tools assume') || text.includes('uptime') ||
     text.includes('Elements') || text.includes('This bonus');
 
-  // Build HTML list items
   const buildLines = (lines) =>
     lines.map(line => `<li${isNote(line) ? ' class="note"' : ''}>${line}</li>`).join('');
 
-  // Build extra bonus section (Extra#1 or Extra#2)
-  function buildExtraSection(extraType, title, state) {
+  const buildExtraSection = (extraType, title) => {
     const extraData = extras[extraType];
     const lines = [];
     const values = [];
 
     extraData.items.forEach(item => {
       const label = LABELS[item.key] || item.key;
-      const valPercent = fmtWithData(item.value * 100);
+      const valPercent = fmt.withData(item.value * 100, showFullPrecision);
 
       if (item.key === 'Reaper') {
         lines.push(
-          `${label}: ${state.wElem} vs ${state.tAttr || 'Neutral'} <button type="button" id="reaperTips" class="tooltip-button"></button>`,
+          `${label}: ${wElem} vs ${tAttr || 'Neutral'} <button type="button" id="reaperTips" class="tooltip-button"></button>`,
           `${valPercent} / 100`
         );
       } else if (item.key === 'Spear') {
@@ -1856,167 +1745,191 @@ function renderMultiplierBreakdown(calculationState) {
 
         switch (item.key) {
           case 'Vesper':
-            if (state.vesper) display = `${label}: Tier ${(state.vesper-8)/8}`;
+            if (vesper) display = `${label}: Tier ${(vesper-8)/8}`;
             break;
           case 'BlueGroup3':
-            if (state.blue3) display = `${label}: Level ${4*state.blue3+10}*3`;
+            if (blue3) display = `${label}: Level ${4*blue3+10}*3`;
             break;
           case 'White':
-            if (state.white) display = `${label}: Tier ${(state.white-30)/6}`;
+            if (white) display = `${label}: Tier ${(white-30)/6}`;
             break;
           case 'BlueGroup8':
-            if (state.blue8) display = `${label}: ${state.blue8}%`;
+            if (blue8) display = `${label}: Level ${2*blue8+20}*8`;
             break;
         }
 
         lines.push(display, `${valPercent} / 100`);
       }
-      values.push(fmtWithData(item.value));
+      values.push(fmt.withData(item.value, showFullPrecision));
     });
 
-    const valuesDisplay = values.join(' + ');
-    lines.push(`1 + ${valuesDisplay} \u2192 <code data-raw-mult="${extraData.factor}">\u00D7${fmt(extraData.factor)}</code>`);
+    lines.push(buildFormula(`1 + ${values.join(' + ')}`, `×${fmt.withMult(extraData.factor, showFullPrecision)}`));
+    return { title, lines };
+  };
 
-    return {
-      title,
-      lines
-    };
-  }
-
-  // Build individual factor breakdown
-  function buildFactor(factor, state) {
-    if (factor.show === false && factor.key !== 'contribution') {
-      return {
-        html: `<li>${factor.label}: \u00D71.00 (no stat)</li>`,
-        mult: `1.00 (no ${factor.label.toLowerCase()})`
-      };
-    }
+  const buildFactor = (factor) => {
+    if (factor.show === false) return { html: null, raw: null };
 
     let factorData = null;
 
     switch (factor.key) {
-      case 'baseAtk':
-        return {
-          html: '', mult: fmt(factor.mult)
-        };
-      case 'main':
-        if (!state.isPenMode) {
-          factorData = {
-            title: `Attack Type: CRIT vs ${state.tDefKey}`,
-            lines: [
-              `Crit DMG: ${fmtWithData(state.crit)}`,
-              `1.00 + ( ${fmtWithData(state.crit)} / 100 ) \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code>`
-            ]
-          };
-        } else {
-          const lines = [
-            `Raw PEN + Final PEN: ${fmtWithData(state.pen)}`,
-            `Target DEF: ${fmtWithData(state.def)}`
-          ];
-
-          const rawBasePen = state.pen - state.def;
-          if (rawBasePen >= 150) {
-            lines.push(
-              `1.00 + ((( ${fmtWithData(state.pen)} - ${fmtWithData(state.def)} ) \u00D7 2 ) - 150 ) / 100`,
-              `1.00 + ( ${fmtWithData((rawBasePen * 2) - 150)} / 100 ) \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code>`
-            );
-          } else {
-            lines.push(`1.00 + (( ${fmtWithData(state.pen)} - ${fmtWithData(state.def)} ) / 100 ) \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code>`);
-          }
-
-          factorData = {
-            title: `Attack Type: PEN vs ${state.tDefKey}`,
-            lines
-          };
+      case 'attackAndType': {
+        const { baseAttack, flatDmg, percentageDmg, typeVal, atkF, def } = factor.val;
+        const lines = [];
+        
+        if (baseAttack > 0) lines.push(`Attack: ${baseAttack}`);
+        if (flatDmg > 0) {
+          lines.push(`Raw Damage Bonus: ${fmt.withData(flatDmg, showFullPrecision)}`);
+          if (percentageDmg > 0) lines.push(`Percentage DMG Bonus: ${fmt.withData(percentageDmg, showFullPrecision)}`);
         }
+        
+        if (isPenMode) {
+          lines.push(
+            `Raw PEN + Final PEN: ${fmt.withData(typeVal, showFullPrecision)}`,
+            `Target DEF: ${fmt.withData(def, showFullPrecision)}`
+          );
+        } else {
+          lines.push(`Crit DMG: ${fmt.withData(typeVal, showFullPrecision)}`);
+        }
+        
+        const baseCalc = baseAttack || 0;
+        const flatCalc = flatDmg || 0;
+        const pctCalc = percentageDmg || 0;
+        const formulaParts = [];
+        
+        if (baseCalc > 0 || atkF > 0) {
+          if (isPenMode) {
+            const rawBasePen = typeVal - def;
+            if (rawBasePen >= 150) {
+              formulaParts.push(
+                `${baseCalc} × [ 1 + [ ( ${fmt.withData(typeVal, showFullPrecision)} - ${fmt.withData(def, showFullPrecision)} ) × 2 - 150 ] / 100 ]`
+              );
+            } else if (rawBasePen > 0) {
+              formulaParts.push(
+                `${baseCalc} × [ 1 + ( ${fmt.withData(typeVal, showFullPrecision)} - ${fmt.withData(def, showFullPrecision)} ) / 100 ]`
+              );
+            } else {
+              formulaParts.push(`${baseCalc}`);
+            }
+          } else {
+            formulaParts.push(`${baseCalc} × [ ${fmt.withData(typeVal, showFullPrecision)} / 100 ]`);
+          }
+        }
+        
+        if (flatCalc > 0) {
+          formulaParts.push(pctCalc > 0
+            ? `${fmt.withData(flatCalc, showFullPrecision)} × [ 1 + ( ${fmt.withData(pctCalc, showFullPrecision)} / 100 ) ]`
+            : `${fmt.withData(flatCalc, showFullPrecision)}`);
+        }
+        
+        lines.push(buildFormula(formulaParts.join(' + '), fmt.withBase(factor.mult, showFullPrecision)));
+        factorData = {
+          title: isPenMode ? `Attack Type (PEN) vs ${tDefKey}` : `Attack + Type (CRIT) vs ${tDefKey}`,
+          lines
+        };
         break;
+      }
 
       case 'dmg':
         factorData = {
           title: 'Final P/M Damage Bonus',
           lines: [
-            `P/M BO: ${fmtWithData(state.dmg)}`,
-            `Target Reduction: ${fmtWithData(state.dmgred)}`,
-            `1.00 + (( ${fmtWithData(state.dmg)} - ${fmtWithData(state.dmgred)} ) / 100 ) \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code>`
+            `P/M BO: ${fmt.withData(calculationState.dmg, showFullPrecision)}`,
+            `Target Reduction: ${fmt.withData(dmgred, showFullPrecision)}`,
+            buildFormula(
+              `1 + ( ${fmt.withData(calculationState.dmg, showFullPrecision)} - ${fmt.withData(dmgred, showFullPrecision)} ) / 100`,
+              `×${fmt.withMult(factor.mult, showFullPrecision)}`
+            )
           ]
         };
         break;
 
       case 'elem':
         factorData = {
-          title: `Element: ${state.wElem} vs ${state.tAttr || "Neutral<button type='button' id='elemCtrTips' class='tooltip-button'></button>"}`,
+          title: `Element: ${wElem} vs ${tAttr || "Neutral<button type='button' id='elemCtrTips' class='tooltip-button'></button>"}`,
           lines: [
-            `Counter: ${fmtWithData(state.elementCounter)}`,
-            `${state.wElem} Enhance: ${fmtWithData(factor.val)}`,
-            `${fmtWithData(state.elementCounter)} + ( ${fmtWithData(factor.val)} / 100 ) \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code>`
+            `Counter: ${fmt.withData(elementCounter, showFullPrecision)}`,
+            `${wElem} Enhance: ${fmt.withData(factor.val, showFullPrecision)}`,
+            buildFormula(
+              `${fmt.withData(elementCounter, showFullPrecision)} + ${fmt.withData(factor.val, showFullPrecision)} / 100`,
+              `×${fmt.withMult(factor.mult, showFullPrecision)}`
+            )
           ]
         };
         break;
 
       case 'size':
         factorData = {
-          title: `Size: ${state.weapon} vs ${state.tSize}`,
+          title: `Size: ${weapon} vs ${tSize}`,
           lines: [
-            `Modifier: ${fmtWithData(state.sizeModifier)}`,
-            `${state.tSize} Enhance: ${fmtWithData(factor.val)}`,
-            `${fmtWithData(state.sizeModifier)} + ( ${fmtWithData(factor.val)} / 100 ) \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code>`
+            `Modifier: ${fmt.withData(sizeModifier, showFullPrecision)}`,
+            `${tSize} Enhance: ${fmt.withData(factor.val, showFullPrecision)}`,
+            buildFormula(
+              `${fmt.withData(sizeModifier, showFullPrecision)} + ${fmt.withData(factor.val, showFullPrecision)} / 100`,
+              `×${fmt.withMult(factor.mult, showFullPrecision)}`
+            )
           ]
         };
         break;
 
       case 'race':
         factorData = {
-          title: `Race: ${state.tRace}`,
+          title: `Race: ${tRace}`,
           lines: [
-            `DMG to ${state.tRace}: ${fmtWithData(factor.val)}`,
-            `1.00 + ( ${fmtWithData(factor.val)} / 100 ) \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code>`
+            `DMG to ${tRace}: ${fmt.withData(factor.val, showFullPrecision)}`,
+            buildFormula(
+              `1 + ${fmt.withData(factor.val, showFullPrecision)} / 100`,
+              `×${fmt.withMult(factor.mult, showFullPrecision)}`
+            )
           ]
         };
         break;
 
       case 'attr':
         factorData = {
-          title: `Attribute: ${state.tAttr}`,
+          title: `Attribute: ${tAttr}`,
           lines: [
-            `DMG to ${state.tAttr} Attribute: ${fmtWithData(factor.val)}`,
-            `1.00 + ( ${fmtWithData(factor.val)} / 100 ) \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code>`
+            `DMG to ${tAttr} Attribute: ${fmt.withData(factor.val, showFullPrecision)}`,
+            buildFormula(
+              `1 + ${fmt.withData(factor.val, showFullPrecision)} / 100`,
+              `×${fmt.withMult(factor.mult, showFullPrecision)}`
+            )
           ]
         };
         break;
 
       case 'extra':
-        factorData = buildExtraSection('extra1', 'Extra#1: Final DMG Bonus', state);
+        factorData = buildExtraSection('extra1', 'Final DMG Bonus');
         break;
 
       case 'extraTwo':
-        factorData = buildExtraSection('extra2', 'Extra#2: Bonus DMG to MVP/MINI', state);
+        factorData = buildExtraSection('extra2', 'Bonus DMG to Normal Monster, MVP/MINI, and BOS');
         break;
 
-      case 'contribution':
-        const hasSpear = state.pctSpear > 0;
-        const hasReaper = state.pctReaper > 0;
+      case 'extraThree':
+        factorData = buildExtraSection('extra3', 'Bonus DMG to MVP/MINI, and BOS');
+        break;
 
-        if (!hasSpear && !hasReaper) {
-          return {
-            html: '',
-            mult: ''
-          };
-        }
+      case 'contribution': {
+        const hasSpear = calculationState.pctSpear > 0;
+        const hasReaper = calculationState.pctReaper > 0;
 
-        const formatBoost = (value) => `<code>\u2248${Math.trunc(value/2)}%</code>`;
+        if (!hasSpear && !hasReaper) return { html: '', raw: null };
+
+        const formatBoost = (value) => `<code>≈${Math.trunc(value/2)}%</code>`;
         const createLine = (label, value) => `${label}: ${formatBoost(value)}`;
-
         const lines = [];
+
         if (hasSpear && hasReaper) {
           lines.push(
-            createLine('Spear Flash', state.pctSpear) + ' damage boost.',
-            createLine('Reaper Flash', state.pctReaper) + ' damage boost.',
-            `Both flashes gives you ${formatBoost(state.pctReaperSpear)} total damage increase.`
+            createLine('Spear Flash', calculationState.pctSpear) + ' damage boost.',
+            createLine('Reaper Flash', calculationState.pctReaper) + ' damage boost.',
+            `Both flashes gives you ${formatBoost(calculationState.pctReaperSpear)} total damage increase.`
           );
         } else if (hasSpear) {
-          lines.push(`Spear Flash boost: ${formatBoost(state.pctSpear)}`);
+          lines.push(`Spear Flash boost: ${formatBoost(calculationState.pctSpear)}`);
         } else {
-          lines.push(`Reaper Flash boost: ${formatBoost(state.pctReaper)}`);
+          lines.push(`Reaper Flash boost: ${formatBoost(calculationState.pctReaper)}`);
         }
 
         factorData = {
@@ -2024,89 +1937,91 @@ function renderMultiplierBreakdown(calculationState) {
           lines
         };
         break;
+      }
 
       default:
         return {
-          html: `<li>${factor.label}: ${fmtWithData(factor.val)} \u2192 <code data-raw-mult="${factor.mult}">\u00D7${fmt(factor.mult)}</code></li>`,
-            mult: fmt(factor.mult)
+          html: `<li>${factor.label}: ${fmt.withData(factor.val, showFullPrecision)} → ${wrapCode(`×${fmt.withMult(factor.mult, showFullPrecision)}`)}</li>`,
+          raw: factor.mult
         };
     }
 
-    const html = `<li>${factorData.title}<ul>${buildLines(factorData.lines)}</ul></li>`;
     return {
-      html,
-      mult: fmt(factor.mult)
+      html: `<li>${factorData.title}<ul>${buildLines(factorData.lines)}</ul></li>`,
+      raw: factor.mult
     };
-  }
-
-  // Process all factors
-  const factorHTML = [];
-  const multiplierParts = [];
-  const stateContext = {
-    ...calculationState,
-    extras,
-    LABELS,
-    isPenMode
   };
 
-  factorList.forEach((factor, i) => {
-    const result = buildFactor(factor, stateContext);
+  const factorHTML = [];
+  let baseValue = null;
+  const multipliers = [];
 
+  factorList.forEach((factor) => {
+    const result = buildFactor(factor);
     factorHTML.push(result.html);
-    if (factor.key === 'contribution') return;
-
-    multiplierParts.push((i === 0 ? '' : '\u00D7 ') + result.mult);
+    
+    if (factor.show === false || factor.key === 'contribution') return;
+    
+    if (factor.key === 'attackAndType') {
+      baseValue = factor.mult;
+    } else {
+      multipliers.push(factor.mult);
+    }
   });
 
-  // Prepare UI components
+  const displayParts = [];
+  if (baseValue !== null) displayParts.push(fmt.withBase(baseValue, showFullPrecision));
+  multipliers.forEach(m => displayParts.push(`× ${fmt.withMult(m, showFullPrecision)}`));
+  
   const targetInfo = [tSize, tRace, tAttr].filter(Boolean).join(" + ");
-  const bq1Text = `By default, every factor starts at \u00D71.00<button type='button' id='breakdownTips' class='tooltip-button'></button>\nNumbers`;
+  const bq1Text = `By default, every factor starts at ×1.00<button type='button' id='breakdownTips' class='tooltip-button'></button>\nNumbers`;
   const bq1Suffix = document.createTextNode(" how it changes with your stats.");
 
   const precisionBtn = PrecisionToggle.create(
     resultContainer,
     (showFullPrecision) => {
       PrecisionToggle.refreshNumbers(resultContainer, showFullPrecision);
+      PrecisionToggle.refreshNumbers(DOM_ELEMENTS.rec, showFullPrecision);
     }
   );
 
   const swapSelect = dropdownManager.createSwapSelect(calculationState, isPenMode);
 
-  // Cleanup old event listeners
   resultContainer.querySelectorAll('[data-listener-id]').forEach(el => {
     const id = el.dataset.listenerId;
-    id && EventManager.remove(parseInt(id));
+    if (id) EventManager.remove(parseInt(id));
   });
 
-  // Render HTML
   resultContainer.innerHTML = `
     <div class="multiplier-breakdown" id="multiplier-breakdown">
       <blockquote class="noted">${bq1Text.replace(/\n/g, '<br>')}</blockquote>
       <ul class="factor-breakdown">${factorHTML.join('')}</ul>
       <hr class="separ">
       <div class="breakdown-swap-wrapper" id="swap-wrapper"></div>
-      <p class="sum-head">Your base multiplier to <i>${targetInfo} (${tDefKey})</i></p>
-      <div class="last-calc">${multiplierParts.join(" ")}<br>\u2248<code data-raw-mult="${mult}">\u00D7${fmt(mult)}</code><button type="button" id="attackTips" class="calcTips tooltip-button"></button></div>
-      <blockquote class="noted">Only base multipliers! Real output depends on class, skills, buffs (vesper, blue, or white stack), and more. More accurate? Just use <a class="job-sim" target="_blank" href="//discord.com/channels/784407151342256148/909016309218541568/1407521807459811328">job sim!</a></blockquote>
+      <p class="sum-head">Your basic attack to <i>${targetInfo} (${tDefKey})</i></p>
+      <div class="last-calc">${displayParts.join(" ")}<br>≈${wrapCode(fmt.finalMult(mult, showFullPrecision))}<button type="button" id="attackTips" class="calcTips tooltip-button"></button></div>
+      <blockquote class="noted">Real output depends on class, skills, buffs (vesper, blue, or white stack), and more. More accurate? Just use <a class="job-sim" target="_blank" href="//discord.com/channels/784407151342256148/909016309218561568/1407521807459811328">job sim!</a></blockquote>
     </div>`;
 
-  // Attach components to DOM
   const bq1 = resultContainer.querySelector('.noted');
   bq1.appendChild(precisionBtn);
   bq1.appendChild(bq1Suffix);
   resultContainer.querySelector('#swap-wrapper').appendChild(swapSelect);
 };
 
-// ========== RECOMMENDATION ==========
+// ======== RECOMMENDATION ========
 const RandomGenerator = (() => {
   const SIZE = 500;
-  let cache = new Float64Array(SIZE),
-    idx = 0;
+  let cache = new Float64Array(SIZE);
+  let idx = 0;
+  
   const refill = () => {
     for (let i = 0; i < SIZE; i++) cache[i] = Math.random();
     idx = 0;
   };
+  
   refill();
+  
   return {
     get: () => (idx >= SIZE && refill(), cache[idx++]),
     reset: refill
@@ -2132,92 +2047,38 @@ const RECOMMENDATION_CONFIG = {
   ratioMin: 0.32,
   ratioMax: 0.64,
   ratioNoise: 0.12,
-  bias: {
-    main: 1.0,
-    dmg: 0.95,
-    elem: 0.90,
-    size: 0.90,
-    race: 0.72,
-    attr: 0.72
-  },
-  cats: [{
-      label: '6-12%',
-      min: 1.06,
-      max: 1.12
-    },
-    {
-      label: '18-24%',
-      min: 1.18,
-      max: 1.24
-    },
-    {
-      label: '32-48%',
-      min: 1.32,
-      max: 1.48
-    },
-    {
-      label: '64-128%',
-      min: 1.64,
-      max: 2.28
-    }
+  bias: { main: 1.0, dmg: 0.95, elem: 0.90, size: 0.90, race: 0.72, attr: 0.72 },
+  cats: [
+    { label: '6-12%', min: 1.06, max: 1.12 },
+    { label: '18-24%', min: 1.18, max: 1.24 },
+    { label: '32-48%', min: 1.32, max: 1.48 },
+    { label: '64-128%', min: 1.64, max: 2.28 }
   ],
-  forSmallCats: [{
-      label: '84-168%',
-      min: 1.84,
-      max: 2.68
-    },
-    {
-      label: '180-270%',
-      min: 2.80,
-      max: 3.70
-    },
-    {
-      label: '320-480%',
-      min: 4.32,
-      max: 5.80
-    },
-    {
-      label: '510-720%',
-      min: 6.10,
-      max: 8.20
-    }
+  forSmallCats: [
+    { label: '84-168%', min: 1.84, max: 2.68 },
+    { label: '180-270%', min: 2.80, max: 3.70 },
+    { label: '320-480%', min: 4.32, max: 5.80 },
+    { label: '510-720%', min: 6.10, max: 8.20 }
   ]
-}
+};
 const calculateRecommendationWeights = (params) => {
   if (!AppState.get('isResultShown')) return;
-
-  const {
-    includeRace,
-    includeAttr,
-    baseMain,
-    baseDmg,
-    baseElem,
-    baseSize,
-    baseRace,
-    baseAttr
-  } = params;
-  const {
-    bias,
-    smallExp,
-    smallMin,
-    raceAttrCap
-  } = RECOMMENDATION_CONFIG;
-
-  // Calculate weighted values for core stats
+  
+  const { includeRace, includeAttr, baseMain, baseDmg, baseElem, baseSize, baseRace, baseAttr } = params;
+  const { bias, smallExp, smallMin, raceAttrCap } = RECOMMENDATION_CONFIG;
+  
   const weights = [
     baseMain * bias.main,
     baseDmg * bias.dmg,
     baseElem * bias.elem,
     baseSize * bias.size
   ];
-
+  
   const maxWeight = Math.max(...weights, 1);
   const coreSum = Math.max(weights.reduce((sum, w) => sum + w / maxWeight, 0), 0.0001);
-
-  // Allocate weight share between core and additional stats
   const hasAdditional = includeRace || includeAttr;
   const coreShare = hasAdditional ? 0.75 : 1.0;
-
+  
   const finalWeights = {
     main: (weights[0] / maxWeight / coreSum) * coreShare,
     dmg: (weights[1] / maxWeight / coreSum) * coreShare,
@@ -2226,21 +2087,19 @@ const calculateRecommendationWeights = (params) => {
     race: 0,
     attr: 0
   };
-
-  // If no additional stats, normalize and return
+  
   if (!hasAdditional) {
     const totalSum = Object.values(finalWeights).reduce((a, b) => a + b, 0);
     Object.keys(finalWeights).forEach(k => finalWeights[k] /= totalSum);
     return finalWeights;
   }
-
-  // Handle race/attr weight distribution - optimized
+  
   const additionalShare = 1 - coreShare;
   const effectiveRace = includeRace ? Math.max(Math.pow(baseRace, smallExp), smallMin) : 0;
   const effectiveAttr = includeAttr ? Math.max(Math.pow(baseAttr, smallExp), smallMin) : 0;
   const raceAvailable = includeRace && effectiveRace > 0 && effectiveRace < raceAttrCap;
   const attrAvailable = includeAttr && effectiveAttr > 0 && effectiveAttr < raceAttrCap;
-
+  
   if (raceAvailable && attrAvailable) {
     const combinedSum = effectiveRace + effectiveAttr;
     finalWeights.race = (effectiveRace / combinedSum) * additionalShare;
@@ -2250,27 +2109,25 @@ const calculateRecommendationWeights = (params) => {
   } else if (attrAvailable) {
     finalWeights.attr = additionalShare;
   } else {
-    // Redistribute to core stats if no additional stats qualify
     const redistribution = additionalShare * 0.25;
     ['main', 'dmg', 'elem', 'size'].forEach(k => finalWeights[k] += redistribution);
   }
-
-  // Final normalization
+  
   const totalSum = Object.values(finalWeights).reduce((a, b) => a + b, 0);
   Object.keys(finalWeights).forEach(k => finalWeights[k] /= totalSum);
-
+  
   return finalWeights;
 };
 function generateRecommendationTable(gameState) {
   if (!AppState.get('isResultShown')) return;
 
-  // Random value generator with jitter
-  const generateRandomValue = (baseValue, jitter = RECOMMENDATION_CONFIG.jitter) => {
-    const {
-      randomMode,
-      clampMaxFraction,
-      clampMaxAbsolute
-    } = RECOMMENDATION_CONFIG;
+  const cfg = RECOMMENDATION_CONFIG;
+  const resultContainer = DOM_ELEMENTS.hasil;
+  const showFullPrecision = resultContainer?.dataset?.showFullPrecision === "1";
+  const fmt = PrecisionToggle.formatters;
+
+  const generateRandomValue = (baseValue, jitter = cfg.jitter) => {
+    const { randomMode, clampMaxFraction, clampMaxAbsolute } = cfg;
 
     if (randomMode === 'clamp') {
       const delta = (RandomGenerator.get() * 2 - 1) * jitter;
@@ -2280,64 +2137,48 @@ function generateRecommendationTable(gameState) {
     }
 
     if (randomMode === 'normal') {
-      let u1 = 0,
-        u2 = 0;
+      let u1 = 0, u2 = 0;
       while (u1 === 0) u1 = RandomGenerator.get();
       while (u2 === 0) u2 = RandomGenerator.get();
       const normalValue = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
       return Math.max(0, baseValue * (1 + normalValue * jitter * 0.5));
     }
 
-    return Math.max(0, baseValue * (1 + (RandomGenerator.get() * 2 - 1) * jitter));
+    //return Math.max(0, baseValue * (1 + (RandomGenerator.get() * 2 - 1) * jitter));
   };
 
-  // Adjust small combined race/attr values
   const applySmallValueAdjustment = (value, raceValue, attrValue) => {
-    const {
-      smallThreshold,
-      smallExp,
-      smallMin
-    } = RECOMMENDATION_CONFIG;
     const combinedTotal = raceValue + attrValue;
-    return (combinedTotal > 0 && combinedTotal < smallThreshold) ?
-      Math.max(Math.pow(value, smallExp), smallMin) :
-      value;
+    return (combinedTotal > 0 && combinedTotal < cfg.smallThreshold) ?
+      Math.max(Math.pow(value, cfg.smallExp), cfg.smallMin) : value;
   };
 
-  // Get max allowed value with tolerance
   const getMaxAllowedValue = (userValue, capLimit, tolerance, isSmall) =>
     userValue >= capLimit ? (isSmall ? capLimit + tolerance : userValue + tolerance) : capLimit;
 
-  // Avoid hitting exact cap limit
   const avoidCapLimit = (value, capLimit) =>
     value < capLimit ? value : capLimit - (capLimit * (0.01 + RandomGenerator.get() * 0.02));
 
-  // Avoid round multiples of 10
   const avoidRoundTen = (value) => {
     const rounded = Math.round(value);
     return rounded % 10 === 0 ? rounded + 1 : rounded;
   };
 
-  // Get cell CSS class based on comparison
   const getCellClass = (currentValue, baseValue) => {
     const diff = Math.round(+currentValue || 0) - Math.round(+baseValue || 0);
-    const threshold = RECOMMENDATION_CONFIG.upDownThreshold;
-    return diff >= threshold ? 'up' : diff <= -threshold ? 'down' : 'neutral';
+    return diff >= cfg.upDownThreshold ? 'up' : diff <= -cfg.upDownThreshold ? 'down' : 'neutral';
   };
 
-  const isPenetrationMode = gameState.atkType === 'pen';
-  const tRace = gameState.tRace,
-    tAttr = gameState.tAttr;
-  const raceVal = +gameState.race || 0,
-    attrVal = +gameState.attr || 0;
-  const shouldIncludeRace = !!tRace && raceVal > 0;
-  const shouldIncludeAttr = !!tAttr && attrVal > 0;
-  const originalMultiplier = +gameState.mult || 1;
-  const baseAttackValue = +gameState.baseAttack || 1;
+  const isPenMode = gameState.atkType === 'pen';
+  const { tRace, tAttr } = gameState;
+  const raceVal = +gameState.race || 0;
+  const attrVal = +gameState.attr || 0;
+  const shouldIncludeRace = !!(tRace && raceVal > 0);
+  const shouldIncludeAttr = !!(tAttr && attrVal > 0);
+  const originalMult = +gameState.mult || 1;
 
-  // User's current stats - cache all conversions
   const userStats = {
-    main: isPenetrationMode ? (+gameState.pen || 0) : (+gameState.crit || 0),
+    main: isPenMode ? (+gameState.pen || 0) : (+gameState.crit || 0),
     dmg: +gameState.dmg || 0,
     size: +gameState.sizeEnh || 0,
     elem: +gameState.elemEnh || 0,
@@ -2345,7 +2186,6 @@ function generateRecommendationTable(gameState) {
     race: shouldIncludeRace ? raceVal : 0
   };
 
-  // Calculate stat weights for recommendation algorithm
   const statWeights = calculateRecommendationWeights({
     includeRace: shouldIncludeRace,
     includeAttr: shouldIncludeAttr,
@@ -2357,129 +2197,97 @@ function generateRecommendationTable(gameState) {
     baseAttr: userStats.attr
   });
 
-  const {
-    centerScale,
-    raceAttrCap,
-    smallThreshold,
-    raceAttrSoloCap,
-    raceAttrTol,
-    ratioMin,
-    ratioMax,
-    maxAttempts,
-    jitter,
-    jitterStep,
-    jitterStepEvery,
-    jitterMax
-  } = RECOMMENDATION_CONFIG;
-
-  // Center values around weighted means
   const centeredValues = {
-    main: userStats.main * (1 + statWeights.main * centerScale),
-    dmg: userStats.dmg * (1 + statWeights.dmg * centerScale),
-    elem: userStats.elem * (1 + statWeights.elem * centerScale),
-    size: userStats.size * (1 + statWeights.size * centerScale)
+    main: userStats.main * (1 + statWeights.main * cfg.centerScale),
+    dmg: userStats.dmg * (1 + statWeights.dmg * cfg.centerScale),
+    elem: userStats.elem * (1 + statWeights.elem * cfg.centerScale),
+    size: userStats.size * (1 + statWeights.size * cfg.centerScale)
   };
 
-  // Adjust race/attr for small combined totals - consolidated
   const raceAttrSum = userStats.race + userStats.attr;
   const adjustedRace = shouldIncludeRace ? applySmallValueAdjustment(userStats.race, userStats.race, userStats.attr) : 0;
   const adjustedAttr = shouldIncludeAttr ? applySmallValueAdjustment(userStats.attr, userStats.race, userStats.attr) : 0;
 
   const raceAttrValues = {
-    race: shouldIncludeRace ? Math.min(adjustedRace * (1 + statWeights.race * centerScale), raceAttrCap) : 0,
-    attr: shouldIncludeAttr ? Math.min(adjustedAttr * (1 + statWeights.attr * centerScale), raceAttrCap) : 0,
+    race: shouldIncludeRace ? Math.min(adjustedRace * (1 + statWeights.race * cfg.centerScale), cfg.raceAttrCap) : 0,
+    attr: shouldIncludeAttr ? Math.min(adjustedAttr * (1 + statWeights.attr * cfg.centerScale), cfg.raceAttrCap) : 0,
     adjustedRace,
     adjustedAttr
   };
 
-  // Base extras (equipment bonuses) - cache object
-  const baseExtras = {
-    blue3: +gameState.blue3 || 0,
-    blue8: +gameState.blue8 || 0,
-    vesper: +gameState.vesper || 0,
-    white: +gameState.white || 0,
-    dmgStack: +gameState.dmgStack || 0,
-    reaperValue: +gameState.reaperValue || 0,
-    spearValue: +gameState.spearValue || 0
-  };
+  const hasSmallCombined = shouldIncludeRace && shouldIncludeAttr && raceAttrSum > 0 && raceAttrSum < cfg.smallThreshold;
+  const categories = hasSmallCombined ? cfg.forSmallCats : cfg.cats;
 
-  // Select appropriate categories based on race/attr totals
-  const hasSmallCombined = shouldIncludeRace && shouldIncludeAttr && raceAttrSum > 0 && raceAttrSum < smallThreshold;
-  const categories = hasSmallCombined ? RECOMMENDATION_CONFIG.forSmallCats : RECOMMENDATION_CONFIG.cats;
-
-  // Build column headers (follows DOM field order) - optimized with conditional push
-  const mainStatLabel = isPenetrationMode ? 'PEN' : 'CRIT';
+  const mainStatLabel = isPenMode ? 'PEN' : 'CRIT';
   const columnHeaders = ['STAT', mainStatLabel, 'P/M BO', 'Element', 'Size'];
-  shouldIncludeRace && columnHeaders.push('Race');
-  shouldIncludeAttr && columnHeaders.push('Attribute');
-  columnHeaders.push('Multiplier', '\u2206');
+  if (shouldIncludeRace) columnHeaders.push('Race');
+  if (shouldIncludeAttr) columnHeaders.push('Attribute');
+  columnHeaders.push('Result', '\u2206');
 
   const tablesHTML = [];
   const headerRow = columnHeaders.map(h => `<th>${h}</th>`).join('');
 
-  // Pre-calculate common values for race/attr generation
   const userTotal = userStats.race + userStats.attr;
   const boostedTotal = raceAttrValues.adjustedRace + raceAttrValues.adjustedAttr;
-  const isSmallTotal = userTotal > 0 && userTotal < smallThreshold;
-  const maxTotal = shouldIncludeRace && shouldIncludeAttr ? getMaxAllowedValue(userTotal, raceAttrCap, raceAttrTol, isSmallTotal) : 0;
+  const isSmallTotal = userTotal > 0 && userTotal < cfg.smallThreshold;
+  const maxTotal = shouldIncludeRace && shouldIncludeAttr ? getMaxAllowedValue(userTotal, cfg.raceAttrCap, cfg.raceAttrTol, isSmallTotal) : 0;
 
-  // Cache single stat values
   const userSingle = shouldIncludeRace ? userStats.race : userStats.attr;
   const boostedSingle = shouldIncludeRace ? raceAttrValues.adjustedRace : raceAttrValues.adjustedAttr;
-  const isSmallSingle = userSingle > 0 && userSingle < smallThreshold;
+  const isSmallSingle = userSingle > 0 && userSingle < cfg.smallThreshold;
   const maxSingle = (shouldIncludeRace || shouldIncludeAttr) && !(shouldIncludeRace && shouldIncludeAttr) ?
-    getMaxAllowedValue(userSingle, raceAttrSoloCap, raceAttrTol, isSmallSingle) :
-    0;
+    getMaxAllowedValue(userSingle, cfg.raceAttrSoloCap, cfg.raceAttrTol, isSmallSingle) : 0;
 
-  // Cache gameState properties used in calculateMultiplier
   const calcParams = {
-    baseAttack: baseAttackValue,
-    atkType: isPenetrationMode ? 'pen' : 'crit',
+    baseAttack: +gameState.baseAttack || 1,
+    flatDmg: +gameState.flatDmg || 0,
+    percentageDmg: +gameState.percentageDmg || 0,
+    atkType: isPenMode ? 'pen' : 'crit',
     weapon: gameState.weapon || '',
     tSize: gameState.tSize || '',
     wElem: gameState.wElem || '',
     tAttr: tAttr || '',
     tRace: tRace || '',
     tDefKey: gameState.tDefKey || '',
-    extras: baseExtras
+    vesper: +gameState.vesper || 0,
+    blue3: +gameState.blue3 || 0,
+    blue8: +gameState.blue8 || 0,
+    white: +gameState.white || 0,
+    dmgStack: +gameState.dmgStack || 0,
+    reaperValue: +gameState.reaperValue || 0,
+    spearValue: +gameState.spearValue || 0
   };
 
-  // Generate recommendation tables for each category
   for (let catIdx = 0, catLen = categories.length; catIdx < catLen; catIdx++) {
     const category = categories[catIdx];
     const uniqueKeys = new Set();
     const uniqueDeltas = new Set();
     const uniqueComposites = new Set();
     const acceptedRows = [];
-    let attempts = 0,
-      currentJitter = jitter;
+    let attempts = 0;
+    let currentJitter = cfg.jitter;
 
-    // Generate unique recommendations with adaptive jitter
-    while (acceptedRows.length < 5 && attempts < maxAttempts) {
+    while (acceptedRows.length < 5 && attempts < cfg.maxAttempts) {
       attempts++;
 
-      // Generate random stat values - reuse object
       const statValues = {
         pen: +gameState.pen || 0,
         crit: +gameState.crit || 0,
         dmg: generateRandomValue(centeredValues.dmg, currentJitter),
-        elem: generateRandomValue(centeredValues.elem, currentJitter),
-        size: generateRandomValue(centeredValues.size, currentJitter)
+        elemEnh: generateRandomValue(centeredValues.elem, currentJitter),
+        sizeEnh: generateRandomValue(centeredValues.size, currentJitter)
       };
 
-      statValues[isPenetrationMode ? 'pen' : 'crit'] = generateRandomValue(centeredValues.main, currentJitter);
+      statValues[isPenMode ? 'pen' : 'crit'] = generateRandomValue(centeredValues.main, currentJitter);
 
-      let raceValue = 0,
-        attrValue = 0;
+      let raceValue = 0, attrValue = 0;
 
-      // Handle race/attr allocation - optimized branching
       if (shouldIncludeAttr && shouldIncludeRace) {
         const randomTotal = avoidCapLimit(Math.min(generateRandomValue(boostedTotal, currentJitter), maxTotal), maxTotal);
-        const ratio = ratioMin + RandomGenerator.get() * (ratioMax - ratioMin);
+        const ratio = cfg.ratioMin + RandomGenerator.get() * (cfg.ratioMax - cfg.ratioMin);
         raceValue = randomTotal * ratio;
         attrValue = randomTotal * (1 - ratio);
 
-        // Scale down if exceeds max total
         const actualSum = raceValue + attrValue;
         if (actualSum > maxTotal) {
           const scale = avoidCapLimit(maxTotal, maxTotal) / actualSum;
@@ -2488,52 +2296,45 @@ function generateRecommendationTable(gameState) {
         }
       } else if (shouldIncludeRace || shouldIncludeAttr) {
         const generatedValue = avoidCapLimit(Math.min(generateRandomValue(boostedSingle, currentJitter), maxSingle), maxSingle);
-        shouldIncludeRace ? (raceValue = generatedValue) : (attrValue = generatedValue);
+        if (shouldIncludeRace) raceValue = generatedValue;
+        else attrValue = generatedValue;
       }
 
-      // Calculate new multiplier with generated stats
-      const {
-        mult: calculatedMultiplier
-      } = calculateMultiplier({
+      const { mult: calculatedMult } = calculateMultiplier({
         ...calcParams,
         pen: +statValues.pen || 0,
         crit: +statValues.crit || 0,
         dmg: +statValues.dmg || 0,
-        sizeEnh: +statValues.size || 0,
-        elemEnh: +statValues.elem || 0,
+        sizeEnh: +statValues.sizeEnh || 0,
+        elemEnh: +statValues.elemEnh || 0,
         race: +raceValue || 0,
         attr: +attrValue || 0
       });
 
-      // Combined filters with early exit
-      const ratio = calculatedMultiplier / originalMultiplier;
-      if (calculatedMultiplier <= originalMultiplier || ratio < category.min || ratio > category.max) continue;
+      const ratio = calculatedMult / originalMult;
+      if (calculatedMult <= originalMult || ratio < category.min || ratio > category.max) continue;
 
-      // Round and avoid multiples of 10
-      const mainVal = avoidRoundTen(isPenetrationMode ? statValues.pen : statValues.crit);
+      const mainVal = avoidRoundTen(isPenMode ? statValues.pen : statValues.crit);
       const dmgVal = avoidRoundTen(statValues.dmg);
-      const elemVal = avoidRoundTen(statValues.elem);
-      const sizeVal = avoidRoundTen(statValues.size);
+      const elemVal = avoidRoundTen(statValues.elemEnh);
+      const sizeVal = avoidRoundTen(statValues.sizeEnh);
       const rVal = shouldIncludeRace ? avoidRoundTen(raceValue) : null;
       const aVal = shouldIncludeAttr ? avoidRoundTen(attrValue) : null;
 
-      // Uniqueness checks - optimized string building
-      const rStr = rVal || '-',
-        aStr = aVal || '-';
+      const rStr = rVal || '-';
+      const aStr = aVal || '-';
       const rowKey = `${mainVal}|${dmgVal}|${elemVal}|${sizeVal}|${rStr}|${aStr}`;
       const compositeKey = `${mainVal}|${dmgVal}|${elemVal}|${sizeVal}|${rVal}|${aVal}`;
 
       if (uniqueKeys.has(rowKey) || uniqueComposites.has(compositeKey)) continue;
 
-      const deltaPercent = ((calculatedMultiplier - originalMultiplier) / originalMultiplier) * 100;
+      const deltaPercent = ((calculatedMult - originalMult) / originalMult) * 100;
       const roundedDelta = Number(deltaPercent.toFixed(1));
       if (uniqueDeltas.has(roundedDelta)) continue;
 
-      // Filter: at least one stat must be lower - optimized conditional
       if (mainVal > userStats.main && dmgVal > userStats.dmg && elemVal > userStats.elem && sizeVal > userStats.size &&
         (!shouldIncludeRace || rVal > userStats.race) && (!shouldIncludeAttr || aVal > userStats.attr)) continue;
 
-      // Accept this recommendation
       uniqueKeys.add(rowKey);
       uniqueDeltas.add(roundedDelta);
       uniqueComposites.add(compositeKey);
@@ -2545,24 +2346,21 @@ function generateRecommendationTable(gameState) {
         size: sizeVal,
         attr: aVal,
         race: rVal,
-        newMultiplier: calculatedMultiplier,
+        newMultiplier: calculatedMult,
         deltaPercent
       });
 
-      // Increase jitter adaptively if struggling to find recommendations
-      if (acceptedRows.length < 5 && attempts % jitterStepEvery === 0) {
-        currentJitter = Math.min(currentJitter + jitterStep, jitterMax);
+      if (acceptedRows.length < 5 && attempts % cfg.jitterStepEvery === 0) {
+        currentJitter = Math.min(currentJitter + cfg.jitterStep, cfg.jitterMax);
       }
     }
 
     if (acceptedRows.length === 0) continue;
 
-    // Sort by improvement percentage, then multiplier, then main stat
     acceptedRows.sort((a, b) =>
       b.deltaPercent - a.deltaPercent || b.newMultiplier - a.newMultiplier || b.main - a.main
     );
 
-    // Build table rows - optimized array building
     const tableRows = acceptedRows.map((row, i) => {
       const cells = [
         `<td class="build">BUILD#${i + 1}</td>`,
@@ -2572,18 +2370,17 @@ function generateRecommendationTable(gameState) {
         `<td><span class="${getCellClass(row.size, userStats.size)}">${row.size}</span></td>`
       ];
 
-      shouldIncludeRace && cells.push(`<td><span class="${getCellClass(row.race, userStats.race)}">${row.race}</span></td>`);
-      shouldIncludeAttr && cells.push(`<td><span class="${getCellClass(row.attr, userStats.attr)}">${row.attr}</span></td>`);
+      if (shouldIncludeRace) cells.push(`<td><span class="${getCellClass(row.race, userStats.race)}">${row.race}</span></td>`);
+      if (shouldIncludeAttr) cells.push(`<td><span class="${getCellClass(row.attr, userStats.attr)}">${row.attr}</span></td>`);
 
       cells.push(
-        `<td class="mult">\u00D7${row.newMultiplier.toFixed(2)}</td>`,
+        `<td class="mult">${fmt.finalMult(row.newMultiplier, showFullPrecision)}</td>`,
         `<td class="delta">+${row.deltaPercent.toFixed(1)}%</td>`
       );
 
       return `<tr>${cells.join('')}</tr>`;
     }).join('');
 
-    // Build "your stats" row - optimized with same pattern
     const yourStatsCells = [
       '<td class="yours-label">YOURS</td>',
       `<td><span>${userStats.main}</span></td>`,
@@ -2592,11 +2389,11 @@ function generateRecommendationTable(gameState) {
       `<td><span>${userStats.size}</span></td>`
     ];
 
-    shouldIncludeRace && yourStatsCells.push(`<td><span>${userStats.race}</span></td>`);
-    shouldIncludeAttr && yourStatsCells.push(`<td><span>${userStats.attr}</span></td>`);
+    if (shouldIncludeRace) yourStatsCells.push(`<td><span>${userStats.race}</span></td>`);
+    if (shouldIncludeAttr) yourStatsCells.push(`<td><span>${userStats.attr}</span></td>`);
 
     yourStatsCells.push(
-      `<td class="mult current-mult">\u00D7${gameState.mult.toFixed(2)}</td>`,
+      `<td class="mult current-mult">${fmt.finalMult(gameState.mult, showFullPrecision)}</td>`,
       `<td id="table-help" class="delta current-delta"><button type='button' id='tableTips' class='tooltip-button'></button></td>`
     );
 
@@ -2610,27 +2407,30 @@ function generateRecommendationTable(gameState) {
   DOM_ELEMENTS.rec.innerHTML = tablesHTML.join('');
 };
 const regenerateRecommendations = () => {
-  AppState.get('isResultShown') && (generateRecommendationTable(getCurrentCalculationState()), showSnackbar?.("Table Refreshed!"));
+  if (AppState.get('isResultShown')) {
+    generateRecommendationTable(getCurrentCalculationState());
+    if (typeof showSnackbar === 'function') showSnackbar("Table Refreshed!");
+  }
 };
 
-// ========== DROPDOWN MANAGER ==========
+// ========== DROPDOWN ==========
 class DropdownManager {
   constructor() {
     this.constants = {
-      formKeys: ['vesperSet', 'whiteSet', 'blueSet', 'tRace', 'tAttr', 'atkType', 'wElem', 'tSize', 'tDef', 'weapon', 'pen', 'crit'],
-      mobMapping: {
-        'sizeMob': 'tSize',
-        'raceMob': 'tRace',
-        'attributeMob': 'tAttr'
-      },
-      disableButtons: ['edit','resetRek', 'testSpear', 'testReaper'],
-      relatedFields: {
-        'tSize': 'sizeEnh',
-        'tRace': 'race',
-        'tAttr': 'attr'
-      },
-      calcFields: ['dmg', 'dmgStack', 'sizeEnh', 'race', 'attr', 'elemEnh'],
-      setKeys: ['blueSet', 'vesperSet', 'whiteSet']
+      formKeys: ['vesperSet', 'whiteSet', 'blueSet', 'tRace', 'tAttr', 'atkType', 'wElem', 'tSize', 'tDef', 'weapon', 'pen', 'crit', 'attack', 'flatDmgBns', 'percentageDmgBns'],
+      mobMapping: { sizeMob: 'tSize', raceMob: 'tRace', attributeMob: 'tAttr' },
+      disableButtons: ['resetRek', 'testSpear', 'testReaper'],
+      calcFields: ['attack','flatDmgBns','percentageDmgBns','dmg', 'dmgStack', 'sizeEnh', 'race', 'attr', 'elemEnh'],
+      setKeys: ['blueSet', 'vesperSet', 'whiteSet'],
+      dependencyChain: {
+        'atkType': ['pen', 'crit', 'attack', 'dmg', 'dmgStack'],
+        'attack': ['flatDmgBns'],
+        'flatDmgBns': ['percentageDmgBns'],
+        'tRace': ['race'],
+        'tAttr': ['attr'],
+        'tSize': ['sizeEnh'],
+        'wElem': ['elemEnh']
+      }
     };
 
     this.config = this.buildConfig();
@@ -2646,268 +2446,156 @@ class DropdownManager {
   }
 
   buildConfig() {
+    const labelMap = (labels) => Object.fromEntries(labels.map(([k,v]) => [k,v]));
+    
     return {
       ...this.constants,
       labels: {
-        static: {
-          blueSetLabel: "Blue SET",
-          vesperSetLabel: "Vesper SET",
-          whiteSetLabel: "White SET (110*3)",
-          atkTypeLabel: "Attack Type",
-          weaponLabel: "Weapon",
-          wElemLabel: "Weapon Element",
-          tSizeLabel: "Target Size",
-          tRaceLabel: "Target Race",
-          tAttrLabel: "Target Attribute",
-          tDefLabel: "MVP/MINI",
-          penLabel: "P/M PEN %",
-          critLabel: "Critical DMG Bonus %",
-          elemEnhLabel: "Element Enhance %",
-          sizeLabel: "DMG to Size %",
-          raceLabel: "Race",
-          attrLabel: "Attribute",
-          dmgLabel: "Final P/M Damage Bonus %",
-          dmgStackLabel: "Extra: Final Damage Stack %"
-        },
+        static: labelMap([
+          ['blueSetLabel', "Blue SET"],
+          ['vesperSetLabel', "Vesper SET"],
+          ['whiteSetLabel', "White SET (110*3)"],
+          ['atkTypeLabel', "Attack Type"],
+          ['weaponLabel', "Weapon"],
+          ['wElemLabel', "Weapon Element"],
+          ['tSizeLabel', "Target Size"],
+          ['tRaceLabel', "Target Race"],
+          ['tAttrLabel', "Target Attribute"],
+          ['tDefLabel', "MVP/MINI"],
+          ['penLabel', "Final P/M. PEN %"],
+          ['critLabel', "Critical DMG Bonus %"],
+          ['atkLabel', "P/M. Attack"],
+          ['flatDmgBnsLabel', "P/M. Damage Bonus %"],
+          ['percentageDmgBnsLabel', "Percentage P/M. Damage Bonus"],
+          ['elemEnhLabel', "Element Enhance %"],
+          ['sizeLabel', "DMG to Size %"],
+          ['raceLabel', "DMG to Race"],
+          ['attrLabel', "DMG to Attribute"],
+          ['dmgLabel', "Final P/M. Damage Bonus %"],
+          ['dmgStackLabel', "Extra: Final Damage Stack %"]
+        ]),
         dynamic: {
-          vesper: {
-            "48": "BRO?!",
-            "56": "REALLY?!",
-            "64": "Wake UP!",
-            "72": "STOP Dreaming!",
-            "80": "F2P DETECTED!"
-          },
-          white: {
-            "36": "Eh?",
-            "42": "WOW",
-            "48": "GG!!",
-            "54": "Have a Nice Day!"
-          }
+          vesper: { 48: "BRO?!", 56: "REALLY?!", 64: "Wake UP!", 72: "STOP Dreaming!", 80: "F2P DETECTED!" },
+          white: { 36: "Eh?", 42: "WOW", 48: "GG!!", 54: "Have a Nice Day!" }
         }
       },
 
       fields: {
         atkType: {
           type: 'dropdown',
-          options: [{
-            value: "pen",
-            label: "P/M PEN"
-          }, {
-            value: "crit",
-            label: "CRIT"
-          }],
+          options: [{ value: "pen", label: "P/M PEN" }, { value: "crit", label: "CRIT" }],
           placeholder: "Select Attack Type",
-          onClear: ['pen', 'crit'],
           onUpdate: 'updateAttackTypeUI'
         },
-        tSize: {
-          type: 'dropdown',
-          options: ["Small", "Medium", "Large"],
-          placeholder: "Select Target Size"
+        tSize: { type: 'dropdown', options: ["Small", "Medium", "Large"], placeholder: "Select Target Size" },
+        tRace: { type: 'dropdown', options: () => RACE_TYPES, placeholder: "skip race" },
+        tAttr: { type: 'dropdown', options: () => Object.keys(getElementCounter()), placeholder: "skip attribute" },
+        weapon: { type: 'dropdown', options: () => Object.keys(getWeaponSizeModifier()), placeholder: "Select Weapon Type" },
+        wElem: { type: 'dropdown', options: () => Object.keys(getElementCounter()), placeholder: "Select Attribute" },
+        tDef: { type: 'dropdown', options: () => Object.keys(getTargetDefenseData()), placeholder: "Select target", special: 'target' },
+        vesperSet: { type: 'set', generator: 'vesper' },
+        whiteSet: { type: 'set', generator: 'white' },
+        blueSet: { type: 'set', generator: 'blue' },
+        attack: {
+          type: 'nested-conditional',
+          dependsOn: 'atkType',
+          active: () => ({ label: 'P/M. Attack', placeholder: 'physical/magical attack...' }),
+          default: { label: "P/M. Attack", placeholder: "select attack type first" }
         },
-        tRace: {
-          type: 'dropdown',
-          options: () => RACE_TYPES,
-          placeholder: "skip race",
-          onClear: ['race']
+        flatDmgBns: {
+          type: 'nested-conditional',
+          dependsOn: 'attack',
+          active: () => ({ label: 'P/M. Damage Bonus', placeholder: 'flat damage bonus...' }),
+          default: { label: "P/M. Damage Bonus", placeholder: "select attack type and fill attack first" }
         },
-        tAttr: {
-          type: 'dropdown',
-          options: () => Object.keys(getElementCounter()),
-          placeholder: "skip attribute",
-          onClear: ['attr']
+        percentageDmgBns: {
+          type: 'nested-conditional',
+          dependsOn: 'flatDmgBns',
+          active: () => ({ label: 'Percentage P/M. Damage Bonus', placeholder: 'percentage p/m damage bonus...' }),
+          default: { label: "Percentage P/M. Damage Bonus", placeholder: "select attack type and fill flat damage first" }
         },
-        weapon: {
-          type: 'dropdown',
-          options: () => Object.keys(getWeaponSizeModifier()),
-          placeholder: "Select Weapon Type"
-        },
-        wElem: {
-          type: 'dropdown',
-          options: () => Object.keys(getElementCounter()),
-          placeholder: "Select Attribute"
-        },
-        tDef: {
-          type: 'dropdown',
-          options: () => Object.keys(getTargetDefenseData()),
-          placeholder: "Select target",
-          special: 'target'
-        },
-        vesperSet: {
-          type: 'set',
-          generator: 'vesper'
-        },
-        whiteSet: {
-          type: 'set',
-          generator: 'white'
-        },
-        blueSet: {
-          type: 'set',
-          generator: 'blue'
-        },
-
         race: {
-          type: 'conditional',
-          dependsOn: 'tRace',
-          active: (race) => ({
-            label: `DMG to ${race}`,
-            placeholder: `dmg to ${race.toLowerCase()} %`
-          }),
-          default: {
-            label: "Race",
-            placeholder: "select target race first"
-          }
+          type: 'conditional', dependsOn: 'tRace',
+          active: (race) => ({ label: `DMG to ${race}`, placeholder: `dmg to ${race.toLowerCase()} %` }),
+          default: { label: "DMG to Race", placeholder: "select target race first" }
         },
         attr: {
-          type: 'conditional',
-          dependsOn: 'tAttr',
-          active: (attr) => ({
-            label: `DMG to ${attr} Attribute`,
-            placeholder: `dmg to ${attr.toLowerCase()} attribute %`
-          }),
-          default: {
-            label: "Attribute",
-            placeholder: "select target attribute first"
-          }
+          type: 'conditional', dependsOn: 'tAttr',
+          active: (attr) => ({ label: `DMG to ${attr} Attribute`, placeholder: `dmg to ${attr.toLowerCase()} attribute %` }),
+          default: { label: "DMG to Attribute", placeholder: "select target attribute first" }
         },
         elemEnh: {
-          type: 'conditional',
-          dependsOn: 'wElem',
-          active: (elem) => ({
-            label: `${elem} Enhance %`,
-            placeholder: `${elem.toLowerCase()} enhance`
-          }),
-          default: {
-            label: "Element Enhance %",
-            placeholder: "select weapon attribute first"
-          }
+          type: 'conditional', dependsOn: 'wElem',
+          active: (elem) => ({ label: `${elem} Enhance %`, placeholder: `${elem.toLowerCase()} enhance` }),
+          default: { label: "Element Enhance %", placeholder: "select weapon attribute first" }
         },
         sizeEnh: {
-          type: 'conditional',
-          dependsOn: 'tSize',
-          active: (size) => ({
-            label: `DMG to ${size} %`,
-            placeholder: `dmg to ${size.toLowerCase()}`
-          }),
-          default: {
-            label: "DMG to Size %",
-            placeholder: "select target size first"
-          }
+          type: 'conditional', dependsOn: 'tSize',
+          active: (size) => ({ label: `DMG to ${size} %`, placeholder: `dmg to ${size.toLowerCase()}` }),
+          default: { label: "DMG to Size %", placeholder: "select target size first" }
         },
         dmg: {
-          type: 'conditional',
-          dependsOn: 'atkType',
-          active: () => ({
-            placeholder: "final p/m damage bonus"
-          }),
-          default: {
-            placeholder: "select attack type first"
-          }
+          type: 'conditional', dependsOn: 'atkType',
+          active: () => ({ placeholder: "final p/m damage bonus" }),
+          default: { placeholder: "select attack type first" }
         },
         dmgStack: {
-          type: 'conditional',
-          dependsOn: 'atkType',
-          active: () => ({
-            placeholder: "final damage bonus/stack %"
-          }),
-          default: {
-            placeholder: "select attack type first"
-          }
+          type: 'conditional', dependsOn: 'atkType',
+          active: () => ({ placeholder: "final damage bonus/stack %" }),
+          default: { placeholder: "select attack type first" }
         }
       },
 
       setGenerators: {
-        vesper: () => [{
-          value: "",
-          label: "skip vesper set"
-        }, ...Object.entries(VESPER_SET).map(([tier, val]) => ({
-          value: val,
-          label: `Tier ${tier}`
-        }))],
-        white: () => [{
-          value: "",
-          label: "skip white set"
-        }, ...Object.entries(WHITE_SET).map(([tier, val]) => ({
-          value: val,
-          label: tier
-        }))],
-        blue: () => [{
-          value: "",
-          label: "skip blue set"
-        }, ...Object.entries(BLUE_SET).flatMap(([multiplier, levels]) =>
-          Object.entries(levels).map(([lvl, val]) => ({
-            value: val,
-            label: `Level ${lvl}*${multiplier}`,
-            // temporary 
-            disabled: multiplier === '8'
-          })))]
+        vesper: () => [{ value: "", label: "skip vesper set" }, 
+          ...Object.entries(VESPER_SET).map(([tier, val]) => ({ value: val, label: `Tier ${tier}` }))],
+        white: () => [{ value: "", label: "skip white set" }, 
+          ...Object.entries(WHITE_SET).map(([tier, val]) => ({ value: val, label: tier }))],
+        blue: () => [{ value: "", label: "skip blue set" }, 
+          ...Object.entries(BLUE_SET).flatMap(([multiplier, levels]) =>
+            Object.entries(levels).map(([lvl, val]) => ({ value: val, label: `Level ${lvl}*${multiplier}` })))]
       },
 
       eventMap: {
-        'penCritSelect': 'atkType',
-        'weaponSelect': 'weapon',
-        'weaponElementSelect': 'wElem',
-        'targetSizeSelect': 'tSize',
-        'targetRaceSelect': 'tRace',
-        'targetElementSelect': 'tAttr'
+        penCritSelect: 'atkType',
+        weaponSelect: 'weapon',
+        weaponElementSelect: 'wElem',
+        targetSizeSelect: 'tSize',
+        targetRaceSelect: 'tRace',
+        targetElementSelect: 'tAttr'
       }
     };
   }
 
-  // === HELPER METHODS ===
-
-  getElement(key) {
-    return DOM_ELEMENTS[key] || null;
-  }
+  getElement(key) { return DOM_ELEMENTS[key] || null; }
 
   safeElementOp(key, callback) {
     const el = this.getElement(key);
-    if (!el) return;
-    callback(el);
+    if (el) callback(el);
   }
 
   updateWrapperState(element, locked, tempUnlocked = false) {
-    if (!element) return;
-    
-    const wrapper = element.closest('.input-wrap');
+    const wrapper = element?.closest('.input-wrap');
     if (!wrapper) return;
-
     wrapper.classList.toggle('locked', locked);
-    
-    if (tempUnlocked) {
-      wrapper.setAttribute('data-temp-unlocked', '1');
-    } else {
-      wrapper.removeAttribute('data-temp-unlocked');
-    }
+    wrapper.toggleAttribute('data-temp-unlocked', tempUnlocked);
   }
 
   createOption(optData) {
     const opt = document.createElement('option');
     const isString = typeof optData === "string";
-    
     opt.value = isString ? optData : optData.value;
     opt.textContent = isString ? optData : optData.label;
-    
-    if (optData.disabled) {
-      opt.disabled = true;
-    }
-    
+    if (optData.disabled) opt.disabled = true;
     return opt;
   }
 
   setButtonStates(buttonIds, disabled) {
-    buttonIds.forEach(btnId => {
-      this.safeElementOp(btnId, btn => {
-        btn.disabled = disabled;
-      });
-    });
+    buttonIds.forEach(id => this.safeElementOp(id, btn => btn.disabled = disabled));
   }
-
-  // === INIT & DATA ===
 
   init() {
     if (this.isInitialized) return;
-    
     this.populateAllDropdowns();
     this.bindEvents();
     this.updateAll();
@@ -2916,180 +2604,173 @@ class DropdownManager {
   }
 
   getFormData() {
-    return this.config.formKeys.reduce((data, key) => {
+    return this.constants.formKeys.reduce((acc, key) => {
       const el = this.getElement(key);
-      if (!el) return data;
-
-      data[key] = el.value || '';
-      
+      if (!el) return acc;
+      acc[key] = el.value || '';
       if (el.tagName === 'SELECT' && el.selectedOptions[0]) {
-        data[`${key}Text`] = el.selectedOptions[0].textContent;
+        acc[`${key}Text`] = el.selectedOptions[0].textContent;
       }
-      
-      return data;
+      return acc;
     }, {});
   }
 
   getTargetData(targetKey) {
     if (!targetKey) return null;
-    
     const rawData = getTargetDefenseData(targetKey);
-    if (!rawData) return null;
-
-    return {
-      ...rawData,
-      sizeMob: rawData.sizeMob || this.getElement('tSize')?.value || ""
-    };
+    return rawData ? { ...rawData, sizeMob: rawData.sizeMob || this.getElement('tSize')?.value || "" } : null;
   }
 
   getCurrentTarget() {
     const targetKey = this.getElement('tDef')?.value;
-    if (!targetKey) return null;
-
-    return {
-      key: targetKey,
-      data: this.getTargetData(targetKey)
-    };
+    return targetKey ? { key: targetKey, data: this.getTargetData(targetKey) } : null;
   }
-
-  // === POPULATE DROPDOWNS ===
 
   populateAllDropdowns() {
     Object.entries(this.config.fields).forEach(([key, config]) => {
       if (config.type !== 'dropdown' && config.type !== 'set') return;
-      
       const el = this.getElement(key);
       if (!el) return;
-
-      const options = config.generator ?
-        this.config.setGenerators[config.generator]() :
+      const options = config.generator ? this.config.setGenerators[config.generator]() :
         (typeof config.options === 'function' ? config.options() : config.options);
-
       this.populateOptions(el, options, config.placeholder);
     });
   }
 
   populateOptions(select, options, placeholder) {
     if (!select) return;
-    
     const fragment = document.createDocumentFragment();
-
     if (placeholder) {
       const opt = document.createElement('option');
       opt.value = '';
       opt.textContent = placeholder;
       fragment.appendChild(opt);
     }
-
-    options.forEach(optData => {
-      fragment.appendChild(this.createOption(optData));
-    });
-
+    options.forEach(optData => fragment.appendChild(this.createOption(optData)));
     select.innerHTML = '';
     select.appendChild(fragment);
   }
 
-  // === FIELD STATE MANAGEMENT ===
-
   setFieldState(element, disabled, activeText = '', inactiveText = '') {
     if (!element) return;
-    
     element.disabled = disabled;
     element.placeholder = disabled ? inactiveText : activeText;
     this.updateWrapperState(element, disabled);
   }
 
   clearFields(fieldIds) {
-    fieldIds.forEach(id => {
-      this.safeElementOp(id, el => {
-        el.value = '';
-      });
+    fieldIds.forEach(id => this.safeElementOp(id, el => {
+      el.value = '';
+      const wrapper = el.closest('.input-wrap');
+      if (wrapper) {
+        wrapper.classList.remove('locked');
+        wrapper.removeAttribute('data-temp-unlocked');
+      }
+    }));
+  }
+
+  clearDependentFields(parentKey) {
+    const dependents = this.constants.dependencyChain[parentKey];
+    if (!dependents?.length) return;
+    
+    dependents.forEach(fieldKey => {
+      const el = this.getElement(fieldKey);
+      if (!el) return;
+      
+      if (el.value?.trim()) el.value = '';
+      
+      const fieldConfig = this.config.fields[fieldKey];
+      const isConditional = fieldConfig?.type === 'nested-conditional' || fieldConfig?.type === 'conditional';
+      
+      if (isConditional && fieldConfig.default) {
+        el.disabled = true;
+        el.placeholder = fieldConfig.default.placeholder;
+        const label = this.getElement(`${fieldKey}Label`);
+        if (label && fieldConfig.default.label) label.textContent = fieldConfig.default.label;
+        this.updateWrapperState(el, true);
+      }
+      
+      if (this.constants.dependencyChain[fieldKey]) this.clearDependentFields(fieldKey);
     });
   }
 
   applyMobProperties(targetData, mode = 'standard', lockOverride = null) {
     if (!targetData) return;
-
-    Object.entries(this.config.mobMapping).forEach(([mobProp, domKey]) => {
+    Object.entries(this.constants.mobMapping).forEach(([mobProp, domKey]) => {
       const el = this.getElement(domKey);
       if (!el) return;
-
       const targetValue = targetData[mobProp];
       const shouldLock = this.shouldLock(domKey, targetValue, mode, lockOverride);
-
       el.value = targetValue || "";
       el.disabled = shouldLock;
       this.state.lockStates.set(domKey, shouldLock);
       this.updateWrapperState(el, shouldLock);
-
-      if (targetValue) return;
-
-      const relatedKey = this.config.relatedFields[domKey];
-      if (!relatedKey) return;
-
-      this.safeElementOp(relatedKey, relatedField => {
-        relatedField.value = "";
-        this.updateWrapperState(relatedField, false, true);
-      });
+      if (targetValue || !this.constants.dependencyChain[domKey]) return;
+      this.clearDependentFields(domKey);
     });
   }
 
   shouldLock(domKey, targetValue, mode, lockOverride) {
     if (lockOverride !== null) return lockOverride;
-    
     const selectedKey = this.getElement('tDef')?.value || "";
-    
     if (mode === 'swap') return !!targetValue;
-    
     return targetValue && !selectedKey.includes("Lvl.");
   }
 
-  // === EVENT HANDLING ===
-
   bindEvents() {
     EventManager.removeNS(this.namespace);
-
-    EventManager.addNS(this.namespace, document, 'change', (e) => {
+    
+    const handleChange = (e) => {
       if (AppState.get('isResultShown')) return;
-
-      if (e.target === this.getElement('tDef')) {
+      
+      const target = e.target;
+      const targetEl = this.getElement('tDef');
+      
+      if (target === targetEl) {
         this.handleTargetChange();
         return;
       }
-
-      if (this.constants.setKeys.includes(e.target.id)) {
-        this.recordSelection(e.target);
+      
+      if (this.constants.setKeys.includes(target.id)) {
+        this.recordSelection(target);
         this.syncThreeSets();
         this.scheduleUpdate();
         return;
       }
-
-      const fieldKey = this.config.eventMap[e.target.id];
-      if (!fieldKey) return;
-
-      const fieldConfig = this.config.fields[fieldKey];
       
-      if (fieldConfig?.onClear) {
-        this.clearFields(fieldConfig.onClear);
+      const fieldKey = this.config.eventMap[target.id];
+      if (fieldKey) {
+        if (this.config.fields[fieldKey]?.onUpdate === 'updateAttackTypeUI') {
+          this.updateAttackTypeUI(this.getFormData());
+        }
+        this.clearDependentFields(fieldKey);
+        this.scheduleUpdate();
       }
+    };
+    
+    const handleInput = (e) => {
+      if (AppState.get('isResultShown')) return;
       
-      if (fieldConfig?.onUpdate === 'updateAttackTypeUI') {
-        this.updateAttackTypeUI();
+      const cascadeFields = ['attack', 'flatDmgBns', 'percentageDmgBns'];
+      if (cascadeFields.includes(e.target.id)) {
+        const numValue = parseFloat(e.target.value);
+        if (!e.target.value?.trim() || numValue === 0 || isNaN(numValue)) {
+          this.clearDependentFields(e.target.id);
+        }
+        this.updateAll();
       }
-      
-      this.scheduleUpdate();
-    });
+    };
+    
+    EventManager.addNS(this.namespace, document, 'change', handleChange);
+    EventManager.addNS(this.namespace, document, 'input', handleInput);
   }
 
   handleTargetChange() {
     if (this.state.isSwapping) return;
-
     const selectedKey = this.getElement('tDef')?.value;
     if (!selectedKey) return;
-
     const targetData = this.getTargetData(selectedKey);
     if (!targetData) return;
-
     this.applyMobProperties(targetData);
     this.syncBreakdownSwap(selectedKey);
     this.scheduleUpdate();
@@ -3099,229 +2780,206 @@ class DropdownManager {
     const formData = this.getFormData();
     const wasCycleComplete = this.state.selectionOrder.length >= 3 || 
       (formData.blueSet && (formData.blueSetText || "").includes("*8"));
-
     if (!selectEl?.value) {
       this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== selectEl);
       return;
     }
-
     if (wasCycleComplete) {
       this.state.selectionOrder = [selectEl];
       return;
     }
-
-    if (this.state.selectionOrder.includes(selectEl)) return;
-
-    this.state.selectionOrder = [...this.state.selectionOrder, selectEl];
+    if (!this.state.selectionOrder.includes(selectEl)) {
+      this.state.selectionOrder = [...this.state.selectionOrder, selectEl];
+    }
   }
 
   syncThreeSets() {
     const setElements = this.constants.setKeys.map(k => this.getElement(k)).filter(Boolean);
     const formData = this.getFormData();
-    const blueIs8x = (formData.blueSetText || "").includes("*8");
-    const hasBlue8x = formData.blueSet && blueIs8x;
-
-    setElements.forEach(el => {
-      Array.from(el.options).forEach(opt => {
-        // temp
-        if (opt.textContent.includes("*8") && opt.value) return;
-        opt.disabled = false;
-      });
-    });
-
+    const hasBlue8x = formData.blueSet && (formData.blueSetText || "").includes("*8");
+    
+    const disableAllOptions = (el) => {
+      Array.from(el.options).forEach(opt => opt.disabled = !!opt.value);
+      el.value = "";
+    };
+    
+    setElements.forEach(el => Array.from(el.options).forEach(opt => opt.disabled = false));
+    
     if (hasBlue8x) {
       [this.getElement('vesperSet'), this.getElement('whiteSet')].forEach(el => {
-        if (!el) return;
-        
-        Array.from(el.options).forEach(opt => {
-          opt.disabled = !!opt.value;
-        });
-        el.value = "";
+        if (el) disableAllOptions(el);
       });
       return;
     }
-
-    const blueEl = this.getElement('blueSet');
     
+    const blueEl = this.getElement('blueSet');
     if (this.state.selectionOrder.length > 0 && blueEl) {
       Array.from(blueEl.options).forEach(opt => {
-        if (opt.value && opt.textContent.includes("*8")) {
-          opt.disabled = true;
-        }
+        if (opt.value && opt.textContent.includes("*8")) opt.disabled = true;
       });
     }
-
+    
     if (this.state.selectionOrder.length >= 2) {
-      setElements.filter(el => !this.state.selectionOrder.includes(el)).forEach(el => {
-        Array.from(el.options).forEach(opt => {
-          opt.disabled = !!opt.value;
-        });
-        el.value = "";
-      });
+      setElements.filter(el => !this.state.selectionOrder.includes(el)).forEach(disableAllOptions);
     }
-
-    if (!blueEl?.value) return;
-    if (!blueEl.selectedOptions[0]?.disabled) return;
-
-    blueEl.value = "";
-    this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== blueEl);
+    
+    if (blueEl?.value && blueEl.selectedOptions[0]?.disabled) {
+      blueEl.value = "";
+      this.state.selectionOrder = this.state.selectionOrder.filter(el => el !== blueEl);
+    }
   }
-
-  // === UPDATE UI ===
 
   updateAll() {
     const formData = this.getFormData();
     this.updateStaticLabels();
     this.updateDynamicLabels(formData);
     this.updateConditionalFields(formData);
-    this.updateAttackTypeUI();
+    this.updateAttackTypeUI(formData);
   }
 
   updateStaticLabels() {
     Object.entries(this.config.labels.static).forEach(([key, label]) => {
-      this.safeElementOp(key, el => {
-        el.textContent = label;
-      });
+      this.safeElementOp(key, el => el.textContent = label);
     });
   }
 
   updateDynamicLabels(formData) {
-    const vesperLabel = this.getElement('vesperSetLabel');
-    const whiteLabel = this.getElement('whiteSetLabel');
-
-    if (vesperLabel) {
-      vesperLabel.textContent = this.config.labels.dynamic.vesper[formData.vesperSet] || "Vesper SET";
-    }
-    
-    if (whiteLabel) {
-      whiteLabel.textContent = this.config.labels.dynamic.white[formData.whiteSet] || "White SET (110*3)";
-    }
-  }
-
-  updateConditionalFields(formData) {
-    Object.entries(this.config.fields).forEach(([key, config]) => {
-      if (config.type !== 'conditional') return;
-
-      const input = this.getElement(key);
-      const label = this.getElement(`${key}Label`);
-      
-      if (!input || !config.active || !config.default) return;
-
-      const conditionValue = formData[config.dependsOn];
-      const settings = conditionValue ? config.active(conditionValue) : config.default;
-      const isActive = !!conditionValue;
-
-      input.disabled = !isActive;
-      input.placeholder = settings.placeholder;
-      
-      if (label && settings.label) {
-        label.textContent = settings.label;
-      }
+    this.safeElementOp('vesperSetLabel', el => {
+      el.textContent = this.config.labels.dynamic.vesper[formData.vesperSet] || "Vesper SET";
+    });
+    this.safeElementOp('whiteSetLabel', el => {
+      el.textContent = this.config.labels.dynamic.white[formData.whiteSet] || "White SET (110*3)";
     });
   }
 
-  updateAttackTypeUI() {
-    const atkType = this.getFormData().atkType;
-    const penGroup = document.querySelector('.form-group.pen-group');
-    const critGroup = document.querySelector('.form-group.crit-group');
+  updateConditionalFields(formData) {
+    const validateNumericInput = (value) => {
+      const num = parseFloat(value);
+      return value?.trim() && !isNaN(num) && num > 0;
+    };
+    
+    Object.entries(this.config.fields).forEach(([key, config]) => {
+      if (config.type !== 'conditional' && config.type !== 'nested-conditional') return;
+      
+      const input = this.getElement(key);
+      const label = this.getElement(`${key}Label`);
+      if (!input || !config.active || !config.default) return;
+      
+      let isActive = false;
+      let settings = config.default;
+      
+      if (config.type === 'nested-conditional') {
+        const { dependsOn } = config;
+        const atkTypeValid = !!(formData.atkType || '').trim();
+        
+        if (dependsOn === 'atkType') {
+          isActive = atkTypeValid;
+        } else if (dependsOn === 'attack') {
+          isActive = atkTypeValid && validateNumericInput(formData.attack);
+        } else if (dependsOn === 'flatDmgBns') {
+          isActive = atkTypeValid && 
+                     validateNumericInput(formData.attack) && 
+                     validateNumericInput(formData.flatDmgBns);
+        }
+        
+        settings = isActive ? config.active() : config.default;
+      } else {
+        const conditionValue = formData[config.dependsOn];
+        isActive = !!conditionValue;
+        settings = isActive ? config.active(conditionValue) : config.default;
+      }
+      
+      input.disabled = !isActive;
+      input.placeholder = settings.placeholder;
+      if (label && settings.label) label.textContent = settings.label;
+      this.updateWrapperState(input, !isActive);
+    });
+  }
 
-    [penGroup, critGroup].forEach(group => group?.classList.add('hidden'));
-
+  updateAttackTypeUI(formData) {
+    const { atkType } = formData;
+    const groups = { 
+      pen: document.querySelector('.form-group.pen-group'), 
+      crit: document.querySelector('.form-group.crit-group') 
+    };
+    
+    Object.values(groups).forEach(g => g?.classList.add('hidden'));
+    
+    const penEl = this.getElement('pen');
+    const critEl = this.getElement('crit');
+    const clearValue = (el) => { if (el?.value) el.value = ''; };
+    
     if (atkType === 'pen') {
-      if (!penGroup) return;
-      
-      penGroup.classList.remove('hidden');
-      this.setFieldState(this.getElement('pen'), false, 'total converted raw pen + final pen...');
-      this.setFieldState(this.getElement('crit'), true);
-      return;
+      groups.pen?.classList.remove('hidden');
+      this.setFieldState(penEl, false, 'total converted raw pen + final pen...');
+      this.setFieldState(critEl, true);
+      clearValue(critEl);
+    } else if (atkType === 'crit') {
+      groups.crit?.classList.remove('hidden');
+      this.setFieldState(critEl, false, 'critical damage bonus...');
+      this.setFieldState(penEl, true);
+      clearValue(penEl);
+    } else {
+      this.setFieldState(penEl, true);
+      this.setFieldState(critEl, true);
+      clearValue(penEl);
+      clearValue(critEl);
     }
-
-    if (atkType === 'crit') {
-      if (!critGroup) return;
-      
-      critGroup.classList.remove('hidden');
-      this.setFieldState(this.getElement('crit'), false, 'critical damage bonus...');
-      this.setFieldState(this.getElement('pen'), true);
-      return;
-    }
-
-    this.setFieldState(this.getElement('pen'), true);
-    this.setFieldState(this.getElement('crit'), true);
   }
 
   scheduleUpdate() {
-    if (this.state.updateTimer) {
-      clearTimeout(this.state.updateTimer);
-    }
-    
+    if (this.state.updateTimer) clearTimeout(this.state.updateTimer);
     this.state.updateTimer = setTimeout(() => {
       this.updateAll();
       this.state.updateTimer = null;
     }, 50);
   }
 
-  // === SWAP LOGIC ===
-
   determineSwapMode(prevKey, nextKey) {
     if (!prevKey || !nextKey || nextKey === prevKey) return 'none';
-
     const prevData = this.getTargetData(prevKey);
     const nextData = this.getTargetData(nextKey);
-    
     if (!prevData || !nextData) return 'manual';
-
+    
     const prevRaw = getTargetDefenseData(prevKey) || {};
     const nextRaw = getTargetDefenseData(nextKey) || {};
-
     const currentDOM = {
       sizeMob: this.getElement('tSize')?.value || "",
       raceMob: this.getElement('tRace')?.value || "",
       attributeMob: this.getElement('tAttr')?.value || ""
     };
-
-    for (const [mobProp] of Object.entries(this.config.mobMapping)) {
+    
+    for (const [mobProp] of Object.entries(this.constants.mobMapping)) {
       const prevValue = prevRaw[mobProp];
       const nextValue = nextRaw[mobProp];
-
       if (prevValue && nextValue && prevValue !== nextValue) return 'manual';
       if (!nextValue || prevValue) continue;
       if (mobProp === 'sizeMob' && currentDOM.sizeMob === nextValue) continue;
-
       return 'manual';
     }
-
     return 'auto';
   }
 
   executeSwap(nextKey, state, isPenMode) {
     const swapMode = this.determineSwapMode(this.getCurrentTarget()?.key, nextKey);
     if (swapMode === 'none') return;
-
+    
     this.state.isSwapping = true;
-
     const tDefEl = this.getElement('tDef');
     if (tDefEl) tDefEl.value = nextKey;
-    
     this.syncBreakdownSwap(nextKey);
     this.resetGlobalStates();
-
+    
     const targetData = this.getTargetData(nextKey);
     if (!targetData) {
       this.state.isSwapping = false;
       return;
     }
-
+    
     if (swapMode === 'auto') {
       this.applyMobProperties(targetData, 'swap');
-      
-      if (typeof processMainCalculation === 'function') {
-        processMainCalculation();
-      }
-      
-      if (typeof showSnackbar === 'function') {
-        showSnackbar('Auto calc triggered!');
-      }
-      
+      if (typeof processMainCalculation === 'function') processMainCalculation();
+      if (typeof showSnackbar === 'function') showSnackbar('Auto calc triggered!');
       this.scheduleUpdate();
     } else {
       this.unlockCalculationFields(isPenMode);
@@ -3329,76 +2987,52 @@ class DropdownManager {
       this.updateManualSwapUI(state, isPenMode);
       this.scheduleUpdate();
     }
-
     this.state.isSwapping = false;
   }
 
   unlockCalculationFields(isPenMode) {
     const fields = [...this.config.calcFields, isPenMode ? "pen" : "crit"];
-    
     fields.forEach(fieldName => {
       const field = this.getElement(fieldName);
       if (!field) return;
-
       const wrapper = field.closest(".input-wrap");
       if (!wrapper?.querySelector('input[type="number"]')) return;
-
       wrapper.classList.remove("locked");
       wrapper.dataset.tempUnlocked = "1";
       field.disabled = false;
     });
-
-    if (typeof unbindInputLockGuard === 'function') {
-      unbindInputLockGuard();
-    }
+    if (typeof unbindInputLockGuard === 'function') unbindInputLockGuard();
   }
 
   updateManualSwapUI(state, isPenMode) {
-    this.safeElementOp('submit', btn => {
-      btn.disabled = false;
-    });
-
+    this.safeElementOp('submit', btn => btn.disabled = false);
     this.setButtonStates(this.config.disableButtons, true);
-
     this.safeElementOp('hasil', el => {
       el.dataset.specificMode = "0";
       el.textContent = 'Input your stats to see the result...';
     });
-
     this.safeElementOp('rec', el => {
       el.textContent = 'Balancing stat recommendations for a higher output multiplier.';
     });
-
-    const focusElement = isPenMode ? this.getElement('pen') : this.getElement('crit');
     
+    const focusElement = isPenMode ? this.getElement('pen') : this.getElement('crit');
     if (typeof scrollAndFocusElement === 'function') {
       scrollAndFocusElement(focusElement, "Target swapped - please verify stats and recalculate!");
     }
-
-    if (typeof validateRequiredFields === 'function') {
-      validateRequiredFields();
-    }
-    
-    if (typeof validateStatsVsTarget === 'function') {
-      validateStatsVsTarget(state);
-    }
+    if (typeof validateRequiredFields === 'function') validateRequiredFields();
+    if (typeof validateStatsVsTarget === 'function') validateStatsVsTarget(state);
   }
 
   syncBreakdownSwap(targetKey) {
     const swapDropdown = document.querySelector('#breakdown-swap');
-    if (!swapDropdown) return;
-    if (swapDropdown.value === targetKey) return;
-    
-    swapDropdown.value = targetKey;
+    if (swapDropdown && swapDropdown.value !== targetKey) swapDropdown.value = targetKey;
   }
 
   resetGlobalStates() {
     AppState.reset();
-    
-    ['testSpear', 'testReaper'].forEach(btnId => {
-      this.safeElementOp(btnId, btn => {
-        btn.classList.remove('activated');
-      });
+    const testButtons = ['testSpear', 'testReaper'];
+    testButtons.forEach(btnId => {
+      this.safeElementOp(btnId, btn => btn.classList.remove('activated'));
     });
   }
 
@@ -3406,12 +3040,12 @@ class DropdownManager {
     const select = document.createElement("select");
     select.id = "breakdown-swap";
     select.className = "breakdown-swap";
-
+    
     const pen = +(state.pen);
     const dmg = +(state.dmg);
     const currentKey = this.getCurrentTarget()?.key;
     const allTargetData = getTargetDefenseData();
-
+    
     const options = Object.keys(allTargetData).map(key => {
       const data = allTargetData[key];
       const def = +(data?.def || 0);
@@ -3419,21 +3053,19 @@ class DropdownManager {
       const insufficient = dmg <= dmgred || (isPenMode && pen <= def);
       const swapMode = this.determineSwapMode(currentKey, key);
       const disabled = swapMode === 'auto' && insufficient;
-
       const text = disabled ? `${key} (cant auto calc)` : key;
       return `<option value="${key}"${disabled ? ' disabled' : ''}>${text}</option>`;
     });
-
+    
     select.innerHTML = options.join('');
     select.value = state.tDefKey || "DUMMY Lvl.0 (0 DEF)";
-
+    
     if (!select.hasAttribute('data-dropdown-bound')) {
       EventManager.addNS(this.namespace, select, 'change', () => {
         this.executeSwap(select.value, state, isPenMode);
       });
       select.setAttribute('data-dropdown-bound', 'true');
     }
-
     return select;
   }
 
@@ -3442,7 +3074,6 @@ class DropdownManager {
       clearTimeout(this.state.updateTimer);
       this.state.updateTimer = null;
     }
-    
     EventManager.removeNS(this.namespace);
     this.state.selectionOrder = [];
     this.state.lockStates.clear();
@@ -3456,6 +3087,8 @@ const dropdownManager = new DropdownManager();
 class ValidationSSoT {
   constructor() {
     this.INVALID_CLASS = 'invalid-value';
+    this.SNACKBAR_COOLDOWN = 2000;
+    this.WATCH_INTERVAL = 200;
     this.touchedFields = new Set();
     this.snackbarCooldowns = new Set();
     this.fieldLastValues = new Map();
@@ -3464,7 +3097,6 @@ class ValidationSSoT {
     this.autoInit();
   }
 
-  // Element type checkers
   isPenOrDmg = (e) => ['pen', 'dmg'].includes(e?.id);
   isRelatedNumeric = (e) => ['race', 'attr'].includes(e?.id);
   isNumeric = (e) => e?.type === 'number' ||
@@ -3472,8 +3104,8 @@ class ValidationSSoT {
     this.isPenOrDmg(e) ||
     this.isRelatedNumeric(e);
 
-  // Utilities
   isValidNumber = (v) => !isNaN(+v) && isFinite(+v);
+  
   normalizeInput = (v) => String(v)
     .replace(/[^\d.,]/g, '')
     .replace(/,/g, '.')
@@ -3486,7 +3118,7 @@ class ValidationSSoT {
   canShowSnackbar(elementId) {
     if (this.snackbarCooldowns.has(elementId)) return false;
     this.snackbarCooldowns.add(elementId);
-    setTimeout(() => this.snackbarCooldowns.delete(elementId), 2000);
+    setTimeout(() => this.snackbarCooldowns.delete(elementId), this.SNACKBAR_COOLDOWN);
     return true;
   }
 
@@ -3512,12 +3144,10 @@ class ValidationSSoT {
     if (isValid) return null;
 
     if (showMessages && this.canShowSnackbar(element.id)) {
-      if (isMin) {
-        const fieldName = element.getAttribute('data-field-name') || element.id || 'Field';
-        this.showMessage(`${fieldName} must be at least ${boundVal}`);
-      } else {
-        this.showMessage('what are you doing?');
-      }
+      const message = isMin 
+        ? `${element.getAttribute('data-field-name') || element.id || 'Field'} must be at least ${boundVal}`
+        : 'what are you doing?';
+      this.showMessage(message);
     }
 
     return { isValid: false, reason: isMin ? 'below_min' : 'above_max' };
@@ -3585,7 +3215,7 @@ class ValidationSSoT {
     this.updateFieldState(element, result.isValid, true);
   }
 
-  setupField(element) {
+  createEventHandlers(element) {
     const validateHandler = (showMessages = false) => {
       const result = this.validateField(element, showMessages);
       this.updateFieldState(element, result.isValid);
@@ -3597,17 +3227,20 @@ class ValidationSSoT {
       if (normalized !== element.value) element.value = normalized;
     };
 
-    this.fieldLastValues.set(element.id, element.value);
-
-    const eventHandlers = {
+    return {
       focus: () => this.touchedFields.add(element.id),
       input: () => { normalizeHandler(); validateHandler(false); },
       blur: () => validateHandler(true),
       change: () => validateHandler(true),
       paste: () => this.isNumeric(element) && setTimeout(() => this.normalizeElement(element), 0)
     };
+  }
 
-    Object.entries(eventHandlers).forEach(([event, handler]) => {
+  setupField(element) {
+    this.fieldLastValues.set(element.id, element.value);
+    const handlers = this.createEventHandlers(element);
+    
+    Object.entries(handlers).forEach(([event, handler]) => {
       EventManager.addNS(this.namespace, element, event, handler);
     });
   }
@@ -3615,21 +3248,23 @@ class ValidationSSoT {
   setupDefenseChangeHandler() {
     if (!DOM_ELEMENTS.tDef) return;
 
-    EventManager.addNS(this.namespace, DOM_ELEMENTS.tDef, 'change', () => {
+    const validatePenDmgFields = () => {
       [DOM_ELEMENTS.pen, DOM_ELEMENTS.dmg]
         .filter(el => el?.value.trim())
         .forEach(el => {
           const result = this.validateField(el, this.canShowSnackbar(el.id));
           this.updateFieldState(el, result.isValid);
         });
-    });
+    };
+
+    EventManager.addNS(this.namespace, DOM_ELEMENTS.tDef, 'change', validatePenDmgFields);
   }
 
   startWatchingTouchedFields() {
     const el = DOM_ELEMENTS.tSize;
     if (!el) return;
 
-    setInterval(() => {
+    const checkFieldChange = () => {
       if (!this.touchedFields.has(el.id) || !el.classList.contains(this.INVALID_CLASS)) return;
 
       const lastValue = this.fieldLastValues.get(el.id);
@@ -3640,17 +3275,22 @@ class ValidationSSoT {
       this.fieldLastValues.set(el.id, currentValue);
       const result = this.validateField(el, false);
       this.updateFieldState(el, result.isValid, true);
-    }, 200);
+    };
+
+    setInterval(checkFieldChange, this.WATCH_INTERVAL);
   }
 
   checkReady = () => typeof DOM_ELEMENTS !== 'undefined' && DOM_ELEMENTS;
 
+  getFieldKeys() {
+    return ['atkType', 'weapon', 'wElem', 'tDef', 'tSize', 'pen', 'crit', 'attack',
+      'flatDmgBns', 'percentageDmgBns', 'dmg', 'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'];
+  }
+
   init() {
     if (this.isInitialized || !this.checkReady()) return false;
 
-    ['atkType', 'weapon', 'wElem', 'tDef', 'tSize', 'pen', 'crit', 'dmg',
-      'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'
-    ]
+    this.getFieldKeys()
       .map(key => DOM_ELEMENTS[key])
       .filter(Boolean)
       .forEach(element => this.setupField(element));
@@ -3678,20 +3318,29 @@ class ValidationSSoT {
   }
 
   getRequiredFields() {
+    const createField = (key, name, condition = null) => ({ 
+      el: DOM_ELEMENTS[key], 
+      name, 
+      ...(condition && { condition }) 
+    });
+
     return [
-      { el: DOM_ELEMENTS.atkType, name: 'Attack Type' },
-      { el: DOM_ELEMENTS.weapon, name: 'Weapon Type' },
-      { el: DOM_ELEMENTS.wElem, name: 'Weapon Attribute' },
-      { el: DOM_ELEMENTS.tDef, name: 'Target Boss' },
-      { el: DOM_ELEMENTS.tSize, name: 'Target Size' },
-      { el: DOM_ELEMENTS.pen, name: 'Final P M PEN %', condition: () => DOM_ELEMENTS.atkType?.value === 'pen' },
-      { el: DOM_ELEMENTS.crit, name: 'Critical DMG Bonus %', condition: () => DOM_ELEMENTS.atkType?.value === 'crit' },
-      { el: DOM_ELEMENTS.dmg, name: 'Final P M DMG Bonus %' },
-      { el: DOM_ELEMENTS.elemEnh, name: 'Element Enhance %' },
-      { el: DOM_ELEMENTS.sizeEnh, name: 'DMG to Size %' },
-      { el: DOM_ELEMENTS.race, name: 'DMG to Race %', condition: () => DOM_ELEMENTS.race && !DOM_ELEMENTS.race.disabled },
-      { el: DOM_ELEMENTS.attr, name: 'DMG to Attribute %', condition: () => DOM_ELEMENTS.attr && !DOM_ELEMENTS.attr.disabled },
-      { el: DOM_ELEMENTS.dmgStack, name: 'Final DMG Bonus %' }
+      createField('atkType', 'Attack Type'),
+      createField('weapon', 'Weapon Type'),
+      createField('wElem', 'Weapon Attribute'),
+      createField('tDef', 'Target Boss'),
+      createField('tSize', 'Target Size'),
+      createField('attack', 'Attack', () => DOM_ELEMENTS.attack && !DOM_ELEMENTS.attack.disabled),
+      createField('flatDmgBns', 'Flat Damage', () => DOM_ELEMENTS.flatDmgBns && !DOM_ELEMENTS.flatDmgBns.disabled),
+      createField('percentageDmgBns', 'Percentage Damage', () => DOM_ELEMENTS.percentageDmgBns && !DOM_ELEMENTS.percentageDmgBns.disabled),
+      createField('pen', 'Final P/M. PEN %', () => DOM_ELEMENTS.atkType?.value === 'pen'),
+      createField('crit', 'Critical DMG Bonus %', () => DOM_ELEMENTS.atkType?.value === 'crit'),
+      createField('dmg', 'Final P/M. Damage Bonus %'),
+      createField('elemEnh', 'Element Enhance %'),
+      createField('sizeEnh', 'DMG to Size %'),
+      createField('race', 'DMG to Race %', () => DOM_ELEMENTS.race && !DOM_ELEMENTS.race.disabled),
+      createField('attr', 'DMG to Attribute %', () => DOM_ELEMENTS.attr && !DOM_ELEMENTS.attr.disabled),
+      createField('dmgStack', 'Final DMG Bonus %')
     ];
   }
 
@@ -3738,9 +3387,7 @@ class ValidationSSoT {
       const shouldScroll = focusedElement === element || !focusedElement;
       const fieldObject = { el: element };
       
-      if (!this.processFieldValidation(fieldObject, shouldScroll)) {
-        return false;
-      }
+      if (!this.processFieldValidation(fieldObject, shouldScroll)) return false;
     }
 
     return true;
@@ -5109,22 +4756,23 @@ const setupTooltips = (config) => {
   });
 };
 setupTooltips({
-  "#weaponTips": "If you're a physical suno or meister, you can choose weapons without size penalty, such as GS, Shuriken, or Book. (Weapon Perfection passive)",
-  "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are <strong>different</strong>! Check your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set it to 0.",
-  "#targetRaceTips": "Specific MVP/Mini will <strong>auto sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> if you want to target a specific race!",
-  "#targetAttrTips": "Same applies to race.",
-  "#dmgRaceTips": "Unlocked when target race is selected, minimum valid value is 0.",
-  "#dmgAttrTips": "Same condition as dmg to race.",
-  "#blueTips": "Blue*8 in testing^^",
+  ".calcTips": "Don't expect too much! This tool calculates some RNG stats and buffs [ Examples: <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>Album#1</a>, <a href='#' class='job-sim' data-lightbox-gallery='new-version' data-lightbox-trigger>Album#2</a>].",
+  //"#attackTypeTips": "This calculator has been tested with physical jobs (PEN). Calculations for magical or critical builds may vary slightly.",
+  "#weaponTips": "Physical Suno or Meister can select weapons without size penalty, such as GS, Shuriken, or Book (Weapon Perfection passive).",
   "#mvpminiTips": "DUMMY has no defense stat. Avg 130, Necro, Ogre, Ktul defs are less accurate than others!",
-  "#calcTips": "Don't expect too much! This tool calculates some RNG stats and buffs from equipment sets and flashes and also doesn't include flat or percentage damage bonuses (<a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).",
-
-  "#attackTips": "As you can see, it starts with 1, which is your attack. You can use the final result of this calculation to multiply with your attack (up to 99.5% accurate, <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>see this</a>).<br><br>However, don't expect too much! This tool calculates RNG buffs from equipment sets, flashes, and also doesn't include flat or percentage damage bonuses.",
-  "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20-second cooldown.",
-  "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus), the bonus doesn't have 100% uptime since it only lasts 10 seconds with a 20-second cooldown. The final result shown below represents the highest output during the buff's active period.",
-  "#spearTips": "This bonus doesn't have 100% uptime because it only lasts 10 seconds while the cooldown is 20 seconds. The final result shown below represents the highest output during the buff's active period.",
+  "#targetRaceTips": "Selecting a specific MVP/Mini will <strong>automatically sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> to target a specific race.",
+  "#targetAttrTips": "Same applies to race.",
+  // "#blueTips": "Blue*8 in testing^^",
+  "#whiteTips": "White set is RNG-based effects. This calculator uses displayed in-game values without normalization. Selecting this set shows maximum output when the Tough Resilience buff is active.",
+  "#rawAttackTips": "If you're using the Vesper set, check your attack value when you reach 5 stacks, and make sure only vesper buff is active (<a href='#' data-lightbox-image='img/Calc_Tips_Atk.jpg' data-caption='make sure only vesper buff is active'>like this</a>).",
+  "#dmgRaceTips": "Unlocked when a target race is selected.Minimum valid value is 0. ",
+  "#dmgAttrTips": "Same condition applies as damage to race.",
+  "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are <strong>different</strong>! Check your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set it to 0.",
+  "#breakdownTips": "Values are shown to two decimal places for readability. The final result is computed with precision, so it may differ slightly if you recompute using the displayed numbers.",
   "#elemCtrTips": "Tool assumes target is Neutral if you're not targeting any attribute.",
-  "#breakdownTips": "Values are shown to two decimal places for readability. The final result is computed with full precision, so it may differ slightly if you recompute using the displayed (rounded) numbers.",
+  "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus).",
+  "#spearTips": "Value shown below represents the highest output during the buff's active period.",
+  "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20-second cooldown.",
   "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward arrow means lower."
 });
 
@@ -5134,7 +4782,22 @@ const aboutCard = (() => {
   const cardBody = document.querySelector('.altsim-card-body');
   const arrowBtn = document.querySelector('.altsim-btn-arrow');
   
-  let isCollapsed = false;
+  const STORAGE_KEY = 'aboutCardCollapsed';
+  const NAMESPACE = 'about-card';
+  const savedState = localStorage.getItem(STORAGE_KEY);
+  let isCollapsed = savedState === 'true';
+  
+  const setCardState = (collapsed) => {
+    if (collapsed) {
+      cardBody.style.maxHeight = '0px';
+      card.classList.add('collapsed');
+    } else {
+      cardBody.style.maxHeight = 'none';
+      card.classList.remove('collapsed');
+    }
+  };
+  
+  const initCollapse = () => setCardState(isCollapsed);
   
   const toggleCollapse = () => {
     isCollapsed = !isCollapsed;
@@ -5156,17 +4819,32 @@ const aboutCard = (() => {
       };
       cardBody.addEventListener('transitionend', handleTransitionEnd);
     }
+    
+    localStorage.setItem(STORAGE_KEY, String(isCollapsed));
   };
   
+  initCollapse();
+  
   if (arrowBtn) {
-    arrowBtn.addEventListener('click', toggleCollapse);
+    EventManager.addNS(NAMESPACE, arrowBtn, 'click', toggleCollapse);
   }
+  
+  const destroy = () => EventManager.removeNS(NAMESPACE);
+  
+  EventManager.addNS(NAMESPACE, window, 'beforeunload', destroy);
+  
+  return { destroy };
 })();
-// ========== ACCORDION SYSTEM ==========
+
+// ======== HOW TO ========
 const accordionManager = (() => {
-  const duration = 320;
-  const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
-  const transition = `max-height ${duration}ms ${easing}, opacity ${duration}ms ${easing}`;
+  const CONFIG = {
+    duration: 320,
+    easing: 'cubic-bezier(0.25, 0.8, 0.25, 1)',
+    cleanupInterval: 30000
+  };
+  
+  const transition = `max-height ${CONFIG.duration}ms ${CONFIG.easing}, opacity ${CONFIG.duration}ms ${CONFIG.easing}`;
   const instances = new Map();
   const namespace = 'accordion-manager';
   let observer = null;
@@ -5219,40 +4897,29 @@ const accordionManager = (() => {
       transitionListenerId = EventManager.add(content, 'transitionend', onTransitionEnd);
     };
     
-    const animateOpen = () => {
-      details.setAttribute('open', '');
-      
-      const targetHeight = content.scrollHeight;
-      
-      applyStyles(content, '0px', 0.3, false);
-      forceReflow(content);
-      
-      currentAnimation = requestAnimationFrame(() => {
-        applyStyles(content, `${targetHeight}px`, 1, true);
+    const animate = (isOpening) => {
+      if (isOpening) {
+        details.setAttribute('open', '');
+        const targetHeight = content.scrollHeight;
+        applyStyles(content, '0px', 0.3, false);
+        forceReflow(content);
         
-        setupTransitionListener(() => {
-          applyStyles(content, 'none', 1, true);
+        currentAnimation = requestAnimationFrame(() => {
+          applyStyles(content, `${targetHeight}px`, 1, true);
+          setupTransitionListener(() => applyStyles(content, 'none', 1, true));
+          currentAnimation = null;
         });
+      } else {
+        const currentHeight = content.scrollHeight;
+        applyStyles(content, `${currentHeight}px`, 1, false);
+        forceReflow(content);
         
-        currentAnimation = null;
-      });
-    };
-    
-    const animateClose = () => {
-      const currentHeight = content.scrollHeight;
-      
-      applyStyles(content, `${currentHeight}px`, 1, false);
-      forceReflow(content);
-      
-      currentAnimation = requestAnimationFrame(() => {
-        applyStyles(content, '0px', 0.3, true);
-        
-        setupTransitionListener(() => {
-          details.removeAttribute('open');
+        currentAnimation = requestAnimationFrame(() => {
+          applyStyles(content, '0px', 0.3, true);
+          setupTransitionListener(() => details.removeAttribute('open'));
+          currentAnimation = null;
         });
-        
-        currentAnimation = null;
-      });
+      }
     };
     
     const handleClick = (e) => {
@@ -5263,7 +4930,7 @@ const accordionManager = (() => {
       isAnimating = true;
       
       const isOpen = details.hasAttribute('open');
-      isOpen ? animateClose() : animateOpen();
+      animate(!isOpen);
     };
     
     EventManager.addNS(instanceNamespace, summary, 'click', handleClick);
@@ -5300,7 +4967,7 @@ const accordionManager = (() => {
   
   const startCleanupInterval = () => {
     if (cleanupInterval || instances.size === 0) return;
-    cleanupInterval = setInterval(cleanupOrphans, 30000);
+    cleanupInterval = setInterval(cleanupOrphans, CONFIG.cleanupInterval);
   };
   
   const initializeDetailsElement = (details) => {
@@ -5396,7 +5063,7 @@ const accordionManager = (() => {
   };
 })();
 
-// ======== LOG MODAL ========
+// ======== CHANGELOG ========
 const modalManager = (() => {
   const { log, openLog, closeLog } = DOM_ELEMENTS || {};
   if (!log) {
@@ -5409,11 +5076,14 @@ const modalManager = (() => {
   
   const content = log.querySelector('.modal-content, .log-content, .modal-body') || log.firstElementChild;
   const changelog = log.querySelector('#changelog');
-  const duration = 280;
-  const easing = 'cubic-bezier(0.25, 0.8, 0.25, 1)';
-  const namespace = 'modal-manager';
   
-  const transition = `${duration}ms ${easing}`;
+  const CONFIG = {
+    duration: 280,
+    easing: 'cubic-bezier(0.25, 0.8, 0.25, 1)',
+    namespace: 'modal-manager'
+  };
+  
+  const transition = `${CONFIG.duration}ms ${CONFIG.easing}`;
   
   log.style.cssText = `
     display: none;
@@ -5538,39 +5208,37 @@ const modalManager = (() => {
     }
   };
   
-  const hide = () => {
-    if (!isVisible) return;
+  const setVisibility = (visible) => {
+    if (visible === isVisible) return;
     
-    isVisible = false;
+    isVisible = visible;
     clearTimers();
     
-    applyModalStyles(false);
-    applyContentStyles(false);
-    
-    hideTimeout = setTimeout(() => {
-      if (!isVisible) {
-        log.style.display = 'none';
-      }
-    }, duration);
+    if (visible) {
+      log.style.display = 'flex';
+      forceReflow(log);
+      
+      animationId = requestAnimationFrame(() => {
+        applyModalStyles(true);
+        applyContentStyles(true);
+        animationId = null;
+      });
+      
+      loadChangelog();
+    } else {
+      applyModalStyles(false);
+      applyContentStyles(false);
+      
+      hideTimeout = setTimeout(() => {
+        if (!isVisible) {
+          log.style.display = 'none';
+        }
+      }, CONFIG.duration);
+    }
   };
   
-  const show = () => {
-    if (isVisible) return;
-    
-    isVisible = true;
-    clearTimers();
-    
-    log.style.display = 'flex';
-    forceReflow(log);
-    
-    animationId = requestAnimationFrame(() => {
-      applyModalStyles(true);
-      applyContentStyles(true);
-      animationId = null;
-    });
-    
-    loadChangelog();
-  };
+  const hide = () => setVisibility(false);
+  const show = () => setVisibility(true);
   
   const handleOpen = (e) => {
     e.stopPropagation();
@@ -5587,24 +5255,48 @@ const modalManager = (() => {
     hide();
   };
   
-  EventManager.addNS(namespace, openLog, 'click', handleOpen);
-  EventManager.addNS(namespace, closeLog, 'click', hide);
-  EventManager.addNS(namespace, document, 'keydown', handleKeydown);
-  EventManager.addNS(namespace, document, 'click', handleOutsideClick);
+  EventManager.addNS(CONFIG.namespace, openLog, 'click', handleOpen);
+  EventManager.addNS(CONFIG.namespace, closeLog, 'click', hide);
+  EventManager.addNS(CONFIG.namespace, document, 'keydown', handleKeydown);
+  EventManager.addNS(CONFIG.namespace, document, 'click', handleOutsideClick);
   
   const destroy = () => {
     clearTimers();
-    EventManager.removeNS(namespace);
+    EventManager.removeNS(CONFIG.namespace);
   };
   
-  EventManager.addNS(namespace, window, 'beforeunload', destroy);
+  EventManager.addNS(CONFIG.namespace, window, 'beforeunload', destroy);
   
   return { show, hide, destroy };
 })();
 
 // ======== LIGHTBOX ========
-const imgLightbox = (() => {
+const lightboxConfig = {
+  galleries: [
+    {
+      name: 'my-gallery',
+      images: [
+        { src: 'img/Calc_vs_Ingame-0.jpg', caption: 'Final DMG Bonus 24 from 5 Stack Vesper T2' },
+        { src: 'img/Calc_vs_Ingame-1.jpg', caption: 'no buff active (P ATTK 325002)' },
+        { src: 'img/Calc_vs_Ingame-2.jpg', caption: '5 Stack Vesper (P ATTK 352793)' },
+        { src: 'img/Calc_vs_Ingame-3.jpg', caption: 'Spear Flash Triggered (P ATTK 325002)' },
+        { src: 'img/Calc_vs_Ingame-4.jpg', caption: 'Spear + 5 Stack Vesper (P ATTK 352793)' }
+      ]
+    },
+    {
+      name: 'new-version',
+      images: [
+        { src: 'img/Test_New-V_ArcAngel.jpg', caption: '' },
+        { src: 'img/Calc_x_Ingame_1.1.6_0.jpg', caption: '' },
+        { src: 'img/Calc_x_Ingame_1.1.6_1.jpg', caption: '' },
+        { src: 'img/Calc_x_Ingame_1.1.6_2.jpg', caption: 'Spear Flash Triggered' }
+      ]
+    }
+  ]
+};
+const imgLightbox = ((config = {}) => {
   const NS = 'img-lightbox';
+  const NS_GALLERY = 'img-lightbox-gallery';
   const els = {
     overlay: document.getElementById('img-lightbox-overlay'),
     image: document.querySelector('.img-lightbox-image'),
@@ -5636,6 +5328,48 @@ const imgLightbox = (() => {
     MIN: 1,
     MAX: 5,
     STEP: 0.3
+  };
+
+  const lazyInitGallery = (galleryName) => {
+    if (state.galleries[galleryName]) return;
+
+    const galleryConfig = config.galleries?.find(g => g.name === galleryName);
+    if (!galleryConfig) return;
+
+    const container = document.getElementById('lightbox-galleries') || (() => {
+      const div = document.createElement('div');
+      div.id = 'lightbox-galleries';
+      div.style.display = 'none';
+      document.body.appendChild(div);
+      return div;
+    })();
+
+    galleryConfig.images.forEach(img => {
+      const div = document.createElement('div');
+      div.setAttribute('data-lightbox-item', galleryName);
+      div.setAttribute('data-lightbox-image', img.src);
+      if (img.caption) {
+        div.setAttribute('data-caption', img.caption);
+      }
+      container.appendChild(div);
+    });
+
+    initGalleries(container);
+  };
+
+  const resolveURL = (path) => {
+    if (/^https?:\/\//i.test(path)) {
+      return path;
+    }
+    
+    const base = window.location.origin;
+    
+    if (path.startsWith('/')) {
+      return base + path;
+    }
+    
+    const currentPath = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+    return base + currentPath + '/' + path;
   };
 
   const clamp = (v, min, max) => Math.min(Math.max(v, min), max);
@@ -5728,12 +5462,14 @@ const imgLightbox = (() => {
 
     els.image.onload = () => handleLoad(true);
     els.image.onerror = () => handleLoad(false);
-    els.image.src = item.src;
+    els.image.src = resolveURL(item.src);
     
     updateUI();
   };
 
   const openGallery = (galleryName, startIndex = 0) => {
+    lazyInitGallery(galleryName);
+    
     if (!state.galleries[galleryName]) return;
     state.currentGallery = galleryName;
     setActive(true);
@@ -5750,25 +5486,29 @@ const imgLightbox = (() => {
     }
   };
 
-  const onWheel = (e) => {
-    if (!els.overlay.classList.contains('img-lightbox-active')) return;
-    e.preventDefault();
-
-    const delta = e.deltaY < 0 ? cfg.STEP : -cfg.STEP;
+  const updateTransform = (newScale, clientX, clientY) => {
     const old = state.scale;
-    state.scale = clamp(state.scale + delta, cfg.MIN, cfg.MAX);
+    state.scale = clamp(newScale, cfg.MIN, cfg.MAX);
 
     if (state.scale !== old) {
       if (state.scale === cfg.MIN) {
         state.translateX = state.translateY = 0;
       } else {
         const ratio = state.scale / old;
-        state.translateX = e.clientX - (e.clientX - state.translateX) * ratio;
-        state.translateY = e.clientY - (e.clientY - state.translateY) * ratio;
+        state.translateX = clientX - (clientX - state.translateX) * ratio;
+        state.translateY = clientY - (clientY - state.translateY) * ratio;
       }
       apply();
       els.image.style.cursor = state.scale > cfg.MIN ? 'move' : 'default';
     }
+  };
+
+  const onWheel = (e) => {
+    if (!els.overlay.classList.contains('img-lightbox-active')) return;
+    e.preventDefault();
+
+    const delta = e.deltaY < 0 ? cfg.STEP : -cfg.STEP;
+    updateTransform(state.scale + delta, e.clientX, e.clientY);
   };
 
   const onMouseDown = (e) => {
@@ -5807,13 +5547,17 @@ const imgLightbox = (() => {
     }
   };
 
+  const startDrag = (clientX, clientY) => {
+    state.isDragging = true;
+    state.dragStartX = clientX - state.translateX;
+    state.dragStartY = clientY - state.translateY;
+  };
+
   const onTouchStart = (e) => {
     const t = e.touches;
 
     if (t.length === 1 && state.scale > cfg.MIN) {
-      state.isDragging = true;
-      state.dragStartX = t[0].clientX - state.translateX;
-      state.dragStartY = t[0].clientY - state.translateY;
+      startDrag(t[0].clientX, t[0].clientY);
     } else if (t.length === 2) {
       e.preventDefault();
       state.isDragging = false;
@@ -5858,9 +5602,7 @@ const imgLightbox = (() => {
         apply();
       }
     } else if (e.touches.length === 1 && state.scale > cfg.MIN) {
-      state.isDragging = true;
-      state.dragStartX = e.touches[0].clientX - state.translateX;
-      state.dragStartY = e.touches[0].clientY - state.translateY;
+      startDrag(e.touches[0].clientX, e.touches[0].clientY);
       state.pinchStart = 0;
     }
   };
@@ -5901,9 +5643,9 @@ const imgLightbox = (() => {
       trigger.setAttribute('data-lb-trigger-init', '');
       const galleryName = trigger.getAttribute('data-lightbox-gallery');
 
-      trigger.addEventListener('click', (e) => {
+      EventManager.addNS(NS_GALLERY, trigger, 'click', (e) => {
         e.preventDefault();
-        if (galleryName && state.galleries[galleryName]) {
+        if (galleryName) {
           openGallery(galleryName, 0);
         }
       });
@@ -5917,7 +5659,7 @@ const imgLightbox = (() => {
       const singleGalleryName = `single-${Math.random().toString(36).substr(2, 9)}`;
       state.galleries[singleGalleryName] = [{ src, caption }];
 
-      link.addEventListener('click', (e) => {
+      EventManager.addNS(NS_GALLERY, link, 'click', (e) => {
         e.preventDefault();
         openGallery(singleGalleryName, 0);
       });
@@ -5967,14 +5709,19 @@ const imgLightbox = (() => {
     EventManager.addNS(NS, el, type, handler, opts);
   });
 
-  window.addEventListener('beforeunload', () => {
+  const destroy = () => {
     cleanupLoaders();
     observer.disconnect();
     EventManager.removeNS(NS);
-  }, { once: true });
-})();
+    EventManager.removeNS(NS_GALLERY);
+  };
 
-// ========== MAIN BUTTON EVENT ==========
+  EventManager.addNS(NS, window, 'beforeunload', destroy);
+
+  return { destroy, openGallery };
+})(lightboxConfig);
+
+// ======== MAIN BUTTON ========
 const mainButtonEvent = (() => {
   if (window._eventsAlreadyBound) return;
   window._eventsAlreadyBound = true;
@@ -5987,7 +5734,8 @@ const mainButtonEvent = (() => {
     ResetHelpers.resetDisplayContainers();
     unbindInputLockGuard();
     unlockAllInputs();
-    dropdownManager.scheduleUpdate();
+    dropdownManager.syncThreeSets();
+    dropdownManager.handleTargetChange();
     scrollAndFocusElement(DOM_ELEMENTS.atkType);
   };
   
@@ -6069,10 +5817,22 @@ const PWAUtils = {
   
   storageRemove: (k) => {
     try { localStorage.removeItem(k); } catch {}
+  },
+  
+  createTimeout: (fn, ms, cleanup) => {
+    const id = setTimeout(fn, ms);
+    cleanup && cleanup.push(() => clearTimeout(id));
+    return id;
+  },
+  
+  addListener: (target, event, handler, options) => {
+    target.addEventListener(event, handler, options);
+    return () => target.removeEventListener(event, handler, options);
   }
 };
 const OverlayManager = (() => {
   let element = null;
+  let pendingTimeout = null;
   
   const create = () => {
     if (element) return element;
@@ -6091,6 +5851,13 @@ const OverlayManager = (() => {
     element = null;
   };
   
+  const clearPendingTimeout = () => {
+    if (pendingTimeout) {
+      clearTimeout(pendingTimeout);
+      pendingTimeout = null;
+    }
+  };
+  
   return {
     show: () => {
       const overlay = create();
@@ -6101,10 +5868,19 @@ const OverlayManager = (() => {
     hide: () => {
       if (!element) return;
       element.classList.remove('active');
-      setTimeout(() => {
+      clearPendingTimeout();
+      pendingTimeout = PWAUtils.createTimeout(() => {
         SnackbarQueue.setOverlayState(false);
         removeElement();
+        pendingTimeout = null;
       }, CONSTANTS.OVERLAY_TRANSITION_MS);
+    },
+    
+    forceRemove: () => {
+      clearPendingTimeout();
+      SnackbarQueue.setOverlayState(false);
+      SnackbarQueue.clear();
+      removeElement();
     }
   };
 })();
@@ -6136,7 +5912,10 @@ const PWAServiceWorker = (() => {
   
   const scheduleUpdateCheck = (reg) => {
     if (updateCheckTimer) clearTimeout(updateCheckTimer);
-    updateCheckTimer = setTimeout(() => reg.update().catch(() => {}), CONSTANTS.SW_UPDATE_CHECK_DELAY);
+    updateCheckTimer = PWAUtils.createTimeout(
+      () => reg.update().catch(() => {}), 
+      CONSTANTS.SW_UPDATE_CHECK_DELAY
+    );
   };
   
   const setupUpdateListener = (reg) => {
@@ -6171,8 +5950,8 @@ const PWAServiceWorker = (() => {
     }
   };
   
-  window.addEventListener('DOMContentLoaded', registerSW, { passive: true });
-  window.addEventListener('beforeunload', cleanup, { passive: true });
+  PWAUtils.addListener(window, 'DOMContentLoaded', registerSW, { passive: true });
+  PWAUtils.addListener(window, 'beforeunload', cleanup, { passive: true });
   
   return { 
     init: () => {},
@@ -6181,9 +5960,12 @@ const PWAServiceWorker = (() => {
   };
 })();
 if (PWAServiceWorker) PWAServiceWorker.init();
-if (!IS_PWA) {
-  DOM_ELEMENTS.checkUpdateBtn?.remove();
-} else {
+const PWAUpdateUIHandler = (() => {
+  if (!IS_PWA) {
+    DOM_ELEMENTS.checkUpdateBtn?.remove();
+    return;
+  }
+  
   const PWAManualUpdate = (() => {
     const state = {
       isChecking: false,
@@ -6250,10 +6032,13 @@ if (!IS_PWA) {
       return new Promise((resolve, reject) => {
         if (worker.state === targetState) return resolve();
         
-        const timer = setTimeout(() => {
-          worker.removeEventListener('statechange', handler);
-          reject(new Error('Timeout waiting for worker state'));
-        }, timeout);
+        const timer = PWAUtils.createTimeout(
+          () => {
+            worker.removeEventListener('statechange', handler);
+            reject(new Error('Timeout waiting for worker state'));
+          }, 
+          timeout
+        );
         
         const handler = () => {
           if (worker.state === targetState) {
@@ -6267,20 +6052,21 @@ if (!IS_PWA) {
       });
     };
     
-    const handleWaitingWorker = (reg) => {
-      state.newWorker = reg.waiting;
+    const handleWorker = async (reg, workerType) => {
+      const worker = workerType === 'waiting' ? reg.waiting : reg.installing;
+      state.newWorker = worker;
       state.registration = reg;
-      markUpdateReady();
-    };
-    
-    const handleInstallingWorker = async (reg) => {
-      state.newWorker = reg.installing;
-      state.registration = reg;
+      
+      if (workerType === 'waiting') {
+        markUpdateReady();
+        return;
+      }
+      
       setButtonState('downloading');
       SnackbarQueue.add('Downloading update...');
       
       try {
-        await waitForWorkerState(reg.installing, 'installed', TIMEOUTS.WORKER_STATE);
+        await waitForWorkerState(worker, 'installed', TIMEOUTS.WORKER_STATE);
         markUpdateReady();
       } catch {
         throw new Error('Download timeout');
@@ -6290,6 +6076,11 @@ if (!IS_PWA) {
     const getRegistration = async () => {
       return PWAServiceWorker?.getRegistration() || 
              await navigator.serviceWorker.getRegistration(CONSTANTS.SW_SCOPE);
+    };
+    
+    const createStateChangeHandler = (worker, onInstalled, onInstalling) => () => {
+      if (worker.state === 'installed' && onInstalled) onInstalled();
+      if (worker.state === 'installing' && onInstalling) onInstalling();
     };
     
     const setupUpdateListener = (reg, resolve) => {
@@ -6302,15 +6093,17 @@ if (!IS_PWA) {
         setButtonState('downloading');
         SnackbarQueue.add('Downloading update...');
         
-        newWorker.addEventListener('statechange', () => {
-          if (newWorker.state === 'installed') {
+        newWorker.addEventListener('statechange', createStateChangeHandler(
+          newWorker,
+          () => {
             markUpdateReady();
             resolve(true);
-          } else if (newWorker.state === 'installing') {
+          },
+          () => {
             setButtonState('installing');
             SnackbarQueue.add('Installing update...');
           }
-        });
+        ));
       };
       
       return updateHandler;
@@ -6318,7 +6111,7 @@ if (!IS_PWA) {
     
     const waitForUpdate = async (reg) => {
       return new Promise((resolve) => {
-        const timeout = setTimeout(() => resolve(false), TIMEOUTS.UPDATE_CHECK);
+        const timeout = PWAUtils.createTimeout(() => resolve(false), TIMEOUTS.UPDATE_CHECK);
         const updateHandler = setupUpdateListener(reg, (hasUpdate) => {
           clearTimeout(timeout);
           resolve(hasUpdate);
@@ -6343,8 +6136,8 @@ if (!IS_PWA) {
         const reg = await getRegistration();
         if (!reg) throw new Error('Service worker not registered');
         
-        if (reg.waiting) return handleWaitingWorker(reg);
-        if (reg.installing) return await handleInstallingWorker(reg);
+        if (reg.waiting) return handleWorker(reg, 'waiting');
+        if (reg.installing) return await handleWorker(reg, 'installing');
         
         const hasUpdate = await waitForUpdate(reg);
         if (!hasUpdate) {
@@ -6364,6 +6157,18 @@ if (!IS_PWA) {
       window.location.reload();
     };
     
+    const setupReloadWithFallback = (timeoutMs, cleanupFn) => {
+      const fallbackTimer = PWAUtils.createTimeout(performReload, timeoutMs);
+      
+      const triggerReload = () => {
+        clearTimeout(fallbackTimer);
+        if (cleanupFn) cleanupFn();
+        performReload();
+      };
+      
+      return { fallbackTimer, triggerReload };
+    };
+    
     const setupControllerChangeListener = (fallbackTimer) => {
       const handler = () => {
         clearTimeout(fallbackTimer);
@@ -6381,7 +6186,7 @@ if (!IS_PWA) {
         clearTimeout(fallbackTimer);
         state.newWorker.removeEventListener('statechange', handler);
         
-        setTimeout(() => {
+        PWAUtils.createTimeout(() => {
           if (navigator.serviceWorker.controller === state.newWorker) performReload();
         }, TIMEOUTS.CONTROLLER_VERIFY);
       };
@@ -6417,7 +6222,7 @@ if (!IS_PWA) {
       OverlayManager.show();
       setButtonState('applying');
       
-      const fallbackTimer = setTimeout(() => performReload(), TIMEOUTS.CONTROLLER_CHANGE);
+      const fallbackTimer = PWAUtils.createTimeout(performReload, TIMEOUTS.CONTROLLER_CHANGE);
       
       setupControllerChangeListener(fallbackTimer);
       
@@ -6431,13 +6236,13 @@ if (!IS_PWA) {
     };
     
     const handleAutoUpdateFound = (worker) => {
-      worker.addEventListener('statechange', () => {
-        if (worker.state === 'installing') {
-          setButtonState('installing');
-        } else if (worker.state === 'installed' && navigator.serviceWorker.controller) {
-          markUpdateReady();
-        }
-      });
+      worker.addEventListener('statechange', createStateChangeHandler(
+        worker,
+        () => {
+          if (navigator.serviceWorker.controller) markUpdateReady();
+        },
+        () => setButtonState('installing')
+      ));
     };
     
     const onUpdateFound = (event) => {
@@ -6492,7 +6297,7 @@ if (!IS_PWA) {
   })();
   
   window.PWAManualUpdate = PWAManualUpdate;
-};
+})();
 const initA2HS = (() => {
   const CFG = {
     app: {
@@ -6608,10 +6413,14 @@ const initA2HS = (() => {
     PWAUtils.scheduleTask(() => container?.remove(), CONSTANTS.A2HS_ANIM_DUR);
   };
   
-  const closeModalDismiss = (container) => {
-    closeModalVisual(container);
+  const saveDismissTimestamp = () => {
     const ts = PWAUtils.safeJSONStringify({ timestamp: Date.now() });
     if (ts) PWAUtils.storageSet(CONSTANTS.A2HS_STORAGE, ts);
+  };
+  
+  const closeModalDismiss = (container) => {
+    closeModalVisual(container);
+    saveDismissTimestamp();
   };
   
   const triggerInstall = async () => {
@@ -6621,8 +6430,7 @@ const initA2HS = (() => {
     const { outcome } = await state.deferredPrompt.userChoice;
     
     if (outcome === 'accepted') {
-      const ts = PWAUtils.safeJSONStringify({ timestamp: Date.now() });
-      if (ts) PWAUtils.storageSet(CONSTANTS.A2HS_STORAGE, ts);
+      saveDismissTimestamp();
       PWAUtils.storageSet('app_installed', 'true');
       state.deferredPrompt = null;
       return true;
@@ -6679,8 +6487,7 @@ const initA2HS = (() => {
   });
   
   EventManager.add(window, 'appinstalled', () => {
-    const ts = PWAUtils.safeJSONStringify({ timestamp: Date.now() });
-    if (ts) PWAUtils.storageSet(CONSTANTS.A2HS_STORAGE, ts);
+    saveDismissTimestamp();
     PWAUtils.storageSet('app_installed', 'true');
     const modal = document.querySelector('.a2hs');
     if (modal) closeModalVisual(modal);
@@ -6724,23 +6531,31 @@ const preventPullToRefresh = (() => {
   const opts = { passive: false };
   const optsEnd = { passive: true };
   
-  document.addEventListener('touchstart', touchStartHandler, opts);
-  document.addEventListener('touchmove', touchMoveHandler, opts);
-  document.addEventListener('touchend', touchEndHandler, optsEnd);
-  document.addEventListener('touchcancel', touchEndHandler, optsEnd);
+  const attachEvents = [
+    ['touchstart', touchStartHandler, opts],
+    ['touchmove', touchMoveHandler, opts],
+    ['touchend', touchEndHandler, optsEnd],
+    ['touchcancel', touchEndHandler, optsEnd]
+  ];
+  
+  attachEvents.forEach(([event, handler, options]) => {
+    document.addEventListener(event, handler, options);
+  });
   
   return () => {
-    document.removeEventListener('touchstart', touchStartHandler, opts);
-    document.removeEventListener('touchmove', touchMoveHandler, opts);
-    document.removeEventListener('touchend', touchEndHandler, optsEnd);
-    document.removeEventListener('touchcancel', touchEndHandler, optsEnd);
+    attachEvents.forEach(([event, handler, options]) => {
+      document.removeEventListener(event, handler, options);
+    });
   };
 })();
 const PWAPersistenceInit = (() => {
-  if (!IS_PWA) return;
-
+  if (IS_PWA) return;
+  
   let cachedElements = null;
   let restoreInProgress = false;
+  let restoreTimeoutId = null;
+  
+  const RESTORE_TIMEOUT_MS = 3000;
   
   const getFormElements = () => {
     if (!cachedElements) {
@@ -6749,10 +6564,25 @@ const PWAPersistenceInit = (() => {
     return cachedElements;
   };
   
+  const getSelectValue = (el) => {
+    const selectedOption = el.options[el.selectedIndex];
+    return selectedOption ? {
+      text: selectedOption.textContent,
+      value: selectedOption.value
+    } : null;
+  };
+  
   const collectFormValues = () => {
     const values = {};
     getFormElements().forEach(el => {
-      if (el.id && el.value) values[el.id] = el.value;
+      if (!el.id) return;
+      
+      if (el.tagName === 'SELECT') {
+        const selectValue = getSelectValue(el);
+        if (selectValue) values[el.id] = selectValue;
+      } else if (el.value) {
+        values[el.id] = el.value;
+      }
     });
     return values;
   };
@@ -6785,36 +6615,106 @@ const PWAPersistenceInit = (() => {
     return state;
   };
   
-  const finalizeRestore = () => {
+  const finalizeWithMessage = (message, delay = 150) => {
     setTimeout(() => {
       OverlayManager.hide();
-      SnackbarQueue.add('Data restored successfully');
+      SnackbarQueue.add(message);
       restoreInProgress = false;
-    }, 150);
+    }, delay);
+  };
+  
+  const handleRestoreError = (error) => {
+    console.error('Restore failed:', error);
+    
+    if (restoreTimeoutId) {
+      clearTimeout(restoreTimeoutId);
+      restoreTimeoutId = null;
+    }
+    
+    PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
+    OverlayManager.forceRemove();
+    restoreInProgress = false;
+    
+    setTimeout(() => {
+      SnackbarQueue.add('Failed to restore previous data. Starting fresh.');
+    }, 100);
   };
   
   const checkCalculationDone = () => {
+    if (!restoreInProgress) return;
+    
     requestAnimationFrame(() => {
-      AppState.get('isResultShown') ? finalizeRestore() : checkCalculationDone();
+      if (AppState.get('isResultShown')) {
+        if (restoreTimeoutId) {
+          clearTimeout(restoreTimeoutId);
+          restoreTimeoutId = null;
+        }
+        finalizeWithMessage('Data restored successfully');
+      } else {
+        checkCalculationDone();
+      }
     });
   };
   
-  const performRestore = (state) => {
-    Object.entries(state.form).forEach(([id, val]) => {
-      const el = document.getElementById(id);
-      if (el) el.value = val;
-    });
+  const restoreSelectValue = (el, val) => {
+    if (typeof val !== 'object' || !val.text || !val.value) return;
     
-    if (!state.isResultShown) {
-      OverlayManager.hide();
-      restoreInProgress = false;
-      return;
+    const options = Array.from(el.options);
+    const matchedOption = options.find(opt => opt.textContent === val.text);
+    
+    if (matchedOption) {
+      el.selectedIndex = options.indexOf(matchedOption);
+    } else {
+      el.value = val.value;
     }
-    
-    PWAUtils.scheduleTask(() => {
-      processMainCalculation();
-      checkCalculationDone();
-    }, CONSTANTS.PWA_RESTORE_DELAY_MS);
+  };
+  
+  const performRestore = (state) => {
+    try {
+      let restoredCount = 0;
+      
+      Object.entries(state.form).forEach(([id, val]) => {
+        try {
+          const el = document.getElementById(id);
+          if (!el) return;
+          
+          if (el.tagName === 'SELECT') {
+            restoreSelectValue(el, val);
+          } else {
+            el.value = typeof val === 'object' ? val.value : val;
+          }
+          restoredCount++;
+        } catch (fieldError) {
+          console.warn(`Failed to restore field ${id}:`, fieldError);
+        }
+      });
+      
+      if (restoredCount === 0) {
+        throw new Error('No fields were restored');
+      }
+      
+      if (!state.isResultShown) {
+        OverlayManager.hide();
+        restoreInProgress = false;
+        return;
+      }
+      
+      restoreTimeoutId = PWAUtils.createTimeout(() => {
+        handleRestoreError(new Error('Restore timeout: calculation took too long'));
+      }, RESTORE_TIMEOUT_MS);
+      
+      PWAUtils.scheduleTask(() => {
+        try {
+          processMainCalculation();
+          checkCalculationDone();
+        } catch (calcError) {
+          handleRestoreError(calcError);
+        }
+      }, CONSTANTS.PWA_RESTORE_DELAY_MS);
+      
+    } catch (error) {
+      handleRestoreError(error);
+    }
   };
   
   const handlePWAExit = () => {
@@ -6823,11 +6723,14 @@ const PWAPersistenceInit = (() => {
   
   const init = () => {
     const opts = { capture: true };
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, document, 'visibilitychange', () => {
-      if (document.hidden) handlePWAExit();
-    }, opts);
+    const events = [
+      ['visibilitychange', () => { if (document.hidden) handlePWAExit(); }, opts, document],
+      ['pagehide', handlePWAExit, opts, window]
+    ];
     
-    EventManager.addNS(CONSTANTS.PWA_NAMESPACE, window, 'pagehide', handlePWAExit, opts);
+    events.forEach(([event, handler, options, target]) => {
+      EventManager.addNS(CONSTANTS.PWA_NAMESPACE, target, event, handler, options);
+    });
   };
   
   const state = shouldRestore();
@@ -6844,27 +6747,33 @@ const PWAPersistenceInit = (() => {
     init();
     
     if (state) {
-      performRestore(state);
+      try {
+        performRestore(state);
+      } catch (error) {
+        handleRestoreError(error);
+      }
     } else if (isUpdating) {
-      setTimeout(() => {
-        OverlayManager.hide();
-        SnackbarQueue.add('Update completed successfully');
-        restoreInProgress = false;
-      }, 300);
+      finalizeWithMessage('Update completed successfully', 300);
     }
     
     dropdownManager?.scheduleUpdate();
   }, { passive: true });
   
-  window.PWAPersistence = { 
-    snap, 
-    isRestoring: () => restoreInProgress 
+  window.PWAPersistence = {
+    snap,
+    isRestoring: () => restoreInProgress
   };
   
   window.clearPWAStorage = () => {
     PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
     EventManager.removeNS(CONSTANTS.PWA_NAMESPACE);
     restoreInProgress = false;
+    
+    if (restoreTimeoutId) {
+      clearTimeout(restoreTimeoutId);
+      restoreTimeoutId = null;
+    }
+    
     return true;
   };
 })();
@@ -7083,8 +6992,7 @@ const CleanupManager = (() => {
 function clearCache() {
   if (!confirm('Clear all cache?')) return;
   
-  cache.clear();
-  cache.rewarm();
+
   RandomGenerator.reset();
   
   caches.keys().then(keys => {
@@ -7096,13 +7004,7 @@ function clearCache() {
 function resetAllData() {
   if (!confirm('Reset all data and inputs (including cache)?')) return;
 
-  cache.clear();
-  cache.rewarm();
-  RandomGenerator.reset();
-  
-  caches.keys().then(keys => {
-    keys.forEach(key => caches.delete(key))
-  })
+  clearCache();
   
   localStorage.clear();
   AppState.reset();

@@ -1,6 +1,31 @@
 {
   "versions": [
     {
+      "version": "1.1.6",
+      "date": "23 Oct, 2025",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "Attack, Raw & Percentage Damage Bonus fields",
+            "<a href='#' class='job-sim' data-lightbox-gallery='new-version' data-lightbox-trigger>Album#2</a>"
+          ]
+        },
+        {
+          "category": "Update",
+          "items": [
+            "Formula",
+            "Breakdown UI"
+          ]
+        }
+
+
+      ]
+    }, 
+    
+    
+    
+    {
       "version": "1.1.5",
       "date": "17 Oct, 2025",
       "changes": [
@@ -23,7 +48,6 @@
 
       ]
     }, 
-
     {
       "version": "1.1.4",
       "date": "14 Oct, 2025",
@@ -64,7 +88,7 @@
         {
           "category": "Added",
           "items": [
-            "Lightbox image gallery"
+            "Lightbox image gallery (<a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>Album#1</a> )"
           ]
         },
         {

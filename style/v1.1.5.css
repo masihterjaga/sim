@@ -176,7 +176,7 @@ hr.separ {
   transition: .25s cubic-bezier(.4, 0, .2, 1);
 }
 
-.input-wrap select {
+select {
   appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -575,7 +575,7 @@ td.build {
 .sticky {
   position: fixed;
   bottom: calc(20px + env(safe-area-inset-bottom));
-  right: 20px;
+  right: 18px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1631,11 +1631,10 @@ transform: rotate(-180deg);
   object-fit: contain;
   display: none;
   pointer-events: auto;
-  transform-origin: center center;
+  transform-origin: 0 0; /* <-- UBAH INI: gunakan top-left sebagai origin */
   touch-action: none;
   user-select: none;
 }
-
 .img-lightbox-close {
   position: fixed;
   top: 10px;
@@ -2055,7 +2054,7 @@ transform: rotate(-180deg);
   /* Sticky Buttons */
   .sticky {
     bottom: calc(20px + env(safe-area-inset-bottom));
-    right: 24px;
+    right: 20px;
   }
 
   /* Breakdown Swap */
