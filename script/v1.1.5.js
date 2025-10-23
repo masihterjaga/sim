@@ -6507,7 +6507,7 @@ const initA2HS = (() => {
     : init();
 })();
 const preventPullToRefresh = (() => {
-  if (!IS_PWA) return;
+  if (IS_PWA) return;
   
   const state = { lastY: 0, shouldPrevent: false };
   
