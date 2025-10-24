@@ -4772,7 +4772,7 @@ setupTooltips({
   "#elemCtrTips": "Tool assumes target is Neutral if you're not targeting any attribute.",
   "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus).",
   "#spearTips": "Value shown below represents the highest output during the buff's active period.",
-  "#flashTips": "The values below are normalized to 100% uptime because both flashes only last 10 seconds on a 20-second cooldown.",
+  "#flashTips": "The values below are normalized to 100% uptime because both flashes only last half the cooldown duration.",
   "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward arrow means lower."
 });
 
