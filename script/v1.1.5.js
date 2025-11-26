@@ -77,7 +77,8 @@ const VESPER_SET = {
   6: 56,
   7: 64,
   8: 72,
-  9: 80
+  9: 80,
+  10: 88
 };
 const BLUE_SET = {
   3: {
@@ -93,7 +94,8 @@ const BLUE_SET = {
     120: 27.5,
     130: 30,
     140: 32.5,
-    150: 35
+    150: 35,
+    160: 37.5
   },
   8: {
     30: 5,
@@ -108,7 +110,8 @@ const BLUE_SET = {
     120: 50,
     130: 55,
     140: 60,
-    150: 65
+    150: 65,
+    160: 70
 
   }
 };
@@ -117,7 +120,8 @@ const WHITE_SET = {
   "Tier 1": 36,
   "Tier 2": 42,
   "Tier 3": 48,
-  "Tier 4": 54
+  "Tier 4": 54,
+  "Tier 5": 60,
 };
 const ELEMENT_COUNTER_TABLE = {
   Neutral: {
