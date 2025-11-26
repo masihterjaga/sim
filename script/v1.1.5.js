@@ -2479,8 +2479,8 @@ class DropdownManager {
           ['dmgStackLabel', "Extra: Final Damage Stack %"]
         ]),
         dynamic: {
-          vesper: { 48: "BRO?!", 56: "REALLY?!", 64: "Wake UP!", 72: "STOP Dreaming!", 80: "F2P DETECTED!" },
-          white: { 36: "Eh?", 42: "WOW", 48: "GG!!", 54: "Have a Nice Day!" }
+          vesper: { 48: "???",56: "BRO?!", 64: "REALLY?!", 72: "Wake UP!", 80: "STOP Dreaming!", 88: "F2P DETECTED!" },
+          white: { 42: "Eh?", 48: "WOW", 54: "GG!!", 60: "Have a Nice Day!" }
         }
       },
 
@@ -4763,7 +4763,7 @@ setupTooltips({
   ".calcTips": "Don't expect too much! This tool calculates some RNG stats and buffs [ Examples: <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>Album#1</a>, <a href='#' class='job-sim' data-lightbox-gallery='new-version' data-lightbox-trigger>Album#2</a>].",
   //"#attackTypeTips": "This calculator has been tested with physical jobs (PEN). Calculations for magical or critical builds may vary slightly.",
   "#weaponTips": "Physical Suno or Meister can select weapons without size penalty, such as GS, Shuriken, or Book (Weapon Perfection passive).",
-  "#mvpminiTips": "DUMMY has no defense stat. Avg 130, Necro, Ogre, Ktul defs are less accurate than others!",
+  "#mvpminiTips": "DUMMY has no defense stat. Avg 130, Necro, Ogre, Ktul defs are less accurate than others! New boss (LHZ MAP) still waiting update from community!",
   "#targetRaceTips": "Selecting a specific MVP/Mini will <strong>automatically sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> to target a specific race.",
   "#targetAttrTips": "Same applies to race.",
   // "#blueTips": "Blue*8 in testing^^",
