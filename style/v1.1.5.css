@@ -420,7 +420,7 @@ button:disabled {
 }
 
 .table-wrapper::-webkit-scrollbar {
-  display: none;
+  /*display: none;*/
 }
 
 .table-wrapper table {
