@@ -1325,8 +1325,7 @@ const processMainCalculation = (() => {
     }
 
     isProcessing = true;
-    executionId++;
-    const currentId = executionId;
+    const currentId = ++executionId;
 
     updateUIState(true, "Calculating...");
 
@@ -1408,42 +1407,17 @@ function getCurrentCalculationState() {
 };
 function calculateMultiplier(state) {
   const {
-    atkType = '',
-      weapon = '',
-      wElem = '',
-      tDefKey = '',
-      tSize = '',
-      tRace = '',
-      tAttr = '',
-      baseAttack = 0,
-      flatDmg = 0,
-      percentageDmg = 0,
-      pen = 0,
-      crit = 0,
-      dmg = 0,
-      elemEnh = 0,
-      sizeEnh = 0,
-      race = 0,
-      attr = 0,
-      vesper = 0,
-      blue3 = 0,
-      blue8 = 0,
-      white = 0,
-      dmgStack = 0,
-      reaperValue = 0,
-      spearValue = 0
+    atkType = '', weapon = '', wElem = '', tDefKey = '', tSize = '', tRace = '', tAttr = '',
+    baseAttack = 0, flatDmg = 0, percentageDmg = 0, pen = 0, crit = 0, dmg = 0,
+    elemEnh = 0, sizeEnh = 0, race = 0, attr = 0, vesper = 0, blue3 = 0, blue8 = 0,
+    white = 0, dmgStack = 0, reaperValue = 0, spearValue = 0
   } = state;
   
   const toPercent = (val) => val / 100;
   
   const EXTRA_LABELS = {
-    vesper: 'Vesper',
-    blue3: 'BlueGroup3',
-    white: 'White',
-    dmgStack: 'Final DMG Bonus',
-    reaperValue: 'Reaper',
-    spearValue: 'Spear',
-    blue8: 'BlueGroup8'
+    vesper: 'Vesper', blue3: 'BlueGroup3', white: 'White', dmgStack: 'Final DMG Bonus',
+    reaperValue: 'Reaper', spearValue: 'Spear', blue8: 'BlueGroup8'
   };
   
   const { def, dmgred } = getTargetDefenseData(tDefKey);
@@ -1474,17 +1448,13 @@ function calculateMultiplier(state) {
     const items = [];
     const rawValues = [];
     
-    Object.entries(extrasMap).forEach(([key, value]) => {
+    for (const [key, value] of Object.entries(extrasMap)) {
       if (value > 0) {
         const normalized = toPercent(value);
-        items.push({
-          key: EXTRA_LABELS[key],
-          type,
-          value: normalized
-        });
+        items.push({ key: EXTRA_LABELS[key], type, value: normalized });
         rawValues.push(normalized);
       }
-    });
+    }
     
     const sum = rawValues.reduce((acc, val) => acc + val, 0);
     return { items, sum, factor: 1 + sum };
@@ -1538,15 +1508,12 @@ function calculateMultiplier(state) {
   const includeExtraThree = extra3.sum > 0;
   
   const buildFactorItem = (key, label, val, mult, options = {}) => ({
-    key,
-    label,
-    val,
-    mult,
-    ...options
+    key, label, val, mult, ...options
   });
   
   const factorList = [
-    buildFactorItem('attackAndType', isPenMode ? 'Attack + Type (PEN)' : 'Attack + Type (CRIT)', { baseAttack, flatDmg, percentageDmg, typeVal: isPenMode ? pen : crit, atkF, def }, step1, { isPenMode }),
+    buildFactorItem('attackAndType', isPenMode ? 'Attack + Type (PEN)' : 'Attack + Type (CRIT)', 
+      { baseAttack, flatDmg, percentageDmg, typeVal: isPenMode ? pen : crit, atkF, def }, step1, { isPenMode }),
     buildFactorItem('dmg', 'Final P/M DMG BNS', dmg, 1 + toPercent(effDmgVal)),
     buildFactorItem('elem', 'Element', elemEnh, elemCtr + toPercent(elemEnh), { extra: `counter ${elemCtr}` }),
     buildFactorItem('size', 'Size', sizeEnh, sizeMod + toPercent(sizeEnh), { extra: `mod ${sizeMod}` }),
@@ -1558,36 +1525,14 @@ function calculateMultiplier(state) {
     buildFactorItem('contribution', 'Flash Contribution', undefined, undefined, { show: pctSpear > 0 || pctReaper > 0 })
   ];
   
-  
   return {
-    mult,
-    pctSpear,
-    pctReaper,
-    pctReaperSpear,
-    def,
-    dmgred,
-    effDmgVal,
-    atkF,
-    sizeModifier: sizeMod,
-    elementCounter: elemCtr,
-    breakdownData: {
-      factorList,
-      isPenMode,
-      includeRace,
-      includeAttr,
-      includeExtra,
-      includeExtraTwo,
-      includeExtraThree
-    },
+    mult, pctSpear, pctReaper, pctReaperSpear, def, dmgred, effDmgVal, atkF,
+    sizeModifier: sizeMod, elementCounter: elemCtr,
+    breakdownData: { factorList, isPenMode, includeRace, includeAttr, includeExtra, includeExtraTwo, includeExtraThree },
     parts: {
-      baseMult: mult,
-      extraGroups: resultGroups,
-      extra1Factor: extra1.factor,
-      extra2Factor: extra2.factor,
-      extra3Factor: extra3.factor,
-      extra1Sum: extra1.sum,
-      extra2Sum: extra2.sum,
-      extra3Sum: extra3.sum
+      baseMult: mult, extraGroups: resultGroups,
+      extra1Factor: extra1.factor, extra2Factor: extra2.factor, extra3Factor: extra3.factor,
+      extra1Sum: extra1.sum, extra2Sum: extra2.sum, extra3Sum: extra3.sum
     }
   };
 };
@@ -1695,12 +1640,8 @@ function renderMultiplierBreakdown(calculationState) {
   const { factorList = [], isPenMode = false } = breakdownData;
 
   const LABELS = {
-    'Vesper': 'Vesper SET',
-    'BlueGroup3': 'Blue SET (Ferocity)',
-    'BlueGroup8': 'Blue SET',
-    'White': 'White SET (110*3)',
-    'Reaper': 'Reaper Scythe',
-    'Spear': 'Divinity#1 Flash: Spear of Eternity'
+    'Vesper': 'Vesper SET', 'BlueGroup3': 'Blue SET (Ferocity)', 'BlueGroup8': 'Blue SET',
+    'White': 'White SET (110*3)', 'Reaper': 'Reaper Scythe', 'Spear': 'Divinity#1 Flash: Spear of Eternity'
   };
 
   const extras = {
@@ -1977,6 +1918,8 @@ function renderMultiplierBreakdown(calculationState) {
   if (baseValue !== null) displayParts.push(fmt.withBase(baseValue, showFullPrecision));
   multipliers.forEach(m => displayParts.push(`× ${fmt.withMult(m, showFullPrecision)}`));
   
+  const multWithoutAttack = baseValue !== null ? mult / baseValue : mult;
+  
   const targetInfo = [tSize, tRace, tAttr].filter(Boolean).join(" + ");
   const bq1Text = `By default, every factor starts at ×1.00<button type='button' id='breakdownTips' class='tooltip-button'></button>\nNumbers`;
   const bq1Suffix = document.createTextNode(" how it changes with your stats.");
@@ -2004,6 +1947,7 @@ function renderMultiplierBreakdown(calculationState) {
       <div class="breakdown-swap-wrapper" id="swap-wrapper"></div>
       <p class="sum-head">Your basic attack to <i>${targetInfo} (${tDefKey})</i></p>
       <div class="last-calc">${displayParts.join(" ")}<br>≈${wrapCode(fmt.finalMult(mult, showFullPrecision))}<button type="button" id="attackTips" class="calcTips tooltip-button"></button></div>
+      <p>or if you're ignoring value of p/m attack, your base multiplier is consistently around ×${wrapCode(fmt.finalMult(multWithoutAttack, showFullPrecision))}</p>
       <blockquote class="noted">Real output depends on class, skills, buffs (vesper, blue, or white stack), and more. More accurate? Just use <a class="job-sim" target="_blank" href="//discord.com/channels/784407151342256148/909016309218561568/1407521807459811328">job sim!</a></blockquote>
     </div>`;
 
@@ -2031,7 +1975,6 @@ const RandomGenerator = (() => {
     reset: refill
   };
 })();
-
 const RECOMMENDATION_CONFIG = {
   randomMode: 'clamp',
   maxAttempts: 500,
@@ -2052,14 +1995,7 @@ const RECOMMENDATION_CONFIG = {
   ratioMin: 0.32,
   ratioMax: 0.64,
   ratioNoise: 0.12,
-  bias: { 
-    main: 1.0, 
-    dmg: 0.95, 
-    elem: 0.90, 
-    size: 0.90, 
-    race: 0.72, 
-    attr: 0.72 
-  },
+  bias: { main: 1.0, dmg: 0.95, elem: 0.90, size: 0.90, race: 0.72, attr: 0.72 },
   cats: [
     { label: '6-12%', min: 1.06, max: 1.12 },
     { label: '18-24%', min: 1.18, max: 1.24 },
@@ -2073,7 +2009,6 @@ const RECOMMENDATION_CONFIG = {
     { label: '510-720%', min: 6.10, max: 8.20 }
   ]
 };
-
 const calculateRecommendationWeights = (params) => {
   if (!AppState.get('isResultShown')) return;
   
@@ -2131,7 +2066,6 @@ const calculateRecommendationWeights = (params) => {
   
   return finalWeights;
 };
-
 function generateRecommendationTable(gameState) {
   if (!AppState.get('isResultShown')) return;
 
@@ -2140,10 +2074,6 @@ function generateRecommendationTable(gameState) {
   const showFullPrecision = resultContainer?.dataset?.showFullPrecision === "1";
   const fmt = PrecisionToggle.formatters;
 
-  // ========================================
-  // Helper Functions
-  // ========================================
-  
   const generateRandomValue = (baseValue, jitter = cfg.jitter) => {
     const { randomMode, clampMaxFraction, clampMaxAbsolute } = cfg;
 
@@ -2194,37 +2124,23 @@ function generateRecommendationTable(gameState) {
         : 'neutral';
   };
 
-  // ========================================
-  // Extract Game State
-  // ========================================
-  
   const isPenMode = gameState.atkType === 'pen';
   const { tRace, tAttr } = gameState;
   const raceVal = +gameState.race || 0;
   const attrVal = +gameState.attr || 0;
   const originalMult = +gameState.mult || 1;
   
-  // ========================================
-  // Toggle State
-  // ========================================
-  
   const raceToggleEl = document.getElementById('toggleRaceRec');
   const attrToggleEl = document.getElementById('toggleAttrRec');
   const raceToggleEnabled = raceToggleEl ? raceToggleEl.checked : true;
   const attrToggleEnabled = attrToggleEl ? attrToggleEl.checked : true;
   
-  // User memiliki input race/attr
   const hasRaceInput = !!(tRace && raceVal > 0);
   const hasAttrInput = !!(tAttr && attrVal > 0);
   
-  // Toggle menentukan apakah nilai akan di-randomize
   const shouldRandomizeRace = raceToggleEnabled && hasRaceInput;
   const shouldRandomizeAttr = attrToggleEnabled && hasAttrInput;
 
-  // ========================================
-  // User Stats
-  // ========================================
-  
   const userStats = {
     main: isPenMode ? (+gameState.pen || 0) : (+gameState.crit || 0),
     dmg: +gameState.dmg || 0,
@@ -2234,10 +2150,6 @@ function generateRecommendationTable(gameState) {
     race: hasRaceInput ? raceVal : 0
   };
 
-  // ========================================
-  // Calculate Weights (hanya untuk yang di-randomize)
-  // ========================================
-  
   const statWeights = calculateRecommendationWeights({
     includeRace: shouldRandomizeRace,
     includeAttr: shouldRandomizeAttr,
@@ -2249,10 +2161,6 @@ function generateRecommendationTable(gameState) {
     baseAttr: userStats.attr
   });
 
-  // ========================================
-  // Centered Values
-  // ========================================
-  
   const centeredValues = {
     main: userStats.main * (1 + statWeights.main * cfg.centerScale),
     dmg: userStats.dmg * (1 + statWeights.dmg * cfg.centerScale),
@@ -2260,10 +2168,6 @@ function generateRecommendationTable(gameState) {
     size: userStats.size * (1 + statWeights.size * cfg.centerScale)
   };
 
-  // ========================================
-  // Race/Attr Adjustments (hanya untuk yang di-randomize)
-  // ========================================
-  
   const adjustedRace = shouldRandomizeRace 
     ? applySmallValueAdjustment(userStats.race, userStats.race, userStats.attr) 
     : 0;
@@ -2282,10 +2186,6 @@ function generateRecommendationTable(gameState) {
     adjustedAttr
   };
 
-  // ========================================
-  // Determine Categories & Toggle Visibility
-  // ========================================
-  
   const userHasSmallCombined = hasRaceInput && hasAttrInput 
     && (raceVal + attrVal) > 0 
     && (raceVal + attrVal) < cfg.smallThreshold;
@@ -2297,22 +2197,14 @@ function generateRecommendationTable(gameState) {
     && (raceVal + attrVal) < cfg.smallThreshold;
   const categories = hasSmallCombined ? cfg.forSmallCats : cfg.cats;
 
-  // ========================================
-  // Table Headers
-  // ========================================
-  
   const mainStatLabel = isPenMode ? 'PEN' : 'CRIT';
   const columnHeaders = ['STAT', mainStatLabel, 'P/M BO', 'Element', 'Size'];
   
   if (hasRaceInput) columnHeaders.push('Race');
   if (hasAttrInput) columnHeaders.push('Attribute');
   
-  columnHeaders.push('Result', '\u2206');
+  columnHeaders.push('Result', 'Multiplier', '\u2206');
 
-  // ========================================
-  // Max Allowed Values (hanya untuk yang di-randomize)
-  // ========================================
-  
   const userTotal = userStats.race + userStats.attr;
   const boostedTotal = raceAttrValues.adjustedRace + raceAttrValues.adjustedAttr;
   const isSmallTotal = userTotal > 0 && userTotal < cfg.smallThreshold;
@@ -2327,10 +2219,6 @@ function generateRecommendationTable(gameState) {
     ? getMaxAllowedValue(userSingle, cfg.raceAttrSoloCap, cfg.raceAttrTol, isSmallSingle) 
     : 0;
 
-  // ========================================
-  // Calculation Parameters
-  // ========================================
-  
   const calcParams = {
     baseAttack: +gameState.baseAttack || 1,
     flatDmg: +gameState.flatDmg || 0,
@@ -2351,14 +2239,10 @@ function generateRecommendationTable(gameState) {
     spearValue: +gameState.spearValue || 0
   };
 
-  // ========================================
-  // Generate Tables
-  // ========================================
-  
   const tablesHTML = [];
   const headerRow = columnHeaders.map(h => `<th>${h}</th>`).join('');
 
-  for (let catIdx = 0, catLen = categories.length; catIdx < catLen; catIdx++) {
+  for (let catIdx = 0; catIdx < categories.length; catIdx++) {
     const category = categories[catIdx];
     const uniqueKeys = new Set();
     const uniqueDeltas = new Set();
@@ -2370,7 +2254,6 @@ function generateRecommendationTable(gameState) {
     while (acceptedRows.length < 5 && attempts < cfg.maxAttempts) {
       attempts++;
 
-      // Generate base stat values
       const statValues = {
         pen: +gameState.pen || 0,
         crit: +gameState.crit || 0,
@@ -2381,7 +2264,6 @@ function generateRecommendationTable(gameState) {
 
       statValues[isPenMode ? 'pen' : 'crit'] = generateRandomValue(centeredValues.main, currentJitter);
 
-      // Generate race/attr values
       let raceValue = 0, attrValue = 0;
 
       if (shouldRandomizeAttr && shouldRandomizeRace) {
@@ -2404,21 +2286,19 @@ function generateRecommendationTable(gameState) {
           Math.min(generateRandomValue(boostedSingle, currentJitter), maxSingle), 
           maxSingle
         );
-        attrValue = userStats.attr; // Pakai nilai user
+        attrValue = userStats.attr;
       } else if (shouldRandomizeAttr) {
-        raceValue = userStats.race; // Pakai nilai user
+        raceValue = userStats.race;
         attrValue = avoidCapLimit(
           Math.min(generateRandomValue(boostedSingle, currentJitter), maxSingle), 
           maxSingle
         );
       } else {
-        // Kedua toggle off, pakai nilai user
         raceValue = userStats.race;
         attrValue = userStats.attr;
       }
 
-      // Calculate multiplier (selalu pakai semua nilai termasuk race/attr)
-      const { mult: calculatedMult } = calculateMultiplier({
+      const calcResult = calculateMultiplier({
         ...calcParams,
         pen: +statValues.pen || 0,
         crit: +statValues.crit || 0,
@@ -2429,11 +2309,13 @@ function generateRecommendationTable(gameState) {
         attr: +attrValue || 0
       });
 
-      // Check if within category range
+      const calculatedMult = calcResult.mult;
+      const attackAndTypeFactor = calcResult.breakdownData?.factorList?.find(f => f.key === 'attackAndType')?.mult || 1;
+      const multWithoutAttack = calculatedMult / attackAndTypeFactor;
+
       const ratio = calculatedMult / originalMult;
       if (calculatedMult <= originalMult || ratio < category.min || ratio > category.max) continue;
 
-      // Round values
       const mainVal = avoidRoundTen(isPenMode ? statValues.pen : statValues.crit);
       const dmgVal = avoidRoundTen(statValues.dmg);
       const elemVal = avoidRoundTen(statValues.elemEnh);
@@ -2441,7 +2323,6 @@ function generateRecommendationTable(gameState) {
       const rVal = hasRaceInput ? avoidRoundTen(raceValue) : null;
       const aVal = hasAttrInput ? avoidRoundTen(attrValue) : null;
 
-      // Check uniqueness
       const rStr = rVal || '-';
       const aStr = aVal || '-';
       const rowKey = `${mainVal}|${dmgVal}|${elemVal}|${sizeVal}|${rStr}|${aStr}`;
@@ -2453,7 +2334,6 @@ function generateRecommendationTable(gameState) {
       const roundedDelta = Number(deltaPercent.toFixed(1));
       if (uniqueDeltas.has(roundedDelta)) continue;
 
-      // Skip if all values are higher than user's
       if (
         mainVal > userStats.main && 
         dmgVal > userStats.dmg && 
@@ -2463,7 +2343,6 @@ function generateRecommendationTable(gameState) {
         (hasAttrInput ? aVal > userStats.attr : true)
       ) continue;
 
-      // Accept row
       uniqueKeys.add(rowKey);
       uniqueDeltas.add(roundedDelta);
       uniqueComposites.add(compositeKey);
@@ -2476,10 +2355,10 @@ function generateRecommendationTable(gameState) {
         attr: aVal,
         race: rVal,
         newMultiplier: calculatedMult,
+        baseMultiplier: multWithoutAttack,
         deltaPercent
       });
 
-      // Increase jitter if needed
       if (acceptedRows.length < 5 && attempts % cfg.jitterStepEvery === 0) {
         currentJitter = Math.min(currentJitter + cfg.jitterStep, cfg.jitterMax);
       }
@@ -2487,14 +2366,12 @@ function generateRecommendationTable(gameState) {
 
     if (acceptedRows.length === 0) continue;
 
-    // Sort rows
     acceptedRows.sort((a, b) =>
       b.deltaPercent - a.deltaPercent || 
       b.newMultiplier - a.newMultiplier || 
       b.main - a.main
     );
 
-    // Build table rows
     const tableRows = acceptedRows.map((row, i) => {
       const cells = [
         `<td class="build">BUILD#${i + 1}</td>`,
@@ -2513,13 +2390,16 @@ function generateRecommendationTable(gameState) {
 
       cells.push(
         `<td class="mult">${fmt.finalMult(row.newMultiplier, showFullPrecision)}</td>`,
+        `<td class="mult-base">×${fmt.finalMult(row.baseMultiplier, showFullPrecision)}</td>`,
         `<td class="delta">+${row.deltaPercent.toFixed(1)}%</td>`
       );
 
       return `<tr>${cells.join('')}</tr>`;
     }).join('');
 
-    // Build "Your Stats" row
+    const userAttackAndTypeFactor = gameState.breakdownData?.factorList?.find(f => f.key === 'attackAndType')?.mult || 1;
+    const userMultWithoutAttack = gameState.mult / userAttackAndTypeFactor;
+
     const yourStatsCells = [
       '<td class="yours-label">YOURS</td>',
       `<td><span>${userStats.main}</span></td>`,
@@ -2528,21 +2408,17 @@ function generateRecommendationTable(gameState) {
       `<td><span>${userStats.size}</span></td>`
     ];
 
-    if (hasRaceInput) {
-      yourStatsCells.push(`<td><span>${userStats.race}</span></td>`);
-    }
-    if (hasAttrInput) {
-      yourStatsCells.push(`<td><span>${userStats.attr}</span></td>`);
-    }
+    if (hasRaceInput) yourStatsCells.push(`<td><span>${userStats.race}</span></td>`);
+    if (hasAttrInput) yourStatsCells.push(`<td><span>${userStats.attr}</span></td>`);
 
     yourStatsCells.push(
       `<td class="mult current-mult">${fmt.finalMult(gameState.mult, showFullPrecision)}</td>`,
+      `<td class="mult-base current-mult-base">×${fmt.finalMult(userMultWithoutAttack, showFullPrecision)}</td>`,
       `<td id="table-help" class="delta current-delta"><button type='button' id='tableTips' class='tooltip-button'></button></td>`
     );
 
     const yourStatsRow = `<tr class="your-stats-values">${yourStatsCells.join('')}</tr>`;
 
-    // Add table to collection
     tablesHTML.push(
       `<div class="table-wrapper">` +
         `<table class="recommend-table">` +
@@ -2554,10 +2430,6 @@ function generateRecommendationTable(gameState) {
     );
   }
 
-  // ========================================
-  // Build Toggle Controls
-  // ========================================
-  
   const toggleControlsHTML = `
     <div class="rec-controls" ${hideToggles ? 'style="display: none;"' : ''}>
       <p>Play with:</p>
@@ -2572,16 +2444,8 @@ function generateRecommendationTable(gameState) {
     </div>
   `;
 
-  // ========================================
-  // Render to DOM
-  // ========================================
-  
   DOM_ELEMENTS.rec.innerHTML = toggleControlsHTML + tablesHTML.join('');
 
-  // ========================================
-  // Bind Toggle Events
-  // ========================================
-  
   const recControls = DOM_ELEMENTS.rec.querySelector('.rec-controls');
   if (recControls) {
     EventManager.removeFromElement(recControls);
@@ -2594,7 +2458,6 @@ function generateRecommendationTable(gameState) {
     });
   }
 }
-
 const regenerateRecommendations = () => {
   if (AppState.get('isResultShown')) {
     generateRecommendationTable(getCurrentCalculationState());

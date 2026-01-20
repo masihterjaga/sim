@@ -7,7 +7,14 @@
         {
           "category": "Added",
           "items": [
-            "Race / Attribute checkbox in recommendation"
+            "Base Multiplier to breakdown & table",
+            "Race / Attribute checkbox to recommendation"
+          ]
+        },
+        {
+          "category": "Update",
+          "items": [
+            "Recommendation logic"
           ]
         }
 
