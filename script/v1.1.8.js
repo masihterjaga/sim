@@ -2031,6 +2031,7 @@ const RandomGenerator = (() => {
     reset: refill
   };
 })();
+
 const RECOMMENDATION_CONFIG = {
   randomMode: 'clamp',
   maxAttempts: 500,
@@ -2042,16 +2043,23 @@ const RECOMMENDATION_CONFIG = {
   clampMaxFraction: 3.5,
   clampMaxAbsolute: 0.20,
   upDownThreshold: 3,
-  raceAttrCap: 310,
-  raceAttrSoloCap: 250,
-  raceAttrTol: 6,
-  smallThreshold: 115,
-  smallMin: 85,
+  raceAttrCap: 510,
+  raceAttrSoloCap: 420,
+  raceAttrTol: 12,
+  smallThreshold: 144,
+  smallMin: 108,
   smallExp: 0.75,
   ratioMin: 0.32,
   ratioMax: 0.64,
   ratioNoise: 0.12,
-  bias: { main: 1.0, dmg: 0.95, elem: 0.90, size: 0.90, race: 0.72, attr: 0.72 },
+  bias: { 
+    main: 1.0, 
+    dmg: 0.95, 
+    elem: 0.90, 
+    size: 0.90, 
+    race: 0.72, 
+    attr: 0.72 
+  },
   cats: [
     { label: '6-12%', min: 1.06, max: 1.12 },
     { label: '18-24%', min: 1.18, max: 1.24 },
@@ -2065,6 +2073,7 @@ const RECOMMENDATION_CONFIG = {
     { label: '510-720%', min: 6.10, max: 8.20 }
   ]
 };
+
 const calculateRecommendationWeights = (params) => {
   if (!AppState.get('isResultShown')) return;
   
@@ -2122,6 +2131,7 @@ const calculateRecommendationWeights = (params) => {
   
   return finalWeights;
 };
+
 function generateRecommendationTable(gameState) {
   if (!AppState.get('isResultShown')) return;
 
@@ -2130,6 +2140,10 @@ function generateRecommendationTable(gameState) {
   const showFullPrecision = resultContainer?.dataset?.showFullPrecision === "1";
   const fmt = PrecisionToggle.formatters;
 
+  // ========================================
+  // Helper Functions
+  // ========================================
+  
   const generateRandomValue = (baseValue, jitter = cfg.jitter) => {
     const { randomMode, clampMaxFraction, clampMaxAbsolute } = cfg;
 
@@ -2147,21 +2161,24 @@ function generateRecommendationTable(gameState) {
       const normalValue = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
       return Math.max(0, baseValue * (1 + normalValue * jitter * 0.5));
     }
-
-    //return Math.max(0, baseValue * (1 + (RandomGenerator.get() * 2 - 1) * jitter));
   };
 
   const applySmallValueAdjustment = (value, raceValue, attrValue) => {
     const combinedTotal = raceValue + attrValue;
-    return (combinedTotal > 0 && combinedTotal < cfg.smallThreshold) ?
-      Math.max(Math.pow(value, cfg.smallExp), cfg.smallMin) : value;
+    return (combinedTotal > 0 && combinedTotal < cfg.smallThreshold)
+      ? Math.max(Math.pow(value, cfg.smallExp), cfg.smallMin)
+      : value;
   };
 
   const getMaxAllowedValue = (userValue, capLimit, tolerance, isSmall) =>
-    userValue >= capLimit ? (isSmall ? capLimit + tolerance : userValue + tolerance) : capLimit;
+    userValue >= capLimit 
+      ? (isSmall ? capLimit + tolerance : userValue + tolerance) 
+      : capLimit;
 
   const avoidCapLimit = (value, capLimit) =>
-    value < capLimit ? value : capLimit - (capLimit * (0.01 + RandomGenerator.get() * 0.02));
+    value < capLimit 
+      ? value 
+      : capLimit - (capLimit * (0.01 + RandomGenerator.get() * 0.02));
 
   const avoidRoundTen = (value) => {
     const rounded = Math.round(value);
@@ -2170,17 +2187,39 @@ function generateRecommendationTable(gameState) {
 
   const getCellClass = (currentValue, baseValue) => {
     const diff = Math.round(+currentValue || 0) - Math.round(+baseValue || 0);
-    return diff >= cfg.upDownThreshold ? 'up' : diff <= -cfg.upDownThreshold ? 'down' : 'neutral';
+    return diff >= cfg.upDownThreshold 
+      ? 'up' 
+      : diff <= -cfg.upDownThreshold 
+        ? 'down' 
+        : 'neutral';
   };
 
+  // ========================================
+  // Extract Game State
+  // ========================================
+  
   const isPenMode = gameState.atkType === 'pen';
   const { tRace, tAttr } = gameState;
   const raceVal = +gameState.race || 0;
   const attrVal = +gameState.attr || 0;
-  const shouldIncludeRace = !!(tRace && raceVal > 0);
-  const shouldIncludeAttr = !!(tAttr && attrVal > 0);
   const originalMult = +gameState.mult || 1;
+  
+  // ========================================
+  // Toggle State
+  // ========================================
+  
+  const raceToggleEl = document.getElementById('toggleRaceRec');
+  const attrToggleEl = document.getElementById('toggleAttrRec');
+  const raceToggleEnabled = raceToggleEl ? raceToggleEl.checked : true;
+  const attrToggleEnabled = attrToggleEl ? attrToggleEl.checked : true;
+  
+  const shouldIncludeRace = raceToggleEnabled && !!(tRace && raceVal > 0);
+  const shouldIncludeAttr = attrToggleEnabled && !!(tAttr && attrVal > 0);
 
+  // ========================================
+  // User Stats
+  // ========================================
+  
   const userStats = {
     main: isPenMode ? (+gameState.pen || 0) : (+gameState.crit || 0),
     dmg: +gameState.dmg || 0,
@@ -2190,6 +2229,10 @@ function generateRecommendationTable(gameState) {
     race: shouldIncludeRace ? raceVal : 0
   };
 
+  // ========================================
+  // Calculate Weights
+  // ========================================
+  
   const statWeights = calculateRecommendationWeights({
     includeRace: shouldIncludeRace,
     includeAttr: shouldIncludeAttr,
@@ -2201,6 +2244,10 @@ function generateRecommendationTable(gameState) {
     baseAttr: userStats.attr
   });
 
+  // ========================================
+  // Centered Values
+  // ========================================
+  
   const centeredValues = {
     main: userStats.main * (1 + statWeights.main * cfg.centerScale),
     dmg: userStats.dmg * (1 + statWeights.dmg * cfg.centerScale),
@@ -2208,40 +2255,79 @@ function generateRecommendationTable(gameState) {
     size: userStats.size * (1 + statWeights.size * cfg.centerScale)
   };
 
-  const raceAttrSum = userStats.race + userStats.attr;
-  const adjustedRace = shouldIncludeRace ? applySmallValueAdjustment(userStats.race, userStats.race, userStats.attr) : 0;
-  const adjustedAttr = shouldIncludeAttr ? applySmallValueAdjustment(userStats.attr, userStats.race, userStats.attr) : 0;
+  // ========================================
+  // Race/Attr Adjustments
+  // ========================================
+  
+  const adjustedRace = shouldIncludeRace 
+    ? applySmallValueAdjustment(userStats.race, userStats.race, userStats.attr) 
+    : 0;
+  const adjustedAttr = shouldIncludeAttr 
+    ? applySmallValueAdjustment(userStats.attr, userStats.race, userStats.attr) 
+    : 0;
 
   const raceAttrValues = {
-    race: shouldIncludeRace ? Math.min(adjustedRace * (1 + statWeights.race * cfg.centerScale), cfg.raceAttrCap) : 0,
-    attr: shouldIncludeAttr ? Math.min(adjustedAttr * (1 + statWeights.attr * cfg.centerScale), cfg.raceAttrCap) : 0,
+    race: shouldIncludeRace 
+      ? Math.min(adjustedRace * (1 + statWeights.race * cfg.centerScale), cfg.raceAttrCap) 
+      : 0,
+    attr: shouldIncludeAttr 
+      ? Math.min(adjustedAttr * (1 + statWeights.attr * cfg.centerScale), cfg.raceAttrCap) 
+      : 0,
     adjustedRace,
     adjustedAttr
   };
 
-  const hasSmallCombined = shouldIncludeRace && shouldIncludeAttr && raceAttrSum > 0 && raceAttrSum < cfg.smallThreshold;
+  // ========================================
+  // Determine Categories & Toggle Visibility
+  // ========================================
+  
+  const hasRaceInput = !!(tRace && raceVal > 0);
+  const hasAttrInput = !!(tAttr && attrVal > 0);
+  const userHasSmallCombined = hasRaceInput && hasAttrInput 
+    && (raceVal + attrVal) > 0 
+    && (raceVal + attrVal) < cfg.smallThreshold;
+  
+  const hideToggles = !userHasSmallCombined;
+  
+  const hasSmallCombined = shouldIncludeRace && shouldIncludeAttr 
+    && (raceVal + attrVal) > 0 
+    && (raceVal + attrVal) < cfg.smallThreshold;
   const categories = hasSmallCombined ? cfg.forSmallCats : cfg.cats;
 
+  // ========================================
+  // Table Headers
+  // ========================================
+  
   const mainStatLabel = isPenMode ? 'PEN' : 'CRIT';
   const columnHeaders = ['STAT', mainStatLabel, 'P/M BO', 'Element', 'Size'];
+  
   if (shouldIncludeRace) columnHeaders.push('Race');
   if (shouldIncludeAttr) columnHeaders.push('Attribute');
+  
   columnHeaders.push('Result', '\u2206');
 
-  const tablesHTML = [];
-  const headerRow = columnHeaders.map(h => `<th>${h}</th>`).join('');
-
+  // ========================================
+  // Max Allowed Values
+  // ========================================
+  
   const userTotal = userStats.race + userStats.attr;
   const boostedTotal = raceAttrValues.adjustedRace + raceAttrValues.adjustedAttr;
   const isSmallTotal = userTotal > 0 && userTotal < cfg.smallThreshold;
-  const maxTotal = shouldIncludeRace && shouldIncludeAttr ? getMaxAllowedValue(userTotal, cfg.raceAttrCap, cfg.raceAttrTol, isSmallTotal) : 0;
+  const maxTotal = shouldIncludeRace && shouldIncludeAttr 
+    ? getMaxAllowedValue(userTotal, cfg.raceAttrCap, cfg.raceAttrTol, isSmallTotal) 
+    : 0;
 
   const userSingle = shouldIncludeRace ? userStats.race : userStats.attr;
   const boostedSingle = shouldIncludeRace ? raceAttrValues.adjustedRace : raceAttrValues.adjustedAttr;
   const isSmallSingle = userSingle > 0 && userSingle < cfg.smallThreshold;
-  const maxSingle = (shouldIncludeRace || shouldIncludeAttr) && !(shouldIncludeRace && shouldIncludeAttr) ?
-    getMaxAllowedValue(userSingle, cfg.raceAttrSoloCap, cfg.raceAttrTol, isSmallSingle) : 0;
+  const maxSingle = (shouldIncludeRace || shouldIncludeAttr) && !(shouldIncludeRace && shouldIncludeAttr)
+    ? getMaxAllowedValue(userSingle, cfg.raceAttrSoloCap, cfg.raceAttrTol, isSmallSingle) 
+    : 0;
 
+  // ========================================
+  // Calculation Parameters
+  // ========================================
+  
   const calcParams = {
     baseAttack: +gameState.baseAttack || 1,
     flatDmg: +gameState.flatDmg || 0,
@@ -2262,6 +2348,13 @@ function generateRecommendationTable(gameState) {
     spearValue: +gameState.spearValue || 0
   };
 
+  // ========================================
+  // Generate Tables
+  // ========================================
+  
+  const tablesHTML = [];
+  const headerRow = columnHeaders.map(h => `<th>${h}</th>`).join('');
+
   for (let catIdx = 0, catLen = categories.length; catIdx < catLen; catIdx++) {
     const category = categories[catIdx];
     const uniqueKeys = new Set();
@@ -2274,6 +2367,7 @@ function generateRecommendationTable(gameState) {
     while (acceptedRows.length < 5 && attempts < cfg.maxAttempts) {
       attempts++;
 
+      // Generate base stat values
       const statValues = {
         pen: +gameState.pen || 0,
         crit: +gameState.crit || 0,
@@ -2284,10 +2378,14 @@ function generateRecommendationTable(gameState) {
 
       statValues[isPenMode ? 'pen' : 'crit'] = generateRandomValue(centeredValues.main, currentJitter);
 
+      // Generate race/attr values
       let raceValue = 0, attrValue = 0;
 
       if (shouldIncludeAttr && shouldIncludeRace) {
-        const randomTotal = avoidCapLimit(Math.min(generateRandomValue(boostedTotal, currentJitter), maxTotal), maxTotal);
+        const randomTotal = avoidCapLimit(
+          Math.min(generateRandomValue(boostedTotal, currentJitter), maxTotal), 
+          maxTotal
+        );
         const ratio = cfg.ratioMin + RandomGenerator.get() * (cfg.ratioMax - cfg.ratioMin);
         raceValue = randomTotal * ratio;
         attrValue = randomTotal * (1 - ratio);
@@ -2298,12 +2396,19 @@ function generateRecommendationTable(gameState) {
           raceValue *= scale;
           attrValue *= scale;
         }
-      } else if (shouldIncludeRace || shouldIncludeAttr) {
-        const generatedValue = avoidCapLimit(Math.min(generateRandomValue(boostedSingle, currentJitter), maxSingle), maxSingle);
-        if (shouldIncludeRace) raceValue = generatedValue;
-        else attrValue = generatedValue;
+      } else if (shouldIncludeRace) {
+        raceValue = avoidCapLimit(
+          Math.min(generateRandomValue(boostedSingle, currentJitter), maxSingle), 
+          maxSingle
+        );
+      } else if (shouldIncludeAttr) {
+        attrValue = avoidCapLimit(
+          Math.min(generateRandomValue(boostedSingle, currentJitter), maxSingle), 
+          maxSingle
+        );
       }
 
+      // Calculate multiplier
       const { mult: calculatedMult } = calculateMultiplier({
         ...calcParams,
         pen: +statValues.pen || 0,
@@ -2315,9 +2420,11 @@ function generateRecommendationTable(gameState) {
         attr: +attrValue || 0
       });
 
+      // Check if within category range
       const ratio = calculatedMult / originalMult;
       if (calculatedMult <= originalMult || ratio < category.min || ratio > category.max) continue;
 
+      // Round values
       const mainVal = avoidRoundTen(isPenMode ? statValues.pen : statValues.crit);
       const dmgVal = avoidRoundTen(statValues.dmg);
       const elemVal = avoidRoundTen(statValues.elemEnh);
@@ -2325,6 +2432,7 @@ function generateRecommendationTable(gameState) {
       const rVal = shouldIncludeRace ? avoidRoundTen(raceValue) : null;
       const aVal = shouldIncludeAttr ? avoidRoundTen(attrValue) : null;
 
+      // Check uniqueness
       const rStr = rVal || '-';
       const aStr = aVal || '-';
       const rowKey = `${mainVal}|${dmgVal}|${elemVal}|${sizeVal}|${rStr}|${aStr}`;
@@ -2336,9 +2444,17 @@ function generateRecommendationTable(gameState) {
       const roundedDelta = Number(deltaPercent.toFixed(1));
       if (uniqueDeltas.has(roundedDelta)) continue;
 
-      if (mainVal > userStats.main && dmgVal > userStats.dmg && elemVal > userStats.elem && sizeVal > userStats.size &&
-        (!shouldIncludeRace || rVal > userStats.race) && (!shouldIncludeAttr || aVal > userStats.attr)) continue;
+      // Skip if all values are higher than user's
+      if (
+        mainVal > userStats.main && 
+        dmgVal > userStats.dmg && 
+        elemVal > userStats.elem && 
+        sizeVal > userStats.size &&
+        (shouldIncludeRace ? rVal > userStats.race : true) && 
+        (shouldIncludeAttr ? aVal > userStats.attr : true)
+      ) continue;
 
+      // Accept row
       uniqueKeys.add(rowKey);
       uniqueDeltas.add(roundedDelta);
       uniqueComposites.add(compositeKey);
@@ -2354,6 +2470,7 @@ function generateRecommendationTable(gameState) {
         deltaPercent
       });
 
+      // Increase jitter if needed
       if (acceptedRows.length < 5 && attempts % cfg.jitterStepEvery === 0) {
         currentJitter = Math.min(currentJitter + cfg.jitterStep, cfg.jitterMax);
       }
@@ -2361,10 +2478,14 @@ function generateRecommendationTable(gameState) {
 
     if (acceptedRows.length === 0) continue;
 
+    // Sort rows
     acceptedRows.sort((a, b) =>
-      b.deltaPercent - a.deltaPercent || b.newMultiplier - a.newMultiplier || b.main - a.main
+      b.deltaPercent - a.deltaPercent || 
+      b.newMultiplier - a.newMultiplier || 
+      b.main - a.main
     );
 
+    // Build table rows
     const tableRows = acceptedRows.map((row, i) => {
       const cells = [
         `<td class="build">BUILD#${i + 1}</td>`,
@@ -2374,8 +2495,12 @@ function generateRecommendationTable(gameState) {
         `<td><span class="${getCellClass(row.size, userStats.size)}">${row.size}</span></td>`
       ];
 
-      if (shouldIncludeRace) cells.push(`<td><span class="${getCellClass(row.race, userStats.race)}">${row.race}</span></td>`);
-      if (shouldIncludeAttr) cells.push(`<td><span class="${getCellClass(row.attr, userStats.attr)}">${row.attr}</span></td>`);
+      if (shouldIncludeRace) {
+        cells.push(`<td><span class="${getCellClass(row.race, userStats.race)}">${row.race}</span></td>`);
+      }
+      if (shouldIncludeAttr) {
+        cells.push(`<td><span class="${getCellClass(row.attr, userStats.attr)}">${row.attr}</span></td>`);
+      }
 
       cells.push(
         `<td class="mult">${fmt.finalMult(row.newMultiplier, showFullPrecision)}</td>`,
@@ -2385,6 +2510,7 @@ function generateRecommendationTable(gameState) {
       return `<tr>${cells.join('')}</tr>`;
     }).join('');
 
+    // Build "Your Stats" row
     const yourStatsCells = [
       '<td class="yours-label">YOURS</td>',
       `<td><span>${userStats.main}</span></td>`,
@@ -2393,8 +2519,12 @@ function generateRecommendationTable(gameState) {
       `<td><span>${userStats.size}</span></td>`
     ];
 
-    if (shouldIncludeRace) yourStatsCells.push(`<td><span>${userStats.race}</span></td>`);
-    if (shouldIncludeAttr) yourStatsCells.push(`<td><span>${userStats.attr}</span></td>`);
+    if (shouldIncludeRace) {
+      yourStatsCells.push(`<td><span>${userStats.race}</span></td>`);
+    }
+    if (shouldIncludeAttr) {
+      yourStatsCells.push(`<td><span>${userStats.attr}</span></td>`);
+    }
 
     yourStatsCells.push(
       `<td class="mult current-mult">${fmt.finalMult(gameState.mult, showFullPrecision)}</td>`,
@@ -2403,13 +2533,59 @@ function generateRecommendationTable(gameState) {
 
     const yourStatsRow = `<tr class="your-stats-values">${yourStatsCells.join('')}</tr>`;
 
+    // Add table to collection
     tablesHTML.push(
-      `<div class="table-wrapper"><table class="recommend-table"><caption>Increase ${category.label}</caption><tr>${headerRow}</tr><tbody>${tableRows}${yourStatsRow}</tbody></table></div>`
+      `<div class="table-wrapper">` +
+        `<table class="recommend-table">` +
+          `<caption>Increase ${category.label}</caption>` +
+          `<tr>${headerRow}</tr>` +
+          `<tbody>${tableRows}${yourStatsRow}</tbody>` +
+        `</table>` +
+      `</div>`
     );
   }
 
-  DOM_ELEMENTS.rec.innerHTML = tablesHTML.join('');
-};
+  // ========================================
+  // Build Toggle Controls
+  // ========================================
+  
+  const toggleControlsHTML = `
+    <div class="rec-controls" ${hideToggles ? 'style="display: none;"' : ''}>
+      <p>Play with:</p>
+      <label class="rec-toggle">
+        <input type="checkbox" id="toggleRaceRec" ${shouldIncludeRace ? 'checked' : ''} ${!hasRaceInput ? 'disabled' : ''}>
+        <span>Race</span>
+      </label>
+      <label class="rec-toggle">
+        <input type="checkbox" id="toggleAttrRec" ${shouldIncludeAttr ? 'checked' : ''} ${!hasAttrInput ? 'disabled' : ''}>
+        <span>Attribute</span>
+      </label>
+    </div>
+  `;
+
+  // ========================================
+  // Render to DOM
+  // ========================================
+  
+  DOM_ELEMENTS.rec.innerHTML = toggleControlsHTML + tablesHTML.join('');
+
+  // ========================================
+  // Bind Toggle Events
+  // ========================================
+  
+  const recControls = DOM_ELEMENTS.rec.querySelector('.rec-controls');
+  if (recControls) {
+    EventManager.removeFromElement(recControls);
+    
+    EventManager.add(recControls, 'change', (e) => {
+      if (e.target.type === 'checkbox' && 
+         (e.target.id === 'toggleRaceRec' || e.target.id === 'toggleAttrRec')) {
+        regenerateRecommendations();
+      }
+    });
+  }
+}
+
 const regenerateRecommendations = () => {
   if (AppState.get('isResultShown')) {
     generateRecommendationTable(getCurrentCalculationState());

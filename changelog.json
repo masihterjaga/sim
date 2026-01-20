@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "1.1.8",
+      "date": "20 Jan, 2026",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "Race / Attribute checkbox in recommendation"
+          ]
+        }
+
+
+      ]
+    }, 
+    {
       "version": "1.1.7",
       "date": "26 Nov, 2025",
       "changes": [
