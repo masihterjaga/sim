@@ -2203,7 +2203,7 @@ function generateRecommendationTable(gameState) {
   if (hasRaceInput) columnHeaders.push('Race');
   if (hasAttrInput) columnHeaders.push('Attribute');
   
-  columnHeaders.push('Result', 'Multiplier', '\u2206');
+  columnHeaders.push('Multiplier', 'Result', '\u2206');
 
   const userTotal = userStats.race + userStats.attr;
   const boostedTotal = raceAttrValues.adjustedRace + raceAttrValues.adjustedAttr;
@@ -2389,8 +2389,8 @@ function generateRecommendationTable(gameState) {
       }
 
       cells.push(
-        `<td class="mult">${fmt.finalMult(row.newMultiplier, showFullPrecision)}</td>`,
         `<td class="mult-base">×${fmt.finalMult(row.baseMultiplier, showFullPrecision)}</td>`,
+        `<td class="mult">${fmt.finalMult(row.newMultiplier, showFullPrecision)}</td>`,
         `<td class="delta">+${row.deltaPercent.toFixed(1)}%</td>`
       );
 
@@ -2412,8 +2412,8 @@ function generateRecommendationTable(gameState) {
     if (hasAttrInput) yourStatsCells.push(`<td><span>${userStats.attr}</span></td>`);
 
     yourStatsCells.push(
-      `<td class="mult current-mult">${fmt.finalMult(gameState.mult, showFullPrecision)}</td>`,
       `<td class="mult-base current-mult-base">×${fmt.finalMult(userMultWithoutAttack, showFullPrecision)}</td>`,
+      `<td class="mult current-mult">${fmt.finalMult(gameState.mult, showFullPrecision)}</td>`,
       `<td id="table-help" class="delta current-delta"><button type='button' id='tableTips' class='tooltip-button'></button></td>`
     );
 
@@ -2457,7 +2457,7 @@ function generateRecommendationTable(gameState) {
       }
     });
   }
-}
+};
 const regenerateRecommendations = () => {
   if (AppState.get('isResultShown')) {
     generateRecommendationTable(getCurrentCalculationState());
