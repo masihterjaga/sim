@@ -2213,8 +2213,13 @@ function generateRecommendationTable(gameState) {
   const raceToggleEnabled = raceToggleEl ? raceToggleEl.checked : true;
   const attrToggleEnabled = attrToggleEl ? attrToggleEl.checked : true;
   
-  const shouldIncludeRace = raceToggleEnabled && !!(tRace && raceVal > 0);
-  const shouldIncludeAttr = attrToggleEnabled && !!(tAttr && attrVal > 0);
+  // User memiliki input race/attr
+  const hasRaceInput = !!(tRace && raceVal > 0);
+  const hasAttrInput = !!(tAttr && attrVal > 0);
+  
+  // Toggle menentukan apakah nilai akan di-randomize
+  const shouldRandomizeRace = raceToggleEnabled && hasRaceInput;
+  const shouldRandomizeAttr = attrToggleEnabled && hasAttrInput;
 
   // ========================================
   // User Stats
@@ -2225,17 +2230,17 @@ function generateRecommendationTable(gameState) {
     dmg: +gameState.dmg || 0,
     size: +gameState.sizeEnh || 0,
     elem: +gameState.elemEnh || 0,
-    attr: shouldIncludeAttr ? attrVal : 0,
-    race: shouldIncludeRace ? raceVal : 0
+    attr: hasAttrInput ? attrVal : 0,
+    race: hasRaceInput ? raceVal : 0
   };
 
   // ========================================
-  // Calculate Weights
+  // Calculate Weights (hanya untuk yang di-randomize)
   // ========================================
   
   const statWeights = calculateRecommendationWeights({
-    includeRace: shouldIncludeRace,
-    includeAttr: shouldIncludeAttr,
+    includeRace: shouldRandomizeRace,
+    includeAttr: shouldRandomizeAttr,
     baseMain: userStats.main,
     baseDmg: userStats.dmg,
     baseElem: userStats.elem,
@@ -2256,21 +2261,21 @@ function generateRecommendationTable(gameState) {
   };
 
   // ========================================
-  // Race/Attr Adjustments
+  // Race/Attr Adjustments (hanya untuk yang di-randomize)
   // ========================================
   
-  const adjustedRace = shouldIncludeRace 
+  const adjustedRace = shouldRandomizeRace 
     ? applySmallValueAdjustment(userStats.race, userStats.race, userStats.attr) 
     : 0;
-  const adjustedAttr = shouldIncludeAttr 
+  const adjustedAttr = shouldRandomizeAttr 
     ? applySmallValueAdjustment(userStats.attr, userStats.race, userStats.attr) 
     : 0;
 
   const raceAttrValues = {
-    race: shouldIncludeRace 
+    race: shouldRandomizeRace 
       ? Math.min(adjustedRace * (1 + statWeights.race * cfg.centerScale), cfg.raceAttrCap) 
       : 0,
-    attr: shouldIncludeAttr 
+    attr: shouldRandomizeAttr 
       ? Math.min(adjustedAttr * (1 + statWeights.attr * cfg.centerScale), cfg.raceAttrCap) 
       : 0,
     adjustedRace,
@@ -2281,15 +2286,13 @@ function generateRecommendationTable(gameState) {
   // Determine Categories & Toggle Visibility
   // ========================================
   
-  const hasRaceInput = !!(tRace && raceVal > 0);
-  const hasAttrInput = !!(tAttr && attrVal > 0);
   const userHasSmallCombined = hasRaceInput && hasAttrInput 
     && (raceVal + attrVal) > 0 
     && (raceVal + attrVal) < cfg.smallThreshold;
   
   const hideToggles = !userHasSmallCombined;
   
-  const hasSmallCombined = shouldIncludeRace && shouldIncludeAttr 
+  const hasSmallCombined = shouldRandomizeRace && shouldRandomizeAttr 
     && (raceVal + attrVal) > 0 
     && (raceVal + attrVal) < cfg.smallThreshold;
   const categories = hasSmallCombined ? cfg.forSmallCats : cfg.cats;
@@ -2301,26 +2304,26 @@ function generateRecommendationTable(gameState) {
   const mainStatLabel = isPenMode ? 'PEN' : 'CRIT';
   const columnHeaders = ['STAT', mainStatLabel, 'P/M BO', 'Element', 'Size'];
   
-  if (shouldIncludeRace) columnHeaders.push('Race');
-  if (shouldIncludeAttr) columnHeaders.push('Attribute');
+  if (hasRaceInput) columnHeaders.push('Race');
+  if (hasAttrInput) columnHeaders.push('Attribute');
   
   columnHeaders.push('Result', '\u2206');
 
   // ========================================
-  // Max Allowed Values
+  // Max Allowed Values (hanya untuk yang di-randomize)
   // ========================================
   
   const userTotal = userStats.race + userStats.attr;
   const boostedTotal = raceAttrValues.adjustedRace + raceAttrValues.adjustedAttr;
   const isSmallTotal = userTotal > 0 && userTotal < cfg.smallThreshold;
-  const maxTotal = shouldIncludeRace && shouldIncludeAttr 
+  const maxTotal = shouldRandomizeRace && shouldRandomizeAttr 
     ? getMaxAllowedValue(userTotal, cfg.raceAttrCap, cfg.raceAttrTol, isSmallTotal) 
     : 0;
 
-  const userSingle = shouldIncludeRace ? userStats.race : userStats.attr;
-  const boostedSingle = shouldIncludeRace ? raceAttrValues.adjustedRace : raceAttrValues.adjustedAttr;
+  const userSingle = shouldRandomizeRace ? userStats.race : userStats.attr;
+  const boostedSingle = shouldRandomizeRace ? raceAttrValues.adjustedRace : raceAttrValues.adjustedAttr;
   const isSmallSingle = userSingle > 0 && userSingle < cfg.smallThreshold;
-  const maxSingle = (shouldIncludeRace || shouldIncludeAttr) && !(shouldIncludeRace && shouldIncludeAttr)
+  const maxSingle = (shouldRandomizeRace || shouldRandomizeAttr) && !(shouldRandomizeRace && shouldRandomizeAttr)
     ? getMaxAllowedValue(userSingle, cfg.raceAttrSoloCap, cfg.raceAttrTol, isSmallSingle) 
     : 0;
 
@@ -2381,7 +2384,7 @@ function generateRecommendationTable(gameState) {
       // Generate race/attr values
       let raceValue = 0, attrValue = 0;
 
-      if (shouldIncludeAttr && shouldIncludeRace) {
+      if (shouldRandomizeAttr && shouldRandomizeRace) {
         const randomTotal = avoidCapLimit(
           Math.min(generateRandomValue(boostedTotal, currentJitter), maxTotal), 
           maxTotal
@@ -2396,19 +2399,25 @@ function generateRecommendationTable(gameState) {
           raceValue *= scale;
           attrValue *= scale;
         }
-      } else if (shouldIncludeRace) {
+      } else if (shouldRandomizeRace) {
         raceValue = avoidCapLimit(
           Math.min(generateRandomValue(boostedSingle, currentJitter), maxSingle), 
           maxSingle
         );
-      } else if (shouldIncludeAttr) {
+        attrValue = userStats.attr; // Pakai nilai user
+      } else if (shouldRandomizeAttr) {
+        raceValue = userStats.race; // Pakai nilai user
         attrValue = avoidCapLimit(
           Math.min(generateRandomValue(boostedSingle, currentJitter), maxSingle), 
           maxSingle
         );
+      } else {
+        // Kedua toggle off, pakai nilai user
+        raceValue = userStats.race;
+        attrValue = userStats.attr;
       }
 
-      // Calculate multiplier
+      // Calculate multiplier (selalu pakai semua nilai termasuk race/attr)
       const { mult: calculatedMult } = calculateMultiplier({
         ...calcParams,
         pen: +statValues.pen || 0,
@@ -2429,8 +2438,8 @@ function generateRecommendationTable(gameState) {
       const dmgVal = avoidRoundTen(statValues.dmg);
       const elemVal = avoidRoundTen(statValues.elemEnh);
       const sizeVal = avoidRoundTen(statValues.sizeEnh);
-      const rVal = shouldIncludeRace ? avoidRoundTen(raceValue) : null;
-      const aVal = shouldIncludeAttr ? avoidRoundTen(attrValue) : null;
+      const rVal = hasRaceInput ? avoidRoundTen(raceValue) : null;
+      const aVal = hasAttrInput ? avoidRoundTen(attrValue) : null;
 
       // Check uniqueness
       const rStr = rVal || '-';
@@ -2450,8 +2459,8 @@ function generateRecommendationTable(gameState) {
         dmgVal > userStats.dmg && 
         elemVal > userStats.elem && 
         sizeVal > userStats.size &&
-        (shouldIncludeRace ? rVal > userStats.race : true) && 
-        (shouldIncludeAttr ? aVal > userStats.attr : true)
+        (hasRaceInput ? rVal > userStats.race : true) && 
+        (hasAttrInput ? aVal > userStats.attr : true)
       ) continue;
 
       // Accept row
@@ -2495,10 +2504,10 @@ function generateRecommendationTable(gameState) {
         `<td><span class="${getCellClass(row.size, userStats.size)}">${row.size}</span></td>`
       ];
 
-      if (shouldIncludeRace) {
+      if (hasRaceInput) {
         cells.push(`<td><span class="${getCellClass(row.race, userStats.race)}">${row.race}</span></td>`);
       }
-      if (shouldIncludeAttr) {
+      if (hasAttrInput) {
         cells.push(`<td><span class="${getCellClass(row.attr, userStats.attr)}">${row.attr}</span></td>`);
       }
 
@@ -2519,10 +2528,10 @@ function generateRecommendationTable(gameState) {
       `<td><span>${userStats.size}</span></td>`
     ];
 
-    if (shouldIncludeRace) {
+    if (hasRaceInput) {
       yourStatsCells.push(`<td><span>${userStats.race}</span></td>`);
     }
-    if (shouldIncludeAttr) {
+    if (hasAttrInput) {
       yourStatsCells.push(`<td><span>${userStats.attr}</span></td>`);
     }
 
@@ -2553,11 +2562,11 @@ function generateRecommendationTable(gameState) {
     <div class="rec-controls" ${hideToggles ? 'style="display: none;"' : ''}>
       <p>Play with:</p>
       <label class="rec-toggle">
-        <input type="checkbox" id="toggleRaceRec" ${shouldIncludeRace ? 'checked' : ''} ${!hasRaceInput ? 'disabled' : ''}>
+        <input type="checkbox" id="toggleRaceRec" ${shouldRandomizeRace ? 'checked' : ''} ${!hasRaceInput ? 'disabled' : ''}>
         <span>Race</span>
       </label>
       <label class="rec-toggle">
-        <input type="checkbox" id="toggleAttrRec" ${shouldIncludeAttr ? 'checked' : ''} ${!hasAttrInput ? 'disabled' : ''}>
+        <input type="checkbox" id="toggleAttrRec" ${shouldRandomizeAttr ? 'checked' : ''} ${!hasAttrInput ? 'disabled' : ''}>
         <span>Attribute</span>
       </label>
     </div>
