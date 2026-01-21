@@ -1952,7 +1952,7 @@ function renderMultiplierBreakdown(calculationState) {
       <p class="sum-head">Your basic attack to <i>${targetInfo} (${tDefKey})</i></p>
       <div class="last-calc">${displayParts.join(" ")}<br>≈${wrapCode(fmt.finalMult(mult, showFullPrecision))}<button type="button" id="attackTips" class="calcTips tooltip-button"></button></div>
       <p>or if you're ignoring value of p/m attack, your base multiplier is consistently around ×${wrapCode(fmt.finalMult(multWithoutAttack, showFullPrecision))}</p>
-      <blockquote class="noted">Once again, that's just the base multiplier based on core-stats (fm/ppen, fp/mbo, element, size, race, attr).<br><br>Real output in the field can be different depending on job, skills, main-stat values (str, dex, vit, etc) and more.  You can also try <a class="job-sim" target="_blank" href="//discord.com/channels/784407151342256148/909016309218561568/1407521807459811328">job sim!</a></blockquote>
+      <blockquote class="noted">Once again, that's just the base multiplier based on core-stats (fm/ppen, fp/mbo, element, size, race, attr).<br><br>Real output in the field can be different depending on job, main-stat values (str, dex, vit, etc), skills, buffs (white, blue, vesper stack) and more.  You can also try <a class="job-sim" target="_blank" href="//discord.com/channels/784407151342256148/909016309218561568/1407521807459811328">job sim!</a></blockquote>
     </div>`;
 
   const bq1 = resultContainer.querySelector('.noted');
