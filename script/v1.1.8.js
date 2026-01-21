@@ -1918,7 +1918,11 @@ function renderMultiplierBreakdown(calculationState) {
   if (baseValue !== null) displayParts.push(fmt.withBase(baseValue, showFullPrecision));
   multipliers.forEach(m => displayParts.push(`× ${fmt.withMult(m, showFullPrecision)}`));
   
+  /**
   const multWithoutAttack = baseValue !== null ? mult / baseValue : mult;
+  **/
+  const rawAttack = calculationState.baseAttack || 1;
+  const multWithoutAttack = mult / rawAttack;
   
   const targetInfo = [tSize, tRace, tAttr].filter(Boolean).join(" + ");
   const bq1Text = `By default, every factor starts at ×1.00<button type='button' id='breakdownTips' class='tooltip-button'></button>\nNumbers`;
@@ -2310,9 +2314,13 @@ function generateRecommendationTable(gameState) {
       });
 
       const calculatedMult = calcResult.mult;
+      /**
       const attackAndTypeFactor = calcResult.breakdownData?.factorList?.find(f => f.key === 'attackAndType')?.mult || 1;
       const multWithoutAttack = calculatedMult / attackAndTypeFactor;
-
+      **/
+      const rawAttack = calcParams.baseAttack || 1;
+      const multWithoutAttack = calculatedMult / rawAttack;
+      
       const ratio = calculatedMult / originalMult;
       if (calculatedMult <= originalMult || ratio < category.min || ratio > category.max) continue;
 
@@ -2398,7 +2406,11 @@ function generateRecommendationTable(gameState) {
     }).join('');
 
     const userAttackAndTypeFactor = gameState.breakdownData?.factorList?.find(f => f.key === 'attackAndType')?.mult || 1;
+    /**
     const userMultWithoutAttack = gameState.mult / userAttackAndTypeFactor;
+    */
+    const userRawAttack = gameState.baseAttack || 1;
+    const userMultWithoutAttack = gameState.mult / userRawAttack;
 
     const yourStatsCells = [
       '<td class="yours-label">YOURS</td>',
