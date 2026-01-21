@@ -8,7 +8,8 @@
           "category": "Added",
           "items": [
             "Base Multiplier to breakdown & table",
-            "Race / Attribute checkbox to recommendation"
+            "Race / Attribute checkbox to recommendation",
+            "Flat & percentage dmg tooltip"
           ]
         },
         {

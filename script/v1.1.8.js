@@ -2529,7 +2529,7 @@ class DropdownManager {
           ['penLabel', "Final P/M. PEN %"],
           ['critLabel', "Critical DMG Bonus %"],
           ['atkLabel', "P/M. Attack"],
-          ['flatDmgBnsLabel', "P/M. Damage Bonus %"],
+          ['flatDmgBnsLabel', "P/M. Damage Bonus"],
           ['percentageDmgBnsLabel', "Percentage P/M. Damage Bonus"],
           ['elemEnhLabel', "Element Enhance %"],
           ['sizeLabel', "DMG to Size %"],
@@ -2569,8 +2569,8 @@ class DropdownManager {
         flatDmgBns: {
           type: 'nested-conditional',
           dependsOn: 'attack',
-          active: () => ({ label: 'P/M. Damage Bonus', placeholder: 'flat damage bonus...' }),
-          default: { label: "P/M. Damage Bonus", placeholder: "select attack type and fill attack first" }
+          active: () => ({ label: 'Flat P/M. Damage Bonus', placeholder: 'flat damage bonus...' }),
+          default: { label: "Flat P/M. Damage Bonus", placeholder: "select attack type and fill attack first" }
         },
         percentageDmgBns: {
           type: 'nested-conditional',
@@ -2580,12 +2580,12 @@ class DropdownManager {
         },
         race: {
           type: 'conditional', dependsOn: 'tRace',
-          active: (race) => ({ label: `DMG to ${race}`, placeholder: `dmg to ${race.toLowerCase()} %` }),
+          active: (race) => ({ label: `DMG to ${race}`, placeholder: `dmg to ${race.toLowerCase()}` }),
           default: { label: "DMG to Race", placeholder: "select target race first" }
         },
         attr: {
           type: 'conditional', dependsOn: 'tAttr',
-          active: (attr) => ({ label: `DMG to ${attr} Attribute`, placeholder: `dmg to ${attr.toLowerCase()} attribute %` }),
+          active: (attr) => ({ label: `DMG to ${attr} Attribute`, placeholder: `dmg to ${attr.toLowerCase()} attribute` }),
           default: { label: "DMG to Attribute", placeholder: "select target attribute first" }
         },
         elemEnh: {
@@ -2605,7 +2605,7 @@ class DropdownManager {
         },
         dmgStack: {
           type: 'conditional', dependsOn: 'atkType',
-          active: () => ({ placeholder: "final damage bonus/stack %" }),
+          active: () => ({ placeholder: "final damage bonus/stack" }),
           default: { placeholder: "select attack type first" }
         }
       },
@@ -3396,7 +3396,7 @@ class ValidationSSoT {
       createField('tSize', 'Target Size'),
       createField('attack', 'Attack', () => DOM_ELEMENTS.attack && !DOM_ELEMENTS.attack.disabled),
       createField('flatDmgBns', 'Flat Damage', () => DOM_ELEMENTS.flatDmgBns && !DOM_ELEMENTS.flatDmgBns.disabled),
-      createField('percentageDmgBns', 'Percentage Damage', () => DOM_ELEMENTS.percentageDmgBns && !DOM_ELEMENTS.percentageDmgBns.disabled),
+      createField('percentageDmgBns', 'Percentage Damage Bonus', () => DOM_ELEMENTS.percentageDmgBns && !DOM_ELEMENTS.percentageDmgBns.disabled),
       createField('pen', 'Final P/M. PEN %', () => DOM_ELEMENTS.atkType?.value === 'pen'),
       createField('crit', 'Critical DMG Bonus %', () => DOM_ELEMENTS.atkType?.value === 'crit'),
       createField('dmg', 'Final P/M. Damage Bonus %'),
@@ -4829,6 +4829,7 @@ setupTooltips({
   // "#blueTips": "Blue*8 in testing^^",
   "#whiteTips": "White set is RNG-based effects. This calculator uses displayed in-game values without normalization. Selecting this set shows maximum output when the Tough Resilience buff is active.",
   "#rawAttackTips": "If you're using the Vesper set, check your attack value when you reach 5 stacks, and make sure only vesper buff is active (<a href='#' data-lightbox-image='img/Calc_Tips_Atk.jpg' data-caption='make sure only vesper buff is active'>like this</a>).",
+  "#flatpercentDmgTips": "Don't want to find this stat value? just set it to 1, the difference isn't significant.",
   "#dmgRaceTips": "Unlocked when a target race is selected.Minimum valid value is 0. ",
   "#dmgAttrTips": "Same condition applies as damage to race.",
   "#dmgStackTips": "<strong>Final DMG Bonus</strong> and <strong>F. P/M DMG BONUS</strong> are <strong>different</strong>! Check your <strong>detailed stats</strong> where it shows as <strong>Final Damage Stack</strong> or <strong>Final Damage Bonus</strong>. Make sure you don't have any buffs active. Can't find it? Just set it to 0.",
