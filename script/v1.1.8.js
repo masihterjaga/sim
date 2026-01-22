@@ -2191,7 +2191,7 @@ function generateRecommendationTable(gameState) {
     && (raceVal + attrVal) > 0 
     && (raceVal + attrVal) < cfg.smallThreshold;
   
-  //const hideToggles = !userHasSmallCombined;
+  // const hideToggles = !userHasSmallCombined;
   const hideToggles = !(hasRaceInput || hasAttrInput);
   
   const hasSmallCombined = shouldRandomizeRace && shouldRandomizeAttr 
