@@ -1918,9 +1918,6 @@ function renderMultiplierBreakdown(calculationState) {
   if (baseValue !== null) displayParts.push(fmt.withBase(baseValue, showFullPrecision));
   multipliers.forEach(m => displayParts.push(`× ${fmt.withMult(m, showFullPrecision)}`));
   
-  /**
-  const multWithoutAttack = baseValue !== null ? mult / baseValue : mult;
-  **/
   const rawAttack = calculationState.baseAttack || 1;
   const multWithoutAttack = mult / rawAttack;
   
@@ -2194,7 +2191,8 @@ function generateRecommendationTable(gameState) {
     && (raceVal + attrVal) > 0 
     && (raceVal + attrVal) < cfg.smallThreshold;
   
-  const hideToggles = !userHasSmallCombined;
+  //const hideToggles = !userHasSmallCombined;
+  const hideToggles = !(hasRaceInput || hasAttrInput);
   
   const hasSmallCombined = shouldRandomizeRace && shouldRandomizeAttr 
     && (raceVal + attrVal) > 0 
@@ -2314,10 +2312,6 @@ function generateRecommendationTable(gameState) {
       });
 
       const calculatedMult = calcResult.mult;
-      /**
-      const attackAndTypeFactor = calcResult.breakdownData?.factorList?.find(f => f.key === 'attackAndType')?.mult || 1;
-      const multWithoutAttack = calculatedMult / attackAndTypeFactor;
-      **/
       const rawAttack = calcParams.baseAttack || 1;
       const multWithoutAttack = calculatedMult / rawAttack;
       
@@ -2342,18 +2336,6 @@ function generateRecommendationTable(gameState) {
       const roundedDelta = Number(deltaPercent.toFixed(1));
       if (uniqueDeltas.has(roundedDelta)) continue;
 
-      // here
-      /**
-       * 
-      if (
-        mainVal > userStats.main && 
-        dmgVal > userStats.dmg && 
-        elemVal > userStats.elem && 
-        sizeVal > userStats.size &&
-        (hasRaceInput ? rVal > userStats.race : true) && 
-        (hasAttrInput ? aVal > userStats.attr : true)
-      ) continue;
-      */
 // Collect stats that are being randomized
 const statsToCheck = [
   { val: mainVal, base: userStats.main },
@@ -2429,9 +2411,6 @@ if (allIncreased) continue;
     }).join('');
 
     const userAttackAndTypeFactor = gameState.breakdownData?.factorList?.find(f => f.key === 'attackAndType')?.mult || 1;
-    /**
-    const userMultWithoutAttack = gameState.mult / userAttackAndTypeFactor;
-    */
     const userRawAttack = gameState.baseAttack || 1;
     const userMultWithoutAttack = gameState.mult / userRawAttack;
 
