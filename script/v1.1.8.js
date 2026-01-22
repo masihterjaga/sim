@@ -2342,6 +2342,9 @@ function generateRecommendationTable(gameState) {
       const roundedDelta = Number(deltaPercent.toFixed(1));
       if (uniqueDeltas.has(roundedDelta)) continue;
 
+      // here
+      /**
+       * 
       if (
         mainVal > userStats.main && 
         dmgVal > userStats.dmg && 
@@ -2350,7 +2353,27 @@ function generateRecommendationTable(gameState) {
         (hasRaceInput ? rVal > userStats.race : true) && 
         (hasAttrInput ? aVal > userStats.attr : true)
       ) continue;
+      */
+// Collect stats that are being randomized
+const statsToCheck = [
+  { val: mainVal, base: userStats.main },
+  { val: dmgVal, base: userStats.dmg },
+  { val: elemVal, base: userStats.elem },
+  { val: sizeVal, base: userStats.size }
+];
 
+// Add race/attr only if they're being randomized
+if (shouldRandomizeRace && hasRaceInput) {
+  statsToCheck.push({ val: rVal, base: userStats.race });
+}
+if (shouldRandomizeAttr && hasAttrInput) {
+  statsToCheck.push({ val: aVal, base: userStats.attr });
+}
+
+// Check if all stats increased (reject if true)
+const allIncreased = statsToCheck.every(stat => stat.val > stat.base);
+if (allIncreased) continue;
+      
       uniqueKeys.add(rowKey);
       uniqueDeltas.add(roundedDelta);
       uniqueComposites.add(compositeKey);
