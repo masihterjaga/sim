@@ -1948,7 +1948,7 @@ function renderMultiplierBreakdown(calculationState) {
       <div class="breakdown-swap-wrapper" id="swap-wrapper"></div>
       <p class="sum-head">Your basic attack to <i>${targetInfo} (${tDefKey})</i></p>
       <div class="last-calc">${displayParts.join(" ")}<br>≈${wrapCode(fmt.finalMult(mult, showFullPrecision))}<button type="button" id="attackTips" class="calcTips tooltip-button"></button></div>
-      <p>or if you're ignoring value of attack, your base multiplier is consistently around ×${wrapCode(fmt.finalMult(multWithoutAttack, showFullPrecision))}<button type="button" id="multiplierTips" class="tooltip-button"></button></p>
+      <p>your base multiplier is consistently around ×${wrapCode(fmt.finalMult(multWithoutAttack, showFullPrecision))}<button type="button" id="multiplierTips" class="tooltip-button"></button></p>
       <blockquote class="noted">That's just base multiplier based on core-stats (fm/ppen, fp/mbo, element, size, dmg to race, dmg to attribute).<br><br>Real output in the field can be different depending on job, main-stat values (str, dex, vit, etc), skills, buffs (white, blue, vesper stack) and more. You can also try <a class="job-sim" target="_blank" href="//discord.com/channels/784407151342256148/909016309218561568/1407521807459811328">job sim!</a></blockquote>
     </div>`;
 
@@ -4840,7 +4840,7 @@ setupTooltips({
   "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus).",
   "#spearTips": "Value shown below represents the highest output during the buff's active period.",
   "#flashTips": "The values below are normalized to 100% uptime because both flashes only last half the cooldown duration.",
-  "#multiplierTips": "With current progress, your character's damage output will be multiplied by that number, like basic attack, skills, etc.",
+  "#multiplierTips": "With current progress, your character's damage output (basic attack, skills, etc) will be multiplied by that number.",
   "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward arrow means lower."
 });
 
