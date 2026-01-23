@@ -4840,7 +4840,7 @@ setupTooltips({
   "#reaperTips": "Whether the elements match (+84% Final DMG Bonus) or differ (+28% Final DMG Bonus).",
   "#spearTips": "Value shown below represents the highest output during the buff's active period.",
   "#flashTips": "The values below are normalized to 100% uptime because both flashes only last half the cooldown duration.",
-  "#multiplierTips": "All your character's damage output will be multiplied by that number, like basic attack, skills, etc.",
+  "#multiplierTips": "With current stats, your character's damage output will be multiplied by that number, like basic attack, skills, etc.",
   "#tableTips": "An upward arrow means higher than your stat, a square means roughly equal (±3%), and a downward arrow means lower."
 });
 
