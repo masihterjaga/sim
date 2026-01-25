@@ -1996,7 +1996,7 @@ const RECOMMENDATION_CONFIG = {
   ratioMin: 0.32,
   ratioMax: 0.64,
   ratioNoise: 0.12,
-  bias: { main: 1.0, dmg: 0.95, elem: 0.90, size: 0.90, race: 0.72, attr: 0.72 },
+  bias: { main: 0.93, dmg: 1, elem: 0.84, size: 0.84, race: 0.72, attr: 0.72 },
   cats: [
     { label: '6-12%', min: 1.06, max: 1.12 },
     { label: '18-24%', min: 1.18, max: 1.24 },
