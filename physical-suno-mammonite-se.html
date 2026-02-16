@@ -4,182 +4,246 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mammonite SE</title>
-<meta name="description" content="Mammonite I or II? which one deals more damage?"/>
-
+<meta name="description" content="Mammonite I or II? which one deals more damage?" />
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   body {
-    background: #111318;
+    background: #0f1117;
     color: #e2e8f0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    font-size: 13px;
+    font-size: 14px;
+    line-height: 1.6;
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 24px 16px;
+    padding: 40px 20px;
   }
 
   .card {
     background: #1a1d24;
-    border: 1px solid #2a2d36;
+    border: 1px solid #252830;
     border-radius: 16px;
-    padding: 32px 28px;
+    padding: 32px;
     width: 100%;
-    max-width: 380px;
+    max-width: 600px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .credit {
+    font-size: 11px;
+    color: #6b7280;
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  .credit a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .credit a:hover { 
+    color: #9ca3af;
+    text-decoration: underline;
   }
 
   h1 {
-    font-size: 18px;
+    font-size: 24px;
     font-weight: 700;
-    color: #fff;
-    margin-bottom: 4px;
+    color: #ffffff;
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
   }
 
   .desc {
-    font-size: 12px;
-    color: #8b92a5;
-    margin-bottom: 28px;
+    font-size: 13px;
+    color: #9ca3af;
+    margin-bottom: 32px;
   }
 
-  .field { margin-bottom: 18px; }
+  .input-section {
+    background: #111318;
+    border: 1px solid #252830;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .field { 
+    margin-bottom: 20px;
+  }
+
+  .field:last-of-type {
+    margin-bottom: 0;
+  }
 
   label {
     display: block;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
-    color: #8b92a5;
+    color: #d1d5db;
     margin-bottom: 8px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
   }
 
   select {
     width: 100%;
-    background: #111318;
+    background: #1a1d24;
     border: 1px solid #2a2d36;
-    border-radius: 10px;
+    border-radius: 8px;
     color: #e2e8f0;
     font-family: inherit;
     font-size: 13px;
-    padding: 11px 14px;
+    padding: 12px 14px;
     outline: none;
     cursor: pointer;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 14px center;
-    transition: border-color 0.2s;
+    transition: border-color 0.2s ease;
   }
 
-  select:focus { border-color: #f5a623; }
-
-  .sub {
-    font-size: 11px;
-    color: #555a6e;
-    margin-top: 5px;
+  select:focus { 
+    border-color: #f5a623;
   }
 
   button {
     width: 100%;
     background: #f5a623;
     border: none;
-    border-radius: 10px;
-    color: #111318;
+    border-radius: 8px;
+    color: #0f1117;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 700;
-    padding: 13px;
+    padding: 14px;
     cursor: pointer;
-    margin-top: 8px;
-    transition: background 0.2s, transform 0.1s;
+    transition: all 0.2s ease;
   }
 
-  button:hover { background: #fbb83f; }
-  button:active { transform: scale(0.98); }
+  button:hover { 
+    background: #fbb83f;
+  }
+  
+  button:active { 
+    transform: scale(0.98);
+  }
 
   .result {
     display: none;
-    margin-top: 24px;
-    border-top: 1px solid #2a2d36;
-    padding-top: 24px;
+    margin-top: 32px;
   }
 
-  .result.show { display: block; }
+  .result.show { 
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
 
   .swap-badge {
-    background: rgba(245,166,35,0.1);
-    border: 1px solid rgba(245,166,35,0.3);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-bottom: 16px;
+    background: rgba(245, 166, 35, 0.08);
+    border: 1.5px solid rgba(245, 166, 35, 0.25);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     user-select: none;
   }
 
-  .swap-badge:hover { background: rgba(245,166,35,0.15); }
+  .swap-badge:hover { 
+    background: rgba(245, 166, 35, 0.12);
+    border-color: rgba(245, 166, 35, 0.35);
+  }
 
   .swap-top {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    gap: 16px;
   }
 
   .swap-label {
-    font-size: 11px;
-    color: #555a6e;
+    font-size: 10px;
+    color: #9ca3af;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    font-weight: 600;
+    margin-bottom: 10px;
   }
 
   .swap-val {
-    font-size: 22px;
+    font-size: 32px;
     font-weight: 700;
     color: #f5a623;
-    margin-top: 2px;
+    letter-spacing: -0.5px;
+    line-height: 1;
   }
 
   .swap-hint {
     font-size: 11px;
-    color: #8b92a5;
-    margin-top: 2px;
+    color: #9ca3af;
+    margin-top: 8px;
   }
 
-  .swap-hint-tap { color: #e2e8f0; font-weight: 600; }
+  .swap-hint-tap { 
+    color: #f5a623;
+    font-weight: 600;
+  }
 
   .chevron {
-    color: #555a6e;
-    font-size: 11px;
-    transition: transform 0.25s;
+    color: #6b7280;
+    font-size: 12px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     flex-shrink: 0;
   }
 
-  .chevron.open { transform: rotate(180deg); }
+  .chevron.open { 
+    transform: rotate(180deg);
+  }
 
   .tips {
     display: none;
     background: #111318;
-    border: 1px solid #2a2d36;
-    border-radius: 10px;
+    border: 1px solid #252830;
+    border-radius: 8px;
     padding: 16px;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     font-size: 12px;
     line-height: 1.7;
-    color: #8b92a5;
+    color: #9ca3af;
   }
 
-  .tips.show { display: block; }
-  .tips strong { color: #e2e8f0; }
+  .tips.show { 
+    display: block;
+    animation: slideDown 0.3s ease;
+  }
+
+  @keyframes slideDown {
+    from { opacity: 0; max-height: 0; }
+    to { opacity: 1; max-height: 500px; }
+  }
+  
+  .tips strong { 
+    color: #e2e8f0;
+    font-weight: 600;
+  }
 
   .tips-row {
     display: flex;
-    gap: 8px;
-    margin-bottom: 8px;
+    gap: 10px;
+    margin-bottom: 10px;
   }
 
-  .tips-row:last-child { margin-bottom: 0; }
+  .tips-row:last-child { 
+    margin-bottom: 0;
+  }
 
   .tip-dot {
     width: 5px;
@@ -190,76 +254,168 @@
     margin-top: 6px;
   }
 
+  .stats-desc {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+  }
+
   .stats {
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+    margin-bottom: 24px;
   }
 
   .stat {
     background: #111318;
-    border: 1px solid #2a2d36;
-    border-radius: 10px;
-    padding: 12px 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    flex: 1;
+    border: 1px solid #252830;
+    border-radius: 8px;
+    padding: 16px 12px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .stat:hover {
+    background: #14161c;
+    border-color: #3a3d46;
+    transform: translateY(-2px);
+  }
+
+  .stat.active-m1 {
+    background: rgba(245, 166, 35, 0.12);
+    border-color: rgba(245, 166, 35, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(245, 166, 35, 0.2);
+  }
+
+  .stat.active-m2 {
+    background: rgba(74, 222, 128, 0.12);
+    border-color: rgba(74, 222, 128, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(74, 222, 128, 0.2);
+  }
+
+  .stat.active-swap {
+    background: rgba(96, 165, 250, 0.12);
+    border-color: rgba(96, 165, 250, 0.6);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(96, 165, 250, 0.2);
   }
 
   .stat-label {
-    font-size: 11px;
-    color: #555a6e;
+    font-size: 10px;
+    color: #9ca3af;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 8px;
   }
 
   .stat-val {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 700;
     color: #e2e8f0;
+    letter-spacing: -0.3px;
   }
 
-  .stat-val.gold { color: #f5a623; }
-  .stat-val.green { color: #4ade80; }
+  .stat-val.gold { 
+    color: #f5a623;
+  }
+  
+  .stat-val.green { 
+    color: #4ade80;
+  }
 
-  .stats-desc, .other-tools, .credit {
+  .chart-wrap {
+    border: 1px solid #252830;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #111318;
+    margin-bottom: 20px;
+  }
+
+  .chart-legend {
+    display: flex;
+    gap: 16px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #252830;
+    background: #0f1117;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     font-size: 11px;
-    color: #555a6e;
+    color: #d1d5db;
+    font-weight: 500;
   }
 
-  .credit { display: block; margin-bottom: 8px; }
-  .stats-desc { margin-bottom: 10px; }
-  .other-tools { margin-top: 12px; }
+  .legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
 
-  .credit a, .other-tools a {
+  .dot-m1   { background: #f5a623; }
+  .dot-m2   { background: #4ade80; }
+  .dot-swap { background: #60a5fa; }
+
+  canvas { 
+    width: 100%;
+    height: auto;
+    display: block;
+    padding: 0 8px 16px 16px;
+  }
+
+  .other-tools {
+    font-size: 11px;
+    color: #6b7280;
+    text-align: center;
+  }
+
+  .other-tools a {
+    color: #9ca3af;
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .other-tools a:hover { 
+    color: #e2e8f0;
     text-decoration: underline;
-    text-underline-offset: 2px;
   }
 
-  .credit a { color: #555a6e; }
-  .credit a:hover { color: #8b92a5; }
-  .other-tools a { color: #8b92a5; }
-  .other-tools a:hover { color: #e2e8f0; }
+  @media (max-width: 640px) {
+    body { padding: 24px 16px; }
+    .card { padding: 24px; }
+    h1 { font-size: 22px; }
+    .swap-val { font-size: 28px; }
+    .stats { gap: 8px; }
+    .stat { padding: 14px 10px; }
+    .stat-val { font-size: 18px; }
+  }
 </style>
 </head>
 <body>
 <div class="card">
-  <span class="credit">generated with <a href="https://claude.ai" target="_blank">Claude Sonnet 4.5</a></span>
-  <h1>Mammonite SE</h1>
+  <span class="credit">try my other tools: <a href="https://masihterjaga.github.io/sim" target="_blank">ratio calculator</a></span>
+  
+  <h1>Physical SUNO SE</h1>
   <p class="desc">Mammonite I or II? which one deals more damage?</p>
 
-  <div class="field">
-    <label>Mammonite I</label>
-    <select id="m1"></select>
-    <div class="sub">damage boost: <span id="m1val">—</span></div>
-  </div>
+  <div class="input-section">
+    <div class="field">
+      <label>Mammonite I</label>
+      <select id="m1"></select>
+    </div>
 
-  <div class="field">
-    <label>Mammonite II</label>
-    <select id="m2"></select>
-    <div class="sub">scales per 1% HP lost: <span id="m2val">—</span></div>
+    <div class="field">
+      <label>Mammonite II</label>
+      <select id="m2"></select>
+    </div>
   </div>
 
   <button onclick="calculate()">Calculate</button>
@@ -269,7 +425,7 @@
     <div class="swap-badge" onclick="toggleTips()">
       <div class="swap-top">
         <div>
-          <div class="swap-label">use / swap to Mammonite II when enemy HP hits</div>
+          <div class="swap-label">Start with Mammonite I then swap to Mammonite II when enemy HP hits</div>
           <div class="swap-val" id="swapHP">—</div>
           <div class="swap-hint" id="swapHint">—</div>
         </div>
@@ -283,86 +439,316 @@
       <div class="tips-row"><div class="tip-dot"></div><div id="tip3">—</div></div>
     </div>
 
-    <p class="stats-desc">below is the effective damage bonus of each Mammonite, assuming you use it the whole fight from full HP</p>
-
+    <p class="stats-desc">Assuming use the whole fight from full HP, below is the effective damage bonus of each Mammonite SE.</p>
+    
     <div class="stats">
-      <div class="stat">
+      <div class="stat" data-line="m1">
         <div class="stat-label">Mammonite I</div>
         <div class="stat-val gold" id="statM1">—</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-line="m2">
         <div class="stat-label">Mammonite II</div>
         <div class="stat-val" id="statM2">—</div>
       </div>
-      <div class="stat">
+      <div class="stat" data-line="swap">
         <div class="stat-label">Active Swap</div>
         <div class="stat-val green" id="statSwap">—</div>
       </div>
     </div>
 
-    <p class="other-tools">check out my other tools: <a href="https://masihterjaga.github.io/sim" target="_blank">ratio calculator</a></p>
+    <div class="chart-wrap">
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot dot-m1"></div>Mammonite I</div>
+        <div class="legend-item"><div class="legend-dot dot-m2"></div>Mammonite II</div>
+        <div class="legend-item"><div class="legend-dot dot-swap"></div>Active Swap</div>
+      </div>
+      <canvas id="chart"></canvas>
+    </div>
+
+    <p class="other-tools">by Silja [Odin - Nastia] generated with <a href="https://claude.ai" target="_blank">Claude Sonnet 4.5</a></p>
 
   </div>
 </div>
 
 <script>
+(function() {
+  'use strict';
+
   const m1Sel = document.getElementById('m1');
   const m2Sel = document.getElementById('m2');
+  const stats = document.querySelectorAll('.stat');
+  
+  let currentData = null;
+  let stickyHighlight = null;
+  let animFrame = null;
+  
+  const anim = { m1: { w: 2, o: 1 }, m2: { w: 2, o: 1 }, swap: { w: 3, o: 1 } };
+  const target = { m1: { w: 2, o: 1 }, m2: { w: 2, o: 1 }, swap: { w: 3, o: 1 } };
 
   for (let i = 1; i <= 11; i++) {
     const inc = 90 + (i - 1) * 30;
-    const o = document.createElement('option');
-    o.value = inc;
-    o.textContent = `Level ${i}  (+${inc}%)`;
-    if (i === 7) o.selected = true;
-    m1Sel.appendChild(o);
+    const opt = document.createElement('option');
+    opt.value = inc;
+    opt.textContent = `Level ${i}  (+${inc}%)`;
+    if (i === 7) opt.selected = true;
+    m1Sel.appendChild(opt);
   }
 
   for (let i = 1; i <= 7; i++) {
     const rate = 4.5 + (i - 1) * 1.5;
-    const o = document.createElement('option');
-    o.value = rate;
-    o.textContent = `Level ${i}  (${rate}% / 1% HP lost)`;
-    if (i === 3) o.selected = true;
-    m2Sel.appendChild(o);
+    const opt = document.createElement('option');
+    opt.value = rate;
+    opt.textContent = `Level ${i}  (${rate}% / 1% HP lost)`;
+    if (i === 3) opt.selected = true;
+    m2Sel.appendChild(opt);
   }
 
-  function updateSubs() {
-    document.getElementById('m1val').textContent = '+' + m1Sel.value + '%';
-    document.getElementById('m2val').textContent = m2Sel.value + '% / 1% HP lost';
-  }
-
-  m1Sel.addEventListener('change', updateSubs);
-  m2Sel.addEventListener('change', updateSubs);
-  updateSubs();
-
-  function gem2Integral(a, b, rate) {
+  const gem2Integral = (a, b, rate) => {
     if (b <= a) return 0;
     return (b - a) + (rate / 100) * (b * b - a * a) / 2;
-  }
+  };
 
-  function calculate() {
-    const gem1Pct    = parseFloat(m1Sel.value);
-    const gem2Rate   = parseFloat(m2Sel.value);
-    const gem1Mult   = 1 + gem1Pct / 100;
+  const animate = () => {
+    let needsUpdate = false;
+    const speed = 0.2;
+
+    ['m1', 'm2', 'swap'].forEach(k => {
+      const dw = Math.abs(anim[k].w - target[k].w);
+      const dop = Math.abs(anim[k].o - target[k].o);
+      
+      if (dw > 0.01) {
+        anim[k].w += (target[k].w - anim[k].w) * speed;
+        needsUpdate = true;
+      } else {
+        anim[k].w = target[k].w;
+      }
+      
+      if (dop > 0.01) {
+        anim[k].o += (target[k].o - anim[k].o) * speed;
+        needsUpdate = true;
+      } else {
+        anim[k].o = target[k].o;
+      }
+    });
+
+    if (currentData) drawChartFrame();
+    if (needsUpdate) animFrame = requestAnimationFrame(animate);
+  };
+
+  const setTargets = hl => {
+    const base = { m1: 2, m2: 2, swap: 3 };
+    
+    ['m1', 'm2', 'swap'].forEach(k => {
+      target[k].w = hl ? (k === hl ? base[k] * 2.2 : base[k]) : base[k];
+      target[k].o = hl ? (k === hl ? 1 : 0.2) : 1;
+    });
+
+    if (animFrame) cancelAnimationFrame(animFrame);
+    animFrame = requestAnimationFrame(animate);
+  };
+
+  const drawChartFrame = () => {
+    const { gem1Pct, gem2Rate, swapAtLost } = currentData;
+    const canvas = document.getElementById('chart');
+    const ctx = canvas.getContext('2d');
+    const gem1Mult = 1 + gem1Pct / 100;
+    const W = 700, H = 380;
+    const PAD = { top: 48, right: 80, bottom: 80, left: 88 };
+    
+    canvas.width = W;
+    canvas.height = H;
+    
+    const plotW = W - PAD.left - PAD.right;
+    const plotH = H - PAD.top - PAD.bottom;
+
+    const points = Array.from({ length: 201 }, (_, i) => {
+      const hpLost = i * 0.5;
+      const m2 = 1 + (gem2Rate / 100) * hpLost;
+      return { hpLost, m1: gem1Mult, m2, swap: hpLost < swapAtLost ? gem1Mult : m2 };
+    });
+
+    const maxY = Math.max(...points.map(p => Math.max(p.m1, p.m2)));
+    const minY = 1;
+    const xPos = v => PAD.left + (v / 100) * plotW;
+    const yPos = v => PAD.top + plotH - ((v - minY) / (maxY - minY)) * plotH;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.strokeStyle = '#1a1d24';
+    ctx.lineWidth = 1;
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '11px -apple-system, sans-serif';
+
+    for (let i = 0; i <= 5; i++) {
+      const val = minY + (i / 5) * (maxY - minY);
+      const y = yPos(val);
+      ctx.beginPath();
+      ctx.moveTo(PAD.left, y);
+      ctx.lineTo(W - PAD.right, y);
+      ctx.stroke();
+      ctx.textAlign = 'right';
+      ctx.fillText('×' + val.toFixed(2), PAD.left - 12, y + 4);
+    }
+
+    for (let i = 0; i <= 10; i++) {
+      const v = i * 10;
+      const x = xPos(v);
+      ctx.beginPath();
+      ctx.moveTo(x, PAD.top);
+      ctx.lineTo(x, H - PAD.bottom);
+      ctx.stroke();
+      ctx.textAlign = 'center';
+      ctx.fillText(v + '%', x, H - PAD.bottom + 20);
+    }
+
+    ctx.fillStyle = '#d1d5db';
+    ctx.font = 'bold 13px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Enemy HP Lost', W / 2, H - 8);
+    
+    ctx.save();
+    ctx.translate(18, H / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('Damage Multiplier', 0, 0);
+    ctx.restore();
+
+    const swapX = xPos(swapAtLost);
+    ctx.beginPath();
+    ctx.strokeStyle = '#f5a623';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.moveTo(swapX, PAD.top);
+    ctx.lineTo(swapX, H - PAD.bottom);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#f5a623';
+    ctx.font = 'bold 11px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('⟵ Swap Point', swapX, PAD.top - 12);
+
+    const drawLine = (k, c) => {
+      ctx.beginPath();
+      ctx.strokeStyle = c;
+      ctx.globalAlpha = anim[k].o;
+      ctx.lineWidth = anim[k].w;
+      ctx.lineJoin = 'round';
+      ctx.lineCap = 'round';
+      points.forEach((p, i) => {
+        i === 0 ? ctx.moveTo(xPos(p.hpLost), yPos(p[k])) : ctx.lineTo(xPos(p.hpLost), yPos(p[k]));
+      });
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    };
+
+    const lines = [
+      { k: 'm2', c: '#4ade80' },
+      { k: 'm1', c: '#f5a623' },
+      { k: 'swap', c: '#60a5fa' }
+    ];
+
+    const highlighted = lines.find(l => anim[l.k].w > (l.k === 'swap' ? 3.5 : 2.5));
+    lines.forEach(({ k, c }) => {
+      if (!highlighted || k !== highlighted.k) drawLine(k, c);
+    });
+    if (highlighted) drawLine(highlighted.k, highlighted.c);
+
+    const drawPoint = (hp, val, c, k) => {
+      ctx.globalAlpha = anim[k].o;
+      ctx.beginPath();
+      ctx.fillStyle = c;
+      ctx.arc(xPos(hp), yPos(val), 4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#111318';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    };
+
+    drawPoint(swapAtLost, gem1Mult, '#60a5fa', 'swap');
+    drawPoint(0, gem1Mult, '#f5a623', 'm1');
+    drawPoint(100, points[200].m2, '#4ade80', 'm2');
+    drawPoint(100, points[200].swap, '#60a5fa', 'swap');
+
+    ctx.font = 'bold 11px -apple-system, sans-serif';
+    ctx.textAlign = 'left';
+    
+    [
+      { y: yPos(gem1Mult), c: '#f5a623', t: '×' + gem1Mult.toFixed(2), k: 'm1' },
+      { y: yPos(points[200].m2), c: '#4ade80', t: '×' + points[200].m2.toFixed(2), k: 'm2' },
+      { y: yPos(points[200].swap), c: '#60a5fa', t: '×' + points[200].swap.toFixed(2), k: 'swap' }
+    ].forEach(({ y, c, t, k }) => {
+      ctx.globalAlpha = anim[k].o;
+      ctx.fillStyle = c;
+      ctx.fillText(t, W - PAD.right + 8, y + 4);
+    });
+    
+    ctx.globalAlpha = 1;
+  };
+
+  const updateHighlight = lk => {
+    stats.forEach(s => {
+      s.classList.remove('active-m1', 'active-m2', 'active-swap');
+      if (s.getAttribute('data-line') === lk) s.classList.add(`active-${lk}`);
+    });
+    setTargets(lk);
+  };
+
+  const clearHighlight = () => {
+    stats.forEach(s => s.classList.remove('active-m1', 'active-m2', 'active-swap'));
+    setTargets(null);
+  };
+
+  stats.forEach(s => {
+    s.addEventListener('mouseenter', e => {
+      if (stickyHighlight) return;
+      updateHighlight(e.currentTarget.getAttribute('data-line'));
+    });
+
+    s.addEventListener('mouseleave', () => {
+      if (stickyHighlight) return;
+      clearHighlight();
+    });
+
+    s.addEventListener('click', e => {
+      const lk = e.currentTarget.getAttribute('data-line');
+      if (stickyHighlight === lk) {
+        stickyHighlight = null;
+        clearHighlight();
+      } else {
+        stickyHighlight = lk;
+        updateHighlight(lk);
+      }
+    });
+  });
+
+  document.addEventListener('click', e => {
+    if (!stickyHighlight) return;
+    if (!e.target.closest('.stat')) {
+      stickyHighlight = null;
+      clearHighlight();
+    }
+  });
+
+  window.calculate = function() {
+    const gem1Pct = parseFloat(m1Sel.value);
+    const gem2Rate = parseFloat(m2Sel.value);
+    const gem1Mult = 1 + gem1Pct / 100;
     const swapAtLost = gem1Pct / gem2Rate;
-    const swapAtHP   = 100 - swapAtLost;
+    const swapAtHP = 100 - swapAtLost;
 
     if (swapAtLost >= 100) {
       alert('With this combo, Mammonite II never catches up to Mammonite I within normal HP range.');
       return;
     }
 
-    const effMult      = (gem1Mult * swapAtLost + gem2Integral(swapAtLost, 100, gem2Rate)) / 100;
+    const effMult = (gem1Mult * swapAtLost + gem2Integral(swapAtLost, 100, gem2Rate)) / 100;
     const gem2OnlyMult = gem2Integral(0, 100, gem2Rate) / 100;
-
-    const effPct      = ((effMult - 1) * 100).toFixed(1);
+    const effPct = ((effMult - 1) * 100).toFixed(1);
     const gem2OnlyPct = ((gem2OnlyMult - 1) * 100).toFixed(1);
 
-    document.getElementById('swapHP').textContent   = swapAtHP.toFixed(1) + '%';
+    document.getElementById('swapHP').textContent = swapAtHP.toFixed(1) + '%';
     document.getElementById('swapHint').innerHTML = `<span class="swap-hint-tap">tap for tips</span> · enemy lost ${swapAtLost.toFixed(1)}% HP already`;
-    document.getElementById('statM1').textContent   = '+' + gem1Pct + '%';
-    document.getElementById('statM2').textContent   = '+' + gem2OnlyPct + '%';
+    document.getElementById('statM1').textContent = '+' + gem1Pct + '%';
+    document.getElementById('statM2').textContent = '+' + gem2OnlyPct + '%';
     document.getElementById('statSwap').textContent = '+' + effPct + '%';
 
     document.getElementById('tip1').innerHTML = `if you only use <strong>Mammonite I</strong>, your bonus is consistent at +${gem1Pct}%`;
@@ -372,14 +758,18 @@
     document.getElementById('result').classList.add('show');
     document.getElementById('tips').classList.remove('show');
     document.getElementById('chevron').classList.remove('open');
-  }
+    
+    currentData = { gem1Pct, gem2Rate, swapAtLost };
+    drawChartFrame();
+  };
 
-  function toggleTips() {
+  window.toggleTips = function() {
     document.getElementById('tips').classList.toggle('show');
     document.getElementById('chevron').classList.toggle('open');
-  }
+  };
 
   calculate();
+})();
 </script>
 </body>
 </html>
