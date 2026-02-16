@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mammonite SE</title>
+<meta name="description" content="Mammonite I or II? which one deals more damage?"/>
+
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #111318;
+    color: #e2e8f0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 13px;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 16px;
+  }
+
+  .card {
+    background: #1a1d24;
+    border: 1px solid #2a2d36;
+    border-radius: 16px;
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 380px;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+
+  .desc {
+    font-size: 12px;
+    color: #8b92a5;
+    margin-bottom: 28px;
+  }
+
+  .field { margin-bottom: 18px; }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #8b92a5;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  select {
+    width: 100%;
+    background: #111318;
+    border: 1px solid #2a2d36;
+    border-radius: 10px;
+    color: #e2e8f0;
+    font-family: inherit;
+    font-size: 13px;
+    padding: 11px 14px;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23555a6e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    transition: border-color 0.2s;
+  }
+
+  select:focus { border-color: #f5a623; }
+
+  .sub {
+    font-size: 11px;
+    color: #555a6e;
+    margin-top: 5px;
+  }
+
+  button {
+    width: 100%;
+    background: #f5a623;
+    border: none;
+    border-radius: 10px;
+    color: #111318;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 13px;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.2s, transform 0.1s;
+  }
+
+  button:hover { background: #fbb83f; }
+  button:active { transform: scale(0.98); }
+
+  .result {
+    display: none;
+    margin-top: 24px;
+    border-top: 1px solid #2a2d36;
+    padding-top: 24px;
+  }
+
+  .result.show { display: block; }
+
+  .swap-badge {
+    background: rgba(245,166,35,0.1);
+    border: 1px solid rgba(245,166,35,0.3);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+    user-select: none;
+  }
+
+  .swap-badge:hover { background: rgba(245,166,35,0.15); }
+
+  .swap-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .swap-label {
+    font-size: 11px;
+    color: #555a6e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .swap-val {
+    font-size: 22px;
+    font-weight: 700;
+    color: #f5a623;
+    margin-top: 2px;
+  }
+
+  .swap-hint {
+    font-size: 11px;
+    color: #8b92a5;
+    margin-top: 2px;
+  }
+
+  .swap-hint-tap { color: #e2e8f0; font-weight: 600; }
+
+  .chevron {
+    color: #555a6e;
+    font-size: 11px;
+    transition: transform 0.25s;
+    flex-shrink: 0;
+  }
+
+  .chevron.open { transform: rotate(180deg); }
+
+  .tips {
+    display: none;
+    background: #111318;
+    border: 1px solid #2a2d36;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    line-height: 1.7;
+    color: #8b92a5;
+  }
+
+  .tips.show { display: block; }
+  .tips strong { color: #e2e8f0; }
+
+  .tips-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .tips-row:last-child { margin-bottom: 0; }
+
+  .tip-dot {
+    width: 5px;
+    height: 5px;
+    background: #f5a623;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .stat {
+    background: #111318;
+    border: 1px solid #2a2d36;
+    border-radius: 10px;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    flex: 1;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: #555a6e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-val {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e2e8f0;
+  }
+
+  .stat-val.gold { color: #f5a623; }
+  .stat-val.green { color: #4ade80; }
+
+  .stats-desc, .other-tools, .credit {
+    font-size: 11px;
+    color: #555a6e;
+  }
+
+  .credit { display: block; margin-bottom: 8px; }
+  .stats-desc { margin-bottom: 10px; }
+  .other-tools { margin-top: 12px; }
+
+  .credit a, .other-tools a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .credit a { color: #555a6e; }
+  .credit a:hover { color: #8b92a5; }
+  .other-tools a { color: #8b92a5; }
+  .other-tools a:hover { color: #e2e8f0; }
+</style>
+</head>
+<body>
+<div class="card">
+  <span class="credit">generated with <a href="https://claude.ai" target="_blank">Claude Sonnet 4.5</a></span>
+  <h1>Mammonite SE</h1>
+  <p class="desc">Mammonite I or II? which one deals more damage?</p>
+
+  <div class="field">
+    <label>Mammonite I</label>
+    <select id="m1"></select>
+    <div class="sub">damage boost: <span id="m1val">—</span></div>
+  </div>
+
+  <div class="field">
+    <label>Mammonite II</label>
+    <select id="m2"></select>
+    <div class="sub">scales per 1% HP lost: <span id="m2val">—</span></div>
+  </div>
+
+  <button onclick="calculate()">Calculate</button>
+
+  <div class="result" id="result">
+
+    <div class="swap-badge" onclick="toggleTips()">
+      <div class="swap-top">
+        <div>
+          <div class="swap-label">use / swap to Mammonite II when enemy HP hits</div>
+          <div class="swap-val" id="swapHP">—</div>
+          <div class="swap-hint" id="swapHint">—</div>
+        </div>
+        <div class="chevron" id="chevron">▼</div>
+      </div>
+    </div>
+
+    <div class="tips" id="tips">
+      <div class="tips-row"><div class="tip-dot"></div><div id="tip1">—</div></div>
+      <div class="tips-row"><div class="tip-dot"></div><div id="tip2">—</div></div>
+      <div class="tips-row"><div class="tip-dot"></div><div id="tip3">—</div></div>
+    </div>
+
+    <p class="stats-desc">below is the effective damage bonus of each Mammonite, assuming you use it the whole fight from full HP</p>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Mammonite I</div>
+        <div class="stat-val gold" id="statM1">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Mammonite II</div>
+        <div class="stat-val" id="statM2">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Active Swap</div>
+        <div class="stat-val green" id="statSwap">—</div>
+      </div>
+    </div>
+
+    <p class="other-tools">check out my other tools: <a href="https://masihterjaga.github.io/sim" target="_blank">ratio calculator</a></p>
+
+  </div>
+</div>
+
+<script>
+  const m1Sel = document.getElementById('m1');
+  const m2Sel = document.getElementById('m2');
+
+  for (let i = 1; i <= 11; i++) {
+    const inc = 90 + (i - 1) * 30;
+    const o = document.createElement('option');
+    o.value = inc;
+    o.textContent = `Level ${i}  (+${inc}%)`;
+    if (i === 7) o.selected = true;
+    m1Sel.appendChild(o);
+  }
+
+  for (let i = 1; i <= 7; i++) {
+    const rate = 4.5 + (i - 1) * 1.5;
+    const o = document.createElement('option');
+    o.value = rate;
+    o.textContent = `Level ${i}  (${rate}% / 1% HP lost)`;
+    if (i === 3) o.selected = true;
+    m2Sel.appendChild(o);
+  }
+
+  function updateSubs() {
+    document.getElementById('m1val').textContent = '+' + m1Sel.value + '%';
+    document.getElementById('m2val').textContent = m2Sel.value + '% / 1% HP lost';
+  }
+
+  m1Sel.addEventListener('change', updateSubs);
+  m2Sel.addEventListener('change', updateSubs);
+  updateSubs();
+
+  function gem2Integral(a, b, rate) {
+    if (b <= a) return 0;
+    return (b - a) + (rate / 100) * (b * b - a * a) / 2;
+  }
+
+  function calculate() {
+    const gem1Pct    = parseFloat(m1Sel.value);
+    const gem2Rate   = parseFloat(m2Sel.value);
+    const gem1Mult   = 1 + gem1Pct / 100;
+    const swapAtLost = gem1Pct / gem2Rate;
+    const swapAtHP   = 100 - swapAtLost;
+
+    if (swapAtLost >= 100) {
+      alert('With this combo, Mammonite II never catches up to Mammonite I within normal HP range.');
+      return;
+    }
+
+    const effMult      = (gem1Mult * swapAtLost + gem2Integral(swapAtLost, 100, gem2Rate)) / 100;
+    const gem2OnlyMult = gem2Integral(0, 100, gem2Rate) / 100;
+
+    const effPct      = ((effMult - 1) * 100).toFixed(1);
+    const gem2OnlyPct = ((gem2OnlyMult - 1) * 100).toFixed(1);
+
+    document.getElementById('swapHP').textContent   = swapAtHP.toFixed(1) + '%';
+    document.getElementById('swapHint').innerHTML = `<span class="swap-hint-tap">tap for tips</span> · enemy lost ${swapAtLost.toFixed(1)}% HP already`;
+    document.getElementById('statM1').textContent   = '+' + gem1Pct + '%';
+    document.getElementById('statM2').textContent   = '+' + gem2OnlyPct + '%';
+    document.getElementById('statSwap').textContent = '+' + effPct + '%';
+
+    document.getElementById('tip1').innerHTML = `if you only use <strong>Mammonite I</strong>, your bonus is consistent at +${gem1Pct}%`;
+    document.getElementById('tip2').innerHTML = `<strong>Mammonite II</strong> is conditional, depending on both level / target HP. M1 (+${gem1Pct}%) ${gem1Mult >= gem2OnlyMult ? 'still deals more damage than' : 'deals less damage than'} M2 (+${gem2OnlyPct}%).`;
+    document.getElementById('tip3').innerHTML = `<strong>active swap</strong> is always the best. no matter what level your Mammonite is, active swap will always maximize your damage at +${effPct}%. sometimes it's only a small difference, but it's still more damage.`;
+
+    document.getElementById('result').classList.add('show');
+    document.getElementById('tips').classList.remove('show');
+    document.getElementById('chevron').classList.remove('open');
+  }
+
+  function toggleTips() {
+    document.getElementById('tips').classList.toggle('show');
+    document.getElementById('chevron').classList.toggle('open');
+  }
+
+  calculate();
+</script>
+</body>
+</html>
