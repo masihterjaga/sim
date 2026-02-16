@@ -1,7 +1,8 @@
-const CACHE_NAME = 'rox-calc-v1.1.88809';
+const CACHE_NAME = 'rox-calc-v1.1.88889';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
+  '/sim/physical-suno-mammonite-se.html',
   '/sim/style/v1.1.5.css',
   '/sim/script/v1.1.8.js',
   '/sim/manifest.json',
