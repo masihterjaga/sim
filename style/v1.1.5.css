@@ -3135,3 +3135,73 @@ transform: rotate(-180deg);
   0%, 100% { opacity: 1; }
   50% { opacity: 0.8; }
 }
+
+
+/* ETC */
+.other-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.other-tools a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-normal);
+  color: var(--text-muted);
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 6px 12px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: .25s cubic-bezier(.4, 0, .2, 1);
+}
+
+.other-tools a:hover {
+  color: var(--label);
+  background: var(--hover-bg);
+  border-color: var(--text-subtle);
+  transform: translateY(-1px);
+}
+
+.other-tools a:active {
+  transform: translateY(0);
+  transition: transform .1s;
+}
+
+.other-tools a.is-new::before {
+  content: "NEW";
+  display: inline-flex;
+  align-items: center;
+  font-size: 9px;
+  font-weight: var(--font-weight-bold);
+  letter-spacing: .06em;
+  line-height: 1;
+  color: #fff;
+  background: var(--primary);
+  border-radius: 4px;
+  padding: 3px 5px 2px;
+  animation: 2s ease-in-out infinite newBadgePulse;
+}
+
+@keyframes newBadgePulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .6; }
+}
+
+@media (min-width: 480px) {
+  .other-tools {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .other-tools a {
+    font-size: var(--font-size-sm);
+    padding: 7px 14px;
+  }
+}
