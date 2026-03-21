@@ -64,9 +64,65 @@
   .other-tools a { color: #6b7280; text-decoration: none; transition: color .15s; }
   .other-tools a:hover { color: #9ca3af; }
   @media (max-width:640px) { body { padding: 20px 14px; } .card { padding: 24px; } h1 { font-size: 22px; } .swap-val { font-size: 26px; } .stats { gap: 6px; } .stat { padding: 12px 10px; } .stat-val { font-size: 18px; } }
+
+  /* ── PWA back-nav confirm modal ── */
+  .pwa-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.72);
+    z-index: 999;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 0 16px 28px;
+  }
+  .pwa-overlay.show { display: flex; }
+
+  .pwa-sheet {
+    background: #181b22;
+    border: 1px solid #20232c;
+    border-radius: 16px;
+    padding: 24px 20px 20px;
+    width: 100%; max-width: 420px;
+    animation: sheetUp .15s cubic-bezier(.25,1,.3,1);
+  }
+  @keyframes sheetUp { from { transform:translateY(20px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+  .pwa-sheet-title {
+    font-size: 15px; font-weight: 700; color: #f1f5f9;
+    margin-bottom: 6px; letter-spacing: -.2px;
+  }
+  .pwa-sheet-body {
+    font-size: 13px; color: #6b7280; margin-bottom: 20px; line-height: 1.55;
+  }
+  .pwa-sheet-body strong { color: #9ca3af; font-weight: 600; }
+  .pwa-actions { display: flex; gap: 10px; }
+  .pwa-btn {
+    flex: 1; padding: 12px; border-radius: 8px; font-family: inherit;
+    font-size: 13px; font-weight: 700; cursor: pointer;
+    border: none; transition: opacity .15s, transform .1s;
+    letter-spacing: .1px;
+  }
+  .pwa-btn:active { transform: scale(.98); opacity: .85; }
+  .pwa-btn-cancel { background: #20232c; color: #9ca3af; }
+  .pwa-btn-go     { background: #f5a623; color: #0d0f14; }
 </style>
 </head>
 <body>
+
+<!-- PWA back-nav modal -->
+<div class="pwa-overlay" id="pwaOverlay" role="dialog" aria-modal="true" aria-labelledby="pwaTitle">
+  <div class="pwa-sheet">
+    <div class="pwa-sheet-title" id="pwaTitle">Back to Main Page?</div>
+    <div class="pwa-sheet-body">
+      You'll be taken back to the <strong>main project</strong> (Ratio Calculator).
+    </div>
+    <div class="pwa-actions">
+      <button class="pwa-btn pwa-btn-cancel" id="pwaCancel">Stay here</button>
+      <button class="pwa-btn pwa-btn-go"     id="pwaGo">Go back</button>
+    </div>
+  </div>
+</div>
+
 <div class="card">
   <span class="credit">try my other tools: <a href="https://masihterjaga.github.io/sim">ratio calculator</a></span>
   <h1>Physical SUNO's SE</h1>
@@ -113,6 +169,36 @@
 <script>
 (() => {
   'use strict';
+
+  // ── PWA Back Navigation ──────────────────────────────────────────────────
+  const RATIO_URL = 'https://masihterjaga.github.io/sim';
+
+  // Detect standalone (PWA) mode — covers Android Chrome & iOS Safari
+  const isPWA = window.matchMedia('(display-mode: standalone)').matches
+             || window.navigator.standalone === true;
+
+  const overlay   = document.getElementById('pwaOverlay');
+  const btnCancel = document.getElementById('pwaCancel');
+  const btnGo     = document.getElementById('pwaGo');
+
+  const showModal = () => overlay.classList.add('show');
+  const hideModal = () => overlay.classList.remove('show');
+
+  btnCancel.addEventListener('click', hideModal);
+  btnGo.addEventListener('click', () => { window.location.href = RATIO_URL; });
+  overlay.addEventListener('click', e => { if (e.target === overlay) hideModal(); });
+
+  if (isPWA) {
+    history.pushState({ pwaGuard: true }, '');
+
+    window.addEventListener('popstate', () => {
+      // Re-push FIRST — sebelum apapun — untuk nutup race window
+      history.pushState({ pwaGuard: true }, '');
+      showModal();
+    });
+  }
+
+  // ── App Logic ────────────────────────────────────────────────────────────
 
   // DOM cache
   const m1Sel    = document.getElementById('m1');
