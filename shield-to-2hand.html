@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Transfer (Shield to 2Hand)</title>
+<meta name="description" content="Shield to 2H cost and expected result." />
+<style>
+:root {
+  --c-bg: #0c0d10;
+  --c-surface: #12141a;
+  --c-surface-2: #181b22;
+  --c-border: #1e2130;
+  --c-border-2: #252840;
+  --c-text: #c8ccda;
+  --c-muted: #58617a;
+  --c-dim: #363d55;
+  --c-accent: #f5a623;
+  --c-accent-dim: rgba(245,166,35,.12);
+  --c-accent-border: rgba(245,166,35,.28);
+  --c-green: #4ade80;
+  --c-green-dim: rgba(74,222,128,.1);
+  --gap-xs: 5px;
+  --gap-sm: 8px;
+  --gap-md: 13px;
+  --gap-lg: 21px;
+  --gap-xl: 34px;
+  --rad-sm: 5px;
+  --rad-md: 8px;
+  --rad-lg: 12px;
+  --font-ui: system-ui, sans-serif;
+  --font-mono: ui-monospace, monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+select, button, a, .enchant-line-bar, .cost-row, .slide-dot, .section {
+  transition: all .18s ease;
+}
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.6;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: var(--gap-xl) var(--gap-md);
+  min-height: 100vh;
+}
+
+.card {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--rad-lg);
+  padding: var(--gap-xl) var(--gap-lg);
+  width: 100%;
+  max-width: 460px;
+}
+
+.card-header { margin-bottom: var(--gap-xl); }
+
+h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #d6dced;
+  letter-spacing: -.6px;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--c-accent-dim);
+  border: 1px solid var(--c-accent-border);
+  border-radius: 20px;
+  padding: 2px 9px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-accent);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: var(--gap-md);
+}
+
+.subtitle {
+  font-size: 12.5px;
+  color: var(--c-muted);
+  line-height: 1.6;
+}
+
+.subtitle a {
+  color: #7c8fbe;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(124,143,190,.3);
+  transition: color .15s;
+}
+.subtitle a:hover { color: #9aabdc; }
+
+.section {
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: var(--rad-md);
+  padding: var(--gap-md);
+  margin-bottom: var(--gap-sm);
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-dim);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: var(--gap-sm);
+}
+
+.field { margin-bottom: var(--gap-sm); }
+.field:last-child { margin-bottom: 0; }
+
+label {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: var(--gap-xs);
+}
+
+select {
+  width: 100%;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border-2);
+  border-radius: var(--rad-sm);
+  color: var(--c-text);
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px var(--gap-xl) 7px var(--gap-md);
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%234a5070' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+select:focus { border-color: var(--c-accent-border); box-shadow: 0 0 0 3px rgba(245,166,35,.06); }
+select option { background: var(--c-surface-2); }
+
+.row { display: flex; gap: var(--gap-sm); }
+.row .field { flex: 1; margin-bottom: 0; }
+.row .field.wide { flex: 2; }
+
+.slot + .slot {
+  border-top: 1px solid var(--c-border);
+  padding-top: var(--gap-md);
+  margin-top: var(--gap-md);
+}
+
+.slot-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-dim);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: var(--gap-sm);
+}
+
+.btn-transfer {
+  width: 100%;
+  margin-top: var(--gap-lg);
+  padding: 13px;
+  background: #181b2a;
+  border: 1px solid #242940;
+  border-radius: var(--rad-md);
+  color: #7a84a8;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.btn-transfer:hover { background: #1e2336; border-color: #303a5c; color: #8f9bbf; }
+.btn-transfer:active { background: #141728; transform: scale(0.998); }
+
+.result {
+  display: none;
+  margin-top: var(--gap-lg);
+  border-radius: var(--rad-lg);
+  overflow: hidden;
+  border: 1px solid var(--c-border);
+}
+
+.result.visible { display: block; }
+
+.result-topbar {
+  background: #0a0b0f;
+  border-bottom: 1px solid var(--c-border);
+  padding: 10px var(--gap-md);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.result-topbar-label {
+  font-size: 16px;
+  font-weight: 700;
+  color: #d6dced;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.result-refine-block {
+  background: var(--c-bg);
+  padding: var(--gap-md);
+  border-bottom: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
+}
+
+.result-block-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .9px;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+}
+
+.result-block-desc {
+  font-size: 11px;
+  color: var(--c-dim);
+}
+
+.result-refine-value {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 600;
+  color: var(--c-accent);
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.result-refine-value span {
+  font-size: 13px;
+  color: var(--c-muted);
+  font-weight: 400;
+  letter-spacing: 0;
+  margin-left: 3px;
+}
+
+.result-enchant-section {
+  background: var(--c-bg);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.enchant-section-header {
+  padding: 10px var(--gap-md) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.enchant-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .9px;
+  text-transform: uppercase;
+}
+
+.slide-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+}
+
+.slide-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.slide-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-dim);
+  transition: background .2s, transform .2s;
+}
+
+.slide-dot.active {
+  background: var(--c-accent);
+  transform: scale(1.3);
+}
+
+.slide-arrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border-2);
+  color: var(--c-muted);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+}
+
+.slide-arrow:hover { background: #232840; color: var(--c-text); }
+.slide-arrow:disabled { opacity: .25; cursor: not-allowed; }
+
+.enchant-result-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.enchant-slider-track {
+  display: flex;
+  transition: transform .32s cubic-bezier(.4, 0, .2, 1);
+}
+
+.enchant-slide { min-width: 100%; padding: var(--gap-md); }
+
+.slide-mode-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #d6dced;
+  margin-bottom: 2px;
+}
+
+.slide-mode-sub {
+  font-size: 11px;
+  color: var(--c-muted);
+  line-height: 1.5;
+  margin-bottom: var(--gap-md);
+  padding-bottom: var(--gap-md);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.enchant-lines { display: flex; flex-direction: column; gap: 6px; }
+
+.enchant-line {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-md);
+}
+
+.enchant-line-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--c-dim);
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.enchant-line-bar {
+  flex: 1;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.enchant-line-city {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-text);
+}
+
+.enchant-line-lvl {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--c-accent);
+  background: var(--c-accent-dim);
+  border: 1px solid var(--c-accent-border);
+  border-radius: 3px;
+  padding: 1px 6px;
+  white-space: nowrap;
+}
+
+.enchant-line-empty {
+  font-size: 12px;
+  color: var(--c-dim);
+}
+
+.result-cost-section {
+  background: var(--c-bg);
+  padding: var(--gap-md);
+}
+
+.cost-section-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--gap-md);
+}
+
+.cost-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .9px;
+  text-transform: uppercase;
+}
+
+.poring-check-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+}
+
+.poring-check-label input[type="checkbox"] {
+  accent-color: var(--c-accent);
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+}
+
+.cost-rows { display: flex; flex-direction: column; gap: 1px; }
+
+.cost-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 10px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--rad-sm);
+  gap: var(--gap-sm);
+}
+
+.cost-row.total {
+  background: #10111a;
+  border-color: var(--c-border-2);
+  margin-top: 5px;
+}
+
+.cost-row-label {
+  font-size: 12px;
+  color: var(--c-muted);
+  flex: 1;
+  font-weight: 500;
+}
+
+.cost-row.total .cost-row-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-dim);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+}
+
+.cost-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 70px;
+}
+
+.cost-value {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: #b8bfcf;
+}
+
+.cost-value.dreamsand { color: var(--c-accent); }
+
+.cost-row.total .cost-value { font-size: 13px; color: #cdd2e2; }
+.cost-row.total .cost-value.dreamsand { font-size: 13px; color: var(--c-accent); }
+
+.cost-headers {
+  display: flex;
+  align-items: center;
+  padding: 0 10px var(--gap-xs);
+  gap: var(--gap-sm);
+}
+
+.cost-header-spacer { flex: 1; }
+
+.cost-header-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--c-dim);
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  min-width: 70px;
+  text-align: right;
+}
+
+.dreamsand-note {
+  font-size: 10px;
+  color: var(--c-dim);
+  margin-top: var(--gap-sm);
+  line-height: 1.5;
+}
+
+.info-toggle {
+  width: 100%;
+  padding: var(--gap-sm) var(--gap-md);
+  background: #0a0b0f;
+  border: none;
+  border-top: 1px solid var(--c-border);
+  color: var(--c-dim);
+  font-family: var(--font-ui);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .9px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: color .15s;
+}
+
+.info-toggle:hover { color: var(--c-muted); }
+
+.info-toggle-icon {
+  font-size: 9px;
+  transition: transform .2s;
+}
+
+.info-toggle-icon.open { transform: rotate(180deg); }
+
+.info-collapse {
+  display: none;
+  background: #0a0b0f;
+  border-top: 1px solid var(--c-border);
+  padding: var(--gap-md);
+  flex-direction: column;
+  gap: var(--gap-md);
+}
+
+.info-collapse.open { display: flex; }
+
+.info-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.info-section p {
+  font-size: 12px;
+  color: var(--c-muted);
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+.info-section p + p { margin-top: 5px; }
+
+.credit {
+  font-size: 11px;
+  color: var(--c-dim);
+  margin-top: var(--gap-lg);
+  letter-spacing: .2px;
+  font-weight: 400;
+}
+
+.credit a, .sheet {
+  color: var(--c-muted);
+  text-decoration: none;
+  transition: color .15s;
+}
+
+.credit a:hover { color: #9ca3af; }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="card-header">
+    <div class="badge">Shield » 2H</div>
+    <h1>Advanced Transfer</h1>
+    <p class="subtitle">Transfer cost & expected result (refine & enchant only)</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Shield Quality</div>
+    <div class="field">
+      <select id="sel-quality">
+        <option value="white">White</option>
+        <option value="blue">Blue</option>
+        <option value="gold">Gold</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Shield Refinement</div>
+    <div class="field"><select id="sel-refine"></select></div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Shield Enchantment</div>
+    <div id="enchant-slots"></div>
+  </div>
+
+  <button class="btn-transfer" id="btn-transfer">Calculate Transfer</button>
+
+  <div class="result" id="result-panel">
+
+    <div class="result-topbar">
+      <div class="result-topbar-label">Result in 2H</div>
+    </div>
+
+    <div class="result-refine-block">
+      <div>
+        <div class="result-block-label">Refine Level</div>
+        <div class="result-block-desc">Expected refine in 2H weapon</div>
+      </div>
+      <div class="result-refine-value" id="out-refine">—<span>/ 15</span></div>
+    </div>
+
+    <div class="result-enchant-section">
+      <div class="enchant-section-header">
+        <div class="enchant-section-title">Enchantment</div>
+        <div class="slide-nav">
+          <div class="slide-dots" id="slide-dots-container">
+            <div class="slide-dot active" id="dot-0"></div>
+            <div class="slide-dot" id="dot-1"></div>
+          </div>
+          <button class="slide-arrow" id="arrow-prev" disabled>&#8592;</button>
+          <button class="slide-arrow" id="arrow-next">&#8594;</button>
+        </div>
+      </div>
+
+      <div class="enchant-result-wrap">
+        <div class="enchant-slider-track" id="slider-track">
+
+          <div class="enchant-slide" id="slide-0">
+            <div class="slide-mode-title">Same City</div>
+            <div class="slide-mode-sub">Result if 1H line is empty</div>
+            <div class="enchant-lines">
+              <div class="enchant-line">
+                <div class="enchant-line-num">1</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s0-e1-city">—</span>
+                  <span class="enchant-line-lvl" id="s0-e1-lvl" style="display:none"></span>
+                </div>
+              </div>
+              <div class="enchant-line">
+                <div class="enchant-line-num">2</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s0-e2-city">—</span>
+                  <span class="enchant-line-lvl" id="s0-e2-lvl" style="display:none"></span>
+                </div>
+              </div>
+              <div class="enchant-line">
+                <div class="enchant-line-num">3</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s0-e3-city">—</span>
+                  <span class="enchant-line-lvl" id="s0-e3-lvl" style="display:none"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="enchant-slide" id="slide-1">
+            <div class="slide-mode-title">Highest Equivalent</div>
+            <div class="slide-mode-sub">Any city highest that reaches Lv.15.<br/>Enchant 1H with city below first (Lv.1 enough)</div>
+            <div class="enchant-lines">
+              <div class="enchant-line">
+                <div class="enchant-line-num">1</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s1-e1-city">—</span>
+                  <span class="enchant-line-lvl" id="s1-e1-lvl" style="display:none"></span>
+                </div>
+              </div>
+              <div class="enchant-line">
+                <div class="enchant-line-num">2</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s1-e2-city">—</span>
+                  <span class="enchant-line-lvl" id="s1-e2-lvl" style="display:none"></span>
+                </div>
+              </div>
+              <div class="enchant-line">
+                <div class="enchant-line-num">3</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s1-e3-city">—</span>
+                  <span class="enchant-line-lvl" id="s1-e3-lvl" style="display:none"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="result-cost-section">
+      <div class="cost-section-titlebar">
+        <div class="cost-section-title">Transfer Cost</div>
+        <label class="poring-check-label">
+          <input type="checkbox" id="chk-poring"> PORING DIAMOND
+        </label>
+      </div>
+      <div class="cost-headers">
+        <div class="cost-header-spacer"></div>
+        <div class="cost-header-label">Dias</div>
+        <div class="cost-header-label">Dreamsand</div>
+      </div>
+      <div class="cost-rows">
+        <div class="cost-row">
+          <div class="cost-row-label">Refine</div>
+          <div class="cost-col">
+            <div class="cost-value" id="out-refine-cost">—</div>
+          </div>
+          <div class="cost-col">
+            <div class="cost-value dreamsand" id="out-refine-dreamsand">—</div>
+          </div>
+        </div>
+        <div class="cost-row">
+          <div class="cost-row-label">Enchant</div>
+          <div class="cost-col">
+            <div class="cost-value" id="out-enchant-cost">—</div>
+          </div>
+          <div class="cost-col">
+            <div class="cost-value dreamsand" id="out-enchant-dreamsand">—</div>
+          </div>
+        </div>
+        <div class="cost-row total">
+          <div class="cost-row-label">Total</div>
+          <div class="cost-col">
+            <div class="cost-value" id="out-normal">—</div>
+          </div>
+          <div class="cost-col">
+            <div class="cost-value dreamsand" id="out-dreamsand">—</div>
+          </div>
+        </div>
+      </div>
+      <p class="dreamsand-note">Tip: Disable VIP Kafra discount when using Dreamsand to ensure a 0 Diamond cost.</p>
+    </div>
+
+    <button class="info-toggle" id="info-toggle">
+      <span>Note</span>
+      <span class="info-toggle-icon" id="info-toggle-icon">▾</span>
+    </button>
+    <div class="info-collapse" id="info-collapse">
+            <div class="info-section">
+        <div class="info-title">Refine</div>
+        <p>This tool assumes 1H is +0. If the 1H is already refined, results might differ. For Adv Transfer from Shield to 2H, ensure refine is only on the shield and quality (White/Blue/Gold) must match for all eq.</p>
+      </div>
+      <div class="info-section">
+        <div class="info-title">Enchant</div>
+        <p>Adv Transfer defaults to the lowest city if 1H and Shield cities differ.</p>
+        <p>Example:<br />
+        • Shield: Geffen Lv.14 | 1H: Empty » <b>Geffen 2H Lv.10</b><br />
+        • Shield: Geffen Lv.14 | 1H: Izlude Lv.1 » <b>Izlude 2H Lv.15</b><br />
+        (Note: Geffen Shield Lv.14 is equivalent to Izlude 2H Lv.15, full manual lookup <u><a class="sheet" href="https://docs.google.com/spreadsheets/d/1UEEdz_XBalhENtpItbL-IWi-Gm28naW5rNxzgYQXxH0/" target="_blank">here</a></u>)</p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <p class="credit">Prompted by Silja [Odin – Nastia] with <a href="https://claude.ai" target="_blank">Claude Sonnet 4.6</a>. Another tool: <a href="https://masihterjaga.github.io/sim">ratio calculator</a></p>
+</div>
+
+<script>
+const refineData={0:{white:{h1:0,h2:0},blue:{h1:0,h2:0},gold:{h1:0,h2:0}},1:{white:{h1:360,h2:540},blue:{h1:720,h2:1080},gold:{h1:1440,h2:2160}},2:{white:{h1:1080,h2:1620},blue:{h1:2160,h2:3240},gold:{h1:4320,h2:6480}},3:{white:{h1:3241,h2:4861},blue:{h1:6481,h2:9721},gold:{h1:12961,h2:19441}},4:{white:{h1:6121,h2:9181},blue:{h1:12241,h2:18361},gold:{h1:24481,h2:36721}},5:{white:{h1:13321,h2:19981},blue:{h1:26641,h2:39961},gold:{h1:53281,h2:79921}},6:{white:{h1:24841,h2:37261},blue:{h1:49681,h2:74521},gold:{h1:99361,h2:149041}},7:{white:{h1:50041,h2:75061},blue:{h1:100081,h2:150121},gold:{h1:200161,h2:300241}},8:{white:{h1:92341,h2:138511},blue:{h1:184681,h2:277021},gold:{h1:369361,h2:554041}},9:{white:{h1:171991,h2:257986},blue:{h1:343981,h2:515971},gold:{h1:687961,h2:1031941}},10:{white:{h1:307666,h2:461498},blue:{h1:615331,h2:922996},gold:{h1:1230661,h2:1845991}},11:{white:{h1:543578,h2:815367},blue:{h1:1087156,h2:1630733},gold:{h1:2174311,h2:3261466}},12:{white:{h1:929847,h2:1394770},blue:{h1:1859693,h2:2789539},gold:{h1:3719386,h2:5579078}},13:{white:{h1:1574050,h2:2361075},blue:{h1:3148099,h2:4722149},gold:{h1:6296198,h2:9444297}},14:{white:{h1:3163591,h2:4745386},blue:{h1:6327181,h2:9490771},gold:{h1:12654361,h2:18981541}},15:{white:{h1:7045319,h2:10567978},blue:{h1:14090637,h2:21135955},gold:{h1:28181273,h2:42271909}}};
+
+const enchantData={"Prontera":{0:{h1:0,h2:0},1:{h1:216,h2:324},2:{h1:648,h2:972},3:{h1:1297,h2:1945},4:{h1:2161,h2:3241},5:{h1:3889,h2:5833},6:{h1:6482,h2:9722},7:{h1:9938,h2:14906},8:{h1:14258,h2:21386},9:{h1:20738,h2:31106},10:{h1:29378,h2:44066},11:{h1:40178,h2:60266},12:{h1:53138,h2:79706},13:{h1:70418,h2:105626},14:{h1:92018,h2:138026},15:{h1:117940,h2:176910}},"Morroc":{0:{h1:0,h2:0},1:{h1:432,h2:648},2:{h1:1296,h2:1944},3:{h1:2593,h2:3889},4:{h1:4321,h2:6481},5:{h1:7777,h2:11665},6:{h1:12963,h2:19444},7:{h1:19875,h2:29812},8:{h1:28515,h2:42772},9:{h1:41475,h2:62212},10:{h1:58755,h2:88132},11:{h1:80355,h2:120532},12:{h1:106275,h2:159412},13:{h1:140835,h2:211252},14:{h1:184035,h2:276052},15:{h1:235880,h2:353819}},"Izlude Island":{0:{h1:0,h2:0},1:{h1:864,h2:1296},2:{h1:2592,h2:3888},3:{h1:5185,h2:7777},4:{h1:8641,h2:12961},5:{h1:15553,h2:23329},6:{h1:25925,h2:38887},7:{h1:39749,h2:59623},8:{h1:57029,h2:85543},9:{h1:82949,h2:124423},10:{h1:117509,h2:176263},11:{h1:160709,h2:241063},12:{h1:212549,h2:318823},13:{h1:281669,h2:422503},14:{h1:368069,h2:552103},15:{h1:471759,h2:707638}},"Alberta":{0:{h1:0,h2:0},1:{h1:864,h2:1296},2:{h1:2592,h2:3888},3:{h1:5185,h2:7777},4:{h1:8641,h2:12961},5:{h1:15553,h2:23329},6:{h1:25925,h2:38887},7:{h1:39749,h2:59623},8:{h1:57029,h2:85543},9:{h1:82949,h2:124423},10:{h1:117509,h2:176263},11:{h1:160709,h2:241063},12:{h1:212549,h2:318823},13:{h1:281669,h2:422503},14:{h1:368069,h2:552103},15:{h1:471759,h2:707638}},"Payon":{0:{h1:0,h2:0},1:{h1:1728,h2:2592},2:{h1:5184,h2:7776},3:{h1:10369,h2:15553},4:{h1:17281,h2:25921},5:{h1:31105,h2:46657},6:{h1:51849,h2:77773},7:{h1:79497,h2:119245},8:{h1:114057,h2:171085},9:{h1:165897,h2:248845},10:{h1:235017,h2:352525},11:{h1:321417,h2:482125},12:{h1:425097,h2:637645},13:{h1:563337,h2:845005},14:{h1:736137,h2:1104205},15:{h1:943518,h2:1415276}},"Geffen":{0:{h1:0,h2:0},1:{h1:3456,h2:5184},2:{h1:10368,h2:15552},3:{h1:20737,h2:31105},4:{h1:34561,h2:51841},5:{h1:62209,h2:93313},6:{h1:103697,h2:155546},7:{h1:158993,h2:238490},8:{h1:228113,h2:342170},9:{h1:331793,h2:497690},10:{h1:470033,h2:705050},11:{h1:642833,h2:964250},12:{h1:850193,h2:1275290},13:{h1:1126673,h2:1690010},14:{h1:1472273,h2:2208410},15:{h1:1887035,h2:2830552}},"Glast Heim":{0:{h1:0,h2:0},1:{h1:6912,h2:10368},2:{h1:20736,h2:31104},3:{h1:41473,h2:62209},4:{h1:69121,h2:103681},5:{h1:124417,h2:186625},6:{h1:207394,h2:311091},7:{h1:317986,h2:476979},8:{h1:456226,h2:684339},9:{h1:663586,h2:995379},10:{h1:940066,h2:1410099},11:{h1:1285666,h2:1928499},12:{h1:1700386,h2:2550579},13:{h1:2253346,h2:3380019},14:{h1:2944546,h2:4416819},15:{h1:3774069,h2:5661103}},"Comodo":{0:{h1:0,h2:0},1:{h1:10368,h2:15552},2:{h1:31104,h2:46656},3:{h1:62209,h2:93313},4:{h1:103681,h2:155521},5:{h1:186625,h2:279937},6:{h1:311091,h2:466636},7:{h1:476979,h2:715468},8:{h1:684339,h2:1026508},9:{h1:995379,h2:1493068},10:{h1:1410099,h2:2115148},11:{h1:1928499,h2:2892748},12:{h1:2550579,h2:3825868},13:{h1:3380019,h2:5070028},14:{h1:4416819,h2:6625228},15:{h1:5661103,h2:8491654}},"Umbala":{0:{h1:0,h2:0},1:{h1:15552,h2:23328},2:{h1:46656,h2:69984},3:{h1:93313,h2:139969},4:{h1:155521,h2:233281},5:{h1:279937,h2:419905},6:{h1:466636,h2:699953},7:{h1:715468,h2:1073201},8:{h1:1026508,h2:1539761},9:{h1:1493068,h2:2239601},10:{h1:2115148,h2:3172721},11:{h1:2892748,h2:4339121},12:{h1:3825868,h2:5738801},13:{h1:5070028,h2:7605041},14:{h1:6625228,h2:9937841},15:{h1:8491654,h2:12737481}},"Juno":{0:{h1:0,h2:0},1:{h1:23328,h2:34992},2:{h1:69984,h2:104976},3:{h1:139969,h2:209954},4:{h1:233281,h2:349922},5:{h1:419905,h2:629858},6:{h1:699953,h2:1049930},7:{h1:1073201,h2:1609802},8:{h1:1539761,h2:2309642},9:{h1:2239601,h2:3359402},10:{h1:3172721,h2:4759082},11:{h1:4339121,h2:6508682},12:{h1:5738801,h2:8608202},13:{h1:7605041,h2:11407562},14:{h1:9937841,h2:14906762},15:{h1:12737481,h2:19106222}}};
+
+const CITIES = Object.keys(enchantData);
+const SLOTS = [1, 2, 3];
+const el = id => document.getElementById(id);
+const fmt = n => Math.round(n).toLocaleString('en-US');
+const roundUp10k = v => Math.ceil(v / 10000) * 10000;
+const buildLevelOptions = () =>
+  `<option value="">—</option>` +
+  Array.from({length: 16}, (_, i) => `<option value="${i}">${i}</option>`).join('');
+
+const CITY_LABEL_MAP = {
+  'Izlude Island': 'Izlude/Alberta',
+  'Alberta':       'Izlude/Alberta',
+  'Morroc':        'Morroc/Einbroch',
+};
+
+let live = false;
+let currentSlide = 0;
+let TOTAL_SLIDES = 2;
+
+const CITY_SLIDE_DEFS = [
+  { key: 'pront',  city: 'Prontera',      title: 'Highest Level in Prontera',        sub: 'Enchant 1H in Prontera first (Lv.1 is enough)' },
+  { key: 'morroc', city: 'Morroc',        title: 'Highest Level in Morroc/Einbroch', sub: 'Enchant 1H in Morroc/Einbroch first (Lv.1 is enough)' },
+  { key: 'izlude', city: 'Izlude Island', title: 'Highest Level in Izlude/Alberta',  sub: 'Enchant 1H in Izlude/Alberta first (Lv.1 is enough)' },
+];
+
+function cityLabel(c) {
+  return CITY_LABEL_MAP[c] ?? c;
+}
+
+function parseEnchantResult(str) {
+  if (!str || str === '—') return null;
+  const m = str.match(/^(.+?)\s+Lv\.?(\d+)$/i);
+  if (!m) return null;
+  return { city: m[1].trim(), lvl: m[2] };
+}
+
+function setEnchantLineResult(cityId, lvlId, rawStr) {
+  const cityEl = el(cityId);
+  const lvlEl  = el(lvlId);
+
+  if (!rawStr || rawStr === '—') {
+    cityEl.textContent = '—';
+    cityEl.className = 'enchant-line-city enchant-line-empty';
+    lvlEl.style.display = 'none';
+    return;
+  }
+
+  const parsed = parseEnchantResult(rawStr);
+  if (!parsed) {
+    cityEl.textContent = rawStr;
+    cityEl.className = 'enchant-line-city';
+    lvlEl.style.display = 'none';
+    return;
+  }
+
+  cityEl.textContent = parsed.city;
+  cityEl.className = 'enchant-line-city';
+  lvlEl.textContent = 'Lv.' + parsed.lvl;
+  lvlEl.style.display = '';
+}
+
+function lookupRefine2H(h1Val, quality) {
+  const budget = h1Val / 2;
+  for (let lvl = 15; lvl >= 0; lvl--)
+    if (refineData[lvl][quality].h2 <= budget) return lvl;
+  return 0;
+}
+
+function lookupSameCity(city, lvl) {
+  if (!city || lvl === '') return '—';
+  const budget = enchantData[city][+lvl].h1 / 2;
+  for (let l = 15; l >= 0; l--)
+    if (enchantData[city][l].h2 <= budget) return `${cityLabel(city)} Lv.${l}`;
+  return '—';
+}
+
+function lookupHighestEquivLv15(city, lvl) {
+  if (!city || lvl === '') return '—';
+  const budget = enchantData[city][+lvl].h1 / 2;
+  for (let i = CITIES.length - 1; i >= 0; i--)
+    if (enchantData[CITIES[i]][15].h2 <= budget) return `${cityLabel(CITIES[i])} Lv.15`;
+  return '—';
+}
+
+function lookupInCity(targetCity, shieldCity, shieldLvl) {
+  if (!shieldCity || shieldLvl === '') return '—';
+  const budget = enchantData[shieldCity][+shieldLvl].h1 / 2;
+  for (let l = 15; l >= 1; l--)
+    if (enchantData[targetCity][l].h2 <= budget) return `${cityLabel(targetCity)} Lv.${l}`;
+  return '—';
+}
+
+function hasJuno58(slots) {
+  return slots.every(s => s && s.city === 'Juno' && s.lvl >= 5 && s.lvl <= 8);
+}
+
+function getSlots() {
+  return SLOTS.map(s => {
+    const city = el(`ench-city-${s}`).value;
+    const lvl  = el(`ench-lvl-${s}`).value;
+    return (city && lvl !== '') ? { city, lvl: +lvl } : null;
+  });
+}
+
+function equivIsMorrocOrHigher(r) {
+  return r !== '—' && r !== 'Prontera Lv.15';
+}
+
+function equivIsIzludeOrHigher(r) {
+  return r !== '—' && r !== 'Prontera Lv.15' && r !== 'Morroc/Einbroch Lv.15';
+}
+
+function buildEnchantSlots() {
+  el('enchant-slots').innerHTML = SLOTS.map(s => `
+    <div class="slot" id="slot-${s}">
+      <div class="slot-label">Line ${s}</div>
+      <div class="row">
+        <div class="field wide"><label>City</label>
+          <select id="ench-city-${s}">
+            <option value="">— none —</option>
+            ${CITIES.map(v => `<option value="${v}">${v}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Level</label>
+          <select id="ench-lvl-${s}" disabled>${buildLevelOptions()}</select>
+        </div>
+      </div>
+    </div>`).join('');
+
+  SLOTS.forEach(s => {
+    el(`ench-city-${s}`).addEventListener('change', ({ target }) => {
+      const lvlEl = el(`ench-lvl-${s}`);
+      lvlEl.innerHTML = buildLevelOptions();
+      lvlEl.disabled = !target.value;
+      if (live) calculate();
+      updateBtn();
+    });
+    el(`ench-lvl-${s}`).addEventListener('change', () => { if (live) calculate(); });
+  });
+}
+
+function renderDynamicSlides(defs) {
+  document.querySelectorAll('.dynamic-slide').forEach(s => s.remove());
+  document.querySelectorAll('.dynamic-dot').forEach(d => d.remove());
+  TOTAL_SLIDES = 2 + defs.length;
+
+  const dotsContainer = el('slide-dots-container');
+  defs.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = 'slide-dot dynamic-dot';
+    dot.id = `dot-${2 + i}`;
+    dotsContainer.appendChild(dot);
+  });
+
+  const track = el('slider-track');
+  const slots = getSlots();
+  defs.forEach((def, i) => {
+    const idx = 2 + i;
+    const div = document.createElement('div');
+    div.className = 'enchant-slide dynamic-slide';
+    div.id = `slide-${idx}`;
+    div.innerHTML = `
+      <div class="slide-mode-title">${def.title}</div>
+      <div class="slide-mode-sub">${def.sub}</div>
+      <div class="enchant-lines">
+        ${[1, 2, 3].map(j => `
+        <div class="enchant-line">
+          <div class="enchant-line-num">${j}</div>
+          <div class="enchant-line-bar">
+            <span class="enchant-line-city enchant-line-empty" id="ds${idx}-e${j}-city">—</span>
+            <span class="enchant-line-lvl" id="ds${idx}-e${j}-lvl" style="display:none"></span>
+          </div>
+        </div>`).join('')}
+      </div>`;
+    track.appendChild(div);
+    [1, 2, 3].forEach(j => {
+      const s = slots[j - 1];
+      const raw = s ? lookupInCity(def.city, s.city, s.lvl) : '—';
+      setEnchantLineResult(`ds${idx}-e${j}-city`, `ds${idx}-e${j}-lvl`, raw);
+    });
+  });
+
+  goSlide(Math.min(currentSlide, TOTAL_SLIDES - 1));
+}
+
+function calculate() {
+  const quality  = el('sel-quality').value;
+  const refineLvl = +el('sel-refine').value;
+  const slots    = getSlots();
+
+  const refH1       = refineData[refineLvl][quality].h1;
+  const enchH1Total = slots.reduce((sum, s) => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
+
+  el('out-refine').innerHTML = `+${lookupRefine2H(refH1, quality)}<span></span>`;
+
+  SLOTS.forEach(i => {
+    const s = slots[i - 1];
+    setEnchantLineResult(`s0-e${i}-city`, `s0-e${i}-lvl`, s ? lookupSameCity(s.city, s.lvl) : '—');
+    setEnchantLineResult(`s1-e${i}-city`, `s1-e${i}-lvl`, s ? lookupHighestEquivLv15(s.city, s.lvl) : '—');
+  });
+
+  const refineCost  = refH1 / 2;
+  const enchantCost = enchH1Total / 2;
+  const normalCost  = refineCost + enchantCost;
+  const poringChecked = el('chk-poring').checked;
+
+  const refineDias  = poringChecked ? Math.ceil(refineCost  * 0.1) : refineCost;
+  const enchantDias = poringChecked ? Math.ceil(enchantCost * 0.1) : enchantCost;
+  const normalDias  = poringChecked ? Math.ceil(normalCost  * 0.1) : normalCost;
+
+  el('out-refine-cost').textContent       = fmt(refineDias);
+  el('out-refine-dreamsand').textContent  = fmt(roundUp10k(refineDias));
+  el('out-enchant-cost').textContent      = fmt(enchantDias);
+  el('out-enchant-dreamsand').textContent = fmt(roundUp10k(enchantDias));
+  el('out-normal').textContent            = fmt(normalDias);
+  el('out-dreamsand').textContent         = fmt(roundUp10k(normalDias));
+
+  const activeSlots   = slots.filter(s => s);
+  const equivResults  = activeSlots.map(s => lookupHighestEquivLv15(s.city, s.lvl));
+  const hasActive     = activeSlots.length > 0;
+  const allPront15    = hasActive && equivResults.every(r => r === 'Prontera Lv.15');
+  const allMorroc15   = hasActive && equivResults.every(r => r === 'Morroc/Einbroch Lv.15');
+  const allIzlude15   = hasActive && equivResults.every(r => r === 'Izlude/Alberta Lv.15');
+  const allMorrocPlus = hasActive && equivResults.every(equivIsMorrocOrHigher);
+  const allIzludePlus = hasActive && equivResults.every(equivIsIzludeOrHigher);
+
+  const activeDefs = hasJuno58(slots)
+    ? CITY_SLIDE_DEFS.filter((_, i) => {
+        if (i === 0) return !allPront15 && !allMorrocPlus;
+        if (i === 1) return !allMorroc15 && !allIzludePlus;
+        return !allIzlude15;
+      })
+    : [];
+
+  renderDynamicSlides(activeDefs);
+  el('result-panel').classList.add('visible');
+}
+
+function goSlide(n) {
+  currentSlide = n;
+  el('slider-track').style.transform = `translateX(-${n * 100}%)`;
+  document.querySelectorAll('.slide-dot').forEach((dot, i) => dot.classList.toggle('active', i === n));
+  el('arrow-prev').disabled = n === 0;
+  el('arrow-next').disabled = n === TOTAL_SLIDES - 1;
+}
+
+function updateBtn() {
+  const refineOk = !!el('sel-refine').value;
+  const enchOk = SLOTS.every(s => {
+    const city = el(`ench-city-${s}`).value;
+    const lvl  = el(`ench-lvl-${s}`).value;
+    return (!city && !lvl) || (city && lvl !== '');
+  });
+  const ready = refineOk && enchOk;
+  const btn = el('btn-transfer');
+  btn.disabled      = !ready;
+  btn.style.opacity = ready ? '1' : '0.4';
+  btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+}
+
+buildEnchantSlots();
+
+el('sel-refine').innerHTML =
+  `<option value="">— none —</option>` +
+  Array.from({length: 16}, (_, i) => `<option value="${i}">${i}</option>`).join('');
+
+updateBtn();
+
+el('chk-poring').addEventListener('change', () => { if (live) calculate(); });
+el('sel-refine').addEventListener('change', updateBtn);
+SLOTS.forEach(s => {
+  el(`ench-city-${s}`).addEventListener('change', updateBtn);
+  el(`ench-lvl-${s}`).addEventListener('change', updateBtn);
+});
+
+el('btn-transfer').addEventListener('click', () => {
+  live = true;
+  calculate();
+  el('btn-transfer').style.display = 'none';
+  el('sel-quality').addEventListener('change', calculate);
+  el('sel-refine').addEventListener('change', calculate);
+  SLOTS.forEach(s => {
+    el(`ench-city-${s}`).addEventListener('change', calculate);
+    el(`ench-lvl-${s}`).addEventListener('change', calculate);
+  });
+});
+
+el('arrow-prev').addEventListener('click', () => goSlide(Math.max(0, currentSlide - 1)));
+el('arrow-next').addEventListener('click', () => goSlide(Math.min(TOTAL_SLIDES - 1, currentSlide + 1)));
+
+const track = el('slider-track');
+let touchStartX = 0;
+track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+track.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) <= 40) return;
+  dx < 0
+    ? goSlide(Math.min(TOTAL_SLIDES - 1, currentSlide + 1))
+    : goSlide(Math.max(0, currentSlide - 1));
+}, { passive: true });
+
+el('info-toggle').addEventListener('click', () => {
+  const collapse = el('info-collapse');
+  const icon = el('info-toggle-icon');
+  const isOpen = collapse.classList.toggle('open');
+  icon.classList.toggle('open', isOpen);
+});
+</script>
+</body>
+</html>
