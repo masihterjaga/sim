@@ -524,7 +524,7 @@ select option { background: var(--c-surface-2); }
   line-height: 1.5;
 }
 .note-note {
-  color: var(--c-accent);
+  color: #d6dced;
 }
 .info-toggle {
   width: 100%;
@@ -532,7 +532,7 @@ select option { background: var(--c-surface-2); }
   background: #0a0b0f;
   border: none;
   border-top: 1px solid var(--c-border);
-  color: var(--c-dim);
+  color: #d6dced;
   font-family: var(--font-ui);
   font-size: 10px;
   font-weight: 700;
@@ -723,6 +723,26 @@ select option { background: var(--c-surface-2); }
       </div>
     </div>
 
+    <button class="info-toggle" id="info-toggle">
+      <span class="note-note">TAP ME!</span>
+      <span class="info-toggle-icon" id="info-toggle-icon">▾</span>
+    </button>
+    <div class="info-collapse" id="info-collapse">
+      <div class="info-section">
+        <div class="info-title">Refine</div>
+        <p>This tool assumes 1H is +0. If the 1H is already refined, results might differ. For Adv Transfer from Shield to 2H, ensure refine is only on the shield and quality (White/Blue/Gold) must match for all eq.</p>
+      </div>
+      <div class="info-section">
+        <div class="info-title">Enchant</div>
+        <p>Adv Transfer defaults to the lowest city if 1H and Shield cities differ.</p>
+        <p>Example:<br />
+          • Shield: Geffen Lv.14 | 1H: Empty » <b>Geffen 2H Lv.10</b><br />
+          • Shield: Geffen Lv.14 | 1H: Izlude Lv.1 » <b>Izlude 2H Lv.15</b><br />
+          (Note: Geffen Shield Lv.14 is equivalent to Izlude 2H Lv.15, full manual lookup <u><a class="sheet" href="https://docs.google.com/spreadsheets/d/1UEEdz_XBalhENtpItbL-IWi-Gm28naW5rNxzgYQXxH0/" target="_blank">here</a></u>)</p>
+      </div>
+      
+    </div>
+
     <div class="result-cost-section">
       <div class="cost-section-titlebar">
         <div class="cost-section-title">Transfer Cost</div>
@@ -767,25 +787,7 @@ select option { background: var(--c-surface-2); }
       <p class="dreamsand-note">Tip: Disable VIP Kafra discount when using Dreamsand to ensure a 0 Diamond cost.</p>
     </div>
 
-    <button class="info-toggle" id="info-toggle">
-      <span class="note-note">Note</span>
-      <span class="info-toggle-icon" id="info-toggle-icon">▾</span>
-    </button>
-    <div class="info-collapse" id="info-collapse">
-            <div class="info-section">
-        <div class="info-title">Refine</div>
-        <p>This tool assumes 1H is +0. If the 1H is already refined, results might differ. For Adv Transfer from Shield to 2H, ensure refine is only on the shield and quality (White/Blue/Gold) must match for all eq.</p>
-      </div>
-      <div class="info-section">
-        <div class="info-title">Enchant</div>
-        <p>Adv Transfer defaults to the lowest city if 1H and Shield cities differ.</p>
-        <p>Example:<br />
-        • Shield: Geffen Lv.14 | 1H: Empty » <b>Geffen 2H Lv.10</b><br />
-        • Shield: Geffen Lv.14 | 1H: Izlude Lv.1 » <b>Izlude 2H Lv.15</b><br />
-        (Note: Geffen Shield Lv.14 is equivalent to Izlude 2H Lv.15, full manual lookup <u><a class="sheet" href="https://docs.google.com/spreadsheets/d/1UEEdz_XBalhENtpItbL-IWi-Gm28naW5rNxzgYQXxH0/" target="_blank">here</a></u>)</p>
-      </div>
 
-    </div>
 
   </div>
 
