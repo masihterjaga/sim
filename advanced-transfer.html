@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,24 +8,29 @@
 <meta name="description" content="Advanced transfer cost and expected result." />
 <style>
 :root {
-  --c-bg:             #09090d;
-  --c-surface:        #111318;
-  --c-surface-2:      #16181f;
-  --c-surface-3:      #1c1f28;
-  --c-border:         #1e2232;
-  --c-border-2:       #272b3e;
-  --c-text:           #c9ceda;
-  --c-muted:          #525b72;
-  --c-dim:            #323849;
-  --c-accent:         #f5a623;
-  --c-accent-dim:     rgba(245,166,35,.1);
-  --c-accent-border:  rgba(245,166,35,.25);
-  --c-accent-text:    rgba(245,166,35,.9);
+  --c-bg:            #07080c;
+  --c-surface:       #0d0f16;
+  --c-surface-2:     #121520;
+  --c-surface-3:     #181c27;
+  --c-border:        #1a1e2e;
+  --c-border-2:      #222740;
+  --c-text:          #cdd3e3;
+  --c-muted:         #4d566e;
+  --c-dim:           #2a3044;
+  --c-accent:        #f5a623;
+  --c-accent-dim:    rgba(245,166,35,.08);
+  --c-accent-border: rgba(245,166,35,.2);
+  --c-accent-text:   rgba(245,166,35,.88);
+  --c-blue:          #5b9cf6;
+  --c-green:         #3ecf8e;
+  --c-green-dim:     rgba(62,207,142,.07);
+  --c-green-border:  rgba(62,207,142,.22);
+  --c-green-text:    rgba(62,207,142,.85);
   --r-sm: 6px;
   --r-md: 10px;
   --r-lg: 14px;
-  --font: system-ui, -apple-system, sans-serif;
-  --mono: ui-monospace, 'SF Mono', monospace;
+  --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --mono: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -37,7 +43,7 @@ body {
   line-height: 1.5;
   display: flex;
   justify-content: center;
-  padding: 32px 16px 72px;
+  padding: 36px 16px 80px;
   min-height: 100vh;
 }
 
@@ -46,11 +52,11 @@ body {
   max-width: 440px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
 .card-header {
-  padding: 8px 0 24px;
+  padding: 4px 0 20px;
 }
 
 .badge {
@@ -63,18 +69,18 @@ body {
   font-size: 10px;
   font-weight: 700;
   color: var(--c-accent-text);
-  letter-spacing: 1px;
+  letter-spacing: 1.2px;
   text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 h1 {
-  font-size: 24px;
+  font-size: 26px;
   font-weight: 800;
-  color: #dde2f0;
-  letter-spacing: -.5px;
+  color: #e0e6f5;
+  letter-spacing: -.6px;
   line-height: 1.15;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .subtitle {
@@ -84,34 +90,39 @@ h1 {
 }
 
 .subtitle a {
-  color: #6e82b8;
+  color: var(--c-blue);
   text-decoration: none;
-  border-bottom: 1px solid rgba(110,130,184,.3);
-  transition: color .15s;
+  border-bottom: 1px solid rgba(91,156,246,.25);
+  transition: color .2s, border-color .2s;
 }
-.subtitle a:hover { color: #8fa0d0; }
+.subtitle a:hover { color: #82b4f8; border-color: rgba(91,156,246,.5); }
 
 .panel {
   background: var(--c-surface);
   border: 1px solid var(--c-border);
   border-radius: var(--r-lg);
   overflow: hidden;
+  position: relative;
+  --q-color: rgba(255,255,255,.12);
+  transition: border-color .35s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
 
 .panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 11px 16px;
   border-bottom: 1px solid var(--c-border);
   background: var(--c-surface-2);
+  transition: background .35s ease;
 }
 
 .panel-title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--c-muted);
-  letter-spacing: .9px;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
 }
 
@@ -128,13 +139,13 @@ h1 {
   gap: 10px;
 }
 
-.field { display: flex; flex-direction: column; gap: 6px; }
+.field { display: flex; flex-direction: column; gap: 5px; }
 
 label {
   font-size: 10px;
   font-weight: 700;
   color: var(--c-muted);
-  letter-spacing: .8px;
+  letter-spacing: 1px;
   text-transform: uppercase;
 }
 
@@ -157,14 +168,14 @@ select {
   -webkit-appearance: none;
   cursor: pointer;
   padding-right: 32px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23404660' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%233a4055' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 11px center;
 }
 
 select:focus, input[type="number"]:focus {
-  border-color: var(--c-accent-border);
-  box-shadow: 0 0 0 3px rgba(245,166,35,.07);
+  border-color: var(--q-color);
+  box-shadow: 0 0 0 3px rgba(255,255,255,.04);
 }
 
 select option { background: var(--c-surface-2); }
@@ -181,34 +192,26 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border-top: 1px solid var(--c-border);
 }
 
-.enchant-slots { display: flex; flex-direction: column; gap: 14px; }
+.enchant-slots { display: flex; flex-direction: column; gap: 12px; }
 
-.slot { display: flex; flex-direction: column; gap: 8px; }
+.slot { display: flex; flex-direction: column; gap: 6px; }
 
-.slot-label {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--c-dim);
-  letter-spacing: .7px;
-  text-transform: uppercase;
-}
-
-.row {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 10px;
-  align-items: end;
-}
-
-.field.wide { flex: 1; }
-
+.slot-label,
 .slot-header {
   font-size: 10px;
   font-weight: 700;
   color: var(--c-muted);
-  letter-spacing: .7px;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  margin-bottom: 10px;
+}
+
+.slot-header { padding-bottom: 10px; }
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 8px;
+  align-items: end;
 }
 
 .btn-toggle-1h {
@@ -217,27 +220,21 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   justify-content: center;
   gap: 6px;
   width: 100%;
-  padding: 11px;
-  background: transparent;
-  border: 1px dashed var(--c-border-2);
+  padding: 11px 16px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border-2);
   border-radius: var(--r-md);
   color: var(--c-muted);
   font-family: var(--font);
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: .5px;
+  letter-spacing: .6px;
   cursor: pointer;
   transition: border-color .15s, color .15s, background .15s;
 }
 
-.btn-toggle-1h:hover {
-  border-color: var(--c-accent-border);
-  color: var(--c-accent-text);
-  background: var(--c-accent-dim);
-}
-
+.btn-toggle-1h:hover,
 .btn-toggle-1h.active {
-  border-style: solid;
   border-color: var(--c-accent-border);
   color: var(--c-accent-text);
   background: var(--c-accent-dim);
@@ -249,24 +246,29 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   background: var(--c-accent);
   border: none;
   border-radius: var(--r-md);
-  color: #1a1200;
+  color: rgba(0,0,0,.85);
   font-family: var(--font);
   font-size: 13px;
   font-weight: 800;
-  letter-spacing: .5px;
+  letter-spacing: .6px;
   text-transform: uppercase;
   cursor: pointer;
-  transition: opacity .15s, transform .1s;
+  transition: opacity .15s, transform .1s, box-shadow .15s;
+  box-shadow: 0 2px 12px rgba(245,166,35,.25);
 }
 
-.btn-transfer:hover { opacity: .9; }
-.btn-transfer:active { transform: scale(.998); opacity: .85; }
+.btn-transfer:hover {
+  opacity: .92;
+  box-shadow: 0 4px 18px rgba(245,166,35,.35);
+}
+.btn-transfer:active { transform: scale(.998); opacity: .85; box-shadow: none; }
 .btn-transfer:disabled {
   background: var(--c-surface-3);
   color: var(--c-muted);
   border: 1px solid var(--c-border);
   cursor: not-allowed;
-  opacity: .6;
+  opacity: .55;
+  box-shadow: none;
 }
 
 .result {
@@ -275,6 +277,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border: 1px solid var(--c-border);
   border-radius: var(--r-lg);
   overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
 
 .result.visible { display: block; }
@@ -282,7 +285,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .result-header {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
+  padding: 11px 16px;
   background: var(--c-surface-2);
   border-bottom: 1px solid var(--c-border);
 }
@@ -291,7 +294,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-size: 10px;
   font-weight: 700;
   color: var(--c-muted);
-  letter-spacing: 1px;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
   flex: 1;
 }
@@ -303,7 +306,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 }
 
 .stat-block {
-  padding: 16px;
+  padding: 18px 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -317,13 +320,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-size: 10px;
   font-weight: 700;
   color: var(--c-muted);
-  letter-spacing: .8px;
+  letter-spacing: 1px;
   text-transform: uppercase;
+  margin-bottom: 4px;
 }
 
 .stat-value {
   font-family: var(--mono);
-  font-size: 28px;
+  font-size: 30px;
   font-weight: 700;
   color: var(--c-accent);
   line-height: 1.1;
@@ -339,7 +343,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .stat-desc {
   font-size: 11px;
   color: var(--c-dim);
-  margin-top: 2px;
+  margin-top: 3px;
 }
 
 .enchant-section {
@@ -350,14 +354,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
+  padding: 11px 16px;
 }
 
 .enchant-section-title {
   font-size: 10px;
   font-weight: 700;
   color: var(--c-muted);
-  letter-spacing: .9px;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
 }
 
@@ -378,12 +382,12 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   height: 6px;
   border-radius: 50%;
   background: var(--c-dim);
-  transition: background .2s, transform .2s;
+  transition: background .2s, transform .2s, width .2s;
 }
 
 .slide-dot.active {
   background: var(--c-accent);
-  transform: scale(1.4);
+  transform: scale(1.5);
 }
 
 .slide-arrow {
@@ -398,10 +402,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background .15s, color .15s;
+  transition: background .15s, color .15s, border-color .15s;
 }
 
-.slide-arrow:hover { background: var(--c-border-2); color: var(--c-text); }
+.slide-arrow:hover:not(:disabled) {
+  background: var(--c-border-2);
+  color: var(--c-text);
+  border-color: var(--c-muted);
+}
 .slide-arrow:disabled { opacity: .2; cursor: not-allowed; }
 
 .enchant-result-wrap { overflow: hidden; }
@@ -420,34 +428,40 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .slide-mode-title {
   font-size: 13px;
   font-weight: 700;
-  color: #dde2f0;
+  color: #e0e6f5;
   margin-bottom: 4px;
 }
 
 .slide-mode-sub {
   font-size: 11px;
   color: var(--c-muted);
-  line-height: 1.5;
+  line-height: 1.55;
   margin-bottom: 12px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--c-border);
 }
 
-.enchant-lines { display: flex; flex-direction: column; gap: 7px; }
+.enchant-lines { display: flex; flex-direction: column; gap: 6px; }
 
 .enchant-line {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .enchant-line-num {
   font-family: var(--mono);
   font-size: 10px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--c-dim);
-  width: 14px;
-  text-align: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--c-surface-3);
+  border: 1px solid var(--c-border-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
@@ -456,10 +470,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   background: var(--c-surface-3);
   border: 1px solid var(--c-border);
   border-radius: var(--r-sm);
-  padding: 7px 12px;
+  padding: 7px 11px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  transition: border-color .15s;
 }
 
 .enchant-line-city {
@@ -488,6 +503,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 
 .enchant-line-main .enchant-line-bar { width: 100%; }
 
+.enchant-line-main:hover .enchant-line-bar {
+  border-color: var(--c-border-2);
+}
+
 .slot-tip {
   display: none;
   position: absolute;
@@ -496,11 +515,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   right: 0;
   font-size: 10px;
   color: var(--c-accent-text);
-  background: #1a1c28;
+  background: #161928;
   border: 1px solid var(--c-accent-border);
   border-radius: var(--r-sm);
-  padding: 6px 9px;
-  line-height: 1.5;
+  padding: 7px 10px;
+  line-height: 1.55;
   z-index: 10;
   pointer-events: none;
 }
@@ -523,14 +542,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .cost-title {
   font-size: 10px;
   font-weight: 700;
   color: var(--c-muted);
-  letter-spacing: .9px;
+  letter-spacing: 1.1px;
   text-transform: uppercase;
 }
 
@@ -541,7 +560,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-size: 10px;
   font-weight: 700;
   color: var(--c-muted);
-  letter-spacing: .7px;
+  letter-spacing: .8px;
   text-transform: uppercase;
   cursor: pointer;
   user-select: none;
@@ -560,7 +579,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .col-labels {
   display: flex;
   gap: 8px;
-  padding: 0 0 8px;
+  padding: 0 0 6px;
 }
 
 .col-spacer { flex: 1; }
@@ -569,13 +588,13 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-size: 9px;
   font-weight: 700;
   color: var(--c-dim);
-  letter-spacing: .7px;
+  letter-spacing: .8px;
   text-transform: uppercase;
   min-width: 72px;
   text-align: right;
 }
 
-.cost-rows { display: flex; flex-direction: column; gap: 6px; }
+.cost-rows { display: flex; flex-direction: column; gap: 5px; }
 
 .cost-row {
   display: flex;
@@ -585,13 +604,12 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border: 1px solid var(--c-border);
   border-radius: var(--r-sm);
   gap: 8px;
-  transition: background .15s;
 }
 
 .cost-row.total {
   background: var(--c-surface-3);
   border-color: var(--c-border-2);
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .cost-row-label {
@@ -605,7 +623,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-size: 11px;
   font-weight: 700;
   color: var(--c-text);
-  letter-spacing: .3px;
+  letter-spacing: .4px;
 }
 
 .cost-col {
@@ -617,7 +635,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-family: var(--mono);
   font-size: 12px;
   font-weight: 600;
-  color: var(--c-text);
+  color: var(--c-blue);
 }
 
 .cost-value.accent { color: var(--c-accent); }
@@ -627,8 +645,25 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .dreamsand-note {
   font-size: 10px;
   color: var(--c-dim);
-  margin-top: 12px;
-  line-height: 1.55;
+  margin-top: 14px;
+  line-height: 1.6;
+}
+
+.awk-note {
+  font-size: 12px;
+  color: var(--c-green-text);
+  background: var(--c-green-dim);
+  border: 1px solid var(--c-green-border);
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  line-height: 1.6;
+  margin: 10px 16px;
+}
+
+.awk-hl {
+  color: var(--c-green);
+  font-family: var(--mono);
+  font-weight: 700;
 }
 
 .info-toggle {
@@ -641,7 +676,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-family: var(--font);
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: .8px;
+  letter-spacing: 1px;
   text-transform: uppercase;
   cursor: pointer;
   display: flex;
@@ -653,8 +688,9 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .info-toggle:hover { color: var(--c-text); background: var(--c-surface-3); }
 
 .info-toggle-icon {
-  font-size: 10px;
+  font-size: 9px;
   transition: transform .2s;
+  opacity: .6;
 }
 
 .info-toggle-icon.open { transform: rotate(180deg); }
@@ -674,7 +710,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-size: 10px;
   font-weight: 700;
   color: var(--c-accent-text);
-  letter-spacing: .7px;
+  letter-spacing: .9px;
   text-transform: uppercase;
   margin-bottom: 6px;
 }
@@ -685,35 +721,113 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   line-height: 1.65;
 }
 
+.info-section p a {
+  color: var(--c-blue);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(91,156,246,.25);
+  transition: color .2s, border-color .2s;
+}
+.info-section p a:hover { color: #82b4f8; border-bottom-color: rgba(91,156,246,.5); }
+
 .info-section p + p { margin-top: 6px; }
 
 .credit {
   font-size: 11px;
-  color: var(--c-dim);
+  color: var(--c-muted);
   text-align: center;
   padding-top: 4px;
+  opacity: .55;
 }
 
 .credit a {
-  color: var(--c-muted);
+  color: inherit;
   text-decoration: none;
-  transition: color .15s;
+  border-bottom: 1px solid transparent;
+  transition: color .2s, border-color .2s, opacity .2s;
 }
 
-.credit a:hover { color: var(--c-text); }
+.credit:hover { opacity: .9; }
+.credit a:hover { color: var(--c-blue); border-bottom-color: rgba(91,156,246,.3); }
+
+.btn-hint {
+  font-size: 11px;
+  color: var(--c-muted);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity .4s ease, transform .4s ease;
+  pointer-events: none;
+  margin-top: -4px;
+}
+.btn-hint.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 .refine-quality-warn {
   font-size: 10px;
   font-weight: 700;
   color: #e07b3a;
-  background: rgba(224,123,58,.1);
-  border: 1px solid rgba(224,123,58,.25);
+  background: rgba(224,123,58,.08);
+  border: 1px solid rgba(224,123,58,.22);
   border-radius: 4px;
-  padding: 4px 8px;
+  padding: 5px 9px;
   margin-top: 6px;
   line-height: 1.4;
   letter-spacing: .2px;
 }
+
+.panel::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  opacity: 0;
+  transition: opacity .35s ease, background .35s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.panel.q-gold {
+  --q-color: rgba(245,166,35,.4);
+  border-color: rgba(245,166,35,.28);
+}
+.panel.q-gold::after {
+  background: linear-gradient(90deg, transparent 10%, rgba(245,166,35,.32) 40%, rgba(245,166,35,.32) 60%, transparent 90%);
+  opacity: 1;
+}
+.panel.q-gold .panel-header { background: color-mix(in srgb, var(--c-surface-2) 93%, rgba(245,166,35,.6) 7%); }
+
+.panel.q-blue {
+  --q-color: rgba(91,156,246,.4);
+  border-color: rgba(91,156,246,.28);
+}
+.panel.q-blue::after {
+  background: linear-gradient(90deg, transparent 10%, rgba(91,156,246,.32) 40%, rgba(91,156,246,.32) 60%, transparent 90%);
+  opacity: 1;
+}
+.panel.q-blue .panel-header { background: color-mix(in srgb, var(--c-surface-2) 93%, rgba(91,156,246,.6) 7%); }
+
+.panel.q-white {
+  --q-color: rgba(180,195,215,.35);
+  border-color: rgba(180,195,215,.2);
+}
+.panel.q-white::after {
+  background: linear-gradient(90deg, transparent 10%, rgba(180,195,215,.24) 40%, rgba(180,195,215,.24) 60%, transparent 90%);
+  opacity: 1;
+}
+.panel.q-white .panel-header { background: color-mix(in srgb, var(--c-surface-2) 94%, rgba(180,195,215,.6) 6%); }
+
+.panel select:focus,
+.panel input[type="number"]:focus {
+  border-color: var(--q-color);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--q-color) 20%, transparent);
+}
+
+#out-refine.q-white { color: #b4c3d7; }
+#out-refine.q-blue  { color: var(--c-blue); }
+#out-refine.q-gold  { color: var(--c-accent); }
 </style>
 </head>
 <body>
@@ -726,10 +840,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
     <p class="subtitle">Transfer cost & expected result (upgrade, refine & enchant)</p>
   </div>
 
-  <button class="btn-toggle-1h" id="btn-toggle-1h">+ Add 1H Weapon</button>
+  <button class="btn-toggle-1h" id="btn-toggle-1h">+ 1H Weapon</button>
 
   <div id="section-1h" style="display:none">
-    <div class="panel">
+    <div class="panel q-white" id="panel-1h">
       <div class="panel-header">
         <div class="panel-title">1H Weapon</div>
         <div class="field" style="width:120px">
@@ -744,7 +858,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
         <div class="field-row">
           <div class="field">
             <label>Upgrade Level</label>
-            <input type="number" id="sel-upgrade-1h" min="0" max="280" value="0" placeholder="0–280">
+            <input type="number" id="sel-upgrade-1h" min="0" max="280" value="" placeholder="0–280">
           </div>
           <div class="field">
             <label>Refine</label>
@@ -760,7 +874,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
     </div>
   </div>
 
-  <div class="panel">
+  <div class="panel q-white" id="panel-shield">
     <div class="panel-header">
       <div class="panel-title">Shield</div>
       <div class="field" style="width:120px">
@@ -775,7 +889,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
       <div class="field-row">
         <div class="field">
           <label>Upgrade Level</label>
-          <input type="number" id="sel-upgrade" min="0" max="280" value="0" placeholder="0–280">
+          <input type="number" id="sel-upgrade" min="0" max="280" value="" placeholder="0-280">
         </div>
         <div class="field">
           <label>Refine</label>
@@ -791,6 +905,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   </div>
 
   <button class="btn-transfer" id="btn-transfer">Calculate Transfer</button>
+  <p class="btn-hint" id="btn-hint">Any change to dropdowns or fields will auto-recalculate.</p>
 
   <div class="result" id="result-panel">
 
@@ -818,7 +933,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
         <div class="slide-nav">
           <div class="slide-dots" id="slide-dots-container">
             <div class="slide-dot active" id="dot-0"></div>
-            <div class="slide-dot" id="dot-1"></div>
           </div>
           <button class="slide-arrow" id="arrow-prev" disabled>&#8592;</button>
           <button class="slide-arrow" id="arrow-next">&#8594;</button>
@@ -856,46 +970,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
             </div>
           </div>
 
-          <div class="enchant-slide" id="slide-1">
-            <div class="slide-mode-title">Highest Equivalent</div>
-            <div class="slide-mode-sub">Per slot: best Lv.15 city achievable from shield or 1H alone (whichever is higher).<br><span style="color:var(--c-dim);font-size:10px;">Tap a slot to see tip.</span></div>
-            <div class="enchant-lines">
-              <div class="enchant-line">
-                <div class="enchant-line-num">1</div>
-                <div class="enchant-line-main">
-                  <div class="enchant-line-bar">
-                    <span class="enchant-line-city enchant-line-empty" id="s1-e1-city">—</span>
-                    <span class="enchant-line-lvl" id="s1-e1-lvl" style="display:none"></span>
-                  </div>
-                  <div class="slot-tip" id="s1-e1-tip"></div>
-                </div>
-              </div>
-              <div class="enchant-line">
-                <div class="enchant-line-num">2</div>
-                <div class="enchant-line-main">
-                  <div class="enchant-line-bar">
-                    <span class="enchant-line-city enchant-line-empty" id="s1-e2-city">—</span>
-                    <span class="enchant-line-lvl" id="s1-e2-lvl" style="display:none"></span>
-                  </div>
-                  <div class="slot-tip" id="s1-e2-tip"></div>
-                </div>
-              </div>
-              <div class="enchant-line">
-                <div class="enchant-line-num">3</div>
-                <div class="enchant-line-main">
-                  <div class="enchant-line-bar">
-                    <span class="enchant-line-city enchant-line-empty" id="s1-e3-city">—</span>
-                    <span class="enchant-line-lvl" id="s1-e3-lvl" style="display:none"></span>
-                  </div>
-                  <div class="slot-tip" id="s1-e3-tip"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
+
+    <p class="awk-note" id="out-awk" style="display:none"></p>
 
     <button class="info-toggle" id="info-toggle">
       How it works
@@ -904,7 +983,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
     <div class="info-collapse" id="info-collapse">
       <div class="info-section">
         <div class="info-section-title">Upgrade</div>
-        <p>Shield contributes half its 1H upgrade cost to the transfer budget. The resulting 2H upgrade level is the highest achievable with that combined budget.</p>
+        <p>Shield contributes half its 1H upgrade cost to the transfer. The resulting 2H upgrade level is the highest achievable with that combined value.</p>
       </div>
       <div class="info-section">
         <div class="info-section-title">Refine</div>
@@ -915,7 +994,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
         <p>Adv Transfer defaults to the lowest city if 1H and Shield cities differ.</p>
         <p>Example:<br>
           Shield: Geffen Lv.14 | 1H: Empty → <b>Geffen 2H Lv.10</b><br>
-          Shield: Geffen Lv.14 | 1H: Izlude Lv.1 → <b>Izlude 2H Lv.15</b><br>
+          Shield: Geffen Lv.14 | 1H: Izlude Lv.1 → <b>Izlude 2H Lv.15</b><br><br>
           Full lookup table <u><a href="https://docs.google.com/spreadsheets/d/1UEEdz_XBalhENtpItbL-IWi-Gm28naW5rNxzgYQXxH0/" target="_blank">here</a></u>.</p>
       </div>
     </div>
@@ -964,14 +1043,33 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 </div>
 
 <script>
-const refineData={0:{white:{h1:0,h2:0},blue:{h1:0,h2:0},gold:{h1:0,h2:0}},1:{white:{h1:360,h2:540},blue:{h1:720,h2:1080},gold:{h1:1440,h2:2160}},2:{white:{h1:1080,h2:1620},blue:{h1:2160,h2:3240},gold:{h1:4320,h2:6480}},3:{white:{h1:3241,h2:4861},blue:{h1:6481,h2:9721},gold:{h1:12961,h2:19441}},4:{white:{h1:6121,h2:9181},blue:{h1:12241,h2:18361},gold:{h1:24481,h2:36721}},5:{white:{h1:13321,h2:19981},blue:{h1:26641,h2:39961},gold:{h1:53281,h2:79921}},6:{white:{h1:24841,h2:37261},blue:{h1:49681,h2:74521},gold:{h1:99361,h2:149041}},7:{white:{h1:50041,h2:75061},blue:{h1:100081,h2:150121},gold:{h1:200161,h2:300241}},8:{white:{h1:92341,h2:138511},blue:{h1:184681,h2:277021},gold:{h1:369361,h2:554041}},9:{white:{h1:171991,h2:257986},blue:{h1:343981,h2:515971},gold:{h1:687961,h2:1031941}},10:{white:{h1:307666,h2:461498},blue:{h1:615331,h2:922996},gold:{h1:1230661,h2:1845991}},11:{white:{h1:543578,h2:815367},blue:{h1:1087156,h2:1630733},gold:{h1:2174311,h2:3261466}},12:{white:{h1:929847,h2:1394770},blue:{h1:1859693,h2:2789539},gold:{h1:3719386,h2:5579078}},13:{white:{h1:1574050,h2:2361075},blue:{h1:3148099,h2:4722149},gold:{h1:6296198,h2:9444297}},14:{white:{h1:3163591,h2:4745386},blue:{h1:6327181,h2:9490771},gold:{h1:12654361,h2:18981541}},15:{white:{h1:7045319,h2:10567978},blue:{h1:14090637,h2:21135955},gold:{h1:28181273,h2:42271909}}};
+const refineData={0:{white:{h1:0,h2:0},blue:{h1:0,h2:0},gold:{h1:0,h2:0}},1:{white:{h1:360,h2:540},blue:{h1:720,h2:1080},gold:{h1:1440,h2:2160,score:20}},2:{white:{h1:1080,h2:1620},blue:{h1:2160,h2:3240},gold:{h1:4320,h2:6480,score:25}},3:{white:{h1:3241,h2:4861},blue:{h1:6481,h2:9721},gold:{h1:12961,h2:19441,score:30}},4:{white:{h1:6121,h2:9181},blue:{h1:12241,h2:18361},gold:{h1:24481,h2:36721,score:40}},5:{white:{h1:13321,h2:19981},blue:{h1:26641,h2:39961},gold:{h1:53281,h2:79921,score:50}},6:{white:{h1:24841,h2:37261},blue:{h1:49681,h2:74521},gold:{h1:99361,h2:149041,score:60}},7:{white:{h1:50041,h2:75061},blue:{h1:100081,h2:150121},gold:{h1:200161,h2:300241,score:80}},8:{white:{h1:92341,h2:138511},blue:{h1:184681,h2:277021},gold:{h1:369361,h2:554041,score:120}},9:{white:{h1:171991,h2:257986},blue:{h1:343981,h2:515971},gold:{h1:687961,h2:1031941,score:180}},10:{white:{h1:307666,h2:461498},blue:{h1:615331,h2:922996},gold:{h1:1230661,h2:1845991,score:330}},11:{white:{h1:543578,h2:815367},blue:{h1:1087156,h2:1630733},gold:{h1:2174311,h2:3261466,score:580}},12:{white:{h1:929847,h2:1394770},blue:{h1:1859693,h2:2789539},gold:{h1:3719386,h2:5579078,score:1000}},13:{white:{h1:1574050,h2:2361075},blue:{h1:3148099,h2:4722149},gold:{h1:6296198,h2:9444297,score:1700}},14:{white:{h1:3163591,h2:4745386},blue:{h1:6327181,h2:9490771},gold:{h1:12654361,h2:18981541,score:3420}},15:{white:{h1:7045319,h2:10567978},blue:{h1:14090637,h2:21135955},gold:{h1:28181273,h2:42271909,score:7500}}};
 
-const enchantData={"Prontera":{0:{h1:0,h2:0},1:{h1:216,h2:324},2:{h1:648,h2:972},3:{h1:1297,h2:1945},4:{h1:2161,h2:3241},5:{h1:3889,h2:5833},6:{h1:6482,h2:9722},7:{h1:9938,h2:14906},8:{h1:14258,h2:21386},9:{h1:20738,h2:31106},10:{h1:29378,h2:44066},11:{h1:40178,h2:60266},12:{h1:53138,h2:79706},13:{h1:70418,h2:105626},14:{h1:92018,h2:138026},15:{h1:117940,h2:176910}},"Morroc":{0:{h1:0,h2:0},1:{h1:432,h2:648},2:{h1:1296,h2:1944},3:{h1:2593,h2:3889},4:{h1:4321,h2:6481},5:{h1:7777,h2:11665},6:{h1:12963,h2:19444},7:{h1:19875,h2:29812},8:{h1:28515,h2:42772},9:{h1:41475,h2:62212},10:{h1:58755,h2:88132},11:{h1:80355,h2:120532},12:{h1:106275,h2:159412},13:{h1:140835,h2:211252},14:{h1:184035,h2:276052},15:{h1:235880,h2:353819}},"Izlude Island":{0:{h1:0,h2:0},1:{h1:864,h2:1296},2:{h1:2592,h2:3888},3:{h1:5185,h2:7777},4:{h1:8641,h2:12961},5:{h1:15553,h2:23329},6:{h1:25925,h2:38887},7:{h1:39749,h2:59623},8:{h1:57029,h2:85543},9:{h1:82949,h2:124423},10:{h1:117509,h2:176263},11:{h1:160709,h2:241063},12:{h1:212549,h2:318823},13:{h1:281669,h2:422503},14:{h1:368069,h2:552103},15:{h1:471759,h2:707638}},"Alberta":{0:{h1:0,h2:0},1:{h1:864,h2:1296},2:{h1:2592,h2:3888},3:{h1:5185,h2:7777},4:{h1:8641,h2:12961},5:{h1:15553,h2:23329},6:{h1:25925,h2:38887},7:{h1:39749,h2:59623},8:{h1:57029,h2:85543},9:{h1:82949,h2:124423},10:{h1:117509,h2:176263},11:{h1:160709,h2:241063},12:{h1:212549,h2:318823},13:{h1:281669,h2:422503},14:{h1:368069,h2:552103},15:{h1:471759,h2:707638}},"Payon":{0:{h1:0,h2:0},1:{h1:1728,h2:2592},2:{h1:5184,h2:7776},3:{h1:10369,h2:15553},4:{h1:17281,h2:25921},5:{h1:31105,h2:46657},6:{h1:51849,h2:77773},7:{h1:79497,h2:119245},8:{h1:114057,h2:171085},9:{h1:165897,h2:248845},10:{h1:235017,h2:352525},11:{h1:321417,h2:482125},12:{h1:425097,h2:637645},13:{h1:563337,h2:845005},14:{h1:736137,h2:1104205},15:{h1:943518,h2:1415276}},"Geffen":{0:{h1:0,h2:0},1:{h1:3456,h2:5184},2:{h1:10368,h2:15552},3:{h1:20737,h2:31105},4:{h1:34561,h2:51841},5:{h1:62209,h2:93313},6:{h1:103697,h2:155546},7:{h1:158993,h2:238490},8:{h1:228113,h2:342170},9:{h1:331793,h2:497690},10:{h1:470033,h2:705050},11:{h1:642833,h2:964250},12:{h1:850193,h2:1275290},13:{h1:1126673,h2:1690010},14:{h1:1472273,h2:2208410},15:{h1:1887035,h2:2830552}},"Glast Heim":{0:{h1:0,h2:0},1:{h1:6912,h2:10368},2:{h1:20736,h2:31104},3:{h1:41473,h2:62209},4:{h1:69121,h2:103681},5:{h1:124417,h2:186625},6:{h1:207394,h2:311091},7:{h1:317986,h2:476979},8:{h1:456226,h2:684339},9:{h1:663586,h2:995379},10:{h1:940066,h2:1410099},11:{h1:1285666,h2:1928499},12:{h1:1700386,h2:2550579},13:{h1:2253346,h2:3380019},14:{h1:2944546,h2:4416819},15:{h1:3774069,h2:5661103}},"Comodo":{0:{h1:0,h2:0},1:{h1:10368,h2:15552},2:{h1:31104,h2:46656},3:{h1:62209,h2:93313},4:{h1:103681,h2:155521},5:{h1:186625,h2:279937},6:{h1:311091,h2:466636},7:{h1:476979,h2:715468},8:{h1:684339,h2:1026508},9:{h1:995379,h2:1493068},10:{h1:1410099,h2:2115148},11:{h1:1928499,h2:2892748},12:{h1:2550579,h2:3825868},13:{h1:3380019,h2:5070028},14:{h1:4416819,h2:6625228},15:{h1:5661103,h2:8491654}},"Umbala":{0:{h1:0,h2:0},1:{h1:15552,h2:23328},2:{h1:46656,h2:69984},3:{h1:93313,h2:139969},4:{h1:155521,h2:233281},5:{h1:279937,h2:419905},6:{h1:466636,h2:699953},7:{h1:715468,h2:1073201},8:{h1:1026508,h2:1539761},9:{h1:1493068,h2:2239601},10:{h1:2115148,h2:3172721},11:{h1:2892748,h2:4339121},12:{h1:3825868,h2:5738801},13:{h1:5070028,h2:7605041},14:{h1:6625228,h2:9937841},15:{h1:8491654,h2:12737481}},"Juno":{0:{h1:0,h2:0},1:{h1:23328,h2:34992},2:{h1:69984,h2:104976},3:{h1:139969,h2:209954},4:{h1:233281,h2:349922},5:{h1:419905,h2:629858},6:{h1:699953,h2:1049930},7:{h1:1073201,h2:1609802},8:{h1:1539761,h2:2309642},9:{h1:2239601,h2:3359402},10:{h1:3172721,h2:4759082},11:{h1:4339121,h2:6508682},12:{h1:5738801,h2:8608202},13:{h1:7605041,h2:11407562},14:{h1:9937841,h2:14906762},15:{h1:12737481,h2:19106222}}};
+const enchantData={"Prontera":{0:{h1:0,h2:0},1:{h1:216,h2:324,score:2},2:{h1:648,h2:972,score:3},3:{h1:1297,h2:1945,score:4},4:{h1:2161,h2:3241,score:5},5:{h1:3889,h2:5833,score:6},6:{h1:6482,h2:9722,score:7},7:{h1:9938,h2:14906,score:8},8:{h1:14258,h2:21386,score:9},9:{h1:20738,h2:31106,score:10},10:{h1:29378,h2:44066,score:11},11:{h1:40178,h2:60266,score:12},12:{h1:53138,h2:79706,score:15},13:{h1:70418,h2:105626,score:20},14:{h1:92018,h2:138026,score:25},15:{h1:117940,h2:176910,score:34}},"Morroc":{0:{h1:0,h2:0},1:{h1:432,h2:648,score:3},2:{h1:1296,h2:1944,score:4},3:{h1:2593,h2:3889,score:5},4:{h1:4321,h2:6481,score:6},5:{h1:7777,h2:11665,score:7},6:{h1:12963,h2:19444,score:8},7:{h1:19875,h2:29812,score:9},8:{h1:28515,h2:42772,score:10},9:{h1:41475,h2:62212,score:11},10:{h1:58755,h2:88132,score:12},11:{h1:80355,h2:120532,score:15},12:{h1:106275,h2:159412,score:20},13:{h1:140835,h2:211252,score:25},14:{h1:184035,h2:276052,score:34},15:{h1:235880,h2:353819,score:50}},"Izlude Island":{0:{h1:0,h2:0},1:{h1:864,h2:1296,score:4},2:{h1:2592,h2:3888,score:5},3:{h1:5185,h2:7777,score:6},4:{h1:8641,h2:12961,score:7},5:{h1:15553,h2:23329,score:8},6:{h1:25925,h2:38887,score:9},7:{h1:39749,h2:59623,score:10},8:{h1:57029,h2:85543,score:11},9:{h1:82949,h2:124423,score:12},10:{h1:117509,h2:176263,score:15},11:{h1:160709,h2:241063,score:20},12:{h1:212549,h2:318823,score:25},13:{h1:281669,h2:422503,score:34},14:{h1:368069,h2:552103,score:50},15:{h1:471759,h2:707638,score:80}},"Alberta":{0:{h1:0,h2:0},1:{h1:864,h2:1296,score:4},2:{h1:2592,h2:3888,score:5},3:{h1:5185,h2:7777,score:6},4:{h1:8641,h2:12961,score:7},5:{h1:15553,h2:23329,score:8},6:{h1:25925,h2:38887,score:9},7:{h1:39749,h2:59623,score:10},8:{h1:57029,h2:85543,score:11},9:{h1:82949,h2:124423,score:12},10:{h1:117509,h2:176263,score:15},11:{h1:160709,h2:241063,score:20},12:{h1:212549,h2:318823,score:25},13:{h1:281669,h2:422503,score:34},14:{h1:368069,h2:552103,score:50},15:{h1:471759,h2:707638,score:80}},"Payon":{0:{h1:0,h2:0},1:{h1:1728,h2:2592,score:5},2:{h1:5184,h2:7776,score:6},3:{h1:10369,h2:15553,score:7},4:{h1:17281,h2:25921,score:8},5:{h1:31105,h2:46657,score:9},6:{h1:51849,h2:77773,score:10},7:{h1:79497,h2:119245,score:11},8:{h1:114057,h2:171085,score:12},9:{h1:165897,h2:248845,score:15},10:{h1:235017,h2:352525,score:20},11:{h1:321417,h2:482125,score:25},12:{h1:425097,h2:637645,score:34},13:{h1:563337,h2:845005,score:50},14:{h1:736137,h2:1104205,score:80},15:{h1:943518,h2:1415276,score:140}},"Geffen":{0:{h1:0,h2:0},1:{h1:3456,h2:5184,score:6},2:{h1:10368,h2:15552,score:7},3:{h1:20737,h2:31105,score:8},4:{h1:34561,h2:51841,score:9},5:{h1:62209,h2:93313,score:10},6:{h1:103697,h2:155546,score:11},7:{h1:158993,h2:238490,score:12},8:{h1:228113,h2:342170,score:15},9:{h1:331793,h2:497690,score:20},10:{h1:470033,h2:705050,score:25},11:{h1:642833,h2:964250,score:34},12:{h1:850193,h2:1275290,score:50},13:{h1:1126673,h2:1690010,score:80},14:{h1:1472273,h2:2208410,score:140},15:{h1:1887035,h2:2830552,score:250}},"Glast Heim":{0:{h1:0,h2:0},1:{h1:6912,h2:10368,score:7},2:{h1:20736,h2:31104,score:8},3:{h1:41473,h2:62209,score:9},4:{h1:69121,h2:103681,score:10},5:{h1:124417,h2:186625,score:11},6:{h1:207394,h2:311091,score:12},7:{h1:317986,h2:476979,score:15},8:{h1:456226,h2:684339,score:20},9:{h1:663586,h2:995379,score:25},10:{h1:940066,h2:1410099,score:34},11:{h1:1285666,h2:1928499,score:50},12:{h1:1700386,h2:2550579,score:80},13:{h1:2253346,h2:3380019,score:140},14:{h1:2944546,h2:4416819,score:250},15:{h1:3774069,h2:5661103,score:480}},"Comodo":{0:{h1:0,h2:0},1:{h1:10368,h2:15552,score:8},2:{h1:31104,h2:46656,score:9},3:{h1:62209,h2:93313,score:10},4:{h1:103681,h2:155521,score:11},5:{h1:186625,h2:279937,score:12},6:{h1:311091,h2:466636,score:15},7:{h1:476979,h2:715468,score:20},8:{h1:684339,h2:1026508,score:25},9:{h1:995379,h2:1493068,score:34},10:{h1:1410099,h2:2115148,score:50},11:{h1:1928499,h2:2892748,score:80},12:{h1:2550579,h2:3825868,score:140},13:{h1:3380019,h2:5070028,score:250},14:{h1:4416819,h2:6625228,score:480},15:{h1:5661103,h2:8491654,score:850}},"Umbala":{0:{h1:0,h2:0},1:{h1:15552,h2:23328,score:9},2:{h1:46656,h2:69984,score:10},3:{h1:93313,h2:139969,score:11},4:{h1:155521,h2:233281,score:12},5:{h1:279937,h2:419905,score:15},6:{h1:466636,h2:699953,score:20},7:{h1:715468,h2:1073201,score:25},8:{h1:1026508,h2:1539761,score:34},9:{h1:1493068,h2:2239601,score:50},10:{h1:2115148,h2:3172721,score:80},11:{h1:2892748,h2:4339121,score:140},12:{h1:3825868,h2:5738801,score:250},13:{h1:5070028,h2:7605041,score:480},14:{h1:6625228,h2:9937841,score:850},15:{h1:8491654,h2:12737481,score:1400}},"Juno":{0:{h1:0,h2:0},1:{h1:23328,h2:34992,score:10},2:{h1:69984,h2:104976,score:11},3:{h1:139969,h2:209954,score:12},4:{h1:233281,h2:349922,score:15},5:{h1:419905,h2:629858,score:20},6:{h1:699953,h2:1049930,score:25},7:{h1:1073201,h2:1609802,score:34},8:{h1:1539761,h2:2309642,score:50},9:{h1:2239601,h2:3359402,score:80},10:{h1:3172721,h2:4759082,score:140},11:{h1:4339121,h2:6508682,score:250},12:{h1:5738801,h2:8608202,score:480},13:{h1:7605041,h2:11407562,score:850},14:{h1:9937841,h2:14906762,score:1400},15:{h1:12737481,h2:19106222,score:2100}}};
 
-const upgradeData={0:{h1:0,h2:0},1:{h1:4,h2:6},2:{h1:8,h2:11},3:{h1:11,h2:17},4:{h1:15,h2:22},5:{h1:18,h2:27},6:{h1:22,h2:33},7:{h1:26,h2:38},8:{h1:29,h2:44},9:{h1:33,h2:49},10:{h1:36,h2:54},11:{h1:40,h2:60},12:{h1:44,h2:65},13:{h1:47,h2:71},14:{h1:51,h2:76},15:{h1:54,h2:81},16:{h1:58,h2:87},17:{h1:62,h2:92},18:{h1:65,h2:98},19:{h1:69,h2:103},20:{h1:72,h2:108},21:{h1:183,h2:275},22:{h1:294,h2:441},23:{h1:405,h2:607},24:{h1:516,h2:773},25:{h1:629,h2:944},26:{h1:743,h2:1114},27:{h1:857,h2:1285},28:{h1:970,h2:1455},29:{h1:1087,h2:1630},30:{h1:1204,h2:1805},31:{h1:1321,h2:1981},32:{h1:1437,h2:2156},33:{h1:1557,h2:2336},34:{h1:1677,h2:2516},35:{h1:1797,h2:2696},36:{h1:1917,h2:2876},37:{h1:2041,h2:3061},38:{h1:2164,h2:3246},39:{h1:2288,h2:3431},40:{h1:2411,h2:3616},41:{h1:2538,h2:3807},42:{h1:2665,h2:3998},43:{h1:2792,h2:4188},44:{h1:2919,h2:4379},45:{h1:3050,h2:4575},46:{h1:3181,h2:4771},47:{h1:3312,h2:4968},48:{h1:3443,h2:5164},49:{h1:3578,h2:5367},50:{h1:3713,h2:5569},51:{h1:3848,h2:5772},52:{h1:3983,h2:5974},53:{h1:4122,h2:6183},54:{h1:4262,h2:6392},55:{h1:4401,h2:6601},56:{h1:4540,h2:6810},57:{h1:4684,h2:7026},58:{h1:4828,h2:7242},59:{h1:4972,h2:7458},60:{h1:5116,h2:7674},61:{h1:5412,h2:8118},62:{h1:5708,h2:8562},63:{h1:6004,h2:9006},64:{h1:6300,h2:9450},65:{h1:6604,h2:9906},66:{h1:6908,h2:10362},67:{h1:7213,h2:10819},68:{h1:7517,h2:11275},69:{h1:7830,h2:11745},70:{h1:8143,h2:12214},71:{h1:8456,h2:12684},72:{h1:8769,h2:13153},73:{h1:9091,h2:13637},74:{h1:9414,h2:14120},75:{h1:9736,h2:14604},76:{h1:10059,h2:15088},77:{h1:10391,h2:15586},78:{h1:10723,h2:16084},79:{h1:11055,h2:16583},80:{h1:11388,h2:17081},81:{h1:11731,h2:17596},82:{h1:12073,h2:18110},83:{h1:12416,h2:18624},84:{h1:12759,h2:19139},85:{h1:13113,h2:19670},86:{h1:13467,h2:20201},87:{h1:13821,h2:20732},88:{h1:14176,h2:21263},89:{h1:14542,h2:21812},90:{h1:14908,h2:22361},91:{h1:15274,h2:22911},92:{h1:15640,h2:23460},93:{h1:16019,h2:24028},94:{h1:16398,h2:24597},95:{h1:16777,h2:25165},96:{h1:17156,h2:25733},97:{h1:17549,h2:26323},98:{h1:17941,h2:26912},99:{h1:18334,h2:27501},100:{h1:18727,h2:28090},101:{h1:19534,h2:29301},102:{h1:20342,h2:30512},103:{h1:21149,h2:31723},104:{h1:21957,h2:32935},105:{h1:22787,h2:34181},106:{h1:23618,h2:35427},107:{h1:24449,h2:36673},108:{h1:25280,h2:37919},109:{h1:26135,h2:39202},110:{h1:26991,h2:40486},111:{h1:27846,h2:41769},112:{h1:28701,h2:43052},113:{h1:29583,h2:44374},114:{h1:30465,h2:45697},115:{h1:31346,h2:47019},116:{h1:32228,h2:48342},117:{h1:33137,h2:49706},118:{h1:34047,h2:51070},119:{h1:34956,h2:52434},120:{h1:35866,h2:53799},121:{h1:36805,h2:55207},122:{h1:37744,h2:56616},123:{h1:38683,h2:58025},124:{h1:39622,h2:59433},125:{h1:40593,h2:60890},126:{h1:41564,h2:62346},127:{h1:42535,h2:63802},128:{h1:43506,h2:65258},129:{h1:44510,h2:66765},130:{h1:45515,h2:68272},131:{h1:46520,h2:69779},132:{h1:47524,h2:71286},133:{h1:48565,h2:72847},134:{h1:49606,h2:74409},135:{h1:50647,h2:75970},136:{h1:51688,h2:77532},137:{h1:52768,h2:79152},138:{h1:53848,h2:80772},139:{h1:54928,h2:82392},140:{h1:56008,h2:84012},141:{h1:58223,h2:87335},142:{h1:60439,h2:90658},143:{h1:62654,h2:93981},144:{h1:64870,h2:97304},145:{h1:67143,h2:100715},146:{h1:69417,h2:104125},147:{h1:71691,h2:107536},148:{h1:73964,h2:110946},149:{h1:76299,h2:114449},150:{h1:78635,h2:117952},151:{h1:80970,h2:121454},152:{h1:83305,h2:124957},153:{h1:85705,h2:128557},154:{h1:88105,h2:132157},155:{h1:90505,h2:135757},156:{h1:92905,h2:139357},157:{h1:95373,h2:143060},158:{h1:97842,h2:146763},159:{h1:100311,h2:150466},160:{h1:102779,h2:154168},161:{h1:105320,h2:157980},162:{h1:107861,h2:161792},163:{h1:110403,h2:165604},164:{h1:112944,h2:169415},165:{h1:115562,h2:173343},166:{h1:118180,h2:177270},167:{h1:120798,h2:181197},168:{h1:123417,h2:185125},169:{h1:126117,h2:189175},170:{h1:128817,h2:193225},171:{h1:131517,h2:197275},172:{h1:134217,h2:201325},173:{h1:137004,h2:205505},174:{h1:139791,h2:209686},175:{h1:142578,h2:213867},176:{h1:145365,h2:218047},177:{h1:148245,h2:222367},178:{h1:151125,h2:226687},179:{h1:154005,h2:231007},180:{h1:156885,h2:235327},181:{h1:168600,h2:252900},182:{h1:180315,h2:270473},183:{h1:192031,h2:288046},184:{h1:203746,h2:305619},185:{h1:215663,h2:323495},186:{h1:227580,h2:341370},187:{h1:239498,h2:359246},188:{h1:251415,h2:377122},189:{h1:263541,h2:395312},190:{h1:275668,h2:413501},191:{h1:287794,h2:431691},192:{h1:299920,h2:449880},193:{h1:312263,h2:468394},194:{h1:324606,h2:486909},195:{h1:336949,h2:505423},196:{h1:349292,h2:523937},197:{h1:361859,h2:542788},198:{h1:374426,h2:561639},199:{h1:386993,h2:580490},200:{h1:399561,h2:599341},201:{h1:412361,h2:618541},202:{h1:425161,h2:637741},203:{h1:437961,h2:656941},204:{h1:450761,h2:676141},205:{h1:463802,h2:695703},206:{h1:476844,h2:715265},207:{h1:489885,h2:734828},208:{h1:502927,h2:754390},209:{h1:516219,h2:774328},210:{h1:529511,h2:794267},211:{h1:542804,h2:814205},212:{h1:556096,h2:834144},213:{h1:569649,h2:854473},214:{h1:583202,h2:874803},215:{h1:596755,h2:895132},216:{h1:610308,h2:915461},217:{h1:624132,h2:936197},218:{h1:637956,h2:956933},219:{h1:651780,h2:977669},220:{h1:665604,h2:998405},221:{h1:679710,h2:1019565},222:{h1:693816,h2:1040724},223:{h1:707922,h2:1061883},224:{h1:722028,h2:1083042},225:{h1:736428,h2:1104642},226:{h1:750828,h2:1126242},227:{h1:765228,h2:1147842},228:{h1:779628,h2:1169442},229:{h1:794335,h2:1191502},230:{h1:809041,h2:1213561},231:{h1:823747,h2:1235621},232:{h1:838454,h2:1257680},233:{h1:853480,h2:1280220},234:{h1:868506,h2:1302759},235:{h1:883532,h2:1325298},236:{h1:898558,h2:1347837},237:{h1:913918,h2:1370877},238:{h1:929278,h2:1393917},239:{h1:944638,h2:1416957},240:{h1:959998,h2:1439997},241:{h1:987416,h2:1481124},242:{h1:1014985,h2:1522477},243:{h1:1042705,h2:1564058},244:{h1:1070579,h2:1605869},245:{h1:1098609,h2:1647914},246:{h1:1126796,h2:1690194},247:{h1:1155141,h2:1732712},248:{h1:1183647,h2:1775471},249:{h1:1212316,h2:1818474},250:{h1:1241149,h2:1861724},251:{h1:1270149,h2:1905223},252:{h1:1299316,h2:1948974},253:{h1:1328653,h2:1992980},254:{h1:1358163,h2:2037245},255:{h1:1387847,h2:2081771},256:{h1:1417707,h2:2126561},257:{h1:1447746,h2:2171619},258:{h1:1477965,h2:2216947},259:{h1:1508367,h2:2262550},260:{h1:1538768,h2:2308152},261:{h1:1569176,h2:2353764},262:{h1:1599580,h2:2399370},263:{h1:1629984,h2:2444976},264:{h1:1660388,h2:2490582},265:{h1:1690792,h2:2536188},266:{h1:1721196,h2:2581794},267:{h1:1751600,h2:2627400},268:{h1:1782004,h2:2673006},269:{h1:1812408,h2:2718612},270:{h1:1842812,h2:2764218},271:{h1:1873216,h2:2809824},272:{h1:1903620,h2:2855430},273:{h1:1934024,h2:2901036},274:{h1:1964428,h2:2946642},275:{h1:1994832,h2:2992248},276:{h1:2025236,h2:3037854},277:{h1:2055640,h2:3083460},278:{h1:2086044,h2:3129066},279:{h1:2116448,h2:3174672},280:{h1:2146852,h2:3220278}};
+const upgradeData={0:{h1:0,h2:0},1:{h1:4,h2:6,score:5},2:{h1:8,h2:11,score:5},3:{h1:11,h2:17,score:5},4:{h1:15,h2:22,score:5},5:{h1:18,h2:27,score:5},6:{h1:22,h2:33,score:5},7:{h1:26,h2:38,score:5},8:{h1:29,h2:44,score:5},9:{h1:33,h2:49,score:5},10:{h1:36,h2:54,score:5},11:{h1:40,h2:60,score:5},12:{h1:44,h2:65,score:5},13:{h1:47,h2:71,score:5},14:{h1:51,h2:76,score:5},15:{h1:54,h2:81,score:5},16:{h1:58,h2:87,score:5},17:{h1:62,h2:92,score:5},18:{h1:65,h2:98,score:5},19:{h1:69,h2:103,score:5},20:{h1:72,h2:108,score:5},21:{h1:183,h2:275,score:10},22:{h1:294,h2:441,score:10},23:{h1:405,h2:607,score:10},24:{h1:516,h2:773,score:10},25:{h1:629,h2:944,score:10},26:{h1:743,h2:1114,score:10},27:{h1:857,h2:1285,score:10},28:{h1:970,h2:1455,score:10},29:{h1:1087,h2:1630,score:10},30:{h1:1204,h2:1805,score:10},31:{h1:1321,h2:1981,score:10},32:{h1:1437,h2:2156,score:10},33:{h1:1557,h2:2336,score:10},34:{h1:1677,h2:2516,score:10},35:{h1:1797,h2:2696,score:10},36:{h1:1917,h2:2876,score:10},37:{h1:2041,h2:3061,score:10},38:{h1:2164,h2:3246,score:10},39:{h1:2288,h2:3431,score:10},40:{h1:2411,h2:3616,score:10},41:{h1:2538,h2:3807,score:15},42:{h1:2665,h2:3998,score:15},43:{h1:2792,h2:4188,score:15},44:{h1:2919,h2:4379,score:15},45:{h1:3050,h2:4575,score:15},46:{h1:3181,h2:4771,score:15},47:{h1:3312,h2:4968,score:15},48:{h1:3443,h2:5164,score:15},49:{h1:3578,h2:5367,score:15},50:{h1:3713,h2:5569,score:15},51:{h1:3848,h2:5772,score:15},52:{h1:3983,h2:5974,score:15},53:{h1:4122,h2:6183,score:15},54:{h1:4262,h2:6392,score:15},55:{h1:4401,h2:6601,score:15},56:{h1:4540,h2:6810,score:15},57:{h1:4684,h2:7026,score:15},58:{h1:4828,h2:7242,score:15},59:{h1:4972,h2:7458,score:15},60:{h1:5116,h2:7674,score:15},61:{h1:5412,h2:8118,score:20},62:{h1:5708,h2:8562,score:20},63:{h1:6004,h2:9006,score:20},64:{h1:6300,h2:9450,score:20},65:{h1:6604,h2:9906,score:20},66:{h1:6908,h2:10362,score:20},67:{h1:7213,h2:10819,score:20},68:{h1:7517,h2:11275,score:20},69:{h1:7830,h2:11745,score:20},70:{h1:8143,h2:12214,score:20},71:{h1:8456,h2:12684,score:20},72:{h1:8769,h2:13153,score:20},73:{h1:9091,h2:13637,score:20},74:{h1:9414,h2:14120,score:20},75:{h1:9736,h2:14604,score:20},76:{h1:10059,h2:15088,score:20},77:{h1:10391,h2:15586,score:20},78:{h1:10723,h2:16084,score:20},79:{h1:11055,h2:16583,score:20},80:{h1:11388,h2:17081,score:20},81:{h1:11731,h2:17596,score:20},82:{h1:12073,h2:18110,score:20},83:{h1:12416,h2:18624,score:20},84:{h1:12759,h2:19139,score:20},85:{h1:13113,h2:19670,score:20},86:{h1:13467,h2:20201,score:20},87:{h1:13821,h2:20732,score:20},88:{h1:14176,h2:21263,score:20},89:{h1:14542,h2:21812,score:20},90:{h1:14908,h2:22361,score:20},91:{h1:15274,h2:22911,score:20},92:{h1:15640,h2:23460,score:20},93:{h1:16019,h2:24028,score:20},94:{h1:16398,h2:24597,score:20},95:{h1:16777,h2:25165,score:20},96:{h1:17156,h2:25733,score:20},97:{h1:17549,h2:26323,score:20},98:{h1:17941,h2:26912,score:20},99:{h1:18334,h2:27501,score:20},100:{h1:18727,h2:28090,score:20},101:{h1:19534,h2:29301,score:30},102:{h1:20342,h2:30512,score:30},103:{h1:21149,h2:31723,score:30},104:{h1:21957,h2:32935,score:30},105:{h1:22787,h2:34181,score:30},106:{h1:23618,h2:35427,score:30},107:{h1:24449,h2:36673,score:30},108:{h1:25280,h2:37919,score:30},109:{h1:26135,h2:39202,score:30},110:{h1:26991,h2:40486,score:30},111:{h1:27846,h2:41769,score:30},112:{h1:28701,h2:43052,score:30},113:{h1:29583,h2:44374,score:30},114:{h1:30465,h2:45697,score:30},115:{h1:31346,h2:47019,score:30},116:{h1:32228,h2:48342,score:30},117:{h1:33137,h2:49706,score:30},118:{h1:34047,h2:51070,score:30},119:{h1:34956,h2:52434,score:30},120:{h1:35866,h2:53799,score:30},121:{h1:36805,h2:55207,score:35},122:{h1:37744,h2:56616,score:35},123:{h1:38683,h2:58025,score:35},124:{h1:39622,h2:59433,score:35},125:{h1:40593,h2:60890,score:35},126:{h1:41564,h2:62346,score:35},127:{h1:42535,h2:63802,score:35},128:{h1:43506,h2:65258,score:35},129:{h1:44510,h2:66765,score:35},130:{h1:45515,h2:68272,score:35},131:{h1:46520,h2:69779,score:35},132:{h1:47524,h2:71286,score:35},133:{h1:48565,h2:72847,score:35},134:{h1:49606,h2:74409,score:35},135:{h1:50647,h2:75970,score:35},136:{h1:51688,h2:77532,score:35},137:{h1:52768,h2:79152,score:35},138:{h1:53848,h2:80772,score:35},139:{h1:54928,h2:82392,score:35},140:{h1:56008,h2:84012,score:35},141:{h1:58223,h2:87335,score:40},142:{h1:60439,h2:90658,score:40},143:{h1:62654,h2:93981,score:40},144:{h1:64870,h2:97304,score:40},145:{h1:67143,h2:100715,score:40},146:{h1:69417,h2:104125,score:40},147:{h1:71691,h2:107536,score:40},148:{h1:73964,h2:110946,score:40},149:{h1:76299,h2:114449,score:40},150:{h1:78635,h2:117952,score:40},151:{h1:80970,h2:121454,score:40},152:{h1:83305,h2:124957,score:40},153:{h1:85705,h2:128557,score:40},154:{h1:88105,h2:132157,score:40},155:{h1:90505,h2:135757,score:40},156:{h1:92905,h2:139357,score:40},157:{h1:95373,h2:143060,score:40},158:{h1:97842,h2:146763,score:40},159:{h1:100311,h2:150466,score:40},160:{h1:102779,h2:154168,score:40},161:{h1:105320,h2:157980,score:60},162:{h1:107861,h2:161792,score:60},163:{h1:110403,h2:165604,score:60},164:{h1:112944,h2:169415,score:60},165:{h1:115562,h2:173343,score:60},166:{h1:118180,h2:177270,score:60},167:{h1:120798,h2:181197,score:60},168:{h1:123417,h2:185125,score:60},169:{h1:126117,h2:189175,score:60},170:{h1:128817,h2:193225,score:60},171:{h1:131517,h2:197275,score:60},172:{h1:134217,h2:201325,score:60},173:{h1:137004,h2:205505,score:60},174:{h1:139791,h2:209686,score:60},175:{h1:142578,h2:213867,score:60},176:{h1:145365,h2:218047,score:60},177:{h1:148245,h2:222367,score:60},178:{h1:151125,h2:226687,score:60},179:{h1:154005,h2:231007,score:60},180:{h1:156885,h2:235327,score:60},181:{h1:168600,h2:252900,score:120},182:{h1:180315,h2:270473,score:120},183:{h1:192031,h2:288046,score:120},184:{h1:203746,h2:305619,score:120},185:{h1:215663,h2:323495,score:120},186:{h1:227580,h2:341370,score:120},187:{h1:239498,h2:359246,score:120},188:{h1:251415,h2:377122,score:120},189:{h1:263541,h2:395312,score:120},190:{h1:275668,h2:413501,score:120},191:{h1:287794,h2:431691,score:120},192:{h1:299920,h2:449880,score:120},193:{h1:312263,h2:468394,score:120},194:{h1:324606,h2:486909,score:120},195:{h1:336949,h2:505423,score:120},196:{h1:349292,h2:523937,score:120},197:{h1:361859,h2:542788,score:120},198:{h1:374426,h2:561639,score:120},199:{h1:386993,h2:580490,score:120},200:{h1:399561,h2:599341,score:120},201:{h1:412361,h2:618541,score:200},202:{h1:425161,h2:637741,score:200},203:{h1:437961,h2:656941,score:200},204:{h1:450761,h2:676141,score:200},205:{h1:463802,h2:695703,score:200},206:{h1:476844,h2:715265,score:200},207:{h1:489885,h2:734828,score:200},208:{h1:502927,h2:754390,score:200},209:{h1:516219,h2:774328,score:200},210:{h1:529511,h2:794267,score:200},211:{h1:542804,h2:814205,score:200},212:{h1:556096,h2:834144,score:200},213:{h1:569649,h2:854473,score:200},214:{h1:583202,h2:874803,score:200},215:{h1:596755,h2:895132,score:200},216:{h1:610308,h2:915461,score:200},217:{h1:624132,h2:936197,score:200},218:{h1:637956,h2:956933,score:200},219:{h1:651780,h2:977669,score:200},220:{h1:665604,h2:998405,score:200},221:{h1:679710,h2:1019565,score:300},222:{h1:693816,h2:1040724,score:300},223:{h1:707922,h2:1061883,score:300},224:{h1:722028,h2:1083042,score:300},225:{h1:736428,h2:1104642,score:300},226:{h1:750828,h2:1126242,score:300},227:{h1:765228,h2:1147842,score:300},228:{h1:779628,h2:1169442,score:300},229:{h1:794335,h2:1191502,score:300},230:{h1:809041,h2:1213561,score:300},231:{h1:823747,h2:1235621,score:300},232:{h1:838454,h2:1257680,score:300},233:{h1:853480,h2:1280220,score:300},234:{h1:868506,h2:1302759,score:300},235:{h1:883532,h2:1325298,score:300},236:{h1:898558,h2:1347837,score:300},237:{h1:913918,h2:1370877,score:300},238:{h1:929278,h2:1393917,score:300},239:{h1:944638,h2:1416957,score:300},240:{h1:959998,h2:1439997,score:300},241:{h1:987416,h2:1481124,score:450},242:{h1:1014985,h2:1522477,score:450},243:{h1:1042705,h2:1564058,score:450},244:{h1:1070579,h2:1605869,score:450},245:{h1:1098609,h2:1647914,score:450},246:{h1:1126796,h2:1690194,score:450},247:{h1:1155141,h2:1732712,score:450},248:{h1:1183647,h2:1775471,score:450},249:{h1:1212316,h2:1818474,score:450},250:{h1:1241149,h2:1861724,score:450},251:{h1:1270149,h2:1905223,score:450},252:{h1:1299316,h2:1948974,score:450},253:{h1:1328653,h2:1992980,score:450},254:{h1:1358163,h2:2037245,score:450},255:{h1:1387847,h2:2081771,score:450},256:{h1:1417707,h2:2126561,score:450},257:{h1:1447746,h2:2171619,score:450},258:{h1:1477965,h2:2216947,score:450},259:{h1:1508367,h2:2262550,score:450},260:{h1:1538768,h2:2308152,score:450},261:{h1:1569176,h2:2353764,score:600},262:{h1:1599580,h2:2399370,score:600},263:{h1:1629984,h2:2444976,score:600},264:{h1:1660388,h2:2490582,score:600},265:{h1:1690792,h2:2536188,score:600},266:{h1:1721196,h2:2581794,score:600},267:{h1:1751600,h2:2627400,score:600},268:{h1:1782004,h2:2673006,score:600},269:{h1:1812408,h2:2718612,score:600},270:{h1:1842812,h2:2764218,score:600},271:{h1:1873216,h2:2809824,score:600},272:{h1:1903620,h2:2855430,score:600},273:{h1:1934024,h2:2901036,score:600},274:{h1:1964428,h2:2946642,score:600},275:{h1:1994832,h2:2992248,score:600},276:{h1:2025236,h2:3037854,score:600},277:{h1:2055640,h2:3083460,score:600},278:{h1:2086044,h2:3129066,score:600},279:{h1:2116448,h2:3174672,score:600},280:{h1:2146852,h2:3220278,score:600}};
 
 const CITIES      = Object.keys(enchantData);
 const SLOTS       = [1, 2, 3];
+
+const weaponAwk = [
+  {tier:'T1',  score:250,   need:2},
+  {tier:'T2',  score:500,   need:2},
+  {tier:'T3',  score:1200,  need:2},
+  {tier:'T4',  score:2000,  need:2},
+  {tier:'T5',  score:2500,  need:3},
+  {tier:'T6',  score:5000,  need:3},
+  {tier:'T7',  score:6500,  need:4},
+  {tier:'T8',  score:9000,  need:4},
+  {tier:'T9',  score:12000, need:5},
+  {tier:'T10', score:14000, need:6},
+];
+
+function lookupWeaponAwk(totalScore) {
+  for (let i = weaponAwk.length - 1; i >= 0; i--)
+    if (totalScore >= weaponAwk[i].score) return weaponAwk[i];
+  return null;
+}
 const MAX_UPGRADE = 280;
 
 const el          = id => document.getElementById(id);
@@ -989,6 +1087,17 @@ const CITY_LABEL_MAP = {
 };
 const cityLabel = c => CITY_LABEL_MAP[c] ?? c;
 
+const CITY_LABEL_TO_KEY = {};
+for (const [k, v] of Object.entries(CITY_LABEL_MAP)) CITY_LABEL_TO_KEY[v] = k;
+CITIES.forEach(c => { if (!(c in CITY_LABEL_TO_KEY)) CITY_LABEL_TO_KEY[c] = c; });
+
+function enchantResultScore(str) {
+  const p = parseEnchantResult(str);
+  if (!p) return 0;
+  const key = CITY_LABEL_TO_KEY[p.city] ?? p.city;
+  return enchantData[key]?.[+p.lvl]?.score ?? 0;
+}
+
 const CITY_SLIDE_DEFS = [
   { city: 'Prontera',      title: 'Highest Level in Prontera',        sub: 'Enchant 1H in Prontera first (Lv.1 is enough)' },
   { city: 'Morroc',        title: 'Highest Level in Morroc/Einbroch', sub: 'Enchant 1H in Morroc/Einbroch first (Lv.1 is enough)' },
@@ -997,7 +1106,10 @@ const CITY_SLIDE_DEFS = [
 
 let live         = false;
 let currentSlide = 0;
-let TOTAL_SLIDES = 2;
+let totalSlides  = 2;
+let slideAwkMap  = {};
+let awkBase      = 0;
+let awkActive    = false;
 
 function getSlots(prefix = '') {
   return SLOTS.map(s => {
@@ -1015,21 +1127,29 @@ function getUpgradeLvl(inputId) {
 function lookupUpgrade2H(budget) {
   for (let lvl = MAX_UPGRADE; lvl >= 0; lvl--)
     if (upgradeData[lvl].h2 <= budget) return lvl;
-  return 0;
 }
 
 function lookupRefine2H(budget, quality) {
   for (let lvl = 15; lvl >= 0; lvl--)
     if (refineData[lvl][quality].h2 <= budget) return lvl;
-  return 0;
+}
+
+function lookupLevelInCity(city, budget, minLevel = 1) {
+  for (let l = 15; l >= minLevel; l--)
+    if (enchantData[city][l].h2 <= budget) return `${cityLabel(city)} Lv.${l}`;
+  return '—';
+}
+
+function lookupRawLevelInCity(city, budget, minLevel = 1) {
+  for (let l = 15; l >= minLevel; l--)
+    if (enchantData[city][l].h2 <= budget) return `${city} Lv.${l}`;
+  return '—';
 }
 
 function lookupEnchant(targetCity, shieldCity, shieldLvl, extra = 0, minLevel = 0) {
   if (!shieldCity || shieldLvl === '') return '—';
   const budget = enchantData[shieldCity][+shieldLvl].h1 / 2 + extra;
-  for (let l = 15; l >= minLevel; l--)
-    if (enchantData[targetCity][l].h2 <= budget) return `${cityLabel(targetCity)} Lv.${l}`;
-  return '—';
+  return lookupLevelInCity(targetCity, budget, minLevel);
 }
 
 function lookupEquivByBudget(budget) {
@@ -1045,8 +1165,8 @@ function setEnchantLineTip(tipId, message) {
   if (message) {
     tipEl.textContent = message;
     tipEl.classList.add('visible');
-    if (main && !main._tapBound) {
-      main._tapBound = true;
+    if (main && !main.dataset.tapBound) {
+      main.dataset.tapBound = '1';
       main.style.cursor = 'pointer';
       main.addEventListener('click', () => main.classList.toggle('tip-open'));
     }
@@ -1064,9 +1184,7 @@ function lookupCombined1H(s, s1H) {
   const targetCity = shieldIdx <= weapIdx ? s.city : s1H.city;
   const budget     = (s   ? enchantData[s.city][s.lvl].h1 / 2 : 0)
                    + (s1H ? enchantData[s1H.city][s1H.lvl].h1  : 0);
-  for (let l = 15; l >= 1; l--)
-    if (enchantData[targetCity][l].h2 <= budget) return `${targetCity} Lv.${l}`;
-  return '—';
+  return lookupRawLevelInCity(targetCity, budget);
 }
 
 const equivIsMorrocOrHigher = r => r !== '—' && r !== 'Prontera Lv.15';
@@ -1085,6 +1203,7 @@ function parseEnchantResult(str) {
 function setEnchantLineResult(cityId, lvlId, rawStr) {
   const cityEl = el(cityId);
   const lvlEl  = el(lvlId);
+  if (!cityEl || !lvlEl) return;
   const parsed = parseEnchantResult(rawStr);
   if (!parsed) {
     cityEl.textContent  = '—';
@@ -1100,7 +1219,7 @@ function setEnchantLineResult(cityId, lvlId, rawStr) {
 
 function buildEnchantLinesHTML(idPrefix) {
   return `<div class="enchant-lines">
-    ${[1, 2, 3].map(j => `
+    ${SLOTS.map(j => `
     <div class="enchant-line">
       <div class="enchant-line-num">${j}</div>
       <div class="enchant-line-bar">
@@ -1138,6 +1257,47 @@ function buildEnchantSlots(prefix, containerId) {
     });
     el(`ench-lvl-${prefix}${s}`).addEventListener('change', () => { if (live) calculate(); });
   });
+}
+
+function renderSlideEquiv(slots, slots1H, has1H) {
+  el('slide-1')?.remove();
+  el('dot-1')?.remove();
+
+  const activeComparisons = SLOTS.map(i => {
+    const s   = slots[i - 1];
+    const s1H = has1H ? slots1H[i - 1] : null;
+    const shieldBudget = s   ? enchantData[s.city][s.lvl].h1 / 2 : 0;
+    const weapBudget   = s1H ? enchantData[s1H.city][s1H.lvl].h1  : 0;
+    if (shieldBudget === 0 && weapBudget === 0) return null;
+    return shieldBudget >= weapBudget ? 'shield' : 'weapon';
+  }).filter(Boolean);
+
+  if (!activeComparisons.length) return;
+  if (!activeComparisons.every(v => v === activeComparisons[0])) return;
+
+  const dot = Object.assign(document.createElement('div'), { className: 'slide-dot', id: 'dot-1' });
+  el('dot-0').after(dot);
+
+  const div = document.createElement('div');
+  div.className = 'enchant-slide';
+  div.id        = 'slide-1';
+  div.innerHTML = `
+    <div class="slide-mode-title">Highest City Lvl.15</div>
+    <div class="slide-mode-sub">Per slot: best Lv.15 city achievable from shield or 1H alone (whichever is higher).<br><span style="color:var(--c-dim);font-size:10px;">Tap a slot to see tip.</span></div>
+    <div class="enchant-lines">
+      ${SLOTS.map(j => `
+      <div class="enchant-line">
+        <div class="enchant-line-num">${j}</div>
+        <div class="enchant-line-main">
+          <div class="enchant-line-bar">
+            <span class="enchant-line-city enchant-line-empty" id="s1-e${j}-city">—</span>
+            <span class="enchant-line-lvl" id="s1-e${j}-lvl" style="display:none"></span>
+          </div>
+          <div class="slot-tip" id="s1-e${j}-tip"></div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  el('slide-0').insertAdjacentElement('afterend', div);
 }
 
 function renderSlide1H(slots, slots1H) {
@@ -1184,17 +1344,14 @@ function renderSlideNoShield(slots1H) {
     const s1H = slots1H[i - 1];
     if (!s1H) { setEnchantLineResult(`sns-e${i}-city`, `sns-e${i}-lvl`, '—'); return; }
     const budget = enchantData[s1H.city][s1H.lvl].h1;
-    let result = '—';
-    for (let l = 15; l >= 1; l--)
-      if (enchantData[s1H.city][l].h2 <= budget) { result = `${cityLabel(s1H.city)} Lv.${l}`; break; }
-    setEnchantLineResult(`sns-e${i}-city`, `sns-e${i}-lvl`, result);
+    setEnchantLineResult(`sns-e${i}-city`, `sns-e${i}-lvl`, lookupRawLevelInCity(s1H.city, budget));
   });
 }
 
 function renderDynamicSlides(defs) {
   document.querySelectorAll('.dynamic-slide').forEach(s => s.remove());
   document.querySelectorAll('.dynamic-dot').forEach(d => d.remove());
-  TOTAL_SLIDES = 2 + defs.length + (el('slide-1h') ? 1 : 0) + (el('slide-ns') ? 1 : 0);
+  totalSlides = 1 + (el('slide-1') ? 1 : 0) + defs.length + (el('slide-1h') ? 1 : 0) + (el('slide-ns') ? 1 : 0);
 
   const dotsContainer = el('slide-dots-container');
   defs.forEach((_, i) => {
@@ -1224,7 +1381,23 @@ function renderDynamicSlides(defs) {
     });
   });
 
-  goSlide(Math.min(currentSlide, TOTAL_SLIDES - 1));
+  goSlide(Math.min(currentSlide, totalSlides - 1));
+}
+
+function renderAwkNote(n) {
+  const awkEl = el('out-awk');
+  if (!awkActive) { awkEl.style.display = 'none'; return; }
+  const slides = el('slider-track').querySelectorAll('.enchant-slide');
+  const slideId = slides[n]?.id;
+  const enchScore = slideAwkMap[slideId] ?? 0;
+  const total = awkBase + enchScore;
+  const awk = lookupWeaponAwk(total);
+  if (awk) {
+    awkEl.innerHTML = `Result in 2H has <span class="awk-hl">${total} score</span>, that's mean ready for <span class="awk-hl">${awk.tier} Weapon Awakening</span>, need <span class="awk-hl">${awk.need - 1}x more</span> with same progress to activate.`;
+    awkEl.style.display = '';
+  } else {
+    awkEl.style.display = 'none';
+  }
 }
 
 function goSlide(n) {
@@ -1232,7 +1405,8 @@ function goSlide(n) {
   el('slider-track').style.transform = `translateX(-${n * 100}%)`;
   document.querySelectorAll('.slide-dot').forEach((dot, i) => dot.classList.toggle('active', i === n));
   el('arrow-prev').disabled = n === 0;
-  el('arrow-next').disabled = n === TOTAL_SLIDES - 1;
+  el('arrow-next').disabled = n === totalSlides - 1;
+  renderAwkNote(n);
 }
 
 function calculate() {
@@ -1256,7 +1430,7 @@ function calculate() {
   const weapEnchH1    = slots1H.reduce((sum, s) => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
   const enchantBudget = weapEnchH1 + shieldEnchH1 / 2;
 
-  el('out-upgrade').textContent = `${lookupUpgrade2H(upgradeBudget)}`;
+  el('out-upgrade').textContent = String(lookupUpgrade2H(upgradeBudget));
   if (qualityMismatch) {
     el('out-refine').style.display = 'none';
     el('refine-desc').style.display = 'none';
@@ -1268,12 +1442,14 @@ function calculate() {
     el('refine-quality-warn').style.display = 'none';
   }
 
+  renderSlideEquiv(slots, slots1H, has1H);
+
   SLOTS.forEach(i => {
     const s   = slots[i - 1];
     const s1H = has1H ? slots1H[i - 1] : null;
 
     setEnchantLineResult(`s0-e${i}-city`, `s0-e${i}-lvl`,
-      s ? lookupEnchant(s.city, s.city, s.lvl, 0) : '—');
+      s ? lookupRawLevelInCity(s.city, enchantData[s.city][s.lvl].h1 / 2) : '—');
 
     const shieldBudget = s   ? enchantData[s.city][s.lvl].h1 / 2 : 0;
     const weapBudget   = s1H ? enchantData[s1H.city][s1H.lvl].h1  : 0;
@@ -1281,31 +1457,36 @@ function calculate() {
     const equivResult  = useBudget > 0 ? lookupEquivByBudget(useBudget) : '—';
     setEnchantLineResult(`s1-e${i}-city`, `s1-e${i}-lvl`, equivResult);
 
-    let tip = '';
-    if (equivResult !== '—') {
+    const buildTip = () => {
+      if (equivResult === '—') return '';
       const parsed = parseEnchantResult(equivResult);
-      if (parsed) {
-        const city = parsed.city;
-        if (shieldBudget >= weapBudget && s)
-          tip = `Your slot ${i} shield is equal to ${equivResult}, so just enchant your slot ${i} 1H in ${city} (any level), result will become 2H ${equivResult}.`;
-        else if (weapBudget > shieldBudget && s1H)
-          tip = `Your slot ${i} 1H is equal to ${equivResult}, so just enchant your slot ${i} shield in ${city} (any level), result will become 2H ${equivResult}.`;
-      }
-    }
-    setEnchantLineTip(`s1-e${i}-tip`, tip);
+      if (!parsed) return '';
+      const { city } = parsed;
+      if (shieldBudget >= weapBudget && s)
+        return `Slot ${i} shield is equal to ${equivResult}, so just enchant slot ${i} 1H in ${city} (any level), result will become 2H ${equivResult}.`;
+      if (weapBudget > shieldBudget && s1H)
+        return `Slot ${i} 1H is equal to ${equivResult}, so just enchant slot ${i} shield in ${city} (any level), result will become 2H ${equivResult}.`;
+      return '';
+    };
+    setEnchantLineTip(`s1-e${i}-tip`, buildTip());
   });
 
   const poring      = el('chk-poring').checked;
   const totalBudget = upgradeBudget + refineBudget + enchantBudget;
 
-  el('out-upgrade-cost').textContent      = fmt(applyPoring(upgradeBudget, poring));
-  el('out-upgrade-dreamsand').textContent = fmt(roundUp10k(applyPoring(upgradeBudget, poring)));
-  el('out-refine-cost').textContent       = fmt(applyPoring(refineBudget, poring));
-  el('out-refine-dreamsand').textContent  = fmt(roundUp10k(applyPoring(refineBudget, poring)));
-  el('out-enchant-cost').textContent      = fmt(applyPoring(enchantBudget, poring));
-  el('out-enchant-dreamsand').textContent = fmt(roundUp10k(applyPoring(enchantBudget, poring)));
-  el('out-normal').textContent            = fmt(applyPoring(totalBudget, poring));
-  el('out-dreamsand').textContent         = fmt(roundUp10k(applyPoring(totalBudget, poring)));
+  const pUpgrade = applyPoring(upgradeBudget, poring);
+  const pRefine  = applyPoring(refineBudget,  poring);
+  const pEnchant = applyPoring(enchantBudget, poring);
+  const pTotal   = applyPoring(totalBudget,   poring);
+
+  el('out-upgrade-cost').textContent      = fmt(pUpgrade);
+  el('out-upgrade-dreamsand').textContent = fmt(roundUp10k(pUpgrade));
+  el('out-refine-cost').textContent       = fmt(pRefine);
+  el('out-refine-dreamsand').textContent  = fmt(roundUp10k(pRefine));
+  el('out-enchant-cost').textContent      = fmt(pEnchant);
+  el('out-enchant-dreamsand').textContent = fmt(roundUp10k(pEnchant));
+  el('out-normal').textContent            = fmt(pTotal);
+  el('out-dreamsand').textContent         = fmt(roundUp10k(pTotal));
 
   const activeSlots  = slots.filter(s => s);
   const hasActive    = activeSlots.length > 0;
@@ -1328,7 +1509,56 @@ function calculate() {
   renderSlide1H(slots, has1H ? slots1H : null);
   renderSlideNoShield(has1H ? slots1H : null);
   renderDynamicSlides(activeDefs);
+
+  awkActive = quality === 'gold' && (!has1H || quality1H === 'gold');
+  if (awkActive) {
+    const upgResult = lookupUpgrade2H(upgradeBudget);
+    const upgScore  = upgradeData[upgResult]?.score ?? 0;
+    const refResult = qualityMismatch ? 0 : lookupRefine2H(refineBudget, quality);
+    const refScore  = refineData[refResult]?.gold?.score ?? 0;
+    awkBase = upgScore + refScore;
+
+    slideAwkMap = {};
+
+    if (el('slide-1h'))
+      slideAwkMap['slide-1h'] = SLOTS.reduce((sum, i) =>
+        sum + enchantResultScore(lookupCombined1H(slots[i-1], slots1H[i-1])), 0);
+
+    if (el('slide-ns'))
+      slideAwkMap['slide-ns'] = SLOTS.reduce((sum, i) => {
+        const s1H = slots1H[i-1];
+        return s1H ? sum + enchantResultScore(lookupRawLevelInCity(s1H.city, enchantData[s1H.city][s1H.lvl].h1)) : sum;
+      }, 0);
+
+    slideAwkMap['slide-0'] = SLOTS.reduce((sum, i) => {
+      const s = slots[i-1];
+      return s ? sum + enchantResultScore(lookupRawLevelInCity(s.city, enchantData[s.city][s.lvl].h1 / 2)) : sum;
+    }, 0);
+
+    if (el('slide-1'))
+      slideAwkMap['slide-1'] = SLOTS.reduce((sum, i) => {
+        const s = slots[i-1], s1H = slots1H[i-1];
+        const shieldB = s   ? enchantData[s.city][s.lvl].h1 / 2 : 0;
+        const weapB   = s1H ? enchantData[s1H.city][s1H.lvl].h1 : 0;
+        const budget  = Math.max(shieldB, weapB);
+        if (!budget) return sum;
+        for (let ci = CITIES.length - 1; ci >= 0; ci--)
+          if (enchantData[CITIES[ci]][15].h2 <= budget)
+            return sum + (enchantData[CITIES[ci]][15].score ?? 0);
+        return sum;
+      }, 0);
+
+    activeDefs.forEach((def, i) => {
+      const id = `slide-${2 + i}`;
+      slideAwkMap[id] = SLOTS.reduce((sum, j) => {
+        const s = slots[j-1];
+        return s ? sum + enchantResultScore(lookupEnchant(def.city, s.city, s.lvl, 0, 1)) : sum;
+      }, 0);
+    });
+  }
+
   el('result-panel').classList.add('visible');
+  renderAwkNote(currentSlide);
 }
 
 function updateBtn() {
@@ -1352,6 +1582,7 @@ el('btn-transfer').addEventListener('click', () => {
   live = true;
   calculate();
   el('btn-transfer').style.display = 'none';
+  el('btn-hint').classList.add('visible');
 });
 
 el('btn-toggle-1h').addEventListener('click', () => {
@@ -1364,7 +1595,7 @@ el('btn-toggle-1h').addEventListener('click', () => {
   updateBtn();
 });
 
-['sel-quality', 'sel-quality-1h', 'sel-refine', 'sel-refine-1h'].forEach(id =>
+['sel-refine', 'sel-refine-1h'].forEach(id =>
   el(id).addEventListener('change', () => { if (live) calculate(); })
 );
 ['sel-upgrade', 'sel-upgrade-1h'].forEach(id =>
@@ -1373,7 +1604,30 @@ el('btn-toggle-1h').addEventListener('click', () => {
 el('chk-poring').addEventListener('change', () => { if (live) calculate(); });
 
 el('arrow-prev').addEventListener('click', () => goSlide(Math.max(0, currentSlide - 1)));
-el('arrow-next').addEventListener('click', () => goSlide(Math.min(TOTAL_SLIDES - 1, currentSlide + 1)));
+el('arrow-next').addEventListener('click', () => goSlide(Math.min(totalSlides - 1, currentSlide + 1)));
+
+function applyQualityClass(panelId, quality) {
+  const panel = el(panelId);
+  if (!panel) return;
+  panel.classList.remove('q-white', 'q-blue', 'q-gold');
+  panel.classList.add('q-' + quality);
+  if (panelId === 'panel-shield') {
+    el('out-refine').classList.remove('q-white', 'q-blue', 'q-gold');
+    el('out-refine').classList.add('q-' + quality);
+  }
+}
+
+applyQualityClass('panel-shield', el('sel-quality').value);
+applyQualityClass('panel-1h',     el('sel-quality-1h').value);
+
+el('sel-quality').addEventListener('change', e => {
+  applyQualityClass('panel-shield', e.target.value);
+  if (live) calculate();
+});
+el('sel-quality-1h').addEventListener('change', e => {
+  applyQualityClass('panel-1h', e.target.value);
+  if (live) calculate();
+});
 
 const track = el('slider-track');
 let touchStartX = 0;
@@ -1381,7 +1635,7 @@ track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; 
 track.addEventListener('touchend', e => {
   const dx = e.changedTouches[0].clientX - touchStartX;
   if (Math.abs(dx) <= 40) return;
-  goSlide(dx < 0 ? Math.min(TOTAL_SLIDES - 1, currentSlide + 1) : Math.max(0, currentSlide - 1));
+  goSlide(dx < 0 ? Math.min(totalSlides - 1, currentSlide + 1) : Math.max(0, currentSlide - 1));
 }, { passive: true });
 
 el('info-toggle').addEventListener('click', () => {
