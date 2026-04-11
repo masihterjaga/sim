@@ -128,10 +128,6 @@ h1 {
   gap: 10px;
 }
 
-.field-row.triple {
-  grid-template-columns: 2fr 1fr;
-}
-
 .field { display: flex; flex-direction: column; gap: 6px; }
 
 label {
@@ -485,6 +481,42 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 
 .enchant-line-empty { color: var(--c-dim); }
 
+.enchant-line-main {
+  flex: 1;
+  position: relative;
+}
+
+.enchant-line-main .enchant-line-bar { width: 100%; }
+
+.slot-tip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  font-size: 10px;
+  color: var(--c-accent-text);
+  background: #1a1c28;
+  border: 1px solid var(--c-accent-border);
+  border-radius: var(--r-sm);
+  padding: 6px 9px;
+  line-height: 1.5;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.slot-tip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 16px;
+  border: 5px solid transparent;
+  border-top-color: var(--c-accent-border);
+}
+
+.enchant-line-main:hover .slot-tip.visible,
+.enchant-line-main.tip-open .slot-tip.visible { display: block; }
+
 .cost-section { padding: 16px; }
 
 .cost-header-row {
@@ -826,27 +858,36 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 
           <div class="enchant-slide" id="slide-1">
             <div class="slide-mode-title">Highest Equivalent</div>
-            <div class="slide-mode-sub">Any city highest that reaches Lv.15.<br/> <!--Enchant 1H with city below first (Lv.1 enough)--> </div>
+            <div class="slide-mode-sub">Per slot: best Lv.15 city achievable from shield or 1H alone (whichever is higher).<br><span style="color:var(--c-dim);font-size:10px;">Tap a slot to see tip.</span></div>
             <div class="enchant-lines">
               <div class="enchant-line">
                 <div class="enchant-line-num">1</div>
-                <div class="enchant-line-bar">
-                  <span class="enchant-line-city enchant-line-empty" id="s1-e1-city">—</span>
-                  <span class="enchant-line-lvl" id="s1-e1-lvl" style="display:none"></span>
+                <div class="enchant-line-main">
+                  <div class="enchant-line-bar">
+                    <span class="enchant-line-city enchant-line-empty" id="s1-e1-city">—</span>
+                    <span class="enchant-line-lvl" id="s1-e1-lvl" style="display:none"></span>
+                  </div>
+                  <div class="slot-tip" id="s1-e1-tip"></div>
                 </div>
               </div>
               <div class="enchant-line">
                 <div class="enchant-line-num">2</div>
-                <div class="enchant-line-bar">
-                  <span class="enchant-line-city enchant-line-empty" id="s1-e2-city">—</span>
-                  <span class="enchant-line-lvl" id="s1-e2-lvl" style="display:none"></span>
+                <div class="enchant-line-main">
+                  <div class="enchant-line-bar">
+                    <span class="enchant-line-city enchant-line-empty" id="s1-e2-city">—</span>
+                    <span class="enchant-line-lvl" id="s1-e2-lvl" style="display:none"></span>
+                  </div>
+                  <div class="slot-tip" id="s1-e2-tip"></div>
                 </div>
               </div>
               <div class="enchant-line">
                 <div class="enchant-line-num">3</div>
-                <div class="enchant-line-bar">
-                  <span class="enchant-line-city enchant-line-empty" id="s1-e3-city">—</span>
-                  <span class="enchant-line-lvl" id="s1-e3-lvl" style="display:none"></span>
+                <div class="enchant-line-main">
+                  <div class="enchant-line-bar">
+                    <span class="enchant-line-city enchant-line-empty" id="s1-e3-city">—</span>
+                    <span class="enchant-line-lvl" id="s1-e3-lvl" style="display:none"></span>
+                  </div>
+                  <div class="slot-tip" id="s1-e3-tip"></div>
                 </div>
               </div>
             </div>
@@ -991,12 +1032,29 @@ function lookupEnchant(targetCity, shieldCity, shieldLvl, extra = 0, minLevel = 
   return '—';
 }
 
-function lookupHighestEquivLv15(city, lvl, extra = 0) {
-  if (!city || lvl === '') return '—';
-  const budget = enchantData[city][+lvl].h1 / 2 + extra;
+function lookupEquivByBudget(budget) {
   for (let i = CITIES.length - 1; i >= 0; i--)
     if (enchantData[CITIES[i]][15].h2 <= budget) return `${cityLabel(CITIES[i])} Lv.15`;
   return '—';
+}
+
+function setEnchantLineTip(tipId, message) {
+  const tipEl = el(tipId);
+  if (!tipEl) return;
+  const main = tipEl.closest('.enchant-line-main');
+  if (message) {
+    tipEl.textContent = message;
+    tipEl.classList.add('visible');
+    if (main && !main._tapBound) {
+      main._tapBound = true;
+      main.style.cursor = 'pointer';
+      main.addEventListener('click', () => main.classList.toggle('tip-open'));
+    }
+  } else {
+    tipEl.textContent = '';
+    tipEl.classList.remove('visible');
+    if (main) { main.classList.remove('tip-open'); main.style.cursor = ''; }
+  }
 }
 
 function lookupCombined1H(s, s1H) {
@@ -1105,10 +1163,38 @@ function renderSlide1H(slots, slots1H) {
   );
 }
 
+function renderSlideNoShield(slots1H) {
+  el('slide-ns')?.remove();
+  el('dot-ns')?.remove();
+  if (!slots1H || slots1H.every(s => !s)) return;
+
+  const dot = Object.assign(document.createElement('div'), { className: 'slide-dot', id: 'dot-ns' });
+  el('slide-dots-container').insertBefore(dot, el('dot-0'));
+
+  const div = document.createElement('div');
+  div.className = 'enchant-slide';
+  div.id        = 'slide-ns';
+  div.innerHTML = `
+    <div class="slide-mode-title">If No Shield Enchantment</div>
+    <div class="slide-mode-sub">Result from 1H enchant only (shield line empty)</div>
+    ${buildEnchantLinesHTML('sns-')}`;
+  el('slider-track').insertBefore(div, el('slide-0'));
+
+  SLOTS.forEach(i => {
+    const s1H = slots1H[i - 1];
+    if (!s1H) { setEnchantLineResult(`sns-e${i}-city`, `sns-e${i}-lvl`, '—'); return; }
+    const budget = enchantData[s1H.city][s1H.lvl].h1;
+    let result = '—';
+    for (let l = 15; l >= 1; l--)
+      if (enchantData[s1H.city][l].h2 <= budget) { result = `${cityLabel(s1H.city)} Lv.${l}`; break; }
+    setEnchantLineResult(`sns-e${i}-city`, `sns-e${i}-lvl`, result);
+  });
+}
+
 function renderDynamicSlides(defs) {
   document.querySelectorAll('.dynamic-slide').forEach(s => s.remove());
   document.querySelectorAll('.dynamic-dot').forEach(d => d.remove());
-  TOTAL_SLIDES = 2 + defs.length + (el('slide-1h') ? 1 : 0);
+  TOTAL_SLIDES = 2 + defs.length + (el('slide-1h') ? 1 : 0) + (el('slide-ns') ? 1 : 0);
 
   const dotsContainer = el('slide-dots-container');
   defs.forEach((_, i) => {
@@ -1170,7 +1256,7 @@ function calculate() {
   const weapEnchH1    = slots1H.reduce((sum, s) => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
   const enchantBudget = weapEnchH1 + shieldEnchH1 / 2;
 
-  el('out-upgrade').innerHTML = `${lookupUpgrade2H(upgradeBudget)}`;
+  el('out-upgrade').textContent = `${lookupUpgrade2H(upgradeBudget)}`;
   if (qualityMismatch) {
     el('out-refine').style.display = 'none';
     el('refine-desc').style.display = 'none';
@@ -1183,12 +1269,30 @@ function calculate() {
   }
 
   SLOTS.forEach(i => {
-    const s     = slots[i - 1];
-    const extra = has1H && slots1H[i - 1] ? enchantData[slots1H[i - 1].city][slots1H[i - 1].lvl].h1 : 0;
+    const s   = slots[i - 1];
+    const s1H = has1H ? slots1H[i - 1] : null;
+
     setEnchantLineResult(`s0-e${i}-city`, `s0-e${i}-lvl`,
-      s ? lookupEnchant(s.city, s.city, s.lvl, extra) : '—');
-    setEnchantLineResult(`s1-e${i}-city`, `s1-e${i}-lvl`,
-      s ? lookupHighestEquivLv15(s.city, s.lvl, extra) : '—');
+      s ? lookupEnchant(s.city, s.city, s.lvl, 0) : '—');
+
+    const shieldBudget = s   ? enchantData[s.city][s.lvl].h1 / 2 : 0;
+    const weapBudget   = s1H ? enchantData[s1H.city][s1H.lvl].h1  : 0;
+    const useBudget    = Math.max(shieldBudget, weapBudget);
+    const equivResult  = useBudget > 0 ? lookupEquivByBudget(useBudget) : '—';
+    setEnchantLineResult(`s1-e${i}-city`, `s1-e${i}-lvl`, equivResult);
+
+    let tip = '';
+    if (equivResult !== '—') {
+      const parsed = parseEnchantResult(equivResult);
+      if (parsed) {
+        const city = parsed.city;
+        if (shieldBudget >= weapBudget && s)
+          tip = `Your slot ${i} shield is equal to ${equivResult}, so just enchant your slot ${i} 1H in ${city} (any level), result will become 2H ${equivResult}.`;
+        else if (weapBudget > shieldBudget && s1H)
+          tip = `Your slot ${i} 1H is equal to ${equivResult}, so just enchant your slot ${i} shield in ${city} (any level), result will become 2H ${equivResult}.`;
+      }
+    }
+    setEnchantLineTip(`s1-e${i}-tip`, tip);
   });
 
   const poring      = el('chk-poring').checked;
@@ -1205,7 +1309,7 @@ function calculate() {
 
   const activeSlots  = slots.filter(s => s);
   const hasActive    = activeSlots.length > 0;
-  const equivResults = activeSlots.map(s => lookupHighestEquivLv15(s.city, s.lvl));
+  const equivResults = activeSlots.map(s => lookupEquivByBudget(enchantData[s.city][s.lvl].h1 / 2));
 
   const allPront15    = hasActive && equivResults.every(r => r === 'Prontera Lv.15');
   const allMorroc15   = hasActive && equivResults.every(r => r === 'Morroc/Einbroch Lv.15');
@@ -1222,21 +1326,18 @@ function calculate() {
     : [];
 
   renderSlide1H(slots, has1H ? slots1H : null);
+  renderSlideNoShield(has1H ? slots1H : null);
   renderDynamicSlides(activeDefs);
   el('result-panel').classList.add('visible');
 }
 
 function updateBtn() {
-  const enchOk   = SLOTS.every(s => {
+  const ready = SLOTS.every(s => {
     const city = el(`ench-city-${s}`).value;
     const lvl  = el(`ench-lvl-${s}`).value;
     return (!city && !lvl) || (city && lvl !== '');
   });
-  const btn   = el('btn-transfer');
-  const ready = enchOk;
-  btn.disabled      = !ready;
-  btn.style.opacity = ready ? '1' : '0.4';
-  btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+  el('btn-transfer').disabled = !ready;
 }
 
 buildEnchantSlots('',    'enchant-slots');
@@ -1247,43 +1348,29 @@ buildEnchantSlots('1h-', 'enchant-slots-1h');
     Array.from({length: 16}, (_, i) => `<option value="${i}">${i}</option>`).join('');
 });
 
-el('btn-toggle-1h').addEventListener('click', () => {
-  const sec       = el('section-1h');
-  const isVisible = sec.style.display !== 'none';
-  sec.style.display = isVisible ? 'none' : 'block';
-  el('btn-toggle-1h').textContent = isVisible ? '+ 1H Weapon' : '− 1H Weapon';
-  el('btn-toggle-1h').classList.toggle('active', !isVisible);
-  if (live) calculate();
-  updateBtn();
-});
-
 el('btn-transfer').addEventListener('click', () => {
   live = true;
   calculate();
   el('btn-transfer').style.display = 'none';
-
-  el('sel-quality').addEventListener('change', calculate);
-  el('sel-quality-1h').addEventListener('change', calculate);
-  el('sel-upgrade').addEventListener('input',  calculate);
-  el('sel-upgrade-1h').addEventListener('input', calculate);
-  el('sel-refine').addEventListener('change',  calculate);
-  el('sel-refine-1h').addEventListener('change', calculate);
-  SLOTS.forEach(s => {
-    el(`ench-city-${s}`).addEventListener('change',    calculate);
-    el(`ench-lvl-${s}`).addEventListener('change',     calculate);
-    el(`ench-city-1h-${s}`).addEventListener('change', calculate);
-    el(`ench-lvl-1h-${s}`).addEventListener('change',  calculate);
-  });
 });
 
+el('btn-toggle-1h').addEventListener('click', () => {
+  const sec = el('section-1h');
+  const showing = sec.style.display !== 'none';
+  sec.style.display = showing ? 'none' : 'block';
+  el('btn-toggle-1h').textContent = showing ? '+ 1H Weapon' : '− 1H Weapon';
+  el('btn-toggle-1h').classList.toggle('active', !showing);
+  if (live) calculate();
+  updateBtn();
+});
+
+['sel-quality', 'sel-quality-1h', 'sel-refine', 'sel-refine-1h'].forEach(id =>
+  el(id).addEventListener('change', () => { if (live) calculate(); })
+);
+['sel-upgrade', 'sel-upgrade-1h'].forEach(id =>
+  el(id).addEventListener('input', () => { if (live) calculate(); })
+);
 el('chk-poring').addEventListener('change', () => { if (live) calculate(); });
-el('sel-refine').addEventListener('change', updateBtn);
-el('sel-upgrade').addEventListener('input', () => { if (live) calculate(); });
-el('sel-upgrade-1h').addEventListener('input', () => { if (live) calculate(); });
-SLOTS.forEach(s => {
-  el(`ench-city-${s}`).addEventListener('change', updateBtn);
-  el(`ench-lvl-${s}`).addEventListener('change',  updateBtn);
-});
 
 el('arrow-prev').addEventListener('click', () => goSlide(Math.max(0, currentSlide - 1)));
 el('arrow-next').addEventListener('click', () => goSlide(Math.min(TOTAL_SLIDES - 1, currentSlide + 1)));
@@ -1291,17 +1378,20 @@ el('arrow-next').addEventListener('click', () => goSlide(Math.min(TOTAL_SLIDES -
 const track = el('slider-track');
 let touchStartX = 0;
 track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-track.addEventListener('touchend',   e => {
+track.addEventListener('touchend', e => {
   const dx = e.changedTouches[0].clientX - touchStartX;
   if (Math.abs(dx) <= 40) return;
-  goSlide(dx < 0
-    ? Math.min(TOTAL_SLIDES - 1, currentSlide + 1)
-    : Math.max(0, currentSlide - 1));
+  goSlide(dx < 0 ? Math.min(TOTAL_SLIDES - 1, currentSlide + 1) : Math.max(0, currentSlide - 1));
 }, { passive: true });
 
 el('info-toggle').addEventListener('click', () => {
   const isOpen = el('info-collapse').classList.toggle('open');
   el('info-toggle-icon').classList.toggle('open', isOpen);
+});
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.enchant-line-main'))
+    document.querySelectorAll('.enchant-line-main.tip-open').forEach(m => m.classList.remove('tip-open'));
 });
 
 updateBtn();
