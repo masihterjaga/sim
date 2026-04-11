@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Advanced Transfer</title>
+<meta name="description" content="Advanced transfer cost and expected result." />
+<style>
+:root {
+  --c-bg:             #09090d;
+  --c-surface:        #111318;
+  --c-surface-2:      #16181f;
+  --c-surface-3:      #1c1f28;
+  --c-border:         #1e2232;
+  --c-border-2:       #272b3e;
+  --c-text:           #c9ceda;
+  --c-muted:          #525b72;
+  --c-dim:            #323849;
+  --c-accent:         #f5a623;
+  --c-accent-dim:     rgba(245,166,35,.1);
+  --c-accent-border:  rgba(245,166,35,.25);
+  --c-accent-text:    rgba(245,166,35,.9);
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --font: system-ui, -apple-system, sans-serif;
+  --mono: ui-monospace, 'SF Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.5;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 72px;
+  min-height: 100vh;
+}
+
+.wrap {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.card-header {
+  padding: 8px 0 24px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  background: var(--c-accent-dim);
+  border: 1px solid var(--c-accent-border);
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-accent-text);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+h1 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #dde2f0;
+  letter-spacing: -.5px;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--c-muted);
+  line-height: 1.6;
+}
+
+.subtitle a {
+  color: #6e82b8;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(110,130,184,.3);
+  transition: color .15s;
+}
+.subtitle a:hover { color: #8fa0d0; }
+
+.panel {
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--c-border);
+  background: var(--c-surface-2);
+}
+
+.panel-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .9px;
+  text-transform: uppercase;
+}
+
+.panel-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.field-row.triple {
+  grid-template-columns: 2fr 1fr;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+
+label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+select, input[type="number"] {
+  width: 100%;
+  background: var(--c-surface-3);
+  border: 1px solid var(--c-border-2);
+  border-radius: var(--r-sm);
+  color: var(--c-text);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: 32px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23404660' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+}
+
+select:focus, input[type="number"]:focus {
+  border-color: var(--c-accent-border);
+  box-shadow: 0 0 0 3px rgba(245,166,35,.07);
+}
+
+select option { background: var(--c-surface-2); }
+
+input[type="number"] {
+  font-family: var(--mono);
+  -moz-appearance: textfield;
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--c-border);
+}
+
+.enchant-slots { display: flex; flex-direction: column; gap: 14px; }
+
+.slot { display: flex; flex-direction: column; gap: 8px; }
+
+.slot-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-dim);
+  letter-spacing: .7px;
+  text-transform: uppercase;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 10px;
+  align-items: end;
+}
+
+.field.wide { flex: 1; }
+
+.slot-header {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.btn-toggle-1h {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 11px;
+  background: transparent;
+  border: 1px dashed var(--c-border-2);
+  border-radius: var(--r-md);
+  color: var(--c-muted);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .5px;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background .15s;
+}
+
+.btn-toggle-1h:hover {
+  border-color: var(--c-accent-border);
+  color: var(--c-accent-text);
+  background: var(--c-accent-dim);
+}
+
+.btn-toggle-1h.active {
+  border-style: solid;
+  border-color: var(--c-accent-border);
+  color: var(--c-accent-text);
+  background: var(--c-accent-dim);
+}
+
+.btn-transfer {
+  width: 100%;
+  padding: 14px;
+  background: var(--c-accent);
+  border: none;
+  border-radius: var(--r-md);
+  color: #1a1200;
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .15s, transform .1s;
+}
+
+.btn-transfer:hover { opacity: .9; }
+.btn-transfer:active { transform: scale(.998); opacity: .85; }
+.btn-transfer:disabled {
+  background: var(--c-surface-3);
+  color: var(--c-muted);
+  border: 1px solid var(--c-border);
+  cursor: not-allowed;
+  opacity: .6;
+}
+
+.result {
+  display: none;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.result.visible { display: block; }
+
+.result-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--c-surface-2);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.result-header-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  flex: 1;
+}
+
+.result-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.stat-block {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-block + .stat-block {
+  border-left: 1px solid var(--c-border);
+}
+
+.stat-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+}
+
+.stat-value {
+  font-family: var(--mono);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--c-accent);
+  line-height: 1.1;
+}
+
+.stat-value span {
+  font-size: 12px;
+  color: var(--c-dim);
+  font-weight: 400;
+  margin-left: 2px;
+}
+
+.stat-desc {
+  font-size: 11px;
+  color: var(--c-dim);
+  margin-top: 2px;
+}
+
+.enchant-section {
+  border-bottom: 1px solid var(--c-border);
+}
+
+.enchant-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+}
+
+.enchant-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .9px;
+  text-transform: uppercase;
+}
+
+.slide-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.slide-dots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.slide-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-dim);
+  transition: background .2s, transform .2s;
+}
+
+.slide-dot.active {
+  background: var(--c-accent);
+  transform: scale(1.4);
+}
+
+.slide-arrow {
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  background: var(--c-surface-3);
+  border: 1px solid var(--c-border-2);
+  color: var(--c-muted);
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+}
+
+.slide-arrow:hover { background: var(--c-border-2); color: var(--c-text); }
+.slide-arrow:disabled { opacity: .2; cursor: not-allowed; }
+
+.enchant-result-wrap { overflow: hidden; }
+
+.enchant-slider-track {
+  display: flex;
+  transition: transform .3s cubic-bezier(.4, 0, .2, 1);
+}
+
+.enchant-slide {
+  min-width: 100%;
+  padding: 14px 16px 16px;
+  border-top: 1px solid var(--c-border);
+}
+
+.slide-mode-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #dde2f0;
+  margin-bottom: 4px;
+}
+
+.slide-mode-sub {
+  font-size: 11px;
+  color: var(--c-muted);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.enchant-lines { display: flex; flex-direction: column; gap: 7px; }
+
+.enchant-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.enchant-line-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--c-dim);
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.enchant-line-bar {
+  flex: 1;
+  background: var(--c-surface-3);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  padding: 7px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.enchant-line-city {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--c-text);
+}
+
+.enchant-line-lvl {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-accent);
+  background: var(--c-accent-dim);
+  border: 1px solid var(--c-accent-border);
+  border-radius: 4px;
+  padding: 2px 7px;
+}
+
+.enchant-line-empty { color: var(--c-dim); }
+
+.cost-section { padding: 16px; }
+
+.cost-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.cost-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .9px;
+  text-transform: uppercase;
+}
+
+.poring-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-muted);
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  cursor: pointer;
+  user-select: none;
+  transition: color .15s;
+}
+
+.poring-label:hover { color: var(--c-text); }
+
+.poring-label input[type="checkbox"] {
+  accent-color: var(--c-accent);
+  width: 13px;
+  height: 13px;
+  cursor: pointer;
+}
+
+.col-labels {
+  display: flex;
+  gap: 8px;
+  padding: 0 0 8px;
+}
+
+.col-spacer { flex: 1; }
+
+.col-label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--c-dim);
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  min-width: 72px;
+  text-align: right;
+}
+
+.cost-rows { display: flex; flex-direction: column; gap: 6px; }
+
+.cost-row {
+  display: flex;
+  align-items: center;
+  padding: 9px 12px;
+  background: var(--c-surface-2);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  gap: 8px;
+  transition: background .15s;
+}
+
+.cost-row.total {
+  background: var(--c-surface-3);
+  border-color: var(--c-border-2);
+  margin-top: 2px;
+}
+
+.cost-row-label {
+  font-size: 12px;
+  color: var(--c-muted);
+  flex: 1;
+  font-weight: 500;
+}
+
+.cost-row.total .cost-row-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-text);
+  letter-spacing: .3px;
+}
+
+.cost-col {
+  min-width: 72px;
+  text-align: right;
+}
+
+.cost-value {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c-text);
+}
+
+.cost-value.accent { color: var(--c-accent); }
+
+.cost-row.total .cost-value { font-size: 13px; }
+
+.dreamsand-note {
+  font-size: 10px;
+  color: var(--c-dim);
+  margin-top: 12px;
+  line-height: 1.55;
+}
+
+.info-toggle {
+  width: 100%;
+  padding: 10px 16px;
+  background: var(--c-surface-2);
+  border: none;
+  border-top: 1px solid var(--c-border);
+  color: var(--c-muted);
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: color .15s, background .15s;
+}
+
+.info-toggle:hover { color: var(--c-text); background: var(--c-surface-3); }
+
+.info-toggle-icon {
+  font-size: 10px;
+  transition: transform .2s;
+}
+
+.info-toggle-icon.open { transform: rotate(180deg); }
+
+.info-collapse {
+  display: none;
+  background: var(--c-surface-2);
+  border-top: 1px solid var(--c-border);
+  padding: 16px;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.info-collapse.open { display: flex; }
+
+.info-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-accent-text);
+  letter-spacing: .7px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.info-section p {
+  font-size: 12px;
+  color: var(--c-muted);
+  line-height: 1.65;
+}
+
+.info-section p + p { margin-top: 6px; }
+
+.credit {
+  font-size: 11px;
+  color: var(--c-dim);
+  text-align: center;
+  padding-top: 4px;
+}
+
+.credit a {
+  color: var(--c-muted);
+  text-decoration: none;
+  transition: color .15s;
+}
+
+.credit a:hover { color: var(--c-text); }
+
+.refine-quality-warn {
+  font-size: 10px;
+  font-weight: 700;
+  color: #e07b3a;
+  background: rgba(224,123,58,.1);
+  border: 1px solid rgba(224,123,58,.25);
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin-top: 6px;
+  line-height: 1.4;
+  letter-spacing: .2px;
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="card-header">
+    <div class="badge">1H+Shield » 2H</div>
+    <h1>Advanced Transfer</h1>
+    <p class="subtitle">Transfer cost & expected result (upgrade, refine & enchant)</p>
+  </div>
+
+  <button class="btn-toggle-1h" id="btn-toggle-1h">+ Add 1H Weapon</button>
+
+  <div id="section-1h" style="display:none">
+    <div class="panel">
+      <div class="panel-header">
+        <div class="panel-title">1H Weapon</div>
+        <div class="field" style="width:120px">
+          <select id="sel-quality-1h">
+            <option value="white">White</option>
+            <option value="blue">Blue</option>
+            <option value="gold">Gold</option>
+          </select>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field">
+            <label>Upgrade Level</label>
+            <input type="number" id="sel-upgrade-1h" min="0" max="280" value="0" placeholder="0–280">
+          </div>
+          <div class="field">
+            <label>Refine</label>
+            <select id="sel-refine-1h"></select>
+          </div>
+        </div>
+        <hr class="divider">
+        <div>
+          <div class="slot-header">Enchantment</div>
+          <div class="enchant-slots" id="enchant-slots-1h"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">Shield</div>
+      <div class="field" style="width:120px">
+        <select id="sel-quality">
+          <option value="white">White</option>
+          <option value="blue">Blue</option>
+          <option value="gold">Gold</option>
+        </select>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="field-row">
+        <div class="field">
+          <label>Upgrade Level</label>
+          <input type="number" id="sel-upgrade" min="0" max="280" value="0" placeholder="0–280">
+        </div>
+        <div class="field">
+          <label>Refine</label>
+          <select id="sel-refine"></select>
+        </div>
+      </div>
+      <hr class="divider">
+      <div>
+        <div class="slot-header">Enchantment</div>
+        <div class="enchant-slots" id="enchant-slots"></div>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-transfer" id="btn-transfer">Calculate Transfer</button>
+
+  <div class="result" id="result-panel">
+
+    <div class="result-header">
+      <div class="result-header-label">Expected Result in 2H</div>
+    </div>
+
+    <div class="result-stats">
+      <div class="stat-block">
+        <div class="stat-label">Upgrade</div>
+        <div class="stat-value" id="out-upgrade">—</div>
+        <div class="stat-desc">Expected level</div>
+      </div>
+      <div class="stat-block">
+        <div class="stat-label">Refine</div>
+        <div class="stat-value" id="out-refine">—</div>
+        <div class="stat-desc" id="refine-desc">Expected level</div>
+        <div class="refine-quality-warn" id="refine-quality-warn" style="display:none">⚠ Quality mismatch</div>
+      </div>
+    </div>
+
+    <div class="enchant-section">
+      <div class="enchant-section-header">
+        <div class="enchant-section-title">Enchantment</div>
+        <div class="slide-nav">
+          <div class="slide-dots" id="slide-dots-container">
+            <div class="slide-dot active" id="dot-0"></div>
+            <div class="slide-dot" id="dot-1"></div>
+          </div>
+          <button class="slide-arrow" id="arrow-prev" disabled>&#8592;</button>
+          <button class="slide-arrow" id="arrow-next">&#8594;</button>
+        </div>
+      </div>
+
+      <div class="enchant-result-wrap">
+        <div class="enchant-slider-track" id="slider-track">
+
+          <div class="enchant-slide" id="slide-0">
+            <div class="slide-mode-title">If No 1H Enchantment</div>
+            <div class="slide-mode-sub">Result if 1H line is empty</div>
+            <div class="enchant-lines">
+              <div class="enchant-line">
+                <div class="enchant-line-num">1</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s0-e1-city">—</span>
+                  <span class="enchant-line-lvl" id="s0-e1-lvl" style="display:none"></span>
+                </div>
+              </div>
+              <div class="enchant-line">
+                <div class="enchant-line-num">2</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s0-e2-city">—</span>
+                  <span class="enchant-line-lvl" id="s0-e2-lvl" style="display:none"></span>
+                </div>
+              </div>
+              <div class="enchant-line">
+                <div class="enchant-line-num">3</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s0-e3-city">—</span>
+                  <span class="enchant-line-lvl" id="s0-e3-lvl" style="display:none"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="enchant-slide" id="slide-1">
+            <div class="slide-mode-title">Highest Equivalent</div>
+            <div class="slide-mode-sub">Any city highest that reaches Lv.15.<br/>Enchant 1H with city below first (Lv.1 enough)</div>
+            <div class="enchant-lines">
+              <div class="enchant-line">
+                <div class="enchant-line-num">1</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s1-e1-city">—</span>
+                  <span class="enchant-line-lvl" id="s1-e1-lvl" style="display:none"></span>
+                </div>
+              </div>
+              <div class="enchant-line">
+                <div class="enchant-line-num">2</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s1-e2-city">—</span>
+                  <span class="enchant-line-lvl" id="s1-e2-lvl" style="display:none"></span>
+                </div>
+              </div>
+              <div class="enchant-line">
+                <div class="enchant-line-num">3</div>
+                <div class="enchant-line-bar">
+                  <span class="enchant-line-city enchant-line-empty" id="s1-e3-city">—</span>
+                  <span class="enchant-line-lvl" id="s1-e3-lvl" style="display:none"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <button class="info-toggle" id="info-toggle">
+      How it works
+      <span class="info-toggle-icon" id="info-toggle-icon">▾</span>
+    </button>
+    <div class="info-collapse" id="info-collapse">
+      <div class="info-section">
+        <div class="info-section-title">Upgrade</div>
+        <p>Shield contributes half its 1H upgrade cost to the transfer budget. The resulting 2H upgrade level is the highest achievable with that combined budget.</p>
+      </div>
+      <div class="info-section">
+        <div class="info-section-title">Refine</div>
+        <p>For Adv Transfer from Shield to 2H, ensure refine is only on the shield and quality (White/Blue/Gold) must match for all eq.</p>
+      </div>
+      <div class="info-section">
+        <div class="info-section-title">Enchant</div>
+        <p>Adv Transfer defaults to the lowest city if 1H and Shield cities differ.</p>
+        <p>Example:<br>
+          Shield: Geffen Lv.14 | 1H: Empty → <b>Geffen 2H Lv.10</b><br>
+          Shield: Geffen Lv.14 | 1H: Izlude Lv.1 → <b>Izlude 2H Lv.15</b><br>
+          Full lookup table <u><a href="https://docs.google.com/spreadsheets/d/1UEEdz_XBalhENtpItbL-IWi-Gm28naW5rNxzgYQXxH0/" target="_blank">here</a></u>.</p>
+      </div>
+    </div>
+
+    <div class="cost-section">
+      <div class="cost-header-row">
+        <div class="cost-title">Transfer Cost</div>
+        <label class="poring-label">
+          <input type="checkbox" id="chk-poring"> Poring Diamond
+        </label>
+      </div>
+      <div class="col-labels">
+        <div class="col-spacer"></div>
+        <div class="col-label">Dias</div>
+        <div class="col-label">Dreamsand</div>
+      </div>
+      <div class="cost-rows">
+        <div class="cost-row">
+          <div class="cost-row-label">Upgrade</div>
+          <div class="cost-col"><div class="cost-value" id="out-upgrade-cost">—</div></div>
+          <div class="cost-col"><div class="cost-value accent" id="out-upgrade-dreamsand">—</div></div>
+        </div>
+        <div class="cost-row">
+          <div class="cost-row-label">Refine</div>
+          <div class="cost-col"><div class="cost-value" id="out-refine-cost">—</div></div>
+          <div class="cost-col"><div class="cost-value accent" id="out-refine-dreamsand">—</div></div>
+        </div>
+        <div class="cost-row">
+          <div class="cost-row-label">Enchant</div>
+          <div class="cost-col"><div class="cost-value" id="out-enchant-cost">—</div></div>
+          <div class="cost-col"><div class="cost-value accent" id="out-enchant-dreamsand">—</div></div>
+        </div>
+        <div class="cost-row total">
+          <div class="cost-row-label">Total</div>
+          <div class="cost-col"><div class="cost-value" id="out-normal">—</div></div>
+          <div class="cost-col"><div class="cost-value accent" id="out-dreamsand">—</div></div>
+        </div>
+      </div>
+      <p class="dreamsand-note">Tip: Disable VIP Kafra discount when using Dreamsand to ensure a 0 Diamond cost.</p>
+    </div>
+
+  </div>
+
+  <p class="credit">Prompted by Silja [Odin – Nastia] with <a href="https://claude.ai" target="_blank">Claude Sonnet 4.6</a>. Another tool: <a href="https://masihterjaga.github.io/sim">ratio calculator</a></p>
+
+</div>
+
+<script>
+const refineData={0:{white:{h1:0,h2:0},blue:{h1:0,h2:0},gold:{h1:0,h2:0}},1:{white:{h1:360,h2:540},blue:{h1:720,h2:1080},gold:{h1:1440,h2:2160}},2:{white:{h1:1080,h2:1620},blue:{h1:2160,h2:3240},gold:{h1:4320,h2:6480}},3:{white:{h1:3241,h2:4861},blue:{h1:6481,h2:9721},gold:{h1:12961,h2:19441}},4:{white:{h1:6121,h2:9181},blue:{h1:12241,h2:18361},gold:{h1:24481,h2:36721}},5:{white:{h1:13321,h2:19981},blue:{h1:26641,h2:39961},gold:{h1:53281,h2:79921}},6:{white:{h1:24841,h2:37261},blue:{h1:49681,h2:74521},gold:{h1:99361,h2:149041}},7:{white:{h1:50041,h2:75061},blue:{h1:100081,h2:150121},gold:{h1:200161,h2:300241}},8:{white:{h1:92341,h2:138511},blue:{h1:184681,h2:277021},gold:{h1:369361,h2:554041}},9:{white:{h1:171991,h2:257986},blue:{h1:343981,h2:515971},gold:{h1:687961,h2:1031941}},10:{white:{h1:307666,h2:461498},blue:{h1:615331,h2:922996},gold:{h1:1230661,h2:1845991}},11:{white:{h1:543578,h2:815367},blue:{h1:1087156,h2:1630733},gold:{h1:2174311,h2:3261466}},12:{white:{h1:929847,h2:1394770},blue:{h1:1859693,h2:2789539},gold:{h1:3719386,h2:5579078}},13:{white:{h1:1574050,h2:2361075},blue:{h1:3148099,h2:4722149},gold:{h1:6296198,h2:9444297}},14:{white:{h1:3163591,h2:4745386},blue:{h1:6327181,h2:9490771},gold:{h1:12654361,h2:18981541}},15:{white:{h1:7045319,h2:10567978},blue:{h1:14090637,h2:21135955},gold:{h1:28181273,h2:42271909}}};
+
+const enchantData={"Prontera":{0:{h1:0,h2:0},1:{h1:216,h2:324},2:{h1:648,h2:972},3:{h1:1297,h2:1945},4:{h1:2161,h2:3241},5:{h1:3889,h2:5833},6:{h1:6482,h2:9722},7:{h1:9938,h2:14906},8:{h1:14258,h2:21386},9:{h1:20738,h2:31106},10:{h1:29378,h2:44066},11:{h1:40178,h2:60266},12:{h1:53138,h2:79706},13:{h1:70418,h2:105626},14:{h1:92018,h2:138026},15:{h1:117940,h2:176910}},"Morroc":{0:{h1:0,h2:0},1:{h1:432,h2:648},2:{h1:1296,h2:1944},3:{h1:2593,h2:3889},4:{h1:4321,h2:6481},5:{h1:7777,h2:11665},6:{h1:12963,h2:19444},7:{h1:19875,h2:29812},8:{h1:28515,h2:42772},9:{h1:41475,h2:62212},10:{h1:58755,h2:88132},11:{h1:80355,h2:120532},12:{h1:106275,h2:159412},13:{h1:140835,h2:211252},14:{h1:184035,h2:276052},15:{h1:235880,h2:353819}},"Izlude Island":{0:{h1:0,h2:0},1:{h1:864,h2:1296},2:{h1:2592,h2:3888},3:{h1:5185,h2:7777},4:{h1:8641,h2:12961},5:{h1:15553,h2:23329},6:{h1:25925,h2:38887},7:{h1:39749,h2:59623},8:{h1:57029,h2:85543},9:{h1:82949,h2:124423},10:{h1:117509,h2:176263},11:{h1:160709,h2:241063},12:{h1:212549,h2:318823},13:{h1:281669,h2:422503},14:{h1:368069,h2:552103},15:{h1:471759,h2:707638}},"Alberta":{0:{h1:0,h2:0},1:{h1:864,h2:1296},2:{h1:2592,h2:3888},3:{h1:5185,h2:7777},4:{h1:8641,h2:12961},5:{h1:15553,h2:23329},6:{h1:25925,h2:38887},7:{h1:39749,h2:59623},8:{h1:57029,h2:85543},9:{h1:82949,h2:124423},10:{h1:117509,h2:176263},11:{h1:160709,h2:241063},12:{h1:212549,h2:318823},13:{h1:281669,h2:422503},14:{h1:368069,h2:552103},15:{h1:471759,h2:707638}},"Payon":{0:{h1:0,h2:0},1:{h1:1728,h2:2592},2:{h1:5184,h2:7776},3:{h1:10369,h2:15553},4:{h1:17281,h2:25921},5:{h1:31105,h2:46657},6:{h1:51849,h2:77773},7:{h1:79497,h2:119245},8:{h1:114057,h2:171085},9:{h1:165897,h2:248845},10:{h1:235017,h2:352525},11:{h1:321417,h2:482125},12:{h1:425097,h2:637645},13:{h1:563337,h2:845005},14:{h1:736137,h2:1104205},15:{h1:943518,h2:1415276}},"Geffen":{0:{h1:0,h2:0},1:{h1:3456,h2:5184},2:{h1:10368,h2:15552},3:{h1:20737,h2:31105},4:{h1:34561,h2:51841},5:{h1:62209,h2:93313},6:{h1:103697,h2:155546},7:{h1:158993,h2:238490},8:{h1:228113,h2:342170},9:{h1:331793,h2:497690},10:{h1:470033,h2:705050},11:{h1:642833,h2:964250},12:{h1:850193,h2:1275290},13:{h1:1126673,h2:1690010},14:{h1:1472273,h2:2208410},15:{h1:1887035,h2:2830552}},"Glast Heim":{0:{h1:0,h2:0},1:{h1:6912,h2:10368},2:{h1:20736,h2:31104},3:{h1:41473,h2:62209},4:{h1:69121,h2:103681},5:{h1:124417,h2:186625},6:{h1:207394,h2:311091},7:{h1:317986,h2:476979},8:{h1:456226,h2:684339},9:{h1:663586,h2:995379},10:{h1:940066,h2:1410099},11:{h1:1285666,h2:1928499},12:{h1:1700386,h2:2550579},13:{h1:2253346,h2:3380019},14:{h1:2944546,h2:4416819},15:{h1:3774069,h2:5661103}},"Comodo":{0:{h1:0,h2:0},1:{h1:10368,h2:15552},2:{h1:31104,h2:46656},3:{h1:62209,h2:93313},4:{h1:103681,h2:155521},5:{h1:186625,h2:279937},6:{h1:311091,h2:466636},7:{h1:476979,h2:715468},8:{h1:684339,h2:1026508},9:{h1:995379,h2:1493068},10:{h1:1410099,h2:2115148},11:{h1:1928499,h2:2892748},12:{h1:2550579,h2:3825868},13:{h1:3380019,h2:5070028},14:{h1:4416819,h2:6625228},15:{h1:5661103,h2:8491654}},"Umbala":{0:{h1:0,h2:0},1:{h1:15552,h2:23328},2:{h1:46656,h2:69984},3:{h1:93313,h2:139969},4:{h1:155521,h2:233281},5:{h1:279937,h2:419905},6:{h1:466636,h2:699953},7:{h1:715468,h2:1073201},8:{h1:1026508,h2:1539761},9:{h1:1493068,h2:2239601},10:{h1:2115148,h2:3172721},11:{h1:2892748,h2:4339121},12:{h1:3825868,h2:5738801},13:{h1:5070028,h2:7605041},14:{h1:6625228,h2:9937841},15:{h1:8491654,h2:12737481}},"Juno":{0:{h1:0,h2:0},1:{h1:23328,h2:34992},2:{h1:69984,h2:104976},3:{h1:139969,h2:209954},4:{h1:233281,h2:349922},5:{h1:419905,h2:629858},6:{h1:699953,h2:1049930},7:{h1:1073201,h2:1609802},8:{h1:1539761,h2:2309642},9:{h1:2239601,h2:3359402},10:{h1:3172721,h2:4759082},11:{h1:4339121,h2:6508682},12:{h1:5738801,h2:8608202},13:{h1:7605041,h2:11407562},14:{h1:9937841,h2:14906762},15:{h1:12737481,h2:19106222}}};
+
+const upgradeData={0:{h1:0,h2:0},1:{h1:4,h2:6},2:{h1:8,h2:11},3:{h1:11,h2:17},4:{h1:15,h2:22},5:{h1:18,h2:27},6:{h1:22,h2:33},7:{h1:26,h2:38},8:{h1:29,h2:44},9:{h1:33,h2:49},10:{h1:36,h2:54},11:{h1:40,h2:60},12:{h1:44,h2:65},13:{h1:47,h2:71},14:{h1:51,h2:76},15:{h1:54,h2:81},16:{h1:58,h2:87},17:{h1:62,h2:92},18:{h1:65,h2:98},19:{h1:69,h2:103},20:{h1:72,h2:108},21:{h1:183,h2:275},22:{h1:294,h2:441},23:{h1:405,h2:607},24:{h1:516,h2:773},25:{h1:629,h2:944},26:{h1:743,h2:1114},27:{h1:857,h2:1285},28:{h1:970,h2:1455},29:{h1:1087,h2:1630},30:{h1:1204,h2:1805},31:{h1:1321,h2:1981},32:{h1:1437,h2:2156},33:{h1:1557,h2:2336},34:{h1:1677,h2:2516},35:{h1:1797,h2:2696},36:{h1:1917,h2:2876},37:{h1:2041,h2:3061},38:{h1:2164,h2:3246},39:{h1:2288,h2:3431},40:{h1:2411,h2:3616},41:{h1:2538,h2:3807},42:{h1:2665,h2:3998},43:{h1:2792,h2:4188},44:{h1:2919,h2:4379},45:{h1:3050,h2:4575},46:{h1:3181,h2:4771},47:{h1:3312,h2:4968},48:{h1:3443,h2:5164},49:{h1:3578,h2:5367},50:{h1:3713,h2:5569},51:{h1:3848,h2:5772},52:{h1:3983,h2:5974},53:{h1:4122,h2:6183},54:{h1:4262,h2:6392},55:{h1:4401,h2:6601},56:{h1:4540,h2:6810},57:{h1:4684,h2:7026},58:{h1:4828,h2:7242},59:{h1:4972,h2:7458},60:{h1:5116,h2:7674},61:{h1:5412,h2:8118},62:{h1:5708,h2:8562},63:{h1:6004,h2:9006},64:{h1:6300,h2:9450},65:{h1:6604,h2:9906},66:{h1:6908,h2:10362},67:{h1:7213,h2:10819},68:{h1:7517,h2:11275},69:{h1:7830,h2:11745},70:{h1:8143,h2:12214},71:{h1:8456,h2:12684},72:{h1:8769,h2:13153},73:{h1:9091,h2:13637},74:{h1:9414,h2:14120},75:{h1:9736,h2:14604},76:{h1:10059,h2:15088},77:{h1:10391,h2:15586},78:{h1:10723,h2:16084},79:{h1:11055,h2:16583},80:{h1:11388,h2:17081},81:{h1:11731,h2:17596},82:{h1:12073,h2:18110},83:{h1:12416,h2:18624},84:{h1:12759,h2:19139},85:{h1:13113,h2:19670},86:{h1:13467,h2:20201},87:{h1:13821,h2:20732},88:{h1:14176,h2:21263},89:{h1:14542,h2:21812},90:{h1:14908,h2:22361},91:{h1:15274,h2:22911},92:{h1:15640,h2:23460},93:{h1:16019,h2:24028},94:{h1:16398,h2:24597},95:{h1:16777,h2:25165},96:{h1:17156,h2:25733},97:{h1:17549,h2:26323},98:{h1:17941,h2:26912},99:{h1:18334,h2:27501},100:{h1:18727,h2:28090},101:{h1:19534,h2:29301},102:{h1:20342,h2:30512},103:{h1:21149,h2:31723},104:{h1:21957,h2:32935},105:{h1:22787,h2:34181},106:{h1:23618,h2:35427},107:{h1:24449,h2:36673},108:{h1:25280,h2:37919},109:{h1:26135,h2:39202},110:{h1:26991,h2:40486},111:{h1:27846,h2:41769},112:{h1:28701,h2:43052},113:{h1:29583,h2:44374},114:{h1:30465,h2:45697},115:{h1:31346,h2:47019},116:{h1:32228,h2:48342},117:{h1:33137,h2:49706},118:{h1:34047,h2:51070},119:{h1:34956,h2:52434},120:{h1:35866,h2:53799},121:{h1:36805,h2:55207},122:{h1:37744,h2:56616},123:{h1:38683,h2:58025},124:{h1:39622,h2:59433},125:{h1:40593,h2:60890},126:{h1:41564,h2:62346},127:{h1:42535,h2:63802},128:{h1:43506,h2:65258},129:{h1:44510,h2:66765},130:{h1:45515,h2:68272},131:{h1:46520,h2:69779},132:{h1:47524,h2:71286},133:{h1:48565,h2:72847},134:{h1:49606,h2:74409},135:{h1:50647,h2:75970},136:{h1:51688,h2:77532},137:{h1:52768,h2:79152},138:{h1:53848,h2:80772},139:{h1:54928,h2:82392},140:{h1:56008,h2:84012},141:{h1:58223,h2:87335},142:{h1:60439,h2:90658},143:{h1:62654,h2:93981},144:{h1:64870,h2:97304},145:{h1:67143,h2:100715},146:{h1:69417,h2:104125},147:{h1:71691,h2:107536},148:{h1:73964,h2:110946},149:{h1:76299,h2:114449},150:{h1:78635,h2:117952},151:{h1:80970,h2:121454},152:{h1:83305,h2:124957},153:{h1:85705,h2:128557},154:{h1:88105,h2:132157},155:{h1:90505,h2:135757},156:{h1:92905,h2:139357},157:{h1:95373,h2:143060},158:{h1:97842,h2:146763},159:{h1:100311,h2:150466},160:{h1:102779,h2:154168},161:{h1:105320,h2:157980},162:{h1:107861,h2:161792},163:{h1:110403,h2:165604},164:{h1:112944,h2:169415},165:{h1:115562,h2:173343},166:{h1:118180,h2:177270},167:{h1:120798,h2:181197},168:{h1:123417,h2:185125},169:{h1:126117,h2:189175},170:{h1:128817,h2:193225},171:{h1:131517,h2:197275},172:{h1:134217,h2:201325},173:{h1:137004,h2:205505},174:{h1:139791,h2:209686},175:{h1:142578,h2:213867},176:{h1:145365,h2:218047},177:{h1:148245,h2:222367},178:{h1:151125,h2:226687},179:{h1:154005,h2:231007},180:{h1:156885,h2:235327},181:{h1:168600,h2:252900},182:{h1:180315,h2:270473},183:{h1:192031,h2:288046},184:{h1:203746,h2:305619},185:{h1:215663,h2:323495},186:{h1:227580,h2:341370},187:{h1:239498,h2:359246},188:{h1:251415,h2:377122},189:{h1:263541,h2:395312},190:{h1:275668,h2:413501},191:{h1:287794,h2:431691},192:{h1:299920,h2:449880},193:{h1:312263,h2:468394},194:{h1:324606,h2:486909},195:{h1:336949,h2:505423},196:{h1:349292,h2:523937},197:{h1:361859,h2:542788},198:{h1:374426,h2:561639},199:{h1:386993,h2:580490},200:{h1:399561,h2:599341},201:{h1:412361,h2:618541},202:{h1:425161,h2:637741},203:{h1:437961,h2:656941},204:{h1:450761,h2:676141},205:{h1:463802,h2:695703},206:{h1:476844,h2:715265},207:{h1:489885,h2:734828},208:{h1:502927,h2:754390},209:{h1:516219,h2:774328},210:{h1:529511,h2:794267},211:{h1:542804,h2:814205},212:{h1:556096,h2:834144},213:{h1:569649,h2:854473},214:{h1:583202,h2:874803},215:{h1:596755,h2:895132},216:{h1:610308,h2:915461},217:{h1:624132,h2:936197},218:{h1:637956,h2:956933},219:{h1:651780,h2:977669},220:{h1:665604,h2:998405},221:{h1:679710,h2:1019565},222:{h1:693816,h2:1040724},223:{h1:707922,h2:1061883},224:{h1:722028,h2:1083042},225:{h1:736428,h2:1104642},226:{h1:750828,h2:1126242},227:{h1:765228,h2:1147842},228:{h1:779628,h2:1169442},229:{h1:794335,h2:1191502},230:{h1:809041,h2:1213561},231:{h1:823747,h2:1235621},232:{h1:838454,h2:1257680},233:{h1:853480,h2:1280220},234:{h1:868506,h2:1302759},235:{h1:883532,h2:1325298},236:{h1:898558,h2:1347837},237:{h1:913918,h2:1370877},238:{h1:929278,h2:1393917},239:{h1:944638,h2:1416957},240:{h1:959998,h2:1439997},241:{h1:987416,h2:1481124},242:{h1:1014985,h2:1522477},243:{h1:1042705,h2:1564058},244:{h1:1070579,h2:1605869},245:{h1:1098609,h2:1647914},246:{h1:1126796,h2:1690194},247:{h1:1155141,h2:1732712},248:{h1:1183647,h2:1775471},249:{h1:1212316,h2:1818474},250:{h1:1241149,h2:1861724},251:{h1:1270149,h2:1905223},252:{h1:1299316,h2:1948974},253:{h1:1328653,h2:1992980},254:{h1:1358163,h2:2037245},255:{h1:1387847,h2:2081771},256:{h1:1417707,h2:2126561},257:{h1:1447746,h2:2171619},258:{h1:1477965,h2:2216947},259:{h1:1508367,h2:2262550},260:{h1:1538768,h2:2308152},261:{h1:1569176,h2:2353764},262:{h1:1599580,h2:2399370},263:{h1:1629984,h2:2444976},264:{h1:1660388,h2:2490582},265:{h1:1690792,h2:2536188},266:{h1:1721196,h2:2581794},267:{h1:1751600,h2:2627400},268:{h1:1782004,h2:2673006},269:{h1:1812408,h2:2718612},270:{h1:1842812,h2:2764218},271:{h1:1873216,h2:2809824},272:{h1:1903620,h2:2855430},273:{h1:1934024,h2:2901036},274:{h1:1964428,h2:2946642},275:{h1:1994832,h2:2992248},276:{h1:2025236,h2:3037854},277:{h1:2055640,h2:3083460},278:{h1:2086044,h2:3129066},279:{h1:2116448,h2:3174672},280:{h1:2146852,h2:3220278}};
+
+const CITIES      = Object.keys(enchantData);
+const SLOTS       = [1, 2, 3];
+const MAX_UPGRADE = 280;
+
+const el          = id => document.getElementById(id);
+const fmt         = n  => Math.round(n).toLocaleString('en-US');
+const roundUp10k  = v  => Math.ceil(v / 10000) * 10000;
+const applyPoring = (cost, poring) => poring ? Math.ceil(cost * 0.1) : cost;
+
+const buildLevelOptions = () =>
+  Array.from({length: 15}, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+
+const CITY_LABEL_MAP = {
+  'Izlude Island': 'Izlude/Alberta',
+  'Alberta':       'Izlude/Alberta',
+  'Morroc':        'Morroc/Einbroch',
+};
+const cityLabel = c => CITY_LABEL_MAP[c] ?? c;
+
+const CITY_SLIDE_DEFS = [
+  { city: 'Prontera',      title: 'Highest Level in Prontera',        sub: 'Enchant 1H in Prontera first (Lv.1 is enough)' },
+  { city: 'Morroc',        title: 'Highest Level in Morroc/Einbroch', sub: 'Enchant 1H in Morroc/Einbroch first (Lv.1 is enough)' },
+  { city: 'Izlude Island', title: 'Highest Level in Izlude/Alberta',  sub: 'Enchant 1H in Izlude/Alberta first (Lv.1 is enough)' },
+];
+
+let live         = false;
+let currentSlide = 0;
+let TOTAL_SLIDES = 2;
+
+function getSlots(prefix = '') {
+  return SLOTS.map(s => {
+    const city = el(`ench-city-${prefix}${s}`).value;
+    const lvl  = el(`ench-lvl-${prefix}${s}`).value;
+    return (city && lvl !== '') ? { city, lvl: +lvl } : null;
+  });
+}
+
+function getUpgradeLvl(inputId) {
+  const v = parseInt(el(inputId).value, 10);
+  return (!isNaN(v) && v >= 0 && v <= MAX_UPGRADE) ? v : 0;
+}
+
+function lookupUpgrade2H(budget) {
+  for (let lvl = MAX_UPGRADE; lvl >= 0; lvl--)
+    if (upgradeData[lvl].h2 <= budget) return lvl;
+  return 0;
+}
+
+function lookupRefine2H(budget, quality) {
+  for (let lvl = 15; lvl >= 0; lvl--)
+    if (refineData[lvl][quality].h2 <= budget) return lvl;
+  return 0;
+}
+
+function lookupEnchant(targetCity, shieldCity, shieldLvl, extra = 0, minLevel = 0) {
+  if (!shieldCity || shieldLvl === '') return '—';
+  const budget = enchantData[shieldCity][+shieldLvl].h1 / 2 + extra;
+  for (let l = 15; l >= minLevel; l--)
+    if (enchantData[targetCity][l].h2 <= budget) return `${cityLabel(targetCity)} Lv.${l}`;
+  return '—';
+}
+
+function lookupHighestEquivLv15(city, lvl, extra = 0) {
+  if (!city || lvl === '') return '—';
+  const budget = enchantData[city][+lvl].h1 / 2 + extra;
+  for (let i = CITIES.length - 1; i >= 0; i--)
+    if (enchantData[CITIES[i]][15].h2 <= budget) return `${cityLabel(CITIES[i])} Lv.15`;
+  return '—';
+}
+
+function lookupCombined1H(s, s1H) {
+  if (!s && !s1H) return '—';
+  const shieldIdx  = s   ? CITIES.indexOf(s.city)   : Infinity;
+  const weapIdx    = s1H ? CITIES.indexOf(s1H.city) : Infinity;
+  const targetCity = shieldIdx <= weapIdx ? s.city : s1H.city;
+  const budget     = (s   ? enchantData[s.city][s.lvl].h1 / 2 : 0)
+                   + (s1H ? enchantData[s1H.city][s1H.lvl].h1  : 0);
+  for (let l = 15; l >= 1; l--)
+    if (enchantData[targetCity][l].h2 <= budget) return `${targetCity} Lv.${l}`;
+  return '—';
+}
+
+const equivIsMorrocOrHigher = r => r !== '—' && r !== 'Prontera Lv.15';
+const equivIsIzludeOrHigher = r => equivIsMorrocOrHigher(r) && r !== 'Morroc/Einbroch Lv.15';
+
+function hasJuno58(slots) {
+  return slots.every(s => s && s.city === 'Juno' && s.lvl >= 5 && s.lvl <= 8);
+}
+
+function parseEnchantResult(str) {
+  if (!str || str === '—') return null;
+  const m = str.match(/^(.+?)\s+Lv\.?(\d+)$/i);
+  return m ? { city: m[1].trim(), lvl: m[2] } : null;
+}
+
+function setEnchantLineResult(cityId, lvlId, rawStr) {
+  const cityEl = el(cityId);
+  const lvlEl  = el(lvlId);
+  const parsed = parseEnchantResult(rawStr);
+  if (!parsed) {
+    cityEl.textContent  = '—';
+    cityEl.className    = 'enchant-line-city enchant-line-empty';
+    lvlEl.style.display = 'none';
+    return;
+  }
+  cityEl.textContent  = parsed.city;
+  cityEl.className    = 'enchant-line-city';
+  lvlEl.textContent   = 'Lv.' + parsed.lvl;
+  lvlEl.style.display = '';
+}
+
+function buildEnchantLinesHTML(idPrefix) {
+  return `<div class="enchant-lines">
+    ${[1, 2, 3].map(j => `
+    <div class="enchant-line">
+      <div class="enchant-line-num">${j}</div>
+      <div class="enchant-line-bar">
+        <span class="enchant-line-city enchant-line-empty" id="${idPrefix}e${j}-city">—</span>
+        <span class="enchant-line-lvl" id="${idPrefix}e${j}-lvl" style="display:none"></span>
+      </div>
+    </div>`).join('')}
+  </div>`;
+}
+
+function buildEnchantSlots(prefix, containerId) {
+  el(containerId).innerHTML = SLOTS.map(s => `
+    <div class="slot" id="slot-${prefix}${s}">
+      <div class="slot-label">Line ${s}</div>
+      <div class="row">
+        <div class="field wide"><label>City</label>
+          <select id="ench-city-${prefix}${s}">
+            <option value="">— none —</option>
+            ${CITIES.map(v => `<option value="${v}">${v}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field"><label>Level</label>
+          <select id="ench-lvl-${prefix}${s}" disabled>${buildLevelOptions()}</select>
+        </div>
+      </div>
+    </div>`).join('');
+
+  SLOTS.forEach(s => {
+    el(`ench-city-${prefix}${s}`).addEventListener('change', ({ target }) => {
+      const lvlEl = el(`ench-lvl-${prefix}${s}`);
+      lvlEl.innerHTML = buildLevelOptions();
+      lvlEl.disabled  = !target.value;
+      if (live) calculate();
+      updateBtn();
+    });
+    el(`ench-lvl-${prefix}${s}`).addEventListener('change', () => { if (live) calculate(); });
+  });
+}
+
+function renderSlide1H(slots, slots1H) {
+  el('slide-1h')?.remove();
+  el('dot-1h')?.remove();
+  if (!slots1H) return;
+
+  const dot = Object.assign(document.createElement('div'), { className: 'slide-dot', id: 'dot-1h' });
+  el('slide-dots-container').prepend(dot);
+
+  const div = document.createElement('div');
+  div.className = 'enchant-slide';
+  div.id        = 'slide-1h';
+  div.innerHTML = `
+    <div class="slide-mode-title">1H + Shield Result</div>
+    <div class="slide-mode-sub">Lowest city between 1H and Shield per slot</div>
+    ${buildEnchantLinesHTML('s1h-')}`;
+  el('slider-track').prepend(div);
+
+  SLOTS.forEach(i =>
+    setEnchantLineResult(`s1h-e${i}-city`, `s1h-e${i}-lvl`,
+      lookupCombined1H(slots[i - 1], slots1H[i - 1]))
+  );
+}
+
+function renderDynamicSlides(defs) {
+  document.querySelectorAll('.dynamic-slide').forEach(s => s.remove());
+  document.querySelectorAll('.dynamic-dot').forEach(d => d.remove());
+  TOTAL_SLIDES = 2 + defs.length + (el('slide-1h') ? 1 : 0);
+
+  const dotsContainer = el('slide-dots-container');
+  defs.forEach((_, i) => {
+    const dot = Object.assign(document.createElement('div'), {
+      className: 'slide-dot dynamic-dot',
+      id: `dot-${2 + i}`,
+    });
+    dotsContainer.appendChild(dot);
+  });
+
+  const slots = getSlots();
+  defs.forEach((def, i) => {
+    const idx = 2 + i;
+    const div = document.createElement('div');
+    div.className = 'enchant-slide dynamic-slide';
+    div.id        = `slide-${idx}`;
+    div.innerHTML = `
+      <div class="slide-mode-title">${def.title}</div>
+      <div class="slide-mode-sub">${def.sub}</div>
+      ${buildEnchantLinesHTML(`ds${idx}-`)}`;
+    el('slider-track').appendChild(div);
+
+    SLOTS.forEach(j => {
+      const s = slots[j - 1];
+      setEnchantLineResult(`ds${idx}-e${j}-city`, `ds${idx}-e${j}-lvl`,
+        s ? lookupEnchant(def.city, s.city, s.lvl, 0, 1) : '—');
+    });
+  });
+
+  goSlide(Math.min(currentSlide, TOTAL_SLIDES - 1));
+}
+
+function goSlide(n) {
+  currentSlide = n;
+  el('slider-track').style.transform = `translateX(-${n * 100}%)`;
+  document.querySelectorAll('.slide-dot').forEach((dot, i) => dot.classList.toggle('active', i === n));
+  el('arrow-prev').disabled = n === 0;
+  el('arrow-next').disabled = n === TOTAL_SLIDES - 1;
+}
+
+function calculate() {
+  const quality   = el('sel-quality').value;
+  const quality1H = el('sel-quality-1h').value;
+  const slots   = getSlots();
+  const has1H   = el('section-1h').style.display !== 'none';
+  const slots1H = has1H ? getSlots('1h-') : [];
+
+  const qualityMismatch = has1H && quality !== quality1H;
+
+  const shieldUpgH1   = upgradeData[getUpgradeLvl('sel-upgrade')].h1;
+  const weapUpgH1     = has1H ? upgradeData[getUpgradeLvl('sel-upgrade-1h')].h1 : 0;
+  const upgradeBudget = weapUpgH1 + shieldUpgH1 / 2;
+
+  const shieldRefH1  = refineData[+el('sel-refine').value][quality].h1;
+  const weapRefH1    = (has1H && !qualityMismatch) ? refineData[+el('sel-refine-1h').value][quality1H].h1 : 0;
+  const refineBudget = qualityMismatch ? 0 : weapRefH1 + shieldRefH1 / 2;
+
+  const shieldEnchH1  = slots.reduce((sum, s)   => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
+  const weapEnchH1    = slots1H.reduce((sum, s) => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
+  const enchantBudget = weapEnchH1 + shieldEnchH1 / 2;
+
+  el('out-upgrade').innerHTML = `${lookupUpgrade2H(upgradeBudget)}`;
+  if (qualityMismatch) {
+    el('out-refine').style.display = 'none';
+    el('refine-desc').style.display = 'none';
+    el('refine-quality-warn').style.display = 'block';
+  } else {
+    el('out-refine').style.display = '';
+    el('out-refine').innerHTML = `+${lookupRefine2H(refineBudget, quality)}`;
+    el('refine-desc').style.display = '';
+    el('refine-quality-warn').style.display = 'none';
+  }
+
+  SLOTS.forEach(i => {
+    const s     = slots[i - 1];
+    const extra = has1H && slots1H[i - 1] ? enchantData[slots1H[i - 1].city][slots1H[i - 1].lvl].h1 : 0;
+    setEnchantLineResult(`s0-e${i}-city`, `s0-e${i}-lvl`,
+      s ? lookupEnchant(s.city, s.city, s.lvl, extra) : '—');
+    setEnchantLineResult(`s1-e${i}-city`, `s1-e${i}-lvl`,
+      s ? lookupHighestEquivLv15(s.city, s.lvl, extra) : '—');
+  });
+
+  const poring      = el('chk-poring').checked;
+  const totalBudget = upgradeBudget + refineBudget + enchantBudget;
+
+  el('out-upgrade-cost').textContent      = fmt(applyPoring(upgradeBudget, poring));
+  el('out-upgrade-dreamsand').textContent = fmt(roundUp10k(applyPoring(upgradeBudget, poring)));
+  el('out-refine-cost').textContent       = fmt(applyPoring(refineBudget, poring));
+  el('out-refine-dreamsand').textContent  = fmt(roundUp10k(applyPoring(refineBudget, poring)));
+  el('out-enchant-cost').textContent      = fmt(applyPoring(enchantBudget, poring));
+  el('out-enchant-dreamsand').textContent = fmt(roundUp10k(applyPoring(enchantBudget, poring)));
+  el('out-normal').textContent            = fmt(applyPoring(totalBudget, poring));
+  el('out-dreamsand').textContent         = fmt(roundUp10k(applyPoring(totalBudget, poring)));
+
+  const activeSlots  = slots.filter(s => s);
+  const hasActive    = activeSlots.length > 0;
+  const equivResults = activeSlots.map(s => lookupHighestEquivLv15(s.city, s.lvl));
+
+  const allPront15    = hasActive && equivResults.every(r => r === 'Prontera Lv.15');
+  const allMorroc15   = hasActive && equivResults.every(r => r === 'Morroc/Einbroch Lv.15');
+  const allIzlude15   = hasActive && equivResults.every(r => r === 'Izlude/Alberta Lv.15');
+  const allMorrocPlus = hasActive && equivResults.every(equivIsMorrocOrHigher);
+  const allIzludePlus = hasActive && equivResults.every(equivIsIzludeOrHigher);
+
+  const activeDefs = hasJuno58(slots)
+    ? CITY_SLIDE_DEFS.filter((_, i) => {
+        if (i === 0) return !allPront15  && !allMorrocPlus;
+        if (i === 1) return !allMorroc15 && !allIzludePlus;
+        return !allIzlude15;
+      })
+    : [];
+
+  renderSlide1H(slots, has1H ? slots1H : null);
+  renderDynamicSlides(activeDefs);
+  el('result-panel').classList.add('visible');
+}
+
+function updateBtn() {
+  const enchOk   = SLOTS.every(s => {
+    const city = el(`ench-city-${s}`).value;
+    const lvl  = el(`ench-lvl-${s}`).value;
+    return (!city && !lvl) || (city && lvl !== '');
+  });
+  const btn   = el('btn-transfer');
+  const ready = enchOk;
+  btn.disabled      = !ready;
+  btn.style.opacity = ready ? '1' : '0.4';
+  btn.style.cursor  = ready ? 'pointer' : 'not-allowed';
+}
+
+buildEnchantSlots('',    'enchant-slots');
+buildEnchantSlots('1h-', 'enchant-slots-1h');
+
+['sel-refine', 'sel-refine-1h'].forEach(id => {
+  el(id).innerHTML =
+    Array.from({length: 16}, (_, i) => `<option value="${i}">${i}</option>`).join('');
+});
+
+el('btn-toggle-1h').addEventListener('click', () => {
+  const sec       = el('section-1h');
+  const isVisible = sec.style.display !== 'none';
+  sec.style.display = isVisible ? 'none' : 'block';
+  el('btn-toggle-1h').textContent = isVisible ? '+ 1H Weapon' : '− 1H Weapon';
+  el('btn-toggle-1h').classList.toggle('active', !isVisible);
+  if (live) calculate();
+  updateBtn();
+});
+
+el('btn-transfer').addEventListener('click', () => {
+  live = true;
+  calculate();
+  el('btn-transfer').style.display = 'none';
+
+  el('sel-quality').addEventListener('change', calculate);
+  el('sel-quality-1h').addEventListener('change', calculate);
+  el('sel-upgrade').addEventListener('input',  calculate);
+  el('sel-upgrade-1h').addEventListener('input', calculate);
+  el('sel-refine').addEventListener('change',  calculate);
+  el('sel-refine-1h').addEventListener('change', calculate);
+  SLOTS.forEach(s => {
+    el(`ench-city-${s}`).addEventListener('change',    calculate);
+    el(`ench-lvl-${s}`).addEventListener('change',     calculate);
+    el(`ench-city-1h-${s}`).addEventListener('change', calculate);
+    el(`ench-lvl-1h-${s}`).addEventListener('change',  calculate);
+  });
+});
+
+el('chk-poring').addEventListener('change', () => { if (live) calculate(); });
+el('sel-refine').addEventListener('change', updateBtn);
+el('sel-upgrade').addEventListener('input', () => { if (live) calculate(); });
+el('sel-upgrade-1h').addEventListener('input', () => { if (live) calculate(); });
+SLOTS.forEach(s => {
+  el(`ench-city-${s}`).addEventListener('change', updateBtn);
+  el(`ench-lvl-${s}`).addEventListener('change',  updateBtn);
+});
+
+el('arrow-prev').addEventListener('click', () => goSlide(Math.max(0, currentSlide - 1)));
+el('arrow-next').addEventListener('click', () => goSlide(Math.min(TOTAL_SLIDES - 1, currentSlide + 1)));
+
+const track = el('slider-track');
+let touchStartX = 0;
+track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
+track.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) <= 40) return;
+  goSlide(dx < 0
+    ? Math.min(TOTAL_SLIDES - 1, currentSlide + 1)
+    : Math.max(0, currentSlide - 1));
+}, { passive: true });
+
+el('info-toggle').addEventListener('click', () => {
+  const isOpen = el('info-collapse').classList.toggle('open');
+  el('info-toggle-icon').classList.toggle('open', isOpen);
+});
+
+updateBtn();
+
+</script>
+</body>
+</html>
