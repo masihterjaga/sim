@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -171,12 +170,14 @@ select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%233a4055' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 11px center;
+  background-size: 7px 4px;
 }
 
 select:focus, input[type="number"]:focus {
-  border-color: var(--q-color);
-  box-shadow: 0 0 0 3px rgba(255,255,255,.04);
+  border-color: var(--c-border-2);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.04);
 }
+
 
 select option { background: var(--c-surface-2); }
 
@@ -382,7 +383,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   height: 6px;
   border-radius: 50%;
   background: var(--c-dim);
-  transition: background .2s, transform .2s, width .2s;
+  transition: background .2s, transform .2s;
 }
 
 .slide-dot.active {
@@ -746,7 +747,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   transition: color .2s, border-color .2s, opacity .2s;
 }
 
-.credit:hover { opacity: .9; }
 .credit a:hover { color: var(--c-blue); border-bottom-color: rgba(91,156,246,.3); }
 
 .btn-hint {
@@ -765,16 +765,15 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 }
 
 .refine-quality-warn {
-  font-size: 10px;
-  font-weight: 700;
-  color: #e07b3a;
-  background: rgba(224,123,58,.08);
-  border: 1px solid rgba(224,123,58,.22);
-  border-radius: 4px;
-  padding: 5px 9px;
-  margin-top: 6px;
-  line-height: 1.4;
-  letter-spacing: .2px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #f2605a;
+  background: rgba(242,96,90,.08);
+  border: 1px solid rgba(242,96,90,.25);
+  border-radius: var(--r-sm);
+  padding: 7px 10px;
+  margin-top: 8px;
+  line-height: 1.5;
 }
 
 .panel::after {
@@ -818,16 +817,244 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   opacity: 1;
 }
 .panel.q-white .panel-header { background: color-mix(in srgb, var(--c-surface-2) 94%, rgba(180,195,215,.6) 6%); }
+.panel.q-gold  .panel-title { color: var(--c-accent-text); }
+.panel.q-blue  .panel-title { color: rgba(91,156,246,.8); }
+.panel.q-white .panel-title { color: rgba(180,195,215,.65); }
+.panel.q-gold  #sel-quality,
+.panel.q-gold  #sel-quality-1h {
+  color: var(--c-accent-text);
+  border-color: rgba(245,166,35,.14);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%23c27e0d' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+}
+.panel.q-blue  #sel-quality,
+.panel.q-blue  #sel-quality-1h {
+  color: rgba(91,156,246,.85);
+  border-color: rgba(91,156,246,.13);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%234070b8' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+}
+.panel.q-white #sel-quality,
+.panel.q-white #sel-quality-1h {
+  color: rgba(180,195,215,.7);
+  border-color: rgba(180,195,215,.12);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%237a8aa0' d='M5 6L0 0h10z'/%3E%3C/svg%3E");
+}
 
 .panel select:focus,
 .panel input[type="number"]:focus {
-  border-color: var(--q-color);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--q-color) 20%, transparent);
+  border-color: var(--c-border-2);
+  box-shadow: 0 0 0 1px rgba(255,255,255,.04);
+
+
 }
 
-#out-refine.q-white { color: #b4c3d7; }
-#out-refine.q-blue  { color: var(--c-blue); }
-#out-refine.q-gold  { color: var(--c-accent); }
+.btn-dd {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: rgba(160,120,255,.85);
+  background: rgba(100,60,210,.13);
+  border: 1px solid rgba(120,80,230,.28);
+  border-radius: var(--r-sm);
+  padding: 3px 8px;
+  cursor: pointer;
+  font-family: var(--font);
+  transition: color .15s, border-color .15s, background .15s;
+}
+.btn-dd:hover {
+  color: rgba(180,145,255,.95);
+  background: rgba(100,60,210,.22);
+  border-color: rgba(140,100,240,.45);
+}
+.btn-dd.active {
+  color: rgba(0,0,0,.85);
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+}
+.btn-dd.active:hover {
+  color: rgba(0,0,0,.85);
+  background: #f7b43a;
+  border-color: #f7b43a;
+}
+
+.egg-toast {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  z-index: 200;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+
+.egg-toast.show {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.egg-modal {
+  background: var(--c-surface);
+  border: 1px solid rgba(245,166,35,.25);
+  border-radius: var(--r-lg);
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.8);
+  transform: translateY(12px);
+  opacity: 0;
+  transition: transform .35s cubic-bezier(.2, 0, 0, 1), opacity .3s ease;
+}
+
+.egg-toast.show .egg-modal {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.egg-modal::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 10%, rgba(245,166,35,.6) 40%, rgba(245,166,35,.6) 60%, transparent 90%);
+}
+
+.egg-modal-close {
+  position: absolute;
+  top: 11px;
+  right: 11px;
+  width: 26px;
+  height: 26px;
+  border-radius: var(--r-sm);
+  background: var(--c-surface-3);
+  border: 1px solid var(--c-border-2);
+  color: var(--c-muted);
+  font-size: 11px;
+  font-family: var(--font);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color .15s, border-color .15s, background .15s;
+  z-index: 5;
+  line-height: 1;
+}
+
+.egg-modal-close:hover {
+  color: var(--c-text);
+  border-color: var(--c-muted);
+  background: var(--c-border-2);
+}
+
+.egg-modal-hero {
+  padding: 28px 20px 20px;
+  border-bottom: 1px solid var(--c-border);
+}
+
+.egg-modal-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--c-accent-text);
+  margin-bottom: 10px;
+}
+
+.egg-modal-eyebrow-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-accent);
+  opacity: .7;
+}
+
+.egg-modal-heading {
+  font-size: 20px;
+  font-weight: 800;
+  color: #e0e6f5;
+  letter-spacing: -.4px;
+  line-height: 1.2;
+  margin-bottom: 6px;
+}
+
+.egg-modal-sub {
+  font-size: 12px;
+  color: var(--c-muted);
+  line-height: 1.6;
+}
+
+.egg-toast-features {
+  padding: 4px 20px 4px;
+  display: flex;
+  flex-direction: column;
+}
+
+.egg-toast-feature {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--c-border);
+  align-items: start;
+}
+
+.egg-toast-feature:last-child {
+  border-bottom: none;
+}
+
+.egg-toast-feature-num {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-accent-text);
+  opacity: .6;
+  padding-top: 2px;
+  letter-spacing: .5px;
+}
+
+.egg-toast-feature-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--c-text);
+  margin-bottom: 3px;
+}
+
+.egg-toast-feature-sub {
+  font-size: 11px;
+  color: var(--c-muted);
+  line-height: 1.55;
+}
+
+.egg-modal-footer {
+  padding: 0 16px 16px;
+}
+
+.egg-modal-btn {
+  width: 100%;
+  padding: 12px;
+  background: var(--c-accent);
+  border: none;
+  border-radius: var(--r-md);
+  color: rgba(0,0,0,.85);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .6px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+
+.egg-modal-btn:hover { opacity: .88; }
 </style>
 </head>
 <body>
@@ -835,7 +1062,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 <div class="wrap">
 
   <div class="card-header">
-    <div class="badge">1H+Shield » 2H</div>
+    <div class="badge">1H+Shiel[DD] » 2H</div>
     <h1>Advanced Transfer</h1>
     <p class="subtitle">Transfer cost & expected result (upgrade, refine & enchant)</p>
   </div>
@@ -911,7 +1138,9 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 
     <div class="result-header">
       <div class="result-header-label">Expected Result in 2H</div>
+      <button class="btn-dd" id="btn-dd" style="display:none"></button>
     </div>
+
 
     <div class="result-stats">
       <div class="stat-block">
@@ -923,7 +1152,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
         <div class="stat-label">Refine</div>
         <div class="stat-value" id="out-refine">—</div>
         <div class="stat-desc" id="refine-desc">Expected level</div>
-        <div class="refine-quality-warn" id="refine-quality-warn" style="display:none">⚠ Quality mismatch</div>
+        <div class="refine-quality-warn" id="refine-quality-warn" style="display:none">Quality mismatch, refine won't transfer</div>
       </div>
     </div>
 
@@ -937,14 +1166,15 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
           <button class="slide-arrow" id="arrow-prev" disabled>&#8592;</button>
           <button class="slide-arrow" id="arrow-next">&#8594;</button>
         </div>
+
       </div>
 
       <div class="enchant-result-wrap">
         <div class="enchant-slider-track" id="slider-track">
 
           <div class="enchant-slide" id="slide-0">
-            <div class="slide-mode-title">If No 1H Enchantment</div>
-            <div class="slide-mode-sub">Result if 1H line is empty</div>
+            <div class="slide-mode-title">Oops, I'm Blind</div>
+            <div class="slide-mode-sub"></div>
             <div class="enchant-lines">
               <div class="enchant-line">
                 <div class="enchant-line-num">1</div>
@@ -987,7 +1217,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
       </div>
       <div class="info-section">
         <div class="info-section-title">Refine</div>
-        <p>For Adv Transfer from Shield to 2H, ensure refine is only on the shield and quality (White/Blue/Gold) must match for all eq.</p>
+        <p>Quality must match for all eq (2H, 1H, and Shield).</p>
       </div>
       <div class="info-section">
         <div class="info-section-title">Enchant</div>
@@ -1039,6 +1269,37 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 
 </div>
 
+<div class="egg-toast" id="egg-toast">
+  <div class="egg-modal">
+    <button class="egg-modal-close" id="egg-modal-close">✕</button>
+    <div class="egg-modal-hero">
+      <div class="egg-modal-eyebrow">
+        <span class="egg-modal-eyebrow-dot"></span>
+        Secret Unlocked
+      </div>
+      <div class="egg-modal-heading">3 Hidden Features Active</div>
+      <div class="egg-modal-sub">Triggered by entering the right upgrade value. These features are now permanently on for this session.</div>
+    </div>
+    <div class="egg-toast-features">
+      <div class="egg-toast-feature">
+        <div class="egg-toast-feature-num">01</div>
+        <div><div class="egg-toast-feature-name">Highest City Lv.15</div><div class="egg-toast-feature-sub">Best achievable city equivalent per enchant slot, visible in the enchant slides</div></div>
+      </div>
+      <div class="egg-toast-feature">
+        <div class="egg-toast-feature-num">02</div>
+        <div><div class="egg-toast-feature-name">Weapon Awakening</div><div class="egg-toast-feature-sub">Total weapon score shown below enchant result when quality is Gold</div></div>
+      </div>
+      <div class="egg-toast-feature">
+        <div class="egg-toast-feature-num">03</div>
+        <div><div class="egg-toast-feature-name">Switch to DD</div><div class="egg-toast-feature-sub">DD mode button appears in the result header when 1H weapon is active</div></div>
+      </div>
+    </div>
+    <div class="egg-modal-footer">
+      <button class="egg-modal-btn" id="egg-modal-btn">Got it</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const refineData={0:{white:{h1:0,h2:0},blue:{h1:0,h2:0},gold:{h1:0,h2:0}},1:{white:{h1:360,h2:540},blue:{h1:720,h2:1080},gold:{h1:1440,h2:2160,score:20}},2:{white:{h1:1080,h2:1620},blue:{h1:2160,h2:3240},gold:{h1:4320,h2:6480,score:25}},3:{white:{h1:3241,h2:4861},blue:{h1:6481,h2:9721},gold:{h1:12961,h2:19441,score:30}},4:{white:{h1:6121,h2:9181},blue:{h1:12241,h2:18361},gold:{h1:24481,h2:36721,score:40}},5:{white:{h1:13321,h2:19981},blue:{h1:26641,h2:39961},gold:{h1:53281,h2:79921,score:50}},6:{white:{h1:24841,h2:37261},blue:{h1:49681,h2:74521},gold:{h1:99361,h2:149041,score:60}},7:{white:{h1:50041,h2:75061},blue:{h1:100081,h2:150121},gold:{h1:200161,h2:300241,score:80}},8:{white:{h1:92341,h2:138511},blue:{h1:184681,h2:277021},gold:{h1:369361,h2:554041,score:120}},9:{white:{h1:171991,h2:257986},blue:{h1:343981,h2:515971},gold:{h1:687961,h2:1031941,score:180}},10:{white:{h1:307666,h2:461498},blue:{h1:615331,h2:922996},gold:{h1:1230661,h2:1845991,score:330}},11:{white:{h1:543578,h2:815367},blue:{h1:1087156,h2:1630733},gold:{h1:2174311,h2:3261466,score:580}},12:{white:{h1:929847,h2:1394770},blue:{h1:1859693,h2:2789539},gold:{h1:3719386,h2:5579078,score:1000}},13:{white:{h1:1574050,h2:2361075},blue:{h1:3148099,h2:4722149},gold:{h1:6296198,h2:9444297,score:1700}},14:{white:{h1:3163591,h2:4745386},blue:{h1:6327181,h2:9490771},gold:{h1:12654361,h2:18981541,score:3420}},15:{white:{h1:7045319,h2:10567978},blue:{h1:14090637,h2:21135955},gold:{h1:28181273,h2:42271909,score:7500}}};
 
@@ -1046,8 +1307,10 @@ const enchantData={"Prontera":{0:{h1:0,h2:0},1:{h1:216,h2:324,score:2},2:{h1:648
 
 const upgradeData={0:{h1:0,h2:0},1:{h1:4,h2:6,score:5},2:{h1:8,h2:11,score:5},3:{h1:11,h2:17,score:5},4:{h1:15,h2:22,score:5},5:{h1:18,h2:27,score:5},6:{h1:22,h2:33,score:5},7:{h1:26,h2:38,score:5},8:{h1:29,h2:44,score:5},9:{h1:33,h2:49,score:5},10:{h1:36,h2:54,score:5},11:{h1:40,h2:60,score:5},12:{h1:44,h2:65,score:5},13:{h1:47,h2:71,score:5},14:{h1:51,h2:76,score:5},15:{h1:54,h2:81,score:5},16:{h1:58,h2:87,score:5},17:{h1:62,h2:92,score:5},18:{h1:65,h2:98,score:5},19:{h1:69,h2:103,score:5},20:{h1:72,h2:108,score:5},21:{h1:183,h2:275,score:10},22:{h1:294,h2:441,score:10},23:{h1:405,h2:607,score:10},24:{h1:516,h2:773,score:10},25:{h1:629,h2:944,score:10},26:{h1:743,h2:1114,score:10},27:{h1:857,h2:1285,score:10},28:{h1:970,h2:1455,score:10},29:{h1:1087,h2:1630,score:10},30:{h1:1204,h2:1805,score:10},31:{h1:1321,h2:1981,score:10},32:{h1:1437,h2:2156,score:10},33:{h1:1557,h2:2336,score:10},34:{h1:1677,h2:2516,score:10},35:{h1:1797,h2:2696,score:10},36:{h1:1917,h2:2876,score:10},37:{h1:2041,h2:3061,score:10},38:{h1:2164,h2:3246,score:10},39:{h1:2288,h2:3431,score:10},40:{h1:2411,h2:3616,score:10},41:{h1:2538,h2:3807,score:15},42:{h1:2665,h2:3998,score:15},43:{h1:2792,h2:4188,score:15},44:{h1:2919,h2:4379,score:15},45:{h1:3050,h2:4575,score:15},46:{h1:3181,h2:4771,score:15},47:{h1:3312,h2:4968,score:15},48:{h1:3443,h2:5164,score:15},49:{h1:3578,h2:5367,score:15},50:{h1:3713,h2:5569,score:15},51:{h1:3848,h2:5772,score:15},52:{h1:3983,h2:5974,score:15},53:{h1:4122,h2:6183,score:15},54:{h1:4262,h2:6392,score:15},55:{h1:4401,h2:6601,score:15},56:{h1:4540,h2:6810,score:15},57:{h1:4684,h2:7026,score:15},58:{h1:4828,h2:7242,score:15},59:{h1:4972,h2:7458,score:15},60:{h1:5116,h2:7674,score:15},61:{h1:5412,h2:8118,score:20},62:{h1:5708,h2:8562,score:20},63:{h1:6004,h2:9006,score:20},64:{h1:6300,h2:9450,score:20},65:{h1:6604,h2:9906,score:20},66:{h1:6908,h2:10362,score:20},67:{h1:7213,h2:10819,score:20},68:{h1:7517,h2:11275,score:20},69:{h1:7830,h2:11745,score:20},70:{h1:8143,h2:12214,score:20},71:{h1:8456,h2:12684,score:20},72:{h1:8769,h2:13153,score:20},73:{h1:9091,h2:13637,score:20},74:{h1:9414,h2:14120,score:20},75:{h1:9736,h2:14604,score:20},76:{h1:10059,h2:15088,score:20},77:{h1:10391,h2:15586,score:20},78:{h1:10723,h2:16084,score:20},79:{h1:11055,h2:16583,score:20},80:{h1:11388,h2:17081,score:20},81:{h1:11731,h2:17596,score:20},82:{h1:12073,h2:18110,score:20},83:{h1:12416,h2:18624,score:20},84:{h1:12759,h2:19139,score:20},85:{h1:13113,h2:19670,score:20},86:{h1:13467,h2:20201,score:20},87:{h1:13821,h2:20732,score:20},88:{h1:14176,h2:21263,score:20},89:{h1:14542,h2:21812,score:20},90:{h1:14908,h2:22361,score:20},91:{h1:15274,h2:22911,score:20},92:{h1:15640,h2:23460,score:20},93:{h1:16019,h2:24028,score:20},94:{h1:16398,h2:24597,score:20},95:{h1:16777,h2:25165,score:20},96:{h1:17156,h2:25733,score:20},97:{h1:17549,h2:26323,score:20},98:{h1:17941,h2:26912,score:20},99:{h1:18334,h2:27501,score:20},100:{h1:18727,h2:28090,score:20},101:{h1:19534,h2:29301,score:30},102:{h1:20342,h2:30512,score:30},103:{h1:21149,h2:31723,score:30},104:{h1:21957,h2:32935,score:30},105:{h1:22787,h2:34181,score:30},106:{h1:23618,h2:35427,score:30},107:{h1:24449,h2:36673,score:30},108:{h1:25280,h2:37919,score:30},109:{h1:26135,h2:39202,score:30},110:{h1:26991,h2:40486,score:30},111:{h1:27846,h2:41769,score:30},112:{h1:28701,h2:43052,score:30},113:{h1:29583,h2:44374,score:30},114:{h1:30465,h2:45697,score:30},115:{h1:31346,h2:47019,score:30},116:{h1:32228,h2:48342,score:30},117:{h1:33137,h2:49706,score:30},118:{h1:34047,h2:51070,score:30},119:{h1:34956,h2:52434,score:30},120:{h1:35866,h2:53799,score:30},121:{h1:36805,h2:55207,score:35},122:{h1:37744,h2:56616,score:35},123:{h1:38683,h2:58025,score:35},124:{h1:39622,h2:59433,score:35},125:{h1:40593,h2:60890,score:35},126:{h1:41564,h2:62346,score:35},127:{h1:42535,h2:63802,score:35},128:{h1:43506,h2:65258,score:35},129:{h1:44510,h2:66765,score:35},130:{h1:45515,h2:68272,score:35},131:{h1:46520,h2:69779,score:35},132:{h1:47524,h2:71286,score:35},133:{h1:48565,h2:72847,score:35},134:{h1:49606,h2:74409,score:35},135:{h1:50647,h2:75970,score:35},136:{h1:51688,h2:77532,score:35},137:{h1:52768,h2:79152,score:35},138:{h1:53848,h2:80772,score:35},139:{h1:54928,h2:82392,score:35},140:{h1:56008,h2:84012,score:35},141:{h1:58223,h2:87335,score:40},142:{h1:60439,h2:90658,score:40},143:{h1:62654,h2:93981,score:40},144:{h1:64870,h2:97304,score:40},145:{h1:67143,h2:100715,score:40},146:{h1:69417,h2:104125,score:40},147:{h1:71691,h2:107536,score:40},148:{h1:73964,h2:110946,score:40},149:{h1:76299,h2:114449,score:40},150:{h1:78635,h2:117952,score:40},151:{h1:80970,h2:121454,score:40},152:{h1:83305,h2:124957,score:40},153:{h1:85705,h2:128557,score:40},154:{h1:88105,h2:132157,score:40},155:{h1:90505,h2:135757,score:40},156:{h1:92905,h2:139357,score:40},157:{h1:95373,h2:143060,score:40},158:{h1:97842,h2:146763,score:40},159:{h1:100311,h2:150466,score:40},160:{h1:102779,h2:154168,score:40},161:{h1:105320,h2:157980,score:60},162:{h1:107861,h2:161792,score:60},163:{h1:110403,h2:165604,score:60},164:{h1:112944,h2:169415,score:60},165:{h1:115562,h2:173343,score:60},166:{h1:118180,h2:177270,score:60},167:{h1:120798,h2:181197,score:60},168:{h1:123417,h2:185125,score:60},169:{h1:126117,h2:189175,score:60},170:{h1:128817,h2:193225,score:60},171:{h1:131517,h2:197275,score:60},172:{h1:134217,h2:201325,score:60},173:{h1:137004,h2:205505,score:60},174:{h1:139791,h2:209686,score:60},175:{h1:142578,h2:213867,score:60},176:{h1:145365,h2:218047,score:60},177:{h1:148245,h2:222367,score:60},178:{h1:151125,h2:226687,score:60},179:{h1:154005,h2:231007,score:60},180:{h1:156885,h2:235327,score:60},181:{h1:168600,h2:252900,score:120},182:{h1:180315,h2:270473,score:120},183:{h1:192031,h2:288046,score:120},184:{h1:203746,h2:305619,score:120},185:{h1:215663,h2:323495,score:120},186:{h1:227580,h2:341370,score:120},187:{h1:239498,h2:359246,score:120},188:{h1:251415,h2:377122,score:120},189:{h1:263541,h2:395312,score:120},190:{h1:275668,h2:413501,score:120},191:{h1:287794,h2:431691,score:120},192:{h1:299920,h2:449880,score:120},193:{h1:312263,h2:468394,score:120},194:{h1:324606,h2:486909,score:120},195:{h1:336949,h2:505423,score:120},196:{h1:349292,h2:523937,score:120},197:{h1:361859,h2:542788,score:120},198:{h1:374426,h2:561639,score:120},199:{h1:386993,h2:580490,score:120},200:{h1:399561,h2:599341,score:120},201:{h1:412361,h2:618541,score:200},202:{h1:425161,h2:637741,score:200},203:{h1:437961,h2:656941,score:200},204:{h1:450761,h2:676141,score:200},205:{h1:463802,h2:695703,score:200},206:{h1:476844,h2:715265,score:200},207:{h1:489885,h2:734828,score:200},208:{h1:502927,h2:754390,score:200},209:{h1:516219,h2:774328,score:200},210:{h1:529511,h2:794267,score:200},211:{h1:542804,h2:814205,score:200},212:{h1:556096,h2:834144,score:200},213:{h1:569649,h2:854473,score:200},214:{h1:583202,h2:874803,score:200},215:{h1:596755,h2:895132,score:200},216:{h1:610308,h2:915461,score:200},217:{h1:624132,h2:936197,score:200},218:{h1:637956,h2:956933,score:200},219:{h1:651780,h2:977669,score:200},220:{h1:665604,h2:998405,score:200},221:{h1:679710,h2:1019565,score:300},222:{h1:693816,h2:1040724,score:300},223:{h1:707922,h2:1061883,score:300},224:{h1:722028,h2:1083042,score:300},225:{h1:736428,h2:1104642,score:300},226:{h1:750828,h2:1126242,score:300},227:{h1:765228,h2:1147842,score:300},228:{h1:779628,h2:1169442,score:300},229:{h1:794335,h2:1191502,score:300},230:{h1:809041,h2:1213561,score:300},231:{h1:823747,h2:1235621,score:300},232:{h1:838454,h2:1257680,score:300},233:{h1:853480,h2:1280220,score:300},234:{h1:868506,h2:1302759,score:300},235:{h1:883532,h2:1325298,score:300},236:{h1:898558,h2:1347837,score:300},237:{h1:913918,h2:1370877,score:300},238:{h1:929278,h2:1393917,score:300},239:{h1:944638,h2:1416957,score:300},240:{h1:959998,h2:1439997,score:300},241:{h1:987416,h2:1481124,score:450},242:{h1:1014985,h2:1522477,score:450},243:{h1:1042705,h2:1564058,score:450},244:{h1:1070579,h2:1605869,score:450},245:{h1:1098609,h2:1647914,score:450},246:{h1:1126796,h2:1690194,score:450},247:{h1:1155141,h2:1732712,score:450},248:{h1:1183647,h2:1775471,score:450},249:{h1:1212316,h2:1818474,score:450},250:{h1:1241149,h2:1861724,score:450},251:{h1:1270149,h2:1905223,score:450},252:{h1:1299316,h2:1948974,score:450},253:{h1:1328653,h2:1992980,score:450},254:{h1:1358163,h2:2037245,score:450},255:{h1:1387847,h2:2081771,score:450},256:{h1:1417707,h2:2126561,score:450},257:{h1:1447746,h2:2171619,score:450},258:{h1:1477965,h2:2216947,score:450},259:{h1:1508367,h2:2262550,score:450},260:{h1:1538768,h2:2308152,score:450},261:{h1:1569176,h2:2353764,score:600},262:{h1:1599580,h2:2399370,score:600},263:{h1:1629984,h2:2444976,score:600},264:{h1:1660388,h2:2490582,score:600},265:{h1:1690792,h2:2536188,score:600},266:{h1:1721196,h2:2581794,score:600},267:{h1:1751600,h2:2627400,score:600},268:{h1:1782004,h2:2673006,score:600},269:{h1:1812408,h2:2718612,score:600},270:{h1:1842812,h2:2764218,score:600},271:{h1:1873216,h2:2809824,score:600},272:{h1:1903620,h2:2855430,score:600},273:{h1:1934024,h2:2901036,score:600},274:{h1:1964428,h2:2946642,score:600},275:{h1:1994832,h2:2992248,score:600},276:{h1:2025236,h2:3037854,score:600},277:{h1:2055640,h2:3083460,score:600},278:{h1:2086044,h2:3129066,score:600},279:{h1:2116448,h2:3174672,score:600},280:{h1:2146852,h2:3220278,score:600}};
 
-const CITIES      = Object.keys(enchantData);
-const SLOTS       = [1, 2, 3];
+
+const cities      = Object.keys(enchantData);
+const slotNums    = [1, 2, 3];
+const maxUpgrade  = 280;
 
 const weaponAwk = [
   {tier:'T1',  score:250,   need:2},
@@ -1062,12 +1325,23 @@ const weaponAwk = [
   {tier:'T10', score:14000, need:6},
 ];
 
-function lookupWeaponAwk(totalScore) {
-  for (let i = weaponAwk.length - 1; i >= 0; i--)
-    if (totalScore >= weaponAwk[i].score) return weaponAwk[i];
-  return null;
-}
-const MAX_UPGRADE = 280;
+const cityLabelMap = {
+  'Izlude Island': 'Izlude/Alberta',
+  'Alberta':       'Izlude/Alberta',
+  'Morroc':        'Morroc/Einbroch',
+};
+const cityLabel      = c => cityLabelMap[c] ?? c;
+const cityLabelToKey = Object.fromEntries(Object.entries(cityLabelMap).map(([k, v]) => [v, k]));
+
+let live           = false;
+let ddMode         = false;
+let currentSlide   = 0;
+let totalSlides    = 2;
+let slideAwkMap    = {};
+let awkBase        = 0;
+let awkActive      = false;
+let eggCracked     = false;
+let highestLevel15 = false;
 
 const el          = id => document.getElementById(id);
 const fmt         = n  => Math.round(n).toLocaleString('en-US');
@@ -1077,124 +1351,79 @@ const applyPoring = (cost, poring) => poring ? Math.ceil(cost * 0.1) : cost;
 const buildLevelOptions = () =>
   Array.from({length: 15}, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
 
-const CITY_LABEL_MAP = {
-  'Izlude Island': 'Izlude/Alberta',
-  'Alberta':       'Izlude/Alberta',
-  'Morroc':        'Morroc/Einbroch',
-};
-const cityLabel = c => CITY_LABEL_MAP[c] ?? c;
+const createDot = (id, extraClass = '') =>
+  Object.assign(document.createElement('div'), { className: `slide-dot${extraClass ? ' ' + extraClass : ''}`, id });
 
-const CITY_LABEL_TO_KEY = {};
-for (const [k, v] of Object.entries(CITY_LABEL_MAP)) CITY_LABEL_TO_KEY[v] = k;
-CITIES.forEach(c => { if (!(c in CITY_LABEL_TO_KEY)) CITY_LABEL_TO_KEY[c] = c; });
+const createSlide = (id, extraClass = '') =>
+  Object.assign(document.createElement('div'), { className: `enchant-slide${extraClass ? ' ' + extraClass : ''}`, id });
 
-function enchantResultScore(str) {
-  const p = parseEnchantResult(str);
-  if (!p) return 0;
-  const key = CITY_LABEL_TO_KEY[p.city] ?? p.city;
-  return enchantData[key]?.[+p.lvl]?.score ?? 0;
-}
-
-const CITY_SLIDE_DEFS = [
-  { city: 'Prontera',      title: 'Highest Level in Prontera',        sub: 'Enchant 1H in Prontera first (Lv.1 is enough)' },
-  { city: 'Morroc',        title: 'Highest Level in Morroc/Einbroch', sub: 'Enchant 1H in Morroc/Einbroch first (Lv.1 is enough)' },
-  { city: 'Izlude Island', title: 'Highest Level in Izlude/Alberta',  sub: 'Enchant 1H in Izlude/Alberta first (Lv.1 is enough)' },
-];
-
-let live         = false;
-let currentSlide = 0;
-let totalSlides  = 2;
-let slideAwkMap  = {};
-let awkBase      = 0;
-let awkActive    = false;
-
-function getSlots(prefix = '') {
-  return SLOTS.map(s => {
-    const city = el(`ench-city-${prefix}${s}`).value;
-    const lvl  = el(`ench-lvl-${prefix}${s}`).value;
-    return (city && lvl !== '') ? { city, lvl: +lvl } : null;
-  });
-}
-
-function getUpgradeLvl(inputId) {
-  const v = parseInt(el(inputId).value, 10);
-  return (!isNaN(v) && v >= 0 && v <= MAX_UPGRADE) ? v : 0;
+function lookupWeaponAwk(totalScore) {
+  for (let i = weaponAwk.length - 1; i >= 0; i--)
+    if (totalScore >= weaponAwk[i].score) return weaponAwk[i];
+  return null;
 }
 
 function lookupUpgrade2H(budget) {
-  for (let lvl = MAX_UPGRADE; lvl >= 0; lvl--)
+  for (let lvl = maxUpgrade; lvl >= 0; lvl--)
     if (upgradeData[lvl].h2 <= budget) return lvl;
+  return 0;
 }
 
 function lookupRefine2H(budget, quality) {
   for (let lvl = 15; lvl >= 0; lvl--)
     if (refineData[lvl][quality].h2 <= budget) return lvl;
+  return 0;
 }
 
-function lookupLevelInCity(city, budget, minLevel = 1) {
+function lookupLevelInCity(city, budget, minLevel = 1, useLabel = true) {
+  const label = useLabel ? cityLabel(city) : city;
+  budget = Math.round(budget);
   for (let l = 15; l >= minLevel; l--)
-    if (enchantData[city][l].h2 <= budget) return `${cityLabel(city)} Lv.${l}`;
+    if (enchantData[city][l].h2 <= budget) return `${label} Lv.${l}`;
   return '—';
-}
-
-function lookupRawLevelInCity(city, budget, minLevel = 1) {
-  for (let l = 15; l >= minLevel; l--)
-    if (enchantData[city][l].h2 <= budget) return `${city} Lv.${l}`;
-  return '—';
-}
-
-function lookupEnchant(targetCity, shieldCity, shieldLvl, extra = 0, minLevel = 0) {
-  if (!shieldCity || shieldLvl === '') return '—';
-  const budget = enchantData[shieldCity][+shieldLvl].h1 / 2 + extra;
-  return lookupLevelInCity(targetCity, budget, minLevel);
 }
 
 function lookupEquivByBudget(budget) {
-  for (let i = CITIES.length - 1; i >= 0; i--)
-    if (enchantData[CITIES[i]][15].h2 <= budget) return `${cityLabel(CITIES[i])} Lv.15`;
+  budget = Math.round(budget);
+  for (let i = cities.length - 1; i >= 0; i--)
+    if (enchantData[cities[i]][15].h2 <= budget) return `${cityLabel(cities[i])} Lv.15`;
   return '—';
 }
 
-function setEnchantLineTip(tipId, message) {
-  const tipEl = el(tipId);
-  if (!tipEl) return;
-  const main = tipEl.closest('.enchant-line-main');
-  if (message) {
-    tipEl.textContent = message;
-    tipEl.classList.add('visible');
-    if (main && !main.dataset.tapBound) {
-      main.dataset.tapBound = '1';
-      main.style.cursor = 'pointer';
-      main.addEventListener('click', () => main.classList.toggle('tip-open'));
-    }
-  } else {
-    tipEl.textContent = '';
-    tipEl.classList.remove('visible');
-    if (main) { main.classList.remove('tip-open'); main.style.cursor = ''; }
-  }
-}
-
-function lookupCombined1H(s, s1H) {
+function lookupCombined1H(s, s1H, shieldF = 0.5, weapF = 1) {
   if (!s && !s1H) return '—';
-  const shieldIdx  = s   ? CITIES.indexOf(s.city)   : Infinity;
-  const weapIdx    = s1H ? CITIES.indexOf(s1H.city) : Infinity;
+  const shieldIdx  = s   ? cities.indexOf(s.city)   : Infinity;
+  const weapIdx    = s1H ? cities.indexOf(s1H.city) : Infinity;
   const targetCity = shieldIdx <= weapIdx ? s.city : s1H.city;
-  const budget     = (s   ? enchantData[s.city][s.lvl].h1 / 2 : 0)
-                   + (s1H ? enchantData[s1H.city][s1H.lvl].h1  : 0);
-  return lookupRawLevelInCity(targetCity, budget);
-}
-
-const equivIsMorrocOrHigher = r => r !== '—' && r !== 'Prontera Lv.15';
-const equivIsIzludeOrHigher = r => equivIsMorrocOrHigher(r) && r !== 'Morroc/Einbroch Lv.15';
-
-function hasJuno58(slots) {
-  return slots.every(s => s && s.city === 'Juno' && s.lvl >= 5 && s.lvl <= 8);
+  const budget     = (s   ? enchantData[s.city][s.lvl].h1 * shieldF : 0)
+                   + (s1H ? enchantData[s1H.city][s1H.lvl].h1 * weapF : 0);
+  return lookupLevelInCity(targetCity, budget, 1, false);
 }
 
 function parseEnchantResult(str) {
   if (!str || str === '—') return null;
   const m = str.match(/^(.+?)\s+Lv\.?(\d+)$/i);
   return m ? { city: m[1].trim(), lvl: m[2] } : null;
+}
+
+function enchantResultScore(str) {
+  const p = parseEnchantResult(str);
+  if (!p) return 0;
+  const key = cityLabelToKey[p.city] ?? p.city;
+  return enchantData[key]?.[+p.lvl]?.score ?? 0;
+}
+
+function getSameSource(slots, slots1H, has1H, shieldF = 0.5, weapF = 1) {
+  const comparisons = slotNums.map(i => {
+    const s   = slots[i - 1];
+    const w   = has1H ? slots1H[i - 1] : null;
+    const shB = s ? enchantData[s.city][s.lvl].h1 * shieldF : 0;
+    const wpB = w ? enchantData[w.city][w.lvl].h1 * weapF   : 0;
+    if (!shB && !wpB) return null;
+    return shB >= wpB ? 'shield' : 'weapon';
+  }).filter(Boolean);
+  if (!comparisons.length) return null;
+  return comparisons.every(v => v === comparisons[0]) ? comparisons[0] : null;
 }
 
 function setEnchantLineResult(cityId, lvlId, rawStr) {
@@ -1205,18 +1434,38 @@ function setEnchantLineResult(cityId, lvlId, rawStr) {
   if (!parsed) {
     cityEl.textContent  = '—';
     cityEl.className    = 'enchant-line-city enchant-line-empty';
+    cityEl.style.color  = '';
     lvlEl.style.display = 'none';
     return;
   }
   cityEl.textContent  = parsed.city;
   cityEl.className    = 'enchant-line-city';
+  cityEl.style.color  = '';
   lvlEl.textContent   = 'Lv.' + parsed.lvl;
   lvlEl.style.display = '';
 }
 
+function setEnchantLineTip(tipId, message) {
+  const tipEl = el(tipId);
+  if (!tipEl) return;
+  const main = tipEl.closest('.enchant-line-main');
+  if (!message) {
+    tipEl.textContent = '';
+    tipEl.classList.remove('visible');
+    if (main) { main.classList.remove('tip-open'); main.style.cursor = ''; }
+    return;
+  }
+  tipEl.textContent = message;
+  tipEl.classList.add('visible');
+  if (main && !main.dataset.tapBound) {
+    main.dataset.tapBound = '1';
+    main.style.cursor = 'pointer';
+    main.addEventListener('click', () => main.classList.toggle('tip-open'));
+  }
+}
+
 function buildEnchantLinesHTML(idPrefix) {
-  return `<div class="enchant-lines">
-    ${SLOTS.map(j => `
+  return `<div class="enchant-lines">${slotNums.map(j => `
     <div class="enchant-line">
       <div class="enchant-line-num">${j}</div>
       <div class="enchant-line-bar">
@@ -1228,14 +1477,14 @@ function buildEnchantLinesHTML(idPrefix) {
 }
 
 function buildEnchantSlots(prefix, containerId) {
-  el(containerId).innerHTML = SLOTS.map(s => `
+  el(containerId).innerHTML = slotNums.map(s => `
     <div class="slot" id="slot-${prefix}${s}">
       <div class="slot-label">Line ${s}</div>
       <div class="row">
-        <div class="field wide"><label>City</label>
+        <div class="field"><label>City</label>
           <select id="ench-city-${prefix}${s}">
             <option value="">— none —</option>
-            ${CITIES.map(v => `<option value="${v}">${v}</option>`).join('')}
+            ${cities.map(v => `<option value="${v}">${v}</option>`).join('')}
           </select>
         </div>
         <div class="field"><label>Level</label>
@@ -1244,7 +1493,7 @@ function buildEnchantSlots(prefix, containerId) {
       </div>
     </div>`).join('');
 
-  SLOTS.forEach(s => {
+  slotNums.forEach(s => {
     el(`ench-city-${prefix}${s}`).addEventListener('change', ({ target }) => {
       const lvlEl = el(`ench-lvl-${prefix}${s}`);
       lvlEl.innerHTML = buildLevelOptions();
@@ -1256,145 +1505,36 @@ function buildEnchantSlots(prefix, containerId) {
   });
 }
 
-function renderSlideEquiv(slots, slots1H, has1H) {
-  el('slide-1')?.remove();
-  el('dot-1')?.remove();
-
-  const activeComparisons = SLOTS.map(i => {
-    const s   = slots[i - 1];
-    const s1H = has1H ? slots1H[i - 1] : null;
-    const shieldBudget = s   ? enchantData[s.city][s.lvl].h1 / 2 : 0;
-    const weapBudget   = s1H ? enchantData[s1H.city][s1H.lvl].h1  : 0;
-    if (shieldBudget === 0 && weapBudget === 0) return null;
-    return shieldBudget >= weapBudget ? 'shield' : 'weapon';
-  }).filter(Boolean);
-
-  if (!activeComparisons.length) return;
-  if (!activeComparisons.every(v => v === activeComparisons[0])) return;
-
-  const dot = Object.assign(document.createElement('div'), { className: 'slide-dot', id: 'dot-1' });
-  el('dot-0').after(dot);
-
-  const div = document.createElement('div');
-  div.className = 'enchant-slide';
-  div.id        = 'slide-1';
-  div.innerHTML = `
-    <div class="slide-mode-title">Highest City Lvl.15</div>
-    <div class="slide-mode-sub">Per slot: best Lv.15 city achievable from shield or 1H alone (whichever is higher).<br><span style="color:var(--c-dim);font-size:10px;">Tap a slot to see tip.</span></div>
-    <div class="enchant-lines">
-      ${SLOTS.map(j => `
-      <div class="enchant-line">
-        <div class="enchant-line-num">${j}</div>
-        <div class="enchant-line-main">
-          <div class="enchant-line-bar">
-            <span class="enchant-line-city enchant-line-empty" id="s1-e${j}-city">—</span>
-            <span class="enchant-line-lvl" id="s1-e${j}-lvl" style="display:none"></span>
-          </div>
-          <div class="slot-tip" id="s1-e${j}-tip"></div>
-        </div>
-      </div>`).join('')}
-    </div>`;
-  el('slide-0').insertAdjacentElement('afterend', div);
-}
-
-function renderSlide1H(slots, slots1H) {
-  el('slide-1h')?.remove();
-  el('dot-1h')?.remove();
-  if (!slots1H) return;
-
-  const dot = Object.assign(document.createElement('div'), { className: 'slide-dot', id: 'dot-1h' });
-  el('slide-dots-container').prepend(dot);
-
-  const div = document.createElement('div');
-  div.className = 'enchant-slide';
-  div.id        = 'slide-1h';
-  div.innerHTML = `
-    <div class="slide-mode-title">1H + Shield Result</div>
-    <div class="slide-mode-sub">Lowest city between 1H and Shield per slot</div>
-    ${buildEnchantLinesHTML('s1h-')}`;
-  el('slider-track').prepend(div);
-
-  SLOTS.forEach(i =>
-    setEnchantLineResult(`s1h-e${i}-city`, `s1h-e${i}-lvl`,
-      lookupCombined1H(slots[i - 1], slots1H[i - 1]))
-  );
-}
-
-function renderSlideNoShield(slots1H) {
-  el('slide-ns')?.remove();
-  el('dot-ns')?.remove();
-  if (!slots1H || slots1H.every(s => !s)) return;
-
-  const dot = Object.assign(document.createElement('div'), { className: 'slide-dot', id: 'dot-ns' });
-  el('slide-dots-container').insertBefore(dot, el('dot-0'));
-
-  const div = document.createElement('div');
-  div.className = 'enchant-slide';
-  div.id        = 'slide-ns';
-  div.innerHTML = `
-    <div class="slide-mode-title">If No Shield Enchantment</div>
-    <div class="slide-mode-sub">Result from 1H enchant only (shield line empty)</div>
-    ${buildEnchantLinesHTML('sns-')}`;
-  el('slider-track').insertBefore(div, el('slide-0'));
-
-  SLOTS.forEach(i => {
-    const s1H = slots1H[i - 1];
-    if (!s1H) { setEnchantLineResult(`sns-e${i}-city`, `sns-e${i}-lvl`, '—'); return; }
-    const budget = enchantData[s1H.city][s1H.lvl].h1;
-    setEnchantLineResult(`sns-e${i}-city`, `sns-e${i}-lvl`, lookupRawLevelInCity(s1H.city, budget));
+function getSlots(prefix = '') {
+  return slotNums.map(s => {
+    const city = el(`ench-city-${prefix}${s}`).value;
+    const lvl  = el(`ench-lvl-${prefix}${s}`).value;
+    return (city && lvl !== '') ? { city, lvl: +lvl } : null;
   });
 }
 
-function renderDynamicSlides(defs) {
-  document.querySelectorAll('.dynamic-slide').forEach(s => s.remove());
-  document.querySelectorAll('.dynamic-dot').forEach(d => d.remove());
-  totalSlides = 1 + (el('slide-1') ? 1 : 0) + defs.length + (el('slide-1h') ? 1 : 0) + (el('slide-ns') ? 1 : 0);
+function getUpgradeLvl(inputId) {
+  const v = parseInt(el(inputId).value, 10);
+  return (!isNaN(v) && v >= 0 && v <= maxUpgrade) ? v : 0;
+}
 
-  const dotsContainer = el('slide-dots-container');
-  defs.forEach((_, i) => {
-    const dot = Object.assign(document.createElement('div'), {
-      className: 'slide-dot dynamic-dot',
-      id: `dot-${2 + i}`,
-    });
-    dotsContainer.appendChild(dot);
-  });
-
-  const slots = getSlots();
-  defs.forEach((def, i) => {
-    const idx = 2 + i;
-    const div = document.createElement('div');
-    div.className = 'enchant-slide dynamic-slide';
-    div.id        = `slide-${idx}`;
-    div.innerHTML = `
-      <div class="slide-mode-title">${def.title}</div>
-      <div class="slide-mode-sub">${def.sub}</div>
-      ${buildEnchantLinesHTML(`ds${idx}-`)}`;
-    el('slider-track').appendChild(div);
-
-    SLOTS.forEach(j => {
-      const s = slots[j - 1];
-      setEnchantLineResult(`ds${idx}-e${j}-city`, `ds${idx}-e${j}-lvl`,
-        s ? lookupEnchant(def.city, s.city, s.lvl, 0, 1) : '—');
-    });
-  });
-
-  goSlide(Math.min(currentSlide, totalSlides - 1));
+function applyQualityClass(panelId, quality) {
+  const panel = el(panelId);
+  if (!panel) return;
+  panel.classList.remove('q-white', 'q-blue', 'q-gold');
+  panel.classList.add('q-' + quality);
 }
 
 function renderAwkNote(n) {
   const awkEl = el('out-awk');
   if (!awkActive) { awkEl.style.display = 'none'; return; }
-  const slides = el('slider-track').querySelectorAll('.enchant-slide');
-  const slideId = slides[n]?.id;
+  const slideId   = el('slider-track').querySelectorAll('.enchant-slide')[n]?.id;
   const enchScore = slideAwkMap[slideId] ?? 0;
-  const total = awkBase + enchScore;
-  const awk = lookupWeaponAwk(total);
-  if (awk) {
-    awkEl.innerHTML = `Result in 2H has <span class="awk-hl">${total} score</span>, that's mean ready for <span class="awk-hl">${awk.tier} Weapon Awakening</span>, need <span class="awk-hl">${awk.need - 1}x more</span> with same progress to activate.`;
-    awkEl.style.display = '';
-  } else {
-    awkEl.style.display = 'none';
-  }
+  const total     = awkBase + enchScore;
+  const awk       = lookupWeaponAwk(total);
+  if (!awk) { awkEl.style.display = 'none'; return; }
+  awkEl.innerHTML     = `Result in 2H has <span class="awk-hl">${total} score</span>, that's mean ready for <span class="awk-hl">${awk.tier} Weapon Awakening</span>, need <span class="awk-hl">${awk.need - 1}x more</span> with same progress to activate.`;
+  awkEl.style.display = '';
 }
 
 function goSlide(n) {
@@ -1406,75 +1546,188 @@ function goSlide(n) {
   renderAwkNote(n);
 }
 
+function renderSlide1H(slots, slots1H, shieldF = 0.5, weapF = 1) {
+  el('slide-1h')?.remove();
+  el('dot-1h')?.remove();
+  if (!slots1H) return;
+  el('slide-dots-container').prepend(createDot('dot-1h'));
+  const div = createSlide('slide-1h');
+  div.innerHTML = `
+    <div class="slide-mode-title">2H Enchantment</div>
+    <div class="slide-mode-sub">Become lowest city between 1H and Shield per slot</div>
+    ${buildEnchantLinesHTML('s1h-')}`;
+  el('slider-track').prepend(div);
+  slotNums.forEach(i =>
+    setEnchantLineResult(`s1h-e${i}-city`, `s1h-e${i}-lvl`,
+      lookupCombined1H(slots[i - 1], slots1H[i - 1], shieldF, weapF))
+  );
+}
+
+function renderSlideEquiv(shieldF = 0.5, weapF = 1) {
+  el('slide-1')?.remove();
+  el('dot-1')?.remove();
+  dot0El.after(createDot('dot-1'));
+  const div = createSlide('slide-1');
+  div.innerHTML = `
+    <div class="slide-mode-title">Highest City Lvl.15</div>
+    <div class="slide-mode-sub">Per slot: best Lv.15 city achievable from shield or 1H alone (whichever is higher).<br><span style="color:var(--c-dim);font-size:10px;">Tap a slot to see tip.</span></div>
+    <div class="enchant-lines">${slotNums.map(j => `
+      <div class="enchant-line">
+        <div class="enchant-line-num">${j}</div>
+        <div class="enchant-line-main">
+          <div class="enchant-line-bar">
+            <span class="enchant-line-city enchant-line-empty" id="s1-e${j}-city">—</span>
+            <span class="enchant-line-lvl" id="s1-e${j}-lvl" style="display:none"></span>
+          </div>
+          <div class="slot-tip" id="s1-e${j}-tip"></div>
+        </div>
+      </div>`).join('')}
+    </div>`;
+  slide0El.insertAdjacentElement('afterend', div);
+}
+
+function renderDynamicSlides(defs, sameSource, slots1H, shieldF = 0.5, weapF = 1) {
+  document.querySelectorAll('.dynamic-slide').forEach(s => s.remove());
+  document.querySelectorAll('.dynamic-dot').forEach(d => d.remove());
+  totalSlides = (slide0El.isConnected ? 1 : 0)
+              + (el('slide-1')  ? 1 : 0)
+              + defs.length
+              + (el('slide-1h') ? 1 : 0);
+
+  const dotsContainer = el('slide-dots-container');
+  const shieldSlots   = getSlots();
+
+  defs.forEach((def, i) => {
+    const idx = 2 + i;
+    dotsContainer.appendChild(createDot(`dot-${idx}`, 'dynamic-dot'));
+    const div = createSlide(`slide-${idx}`, 'dynamic-slide');
+    div.innerHTML = `
+      <div class="slide-mode-title">${def.title}</div>
+      <div class="slide-mode-sub">${def.sub}</div>
+      ${buildEnchantLinesHTML(`ds${idx}-`)}`;
+    el('slider-track').appendChild(div);
+
+    slotNums.forEach(j => {
+      let result;
+      if (sameSource === 'weapon') {
+        const w = slots1H?.[j - 1];
+        result  = w ? lookupLevelInCity(def.city, enchantData[w.city][w.lvl].h1 * weapF, 1) : '—';
+      } else {
+        const s = shieldSlots[j - 1];
+        result  = s ? lookupLevelInCity(def.city, enchantData[s.city][s.lvl].h1 * shieldF, 1) : '—';
+      }
+      setEnchantLineResult(`ds${idx}-e${j}-city`, `ds${idx}-e${j}-lvl`, result);
+    });
+  });
+
+  goSlide(Math.min(currentSlide, totalSlides - 1));
+}
+
+function setBlindMode() {
+  el('slider-track').prepend(slide0El);
+  el('slide-dots-container').prepend(dot0El);
+  el('out-refine').style.display          = '';
+  el('refine-desc').style.display         = '';
+  el('refine-quality-warn').style.display = 'none';
+  ['out-upgrade','out-refine','out-upgrade-cost','out-upgrade-dreamsand',
+   'out-refine-cost','out-refine-dreamsand','out-enchant-cost','out-enchant-dreamsand',
+   'out-normal','out-dreamsand'].forEach(id => { el(id).textContent = '888'; });
+  slotNums.forEach(i => {
+    const cityEl = el(`s0-e${i}-city`);
+    const lvlEl  = el(`s0-e${i}-lvl`);
+    if (cityEl) { cityEl.textContent = 'Input 1H first'; cityEl.className = 'enchant-line-city'; cityEl.style.color = '#f2605a'; }
+    if (lvlEl)  lvlEl.style.display = 'none';
+  });
+  el('btn-dd').style.display = 'none';
+  ddMode      = false;
+  totalSlides = 1;
+  goSlide(0);
+  el('result-panel').classList.add('visible');
+}
+
+function updateBtn() {
+  el('btn-transfer').disabled = !slotNums.every(s => {
+    const city = el(`ench-city-${s}`).value;
+    const lvl  = el(`ench-lvl-${s}`).value;
+    return (!city && !lvl) || (city && lvl !== '');
+  });
+}
+
 function calculate() {
   const quality   = el('sel-quality').value;
   const quality1H = el('sel-quality-1h').value;
-  const slots   = getSlots();
-  const has1H   = el('section-1h').style.display !== 'none';
-  const slots1H = has1H ? getSlots('1h-') : [];
+  const slots     = getSlots();
+  const has1H     = el('section-1h').style.display !== 'none';
+  const slots1H   = has1H ? getSlots('1h-') : [];
+  const shieldF   = ddMode ? 0.75 : 0.5;
+  const weapF     = ddMode ? 0.75 : 1.0;
+
+  if (!has1H && !eggCracked) { setBlindMode(); return; }
 
   const qualityMismatch = has1H && quality !== quality1H;
-
-  const shieldUpgH1   = upgradeData[getUpgradeLvl('sel-upgrade')].h1;
-  const weapUpgH1     = has1H ? upgradeData[getUpgradeLvl('sel-upgrade-1h')].h1 : 0;
-  const upgradeBudget = weapUpgH1 + shieldUpgH1 / 2;
-
-  const shieldRefH1  = refineData[+el('sel-refine').value][quality].h1;
-  const weapRefH1    = (has1H && !qualityMismatch) ? refineData[+el('sel-refine-1h').value][quality1H].h1 : 0;
-  const refineBudget = qualityMismatch ? 0 : weapRefH1 + shieldRefH1 / 2;
-
-  const shieldEnchH1  = slots.reduce((sum, s)   => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
-  const weapEnchH1    = slots1H.reduce((sum, s) => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
-  const enchantBudget = weapEnchH1 + shieldEnchH1 / 2;
+  const shieldUpgH1     = upgradeData[getUpgradeLvl('sel-upgrade')].h1;
+  const weapUpgH1       = has1H ? upgradeData[getUpgradeLvl('sel-upgrade-1h')].h1 : 0;
+  const upgradeBudget   = weapUpgH1 * weapF + shieldUpgH1 * shieldF;
+  const shieldRefH1     = refineData[+el('sel-refine').value][quality].h1;
+  const weapRefH1       = (has1H && !qualityMismatch) ? refineData[+el('sel-refine-1h').value][quality1H].h1 : 0;
+  const refineBudget    = qualityMismatch ? 0 : weapRefH1 * weapF + shieldRefH1 * shieldF;
+  const shieldEnchH1    = slots.reduce((sum, s)   => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
+  const weapEnchH1      = slots1H.reduce((sum, s) => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
+  const enchantBudget   = weapEnchH1 * weapF + shieldEnchH1 * shieldF;
 
   el('out-upgrade').textContent = String(lookupUpgrade2H(upgradeBudget));
+
   if (qualityMismatch) {
-    el('out-refine').style.display = 'none';
-    el('refine-desc').style.display = 'none';
+    el('out-refine').style.display          = 'none';
+    el('refine-desc').style.display         = 'none';
     el('refine-quality-warn').style.display = 'block';
   } else {
-    el('out-refine').style.display = '';
-    el('out-refine').innerHTML = `+${lookupRefine2H(refineBudget, quality)}`;
-    el('refine-desc').style.display = '';
+    el('out-refine').style.display          = '';
+    el('out-refine').innerHTML              = `+${lookupRefine2H(refineBudget, quality)}`;
+    el('refine-desc').style.display         = '';
     el('refine-quality-warn').style.display = 'none';
   }
 
-  renderSlideEquiv(slots, slots1H, has1H);
+  el('slider-track').prepend(slide0El);
+  el('slide-dots-container').prepend(dot0El);
+  el('slide-0').querySelector('.slide-mode-title').textContent = '2H Enchantment';
+  el('slide-0').querySelector('.slide-mode-sub').textContent = 'Become lowest city between 1H and Shield per slot';
 
-  SLOTS.forEach(i => {
+  if (highestLevel15 && getSameSource(slots, slots1H, has1H, shieldF, weapF) === 'shield')
+    renderSlideEquiv(shieldF, weapF);
+  else { el('slide-1')?.remove(); el('dot-1')?.remove(); }
+
+  slotNums.forEach(i => {
     const s   = slots[i - 1];
-    const s1H = has1H ? slots1H[i - 1] : null;
+    const w   = has1H ? slots1H[i - 1] : null;
 
     setEnchantLineResult(`s0-e${i}-city`, `s0-e${i}-lvl`,
-      s ? lookupRawLevelInCity(s.city, enchantData[s.city][s.lvl].h1 / 2) : '—');
+      s ? lookupLevelInCity(s.city, enchantData[s.city][s.lvl].h1 * shieldF, 1, false) : '—');
 
-    const shieldBudget = s   ? enchantData[s.city][s.lvl].h1 / 2 : 0;
-    const weapBudget   = s1H ? enchantData[s1H.city][s1H.lvl].h1  : 0;
+    const shieldBudget = s ? enchantData[s.city][s.lvl].h1 * shieldF : 0;
+    const weapBudget   = w ? enchantData[w.city][w.lvl].h1 * weapF   : 0;
     const useBudget    = Math.max(shieldBudget, weapBudget);
     const equivResult  = useBudget > 0 ? lookupEquivByBudget(useBudget) : '—';
     setEnchantLineResult(`s1-e${i}-city`, `s1-e${i}-lvl`, equivResult);
 
     const buildTip = () => {
-      if (equivResult === '—') return '';
       const parsed = parseEnchantResult(equivResult);
       if (!parsed) return '';
       const { city } = parsed;
       if (shieldBudget >= weapBudget && s)
         return `Slot ${i} shield is equal to ${equivResult}, so just enchant slot ${i} 1H in ${city} (any level), result will become 2H ${equivResult}.`;
-      if (weapBudget > shieldBudget && s1H)
+      if (weapBudget > shieldBudget && w)
         return `Slot ${i} 1H is equal to ${equivResult}, so just enchant slot ${i} shield in ${city} (any level), result will become 2H ${equivResult}.`;
       return '';
     };
     setEnchantLineTip(`s1-e${i}-tip`, buildTip());
   });
 
-  const poring      = el('chk-poring').checked;
-  const totalBudget = upgradeBudget + refineBudget + enchantBudget;
-
-  const pUpgrade = applyPoring(upgradeBudget, poring);
-  const pRefine  = applyPoring(refineBudget,  poring);
-  const pEnchant = applyPoring(enchantBudget, poring);
-  const pTotal   = applyPoring(totalBudget,   poring);
+  const poring    = el('chk-poring').checked;
+  const pUpgrade  = applyPoring(upgradeBudget, poring);
+  const pRefine   = applyPoring(refineBudget,  poring);
+  const pEnchant  = applyPoring(enchantBudget, poring);
+  const pTotal    = applyPoring(upgradeBudget + refineBudget + enchantBudget, poring);
 
   el('out-upgrade-cost').textContent      = fmt(pUpgrade);
   el('out-upgrade-dreamsand').textContent = fmt(roundUp10k(pUpgrade));
@@ -1485,95 +1738,67 @@ function calculate() {
   el('out-normal').textContent            = fmt(pTotal);
   el('out-dreamsand').textContent         = fmt(roundUp10k(pTotal));
 
-  const activeSlots  = slots.filter(s => s);
-  const hasActive    = activeSlots.length > 0;
-  const equivResults = activeSlots.map(s => lookupEquivByBudget(enchantData[s.city][s.lvl].h1 / 2));
+  renderSlide1H(slots, has1H ? slots1H : null, shieldF, weapF);
+  if (has1H) { slide0El.remove(); dot0El.remove(); }
+  renderDynamicSlides([], null, has1H ? slots1H : null, shieldF, weapF);
 
-  const allPront15    = hasActive && equivResults.every(r => r === 'Prontera Lv.15');
-  const allMorroc15   = hasActive && equivResults.every(r => r === 'Morroc/Einbroch Lv.15');
-  const allIzlude15   = hasActive && equivResults.every(r => r === 'Izlude/Alberta Lv.15');
-  const allMorrocPlus = hasActive && equivResults.every(equivIsMorrocOrHigher);
-  const allIzludePlus = hasActive && equivResults.every(equivIsIzludeOrHigher);
-
-  const activeDefs = hasJuno58(slots)
-    ? CITY_SLIDE_DEFS.filter((_, i) => {
-        if (i === 0) return !allPront15  && !allMorrocPlus;
-        if (i === 1) return !allMorroc15 && !allIzludePlus;
-        return !allIzlude15;
-      })
-    : [];
-
-  renderSlide1H(slots, has1H ? slots1H : null);
-  renderSlideNoShield(has1H ? slots1H : null);
-  renderDynamicSlides(activeDefs);
-
-  awkActive = quality === 'gold' && (!has1H || quality1H === 'gold');
+  awkActive = highestLevel15 && quality === 'gold' && (!has1H || quality1H === 'gold');
   if (awkActive) {
     const upgResult = lookupUpgrade2H(upgradeBudget);
-    const upgScore  = upgradeData[upgResult]?.score ?? 0;
     const refResult = qualityMismatch ? 0 : lookupRefine2H(refineBudget, quality);
-    const refScore  = refineData[refResult]?.gold?.score ?? 0;
-    awkBase = upgScore + refScore;
-
+    awkBase     = (upgradeData[upgResult]?.score ?? 0) + (refineData[refResult]?.gold?.score ?? 0);
     slideAwkMap = {};
 
     if (el('slide-1h'))
-      slideAwkMap['slide-1h'] = SLOTS.reduce((sum, i) =>
-        sum + enchantResultScore(lookupCombined1H(slots[i-1], slots1H[i-1])), 0);
+      slideAwkMap['slide-1h'] = slotNums.reduce((sum, i) =>
+        sum + enchantResultScore(lookupCombined1H(slots[i-1], slots1H[i-1], shieldF, weapF)), 0);
 
-    if (el('slide-ns'))
-      slideAwkMap['slide-ns'] = SLOTS.reduce((sum, i) => {
-        const s1H = slots1H[i-1];
-        return s1H ? sum + enchantResultScore(lookupRawLevelInCity(s1H.city, enchantData[s1H.city][s1H.lvl].h1)) : sum;
-      }, 0);
-
-    slideAwkMap['slide-0'] = SLOTS.reduce((sum, i) => {
+    slideAwkMap['slide-0'] = slotNums.reduce((sum, i) => {
       const s = slots[i-1];
-      return s ? sum + enchantResultScore(lookupRawLevelInCity(s.city, enchantData[s.city][s.lvl].h1 / 2)) : sum;
+      return s ? sum + enchantResultScore(lookupLevelInCity(s.city, enchantData[s.city][s.lvl].h1 * shieldF, 1, false)) : sum;
     }, 0);
 
     if (el('slide-1'))
-      slideAwkMap['slide-1'] = SLOTS.reduce((sum, i) => {
-        const s = slots[i-1], s1H = slots1H[i-1];
-        const shieldB = s   ? enchantData[s.city][s.lvl].h1 / 2 : 0;
-        const weapB   = s1H ? enchantData[s1H.city][s1H.lvl].h1 : 0;
-        const budget  = Math.max(shieldB, weapB);
+      slideAwkMap['slide-1'] = slotNums.reduce((sum, i) => {
+        const s  = slots[i-1];
+        const w  = slots1H[i-1];
+        const shB = s ? enchantData[s.city][s.lvl].h1 * shieldF : 0;
+        const wpB = w ? enchantData[w.city][w.lvl].h1 * weapF   : 0;
+        const budget = Math.max(shB, wpB);
         if (!budget) return sum;
-        for (let ci = CITIES.length - 1; ci >= 0; ci--)
-          if (enchantData[CITIES[ci]][15].h2 <= budget)
-            return sum + (enchantData[CITIES[ci]][15].score ?? 0);
+        for (let ci = cities.length - 1; ci >= 0; ci--)
+          if (enchantData[cities[ci]][15].h2 <= budget)
+            return sum + (enchantData[cities[ci]][15].score ?? 0);
         return sum;
       }, 0);
+  }
 
-    activeDefs.forEach((def, i) => {
-      const id = `slide-${2 + i}`;
-      slideAwkMap[id] = SLOTS.reduce((sum, j) => {
-        const s = slots[j-1];
-        return s ? sum + enchantResultScore(lookupEnchant(def.city, s.city, s.lvl, 0, 1)) : sum;
-      }, 0);
-    });
+  const btnDD = el('btn-dd');
+  if (highestLevel15 && has1H) {
+    btnDD.style.display = '';
+    btnDD.textContent   = ddMode ? 'Back to 1H+Shield' : 'Switch to DD';
+    btnDD.classList.toggle('active', ddMode);
+  } else {
+    btnDD.style.display = 'none';
+    if (!has1H) ddMode  = false;
   }
 
   el('result-panel').classList.add('visible');
   renderAwkNote(currentSlide);
 }
 
-function updateBtn() {
-  const ready = SLOTS.every(s => {
-    const city = el(`ench-city-${s}`).value;
-    const lvl  = el(`ench-lvl-${s}`).value;
-    return (!city && !lvl) || (city && lvl !== '');
-  });
-  el('btn-transfer').disabled = !ready;
-}
-
 buildEnchantSlots('',    'enchant-slots');
 buildEnchantSlots('1h-', 'enchant-slots-1h');
 
+const slide0El = el('slide-0');
+const dot0El   = el('dot-0');
+
 ['sel-refine', 'sel-refine-1h'].forEach(id => {
-  el(id).innerHTML =
-    Array.from({length: 16}, (_, i) => `<option value="${i}">${i}</option>`).join('');
+  el(id).innerHTML = Array.from({length: 16}, (_, i) => `<option value="${i}">${i}</option>`).join('');
 });
+
+applyQualityClass('panel-shield', el('sel-quality').value);
+applyQualityClass('panel-1h',     el('sel-quality-1h').value);
 
 el('btn-transfer').addEventListener('click', () => {
   live = true;
@@ -1583,7 +1808,7 @@ el('btn-transfer').addEventListener('click', () => {
 });
 
 el('btn-toggle-1h').addEventListener('click', () => {
-  const sec = el('section-1h');
+  const sec     = el('section-1h');
   const showing = sec.style.display !== 'none';
   sec.style.display = showing ? 'none' : 'block';
   el('btn-toggle-1h').textContent = showing ? '+ 1H Weapon' : '− 1H Weapon';
@@ -1595,53 +1820,50 @@ el('btn-toggle-1h').addEventListener('click', () => {
 ['sel-refine', 'sel-refine-1h'].forEach(id =>
   el(id).addEventListener('change', () => { if (live) calculate(); })
 );
+
 ['sel-upgrade', 'sel-upgrade-1h'].forEach(id =>
-  el(id).addEventListener('input', () => { if (live) calculate(); })
+  el(id).addEventListener('input', ({ target }) => {
+    if (target.value === '88888888') {
+      highestLevel15 = true;
+      if (!eggCracked) { eggCracked = true; el('egg-toast').classList.add('show'); }
+    }
+    if (live) calculate();
+  })
 );
-el('chk-poring').addEventListener('change', () => { if (live) calculate(); });
 
-el('arrow-prev').addEventListener('click', () => goSlide(Math.max(0, currentSlide - 1)));
-el('arrow-next').addEventListener('click', () => goSlide(Math.min(totalSlides - 1, currentSlide + 1)));
+['egg-modal-close', 'egg-modal-btn'].forEach(id =>
+  el(id).addEventListener('click', () => el('egg-toast').classList.remove('show'))
+);
 
-function applyQualityClass(panelId, quality) {
-  const panel = el(panelId);
-  if (!panel) return;
-  panel.classList.remove('q-white', 'q-blue', 'q-gold');
-  panel.classList.add('q-' + quality);
-  if (panelId === 'panel-shield') {
-    el('out-refine').classList.remove('q-white', 'q-blue', 'q-gold');
-    el('out-refine').classList.add('q-' + quality);
-  }
-}
+el('chk-poring').addEventListener('change',   () => { if (live) calculate(); });
+el('btn-dd').addEventListener('click',         () => { ddMode = !ddMode; calculate(); });
+el('arrow-prev').addEventListener('click',     () => goSlide(Math.max(0, currentSlide - 1)));
+el('arrow-next').addEventListener('click',     () => goSlide(Math.min(totalSlides - 1, currentSlide + 1)));
 
-applyQualityClass('panel-shield', el('sel-quality').value);
-applyQualityClass('panel-1h',     el('sel-quality-1h').value);
-
-el('sel-quality').addEventListener('change', e => {
-  applyQualityClass('panel-shield', e.target.value);
+el('sel-quality').addEventListener('change', ({ target }) => {
+  applyQualityClass('panel-shield', target.value);
   if (live) calculate();
 });
-el('sel-quality-1h').addEventListener('change', e => {
-  applyQualityClass('panel-1h', e.target.value);
+el('sel-quality-1h').addEventListener('change', ({ target }) => {
+  applyQualityClass('panel-1h', target.value);
   if (live) calculate();
 });
-
-const track = el('slider-track');
-let touchStartX = 0;
-track.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, { passive: true });
-track.addEventListener('touchend', e => {
-  const dx = e.changedTouches[0].clientX - touchStartX;
-  if (Math.abs(dx) <= 40) return;
-  goSlide(dx < 0 ? Math.min(totalSlides - 1, currentSlide + 1) : Math.max(0, currentSlide - 1));
-}, { passive: true });
 
 el('info-toggle').addEventListener('click', () => {
   const isOpen = el('info-collapse').classList.toggle('open');
   el('info-toggle-icon').classList.toggle('open', isOpen);
 });
 
-document.addEventListener('click', e => {
-  if (!e.target.closest('.enchant-line-main'))
+let touchStartX = 0;
+el('slider-track').addEventListener('touchstart', ({ touches })    => { touchStartX = touches[0].clientX; }, { passive: true });
+el('slider-track').addEventListener('touchend',   ({ changedTouches }) => {
+  const dx = changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) <= 40) return;
+  goSlide(dx < 0 ? Math.min(totalSlides - 1, currentSlide + 1) : Math.max(0, currentSlide - 1));
+}, { passive: true });
+
+document.addEventListener('click', ({ target }) => {
+  if (!target.closest('.enchant-line-main'))
     document.querySelectorAll('.enchant-line-main.tip-open').forEach(m => m.classList.remove('tip-open'));
 });
 
