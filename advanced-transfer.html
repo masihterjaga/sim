@@ -54,11 +54,8 @@
   --font: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; }
-
 .hidden { display: none; }
-
 body {
   background: var(--c-bg);
   color: var(--c-text);
@@ -70,7 +67,6 @@ body {
   padding: 36px 16px 80px;
   min-height: 100vh;
 }
-
 .wrap {
   width: 100%;
   max-width: 440px;
@@ -78,11 +74,9 @@ body {
   flex-direction: column;
   gap: 12px;
 }
-
 .card-header {
   padding: 4px 0 20px;
 }
-
 .badge {
   display: inline-flex;
   align-items: center;
@@ -97,7 +91,6 @@ body {
   text-transform: uppercase;
   margin-bottom: 14px;
 }
-
 h1 {
   font-size: 28px;
   font-weight: 800;
@@ -106,13 +99,11 @@ h1 {
   line-height: 1.15;
   margin-bottom: 8px;
 }
-
 .subtitle {
   font-size: 13px;
   color: var(--c-sub);
   line-height: 1.6;
 }
-
 .subtitle a {
   color: var(--c-blue);
   text-decoration: none;
@@ -120,7 +111,6 @@ h1 {
   transition: color .2s, border-color .2s;
 }
 .subtitle a:hover { color: #82b4f8; border-color: rgba(91,156,246,.5); }
-
 .panel {
   background: var(--c-surface);
   border: 1px solid var(--c-border);
@@ -130,7 +120,6 @@ h1 {
   transition: border-color .35s ease;
   box-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
-
 .panel-header {
   display: flex;
   align-items: center;
@@ -140,7 +129,6 @@ h1 {
   background: var(--c-surface-2);
   transition: background .35s ease;
 }
-
 .panel-title {
   font-size: 11px;
   font-weight: 700;
@@ -148,22 +136,18 @@ h1 {
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-
 .panel-body {
   padding: 16px;
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
-
 .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
-
 .field { display: flex; flex-direction: column; gap: 5px; }
-
 label {
   font-size: 10.5px;
   font-weight: 700;
@@ -171,7 +155,6 @@ label {
   letter-spacing: .9px;
   text-transform: uppercase;
 }
-
 select, input[type="number"] {
   width: 100%;
   background: var(--c-surface-3);
@@ -185,7 +168,6 @@ select, input[type="number"] {
   outline: none;
   transition: border-color .15s, box-shadow .15s;
 }
-
 select {
   appearance: none;
   -webkit-appearance: none;
@@ -196,30 +178,23 @@ select {
   background-position: right 11px center;
   background-size: 7px 4px;
 }
-
 select:focus, input[type="number"]:focus {
   border-color: var(--c-border-2);
   box-shadow: 0 0 0 1px rgba(255,255,255,.04);
 }
-
 select option { background: var(--c-surface-2); }
-
 input[type="number"] {
   font-family: var(--mono);
   -moz-appearance: textfield;
 }
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
-
 .divider {
   border: none;
   border-top: 1px solid var(--c-border);
 }
-
 .enchant-slots { display: flex; flex-direction: column; gap: 12px; }
-
 .slot { display: flex; flex-direction: column; gap: 6px; }
-
 .slot-label,
 .slot-header {
   font-size: 10.5px;
@@ -228,16 +203,13 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   letter-spacing: .9px;
   text-transform: uppercase;
 }
-
 .slot-header { padding-bottom: 10px; }
-
 .row {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 8px;
   align-items: end;
 }
-
 .btn-toggle-1h {
   display: flex;
   align-items: center;
@@ -256,14 +228,12 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   cursor: pointer;
   transition: border-color .15s, color .15s, background .15s;
 }
-
 .btn-toggle-1h:hover,
 .btn-toggle-1h.active {
   border-color: var(--c-accent-border);
   color: var(--c-accent-text);
   background: var(--c-accent-dim);
 }
-
 .btn-transfer {
   width: 100%;
   padding: 16px;
@@ -280,7 +250,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   transition: opacity .15s, transform .1s, box-shadow .15s;
   box-shadow: 0 4px 20px rgba(245,166,35,.32);
 }
-
 .btn-transfer:hover {
   opacity: .92;
   box-shadow: 0 4px 18px rgba(245,166,35,.35);
@@ -294,7 +263,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   opacity: .55;
   box-shadow: none;
 }
-
 .result {
   display: none;
   background: var(--c-surface);
@@ -303,9 +271,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
-
 .result.visible { display: block; }
-
 .result-header {
   display: flex;
   align-items: center;
@@ -313,7 +279,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   background: var(--c-surface-2);
   border-bottom: 1px solid var(--c-border);
 }
-
 .result-header-label {
   font-size: 11px;
   font-weight: 700;
@@ -322,24 +287,20 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   text-transform: uppercase;
   flex: 1;
 }
-
 .result-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
   border-bottom: 1px solid var(--c-border);
 }
-
 .stat-block {
   padding: 18px 16px 16px;
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-
 .stat-block + .stat-block {
   border-left: 1px solid var(--c-border);
 }
-
 .stat-label {
   font-size: 11px;
   font-weight: 700;
@@ -348,7 +309,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   text-transform: uppercase;
   margin-bottom: 4px;
 }
-
 .stat-value {
   font-family: var(--mono);
   font-size: 34px;
@@ -356,26 +316,21 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   color: var(--c-accent);
   line-height: 1.1;
 }
-
-#out-upgrade { color: var(--c-green); }
-
+#out-upgrade { color: rgba(180,195,215,.75); }
 .stat-desc {
   font-size: 11px;
   color: var(--c-dim-2);
   margin-top: 3px;
 }
-
 .enchant-section {
   border-bottom: 1px solid var(--c-border);
 }
-
 .enchant-section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 11px 16px;
 }
-
 .enchant-section-title {
   font-size: 11px;
   font-weight: 700;
@@ -383,19 +338,16 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-
 .slide-nav {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .slide-dots {
   display: flex;
   gap: 5px;
   align-items: center;
 }
-
 .slide-dot {
   width: 6px;
   height: 6px;
@@ -404,13 +356,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border: 1px solid var(--c-dot-border);
   transition: background .2s, transform .2s, border-color .2s;
 }
-
 .slide-dot.active {
   background: var(--c-dot-active);
   border-color: var(--c-dot-active);
   transform: scale(1.5);
 }
-
 .slide-arrow {
   width: 26px;
   height: 26px;
@@ -425,27 +375,22 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   justify-content: center;
   transition: background .15s, color .15s, border-color .15s;
 }
-
 .slide-arrow:hover:not(:disabled) {
   background: var(--c-border-2);
   color: var(--c-text);
   border-color: var(--c-muted);
 }
 .slide-arrow:disabled { opacity: .2; cursor: not-allowed; }
-
 .enchant-result-wrap { overflow: hidden; }
-
 .enchant-slider-track {
   display: flex;
   transition: transform .3s cubic-bezier(.4, 0, .2, 1);
 }
-
 .enchant-slide {
   min-width: 100%;
   padding: 14px 16px 16px;
   border-top: 1px solid var(--c-border);
 }
-
 .slide-mode-title {
   font-size: 12px;
   font-weight: 600;
@@ -453,7 +398,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   margin-bottom: 4px;
   letter-spacing: .3px;
 }
-
 .slide-mode-sub {
   font-size: 11px;
   color: var(--c-dim);
@@ -462,15 +406,12 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   padding-bottom: 12px;
   border-bottom: 1px solid var(--c-border);
 }
-
 .enchant-lines { display: flex; flex-direction: column; gap: 6px; }
-
 .enchant-line {
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .enchant-line-num {
   font-family: var(--mono);
   font-size: 10px;
@@ -486,7 +427,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   justify-content: center;
   flex-shrink: 0;
 }
-
 .enchant-line-bar {
   flex: 1;
   background: var(--c-surface-3);
@@ -498,13 +438,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   justify-content: space-between;
   transition: border-color .15s;
 }
-
 .enchant-line-city {
   font-size: 13px;
   font-weight: 500;
   color: var(--c-text);
 }
-
 .enchant-line-lvl {
   font-family: var(--mono);
   font-size: 10px;
@@ -515,22 +453,16 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border-radius: 4px;
   padding: 2px 7px;
 }
-
 .enchant-line-empty { color: var(--c-dim); }
-
 .enchant-line-main {
   flex: 1;
   position: relative;
 }
-
 .enchant-line-main .enchant-line-bar { width: 100%; }
-
 .enchant-line-main:hover .enchant-line-bar {
   border-color: var(--c-border-2);
 }
-
 .enchant-line-main.has-tip { cursor: pointer; }
-
 .slot-tip {
   display: none;
   position: absolute;
@@ -547,7 +479,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   z-index: 10;
   pointer-events: none;
 }
-
 .slot-tip::after {
   content: '';
   position: absolute;
@@ -556,19 +487,15 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border: 5px solid transparent;
   border-top-color: var(--c-accent-border);
 }
-
 .enchant-line-main:hover .slot-tip.visible,
 .enchant-line-main.tip-open .slot-tip.visible { display: block; }
-
 .cost-section { padding: 16px; }
-
 .cost-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 14px;
 }
-
 .cost-title {
   font-size: 11px;
   font-weight: 700;
@@ -576,7 +503,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-
 .poring-label {
   display: inline-flex;
   align-items: center;
@@ -590,9 +516,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   user-select: none;
   transition: color .15s;
 }
-
 .poring-label:hover { color: var(--c-text); }
-
 .poring-label input[type="checkbox"] {
   appearance: none;
   -webkit-appearance: none;
@@ -606,7 +530,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   flex-shrink: 0;
   transition: background .2s, border-color .2s;
 }
-
 .poring-label input[type="checkbox"]::before {
   content: '';
   position: absolute;
@@ -618,25 +541,20 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   left: 2px;
   transition: transform .2s, background .2s;
 }
-
 .poring-label input[type="checkbox"]:checked {
   background: var(--c-accent-dim);
   border-color: rgba(245,166,35,.45);
 }
-
 .poring-label input[type="checkbox"]:checked::before {
-  background: conic-gradient(#9878ff, #f5a623, #22d3ee, #9878ff);
+  background: conic-gradient(#a078ff, #5b9cf6, #22d3ee, #3ecf8e, #f5a623, #f2605a, #a078ff);
   transform: translateX(12px);
 }
-
 .col-labels {
   display: flex;
   gap: 8px;
   padding: 0 0 6px;
 }
-
 .col-spacer { flex: 1; }
-
 .col-label {
   font-size: 10px;
   font-weight: 700;
@@ -646,9 +564,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   min-width: 72px;
   text-align: right;
 }
-
 .cost-rows { display: flex; flex-direction: column; gap: 5px; }
-
 .cost-row {
   display: flex;
   align-items: center;
@@ -658,74 +574,62 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border-radius: var(--r-sm);
   gap: 8px;
 }
-
 .cost-row.total {
   background: var(--c-surface-3);
   border-color: var(--c-border-2);
   margin-top: 4px;
 }
-
 .cost-row-label {
   font-size: 12.5px;
   color: var(--c-muted);
   flex: 1;
   font-weight: 500;
 }
-
 .cost-row.total .cost-row-label {
   font-size: 12px;
   font-weight: 700;
   color: var(--c-text);
   letter-spacing: .4px;
 }
-
 .cost-col {
   min-width: 72px;
   text-align: right;
 }
-
 .cost-value {
   font-family: var(--mono);
   font-size: 12.5px;
   font-weight: 600;
   color: var(--c-blue);
 }
-
 .cost-value.accent { color: var(--c-accent); }
-
 .cost-row.total .cost-value { font-size: 14px; }
-
 .dreamsand-note {
   font-size: 11px;
   color: var(--c-muted);
   margin-top: 14px;
   line-height: 1.6;
 }
-
 .combo-desc {
   font-size: 11.5px;
   color: var(--c-dim);
   line-height: 1.6;
   margin-bottom: 12px;
 }
-
 .awk-note {
   font-size: 12.5px;
-  color: var(--c-cyan-text);
-  background: var(--c-cyan-dim);
-  border: 1px solid var(--c-cyan-border);
+  color: var(--c-green);
+  background: rgba(62,207,142,.07);
+  border: 1px solid rgba(62,207,142,.2);
   border-radius: var(--r-sm);
   padding: 10px 12px;
   line-height: 1.6;
   margin: 10px 16px;
 }
-
 .awk-hl {
-  color: var(--c-cyan);
+  color: var(--c-green);
   font-family: var(--mono);
   font-weight: 700;
 }
-
 .info-toggle {
   width: 100%;
   padding: 11px 16px;
@@ -744,17 +648,13 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   align-items: center;
   transition: color .15s, background .15s;
 }
-
 .info-toggle:hover { color: var(--c-text); background: var(--c-surface-3); }
-
 .info-toggle-icon {
   font-size: 9px;
   transition: transform .2s;
   opacity: .6;
 }
-
 .info-toggle-icon.open { transform: rotate(180deg); }
-
 .info-collapse {
   display: none;
   background: var(--c-surface-2);
@@ -763,9 +663,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   flex-direction: column;
   gap: 14px;
 }
-
 .info-collapse.open { display: flex; }
-
 .info-section-title {
   font-size: 11px;
   font-weight: 700;
@@ -774,13 +672,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   text-transform: uppercase;
   margin-bottom: 6px;
 }
-
 .info-section p {
   font-size: 12.5px;
   color: var(--c-muted);
   line-height: 1.65;
 }
-
 .info-section p a {
   color: var(--c-blue);
   text-decoration: none;
@@ -788,9 +684,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   transition: color .2s, border-color .2s;
 }
 .info-section p a:hover { color: #82b4f8; border-bottom-color: rgba(91,156,246,.5); }
-
 .info-section p + p { margin-top: 6px; }
-
 .credit {
   font-size: 11px;
   color: var(--c-muted);
@@ -798,16 +692,13 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   padding-top: 4px;
   opacity: .55;
 }
-
 .credit a {
   color: inherit;
   text-decoration: none;
   border-bottom: 1px solid transparent;
   transition: color .2s, border-color .2s, opacity .2s;
 }
-
 .credit a:hover { color: var(--c-blue); border-bottom-color: rgba(91,156,246,.3); }
-
 .btn-hint {
   font-size: 11.5px;
   color: var(--c-muted);
@@ -822,7 +713,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   opacity: 1;
   transform: translateY(0);
 }
-
 .refine-quality-warn {
   font-size: 11px;
   font-weight: 600;
@@ -834,7 +724,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   margin-top: 8px;
   line-height: 1.5;
 }
-
 .panel::after {
   content: '';
   position: absolute;
@@ -846,7 +735,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   pointer-events: none;
   z-index: 1;
 }
-
 .panel.q-gold {
   border-color: rgba(245,166,35,.28);
 }
@@ -855,7 +743,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   opacity: 1;
 }
 .panel.q-gold .panel-header { background: color-mix(in srgb, var(--c-surface-2) 93%, rgba(245,166,35,.6) 7%); }
-
 .panel.q-blue {
   border-color: rgba(91,156,246,.28);
 }
@@ -864,7 +751,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   opacity: 1;
 }
 .panel.q-blue .panel-header { background: color-mix(in srgb, var(--c-surface-2) 93%, rgba(91,156,246,.6) 7%); }
-
 .panel.q-white {
   border-color: rgba(180,195,215,.2);
 }
@@ -896,28 +782,23 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 }
 .panel select:focus,
 .panel input[type="number"]:focus {
-  border-color: var(--c-border-2);
   box-shadow: 0 0 0 2px rgba(255,255,255,.05);
 }
-
 .panel.q-gold select:focus,
 .panel.q-gold input[type="number"]:focus {
   border-color: rgba(245,166,35,.45);
   box-shadow: 0 0 0 2px rgba(245,166,35,.1);
 }
-
 .panel.q-blue select:focus,
 .panel.q-blue input[type="number"]:focus {
   border-color: rgba(91,156,246,.45);
   box-shadow: 0 0 0 2px rgba(91,156,246,.1);
 }
-
 .panel.q-white select:focus,
 .panel.q-white input[type="number"]:focus {
   border-color: rgba(180,195,215,.4);
   box-shadow: 0 0 0 2px rgba(180,195,215,.07);
 }
-
 .btn-dd {
   font-size: 9px;
   font-weight: 700;
@@ -947,7 +828,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   background: #f7b43a;
   border-color: #f7b43a;
 }
-
 .egg-toast {
   position: fixed;
   inset: 0;
@@ -963,12 +843,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   pointer-events: none;
   transition: opacity .3s ease;
 }
-
 .egg-toast.show {
   opacity: 1;
   pointer-events: all;
 }
-
 .egg-modal {
   background: var(--c-surface);
   border: 1px solid rgba(245,166,35,.25);
@@ -982,12 +860,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   opacity: 0;
   transition: transform .35s cubic-bezier(.2, 0, 0, 1), opacity .3s ease;
 }
-
 .egg-toast.show .egg-modal {
   transform: translateY(0);
   opacity: 1;
 }
-
 .egg-modal::before {
   content: '';
   position: absolute;
@@ -995,7 +871,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   height: 1px;
   background: linear-gradient(90deg, transparent 10%, rgba(245,166,35,.6) 40%, rgba(245,166,35,.6) 60%, transparent 90%);
 }
-
 .egg-modal-close {
   position: absolute;
   top: 11px;
@@ -1016,18 +891,15 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   z-index: 5;
   line-height: 1;
 }
-
 .egg-modal-close:hover {
   color: var(--c-text);
   border-color: var(--c-muted);
   background: var(--c-border-2);
 }
-
 .egg-modal-hero {
   padding: 28px 20px 20px;
   border-bottom: 1px solid var(--c-border);
 }
-
 .egg-modal-eyebrow {
   display: inline-flex;
   align-items: center;
@@ -1039,7 +911,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   color: var(--c-accent-text);
   margin-bottom: 10px;
 }
-
 .egg-modal-eyebrow-dot {
   width: 5px;
   height: 5px;
@@ -1047,7 +918,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   background: var(--c-accent);
   opacity: .7;
 }
-
 .egg-modal-heading {
   font-size: 20px;
   font-weight: 800;
@@ -1056,19 +926,16 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   line-height: 1.2;
   margin-bottom: 6px;
 }
-
 .egg-modal-sub {
   font-size: 12px;
   color: var(--c-muted);
   line-height: 1.6;
 }
-
 .egg-toast-features {
   padding: 4px 20px 4px;
   display: flex;
   flex-direction: column;
 }
-
 .egg-toast-feature {
   display: grid;
   grid-template-columns: 28px 1fr;
@@ -1077,11 +944,9 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border-bottom: 1px solid var(--c-border);
   align-items: start;
 }
-
 .egg-toast-feature:last-child {
   border-bottom: none;
 }
-
 .egg-toast-feature-num {
   font-family: var(--mono);
   font-size: 10px;
@@ -1091,24 +956,20 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   padding-top: 2px;
   letter-spacing: .5px;
 }
-
 .egg-toast-feature-name {
   font-size: 12px;
   font-weight: 700;
   color: var(--c-text);
   margin-bottom: 3px;
 }
-
 .egg-toast-feature-sub {
   font-size: 11px;
   color: var(--c-muted);
   line-height: 1.55;
 }
-
 .egg-modal-footer {
   padding: 0 16px 16px;
 }
-
 .egg-modal-btn {
   width: 100%;
   padding: 12px;
@@ -1124,22 +985,18 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   cursor: pointer;
   transition: opacity .15s;
 }
-
 .egg-modal-btn:hover { opacity: .88; }
-
 .combo-section-divider {
   border: none;
   border-top: 1px solid var(--c-border);
   margin: 14px 0 0;
 }
-
 .combo-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 12px 0 10px;
 }
-
 .combo-title {
   font-size: 11px;
   font-weight: 700;
@@ -1147,19 +1004,16 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   letter-spacing: 1px;
   text-transform: uppercase;
 }
-
 .combo-nav {
   display: flex;
   align-items: center;
   gap: 6px;
 }
-
 .combo-dots {
   display: flex;
   gap: 4px;
   align-items: center;
 }
-
 .combo-dot {
   width: 5px;
   height: 5px;
@@ -1168,13 +1022,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   border: 1px solid var(--c-dot-border);
   transition: background .2s, transform .2s, border-color .2s;
 }
-
 .combo-dot.active {
   background: var(--c-dot-active);
   border-color: var(--c-dot-active);
   transform: scale(1.5);
 }
-
 .combo-arrow {
   width: 22px;
   height: 22px;
@@ -1189,58 +1041,48 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   justify-content: center;
   transition: background .15s, color .15s;
 }
-
 .combo-arrow:hover:not(:disabled) {
   background: var(--c-border-2);
   color: var(--c-text);
 }
-
 .combo-arrow:disabled { opacity: .2; cursor: not-allowed; }
-
 .combo-slider-wrap {
   overflow: hidden;
   margin: 0 -16px;
 }
-
 .combo-slider-track {
   display: flex;
   transition: transform .3s cubic-bezier(.4, 0, .2, 1);
 }
-
 .combo-slide {
   min-width: 100%;
   padding: 0 16px 2px;
 }
-
 .combo-tier-badge {
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
-  color: var(--c-green);
-  background: rgba(62,207,142,.07);
-  border: 1px solid rgba(62,207,142,.2);
+  color: var(--c-cyan-text);
+  background: var(--c-cyan-dim);
+  border: 1px solid var(--c-cyan-border);
   border-radius: 99px;
   padding: 2px 9px;
   display: inline-block;
   margin-bottom: 8px;
 }
-
 .combo-card {
   background: var(--c-surface-2);
   border: 1px solid var(--c-border-2);
   border-radius: var(--r-md);
   padding: 11px 12px 10px;
 }
-
 .combo-item-block { margin-bottom: 2px; }
-
 .combo-item-row {
   display: flex;
   align-items: center;
   gap: 7px;
 }
-
 .combo-item-qty {
   font-family: var(--mono);
   font-size: 15px;
@@ -1248,25 +1090,21 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   color: var(--c-accent);
   min-width: 34px;
 }
-
 .combo-item-type {
   font-size: 12.5px;
   font-weight: 600;
   color: var(--c-text);
   flex: 1;
 }
-
 .combo-item-tier {
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--c-cyan-text);
-  background: var(--c-cyan-dim);
-  border: 1px solid var(--c-cyan-border);
+  font-size: 11px;
+  font-weight: 900;
+  color: #000;
+  background: var(--c-green);
   border-radius: 4px;
   padding: 2px 6px;
   flex-shrink: 0;
 }
-
 .combo-item-monsters {
   font-size: 10px;
   color: var(--c-dim-2);
@@ -1274,7 +1112,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   margin-top: 3px;
   margin-left: 41px;
 }
-
 .combo-show-more {
   background: none;
   border: none;
@@ -1287,17 +1124,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   transition: opacity .15s;
 }
 .combo-show-more:hover { opacity: 1; }
-
 .combo-monsters-more { display: inline; }
 .combo-monsters-more.hidden { display: none; }
-
 .combo-plus {
   font-size: 11px;
   font-weight: 700;
   color: var(--c-dim-2);
   margin: 6px 0 6px 41px;
 }
-
 .combo-total-row {
   display: flex;
   align-items: center;
@@ -1306,16 +1140,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   padding-top: 9px;
   border-top: 1px solid var(--c-border);
 }
-
 .combo-total-label { font-size: 11px; color: var(--c-dim-2); }
-
 .combo-total-value {
   font-family: var(--mono);
   font-size: 12.5px;
   font-weight: 700;
-  color: var(--c-green);
+  color: var(--c-accent);
 }
-
+.combo-total-value.blue { color: var(--c-blue); }
 .combo-empty {
   font-size: 12px;
   color: var(--c-dim-2);
@@ -1325,17 +1157,13 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 </style>
 </head>
 <body>
-
 <div class="wrap">
-
   <div class="card-header">
     <div class="badge">1H+Shiel[DD] » 2H</div>
     <h1>Advanced Transfer</h1>
     <p class="subtitle">Transfer cost & expected result (upgrade, refine & enchant)</p>
   </div>
-
   <button class="btn-toggle-1h" id="btn-toggle-1h">+ 1H Weapon</button>
-
   <div id="section-1h" class="hidden">
     <div class="panel q-white" id="panel-1h">
       <div class="panel-header">
@@ -1367,7 +1195,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
       </div>
     </div>
   </div>
-
   <div class="panel q-white" id="panel-shield">
     <div class="panel-header">
       <div class="panel-title">Shield</div>
@@ -1397,17 +1224,13 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
       </div>
     </div>
   </div>
-
   <button class="btn-transfer" id="btn-transfer">Calculate Transfer</button>
   <p class="btn-hint" id="btn-hint">Any change to dropdowns or fields will auto-recalculate.</p>
-
   <div class="result" id="result-panel">
-
     <div class="result-header">
       <div class="result-header-label">Expected Result in 2H</div>
       <button class="btn-dd hidden" id="btn-dd"></button>
     </div>
-
     <div class="result-stats">
       <div class="stat-block">
         <div class="stat-label">Upgrade</div>
@@ -1421,7 +1244,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
         <div class="refine-quality-warn hidden" id="refine-quality-warn">Quality mismatch, refine won't transfer</div>
       </div>
     </div>
-
     <div class="enchant-section">
       <div class="enchant-section-header">
         <div class="enchant-section-title">Enchantment</div>
@@ -1433,10 +1255,8 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
           <button class="slide-arrow" id="arrow-next">&#8594;</button>
         </div>
       </div>
-
       <div class="enchant-result-wrap">
         <div class="enchant-slider-track" id="slider-track">
-
           <div class="enchant-slide" id="slide-0">
             <div class="slide-mode-title">Oops, I'm Blind</div>
             <div class="slide-mode-sub"></div>
@@ -1464,13 +1284,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>
-
     <p class="awk-note hidden" id="out-awk"></p>
-
     <button class="info-toggle" id="info-toggle">
       How it works
       <span class="info-toggle-icon" id="info-toggle-icon">▾</span>
@@ -1490,7 +1307,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
           Full lookup table <u><a href="https://docs.google.com/spreadsheets/d/1UEEdz_XBalhENtpItbL-IWi-Gm28naW5rNxzgYQXxH0/" target="_blank">here</a></u>.</p>
       </div>
     </div>
-
     <div class="cost-section">
       <div class="cost-header-row">
         <div class="cost-title">Transfer Cost</div>
@@ -1525,9 +1341,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
           <div class="cost-col"><div class="cost-value accent" id="out-dreamsand">—</div></div>
         </div>
       </div>
-
       <hr class="combo-section-divider">
-
       <div class="combo-header-row">
         <div class="combo-title">Dreamsand Conversion</div>
         <div class="combo-nav">
@@ -1541,9 +1355,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
           <button class="combo-arrow" id="combo-next">&#8594;</button>
         </div>
       </div>
-
       <p class="combo-desc">Below are equipment options for conversion.</p>
-
       <div class="combo-slider-wrap">
         <div class="combo-slider-track" id="combo-track">
           <div class="combo-slide" id="combo-slide-0">
@@ -1564,16 +1376,11 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
           </div>
         </div>
       </div>
-
       <p class="dreamsand-note">Tip: Disable VIP Kafra discount when using Dreamsand to ensure a 0 Diamond cost.</p>
     </div>
-
   </div>
-
   <p class="credit">Prompted by Silja [Odin – Nastia] with <a href="https://claude.ai" target="_blank">Claude Sonnet 4.6</a>. Another tool: <a href="https://masihterjaga.github.io/sim">ratio calculator</a></p>
-
 </div>
-
 <div class="egg-toast" id="egg-toast">
   <div class="egg-modal">
     <button class="egg-modal-close" id="egg-modal-close">✕</button>
@@ -1604,7 +1411,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
     </div>
   </div>
 </div>
-
 <script>
 const refineData = {
   0: {white: {h1: 0, h2: 0}, blue: {h1: 0, h2: 0}, gold: {h1: 0, h2: 0}},
@@ -2110,38 +1916,53 @@ const upgradeData = {
 const dreamSand = {
   T1: {
     monsters: ["Mistress", "Phreeoni", "Kraken", "Eddga", "Eclipse", "Dragon Fly", "Ghostring", "Mastering"],
-    "1H": 108000, "2H": 162000, "Dagger": 81000, "Shield": 54000
+    "1H":     { ds: 108000, diamond:  10800 },
+    "2H":     { ds: 162000, diamond:  16200 },
+    "Dagger": { ds:  81000, diamond:   8100 },
+    "Shield": { ds:  54000, diamond:   5400 }
   },
   T2: {
     monsters: ["Maya", "Orc Hero", "Pharaoh", "Orc Lord", "King Dramoh", "Toad", "Angeling", "Deviling", "All MVP MINI from Juno - Latest Map"],
-    "1H": 203000, "2H": 237000, "Dagger": 235000, "Shield": 157000
+    "1H":     { ds: 203000, diamond:  54000 },
+    "2H":     { ds: 237000, diamond:  81000 },
+    "Dagger": { ds: 235000, diamond:  40500 },
+    "Shield": { ds: 157000, diamond:  27000 }
   },
   T3: {
     monsters: ["Doppelganger", "Amon Ra", "Vagabond Wolf", "Dark Priest"],
-    "1H": 267000, "2H": 401000, "Dagger": 237000, "Shield": 203000
+    "1H":     { ds: 267000, diamond:  78000 },
+    "2H":     { ds: 401000, diamond: 117000 },
+    "Dagger": { ds: 237000, diamond:  58000 },
+    "Shield": { ds: 203000, diamond:  39000 }
   },
   T4: {
     monsters: ["Morroc", "Time Holder", "Chimera", "Mysteltainn"],
-    "1H": 401000, "2H": 711000, "Dagger": 355000, "Shield": 237000
+    "1H":     { ds: 401000, diamond: 105000 },
+    "2H":     { ds: 711000, diamond: 158000 },
+    "Dagger": { ds: 355000, diamond:  79000 },
+    "Shield": { ds: 237000, diamond:  53000 }
   },
   T5: {
     monsters: ["Lost Dragon", "Tao Gunka", "Ogretooth", "Necromancer"],
-    "1H": 535000, "2H": 803000, "Dagger": 401000, "Shield": 267000
+    "1H":     { ds: 535000, diamond: 130000 },
+    "2H":     { ds: 803000, diamond: 194000 },
+    "Dagger": { ds: 401000, diamond:  97000 },
+    "Shield": { ds: 267000, diamond:  65000 }
   },
   T6: {
     monsters: ["Lord of the Dead", "Fallen Bishop", "Naght Sieger", "Coelacanth"],
-    "1H": 592000, "2H": 889000, "Dagger": 444000, "Shield": 296000
+    "1H":     { ds: 592000, diamond: 157000 },
+    "2H":     { ds: 889000, diamond: 235000 },
+    "Dagger": { ds: 444000, diamond: 117000 },
+    "Shield": { ds: 296000, diamond:  78000 }
   }
 };
-
 const cities      = Object.keys(enchantData);
 const slotNums    = [1, 2, 3];
 const maxUpgrade  = 280;
-
 const DEFAULT_SHIELD_F  = 0.5;
 const DEFAULT_WEAP_F    = 1.0;
 const CLS_ENCHANT_EMPTY = 'enchant-line-city enchant-line-empty';
-
 const weaponAwk = [
   {tier:'T1',  score:250,   need:2},
   {tier:'T2',  score:500,   need:2},
@@ -2154,9 +1975,7 @@ const weaponAwk = [
   {tier:'T9',  score:12000, need:5},
   {tier:'T10', score:14000, need:6},
 ];
-
 const refineColorMap = { gold: 'var(--c-accent)', blue: 'var(--c-blue)', white: 'rgba(180,195,215,.75)' };
-
 const cityLabelMap = {
   'Izlude Island': 'Izlude/Alberta',
   'Alberta':       'Izlude/Alberta',
@@ -2164,7 +1983,6 @@ const cityLabelMap = {
 };
 const cityLabel      = c => cityLabelMap[c] ?? c;
 const cityLabelToKey = Object.fromEntries(Object.entries(cityLabelMap).map(([k, v]) => [v, k]));
-
 let live           = false;
 let show1H         = false;
 let ddMode         = false;
@@ -2175,39 +1993,32 @@ let awkBase        = 0;
 let awkActive      = false;
 let eggCracked     = false;
 let highestLevel15 = false;
-
 const el          = id => document.getElementById(id);
 const fmt         = n  => Math.round(n).toLocaleString('en-US');
 const roundUp10k  = v  => Math.ceil(v / 10000) * 10000;
 const applyPoring = (cost, poring) => poring ? Math.ceil(cost * 0.1) : cost;
-
 const buildLevelOptions = () =>
+  `<option value="0">0</option>` +
   Array.from({length: 15}, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
-
 const createDot = (id, extraClass = '') =>
   Object.assign(document.createElement('div'), { className: `slide-dot${extraClass ? ' ' + extraClass : ''}`, id });
-
 const createSlide = (id, extraClass = '') =>
   Object.assign(document.createElement('div'), { className: `enchant-slide${extraClass ? ' ' + extraClass : ''}`, id });
-
 function lookupWeaponAwk(totalScore) {
   for (let i = weaponAwk.length - 1; i >= 0; i--)
     if (totalScore >= weaponAwk[i].score) return weaponAwk[i];
   return null;
 }
-
 function lookupUpgrade2H(budget) {
   for (let lvl = maxUpgrade; lvl >= 0; lvl--)
     if (upgradeData[lvl].h2 <= budget) return lvl;
   return 0;
 }
-
 function lookupRefine2H(budget, quality) {
   for (let lvl = 15; lvl >= 0; lvl--)
     if (refineData[lvl][quality].h2 <= budget) return lvl;
   return 0;
 }
-
 function lookupLevelInCity(city, budget, minLevel = 1, useLabel = true) {
   const label = useLabel ? cityLabel(city) : city;
   budget = Math.round(budget);
@@ -2215,14 +2026,12 @@ function lookupLevelInCity(city, budget, minLevel = 1, useLabel = true) {
     if (enchantData[city][l].h2 <= budget) return `${label} Lv.${l}`;
   return '—';
 }
-
 function lookupEquivByBudget(budget) {
   budget = Math.round(budget);
   for (let i = cities.length - 1; i >= 0; i--)
     if (enchantData[cities[i]][15].h2 <= budget) return `${cityLabel(cities[i])} Lv.15`;
   return '—';
 }
-
 function lookupCombined1H(s, s1H, shieldF = DEFAULT_SHIELD_F, weapF = DEFAULT_WEAP_F) {
   if (!s && !s1H) return '—';
   const shieldIdx  = s   ? cities.indexOf(s.city)   : Infinity;
@@ -2232,20 +2041,17 @@ function lookupCombined1H(s, s1H, shieldF = DEFAULT_SHIELD_F, weapF = DEFAULT_WE
                    + (s1H ? enchantData[s1H.city][s1H.lvl].h1 * weapF : 0);
   return lookupLevelInCity(targetCity, budget, 1, false);
 }
-
 function parseEnchantResult(str) {
   if (!str || str === '—') return null;
   const m = str.match(/^(.+?)\s+Lv\.?(\d+)$/i);
   return m ? { city: m[1].trim(), lvl: m[2] } : null;
 }
-
 function enchantResultScore(str) {
   const p = parseEnchantResult(str);
   if (!p) return 0;
   const key = cityLabelToKey[p.city] ?? p.city;
   return enchantData[key]?.[+p.lvl]?.score ?? 0;
 }
-
 function getSameSource(slots, slots1H, has1H, shieldF = DEFAULT_SHIELD_F, weapF = DEFAULT_WEAP_F) {
   const comparisons = slotNums.map(i => {
     const s   = slots[i - 1];
@@ -2258,7 +2064,6 @@ function getSameSource(slots, slots1H, has1H, shieldF = DEFAULT_SHIELD_F, weapF 
   if (!comparisons.length) return null;
   return comparisons.every(v => v === comparisons[0]) ? comparisons[0] : null;
 }
-
 function setEnchantLineResult(cityId, lvlId, rawStr) {
   const cityEl = el(cityId);
   const lvlEl  = el(lvlId);
@@ -2277,7 +2082,6 @@ function setEnchantLineResult(cityId, lvlId, rawStr) {
   lvlEl.textContent  = 'Lv.' + parsed.lvl;
   lvlEl.classList.remove('hidden');
 }
-
 function setEnchantLineTip(tipId, message) {
   const tipEl = el(tipId);
   if (!tipEl) return;
@@ -2296,7 +2100,6 @@ function setEnchantLineTip(tipId, message) {
     main.addEventListener('click', () => main.classList.toggle('tip-open'));
   }
 }
-
 function buildEnchantLinesHTML(idPrefix) {
   return `<div class="enchant-lines">${slotNums.map(j => `
     <div class="enchant-line">
@@ -2308,7 +2111,6 @@ function buildEnchantLinesHTML(idPrefix) {
     </div>`).join('')}
   </div>`;
 }
-
 function buildEnchantSlots(prefix, containerId) {
   el(containerId).innerHTML = slotNums.map(s => `
     <div class="slot" id="slot-${prefix}${s}">
@@ -2325,7 +2127,6 @@ function buildEnchantSlots(prefix, containerId) {
         </div>
       </div>
     </div>`).join('');
-
   slotNums.forEach(s => {
     el(`ench-city-${prefix}${s}`).addEventListener('change', ({ target }) => {
       const lvlEl = el(`ench-lvl-${prefix}${s}`);
@@ -2334,37 +2135,32 @@ function buildEnchantSlots(prefix, containerId) {
       if (live) calculate();
       updateBtn();
     });
-    el(`ench-lvl-${prefix}${s}`).addEventListener('change', () => { if (live) calculate(); });
+    el(`ench-lvl-${prefix}${s}`).addEventListener('change', () => { if (live) calculate(); updateBtn(); });
   });
 }
-
 function getSlots(prefix = '') {
   return slotNums.map(s => {
     const city = el(`ench-city-${prefix}${s}`).value;
     const lvl  = el(`ench-lvl-${prefix}${s}`).value;
-    return (city && lvl !== '') ? { city, lvl: +lvl } : null;
+    return (city && +lvl > 0) ? { city, lvl: +lvl } : null;
   });
 }
-
 function getUpgradeLvl(inputId) {
   const v = parseInt(el(inputId).value, 10);
   return (!isNaN(v) && v >= 0 && v <= maxUpgrade) ? v : 0;
 }
-
 function applyQualityClass(panelId, quality) {
   const panel = el(panelId);
   if (!panel) return;
   panel.classList.remove('q-white', 'q-blue', 'q-gold');
   panel.classList.add('q-' + quality);
 }
-
 function setRefineState(visible, quality) {
   el('out-refine').classList.toggle('hidden', !visible);
   el('refine-desc').classList.toggle('hidden', !visible);
   el('refine-quality-warn').classList.toggle('hidden', visible);
   if (visible) el('out-refine').style.color = refineColorMap[quality] ?? 'var(--c-accent)';
 }
-
 function renderAwkNote(n) {
   const awkEl = el('out-awk');
   if (!awkActive) { awkEl.classList.add('hidden'); return; }
@@ -2376,7 +2172,6 @@ function renderAwkNote(n) {
   awkEl.innerHTML = `Result in 2H has <span class="awk-hl">${total} score</span>, that's mean ready for <span class="awk-hl">${awk.tier} Weapon Awakening</span>, need <span class="awk-hl">${awk.need - 1}x more</span> with same progress to activate.`;
   awkEl.classList.remove('hidden');
 }
-
 function goSlide(n) {
   currentSlide = n;
   el('slider-track').style.transform = `translateX(-${n * 100}%)`;
@@ -2385,7 +2180,6 @@ function goSlide(n) {
   el('arrow-next').disabled = n === totalSlides - 1;
   renderAwkNote(n);
 }
-
 function renderSlide1H(slots, slots1H, shieldF = DEFAULT_SHIELD_F, weapF = DEFAULT_WEAP_F) {
   el('slide-1h')?.remove();
   el('dot-1h')?.remove();
@@ -2402,7 +2196,6 @@ function renderSlide1H(slots, slots1H, shieldF = DEFAULT_SHIELD_F, weapF = DEFAU
       lookupCombined1H(slots[i - 1], slots1H[i - 1], shieldF, weapF))
   );
 }
-
 function renderSlideEquiv(shieldF = DEFAULT_SHIELD_F, weapF = DEFAULT_WEAP_F) {
   el('slide-1')?.remove();
   el('dot-1')?.remove();
@@ -2425,7 +2218,6 @@ function renderSlideEquiv(shieldF = DEFAULT_SHIELD_F, weapF = DEFAULT_WEAP_F) {
     </div>`;
   slide0El.insertAdjacentElement('afterend', div);
 }
-
 function renderDynamicSlides(defs, sameSource, slots1H, shieldF = DEFAULT_SHIELD_F, weapF = DEFAULT_WEAP_F) {
   document.querySelectorAll('.dynamic-slide').forEach(s => s.remove());
   document.querySelectorAll('.dynamic-dot').forEach(d => d.remove());
@@ -2433,10 +2225,8 @@ function renderDynamicSlides(defs, sameSource, slots1H, shieldF = DEFAULT_SHIELD
               + (el('slide-1')  ? 1 : 0)
               + defs.length
               + (el('slide-1h') ? 1 : 0);
-
   const dotsContainer = el('slide-dots-container');
   const shieldSlots   = getSlots();
-
   defs.forEach((def, i) => {
     const idx = 2 + i;
     dotsContainer.appendChild(createDot(`dot-${idx}`, 'dynamic-dot'));
@@ -2446,7 +2236,6 @@ function renderDynamicSlides(defs, sameSource, slots1H, shieldF = DEFAULT_SHIELD
       <div class="slide-mode-sub">${def.sub}</div>
       ${buildEnchantLinesHTML(`ds${idx}-`)}`;
     el('slider-track').appendChild(div);
-
     slotNums.forEach(j => {
       let result;
       if (sameSource === 'weapon') {
@@ -2459,10 +2248,8 @@ function renderDynamicSlides(defs, sameSource, slots1H, shieldF = DEFAULT_SHIELD
       setEnchantLineResult(`ds${idx}-e${j}-city`, `ds${idx}-e${j}-lvl`, result);
     });
   });
-
   goSlide(Math.min(currentSlide, totalSlides - 1));
 }
-
 function setBlindMode() {
   el('slider-track').prepend(slide0El);
   el('slide-dots-container').prepend(dot0El);
@@ -2482,15 +2269,17 @@ function setBlindMode() {
   goSlide(0);
   el('result-panel').classList.add('visible');
 }
-
 function updateBtn() {
-  el('btn-transfer').disabled = !slotNums.every(s => {
-    const city = el(`ench-city-${s}`).value;
-    const lvl  = el(`ench-lvl-${s}`).value;
-    return (!city && !lvl) || (city && lvl !== '');
+  const upgradeOk  = el('sel-upgrade').value !== '';
+  const upgrade1hOk = !show1H || el('sel-upgrade-1h').value !== '';
+  const slotOk = (prefix) => slotNums.every(s => {
+    const city = el(`ench-city-${prefix}${s}`).value;
+    const lvl  = +el(`ench-lvl-${prefix}${s}`).value;
+    if (!city) return false;
+    return lvl > 0;
   });
+  el('btn-transfer').disabled = !(upgradeOk && upgrade1hOk && slotOk('') && (!show1H || slotOk('1h-')));
 }
-
 function calculate() {
   const quality   = el('sel-quality').value;
   const quality1H = el('sel-quality-1h').value;
@@ -2498,9 +2287,7 @@ function calculate() {
   const slots1H   = show1H ? getSlots('1h-') : [];
   const shieldF   = ddMode ? 0.75 : DEFAULT_SHIELD_F;
   const weapF     = ddMode ? 0.75 : DEFAULT_WEAP_F;
-
   if (!show1H && !eggCracked) { setBlindMode(); return; }
-
   const qualityMismatch = show1H && quality !== quality1H;
   const shieldUpgH1     = upgradeData[getUpgradeLvl('sel-upgrade')].h1;
   const weapUpgH1       = show1H ? upgradeData[getUpgradeLvl('sel-upgrade-1h')].h1 : 0;
@@ -2511,38 +2298,30 @@ function calculate() {
   const shieldEnchH1    = slots.reduce((sum, s)   => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
   const weapEnchH1      = slots1H.reduce((sum, s) => sum + (s ? enchantData[s.city][s.lvl].h1 : 0), 0);
   const enchantBudget   = weapEnchH1 * weapF + shieldEnchH1 * shieldF;
-
   el('out-upgrade').textContent = String(lookupUpgrade2H(upgradeBudget));
-
   if (qualityMismatch) {
     setRefineState(false, quality);
   } else {
     setRefineState(true, quality);
     el('out-refine').innerHTML = `+${lookupRefine2H(refineBudget, quality)}`;
   }
-
   el('slider-track').prepend(slide0El);
   el('slide-dots-container').prepend(dot0El);
   el('slide-0').querySelector('.slide-mode-title').textContent = 'Expected 2H Enchantment';
   el('slide-0').querySelector('.slide-mode-sub').textContent = 'Become lowest city between 1H and Shield per slot';
-
   if (highestLevel15 && getSameSource(slots, slots1H, show1H, shieldF, weapF) === 'shield')
     renderSlideEquiv(shieldF, weapF);
   else { el('slide-1')?.remove(); el('dot-1')?.remove(); }
-
   slotNums.forEach(i => {
     const s = slots[i - 1];
     const w = show1H ? slots1H[i - 1] : null;
-
     setEnchantLineResult(`s0-e${i}-city`, `s0-e${i}-lvl`,
       s ? lookupLevelInCity(s.city, enchantData[s.city][s.lvl].h1 * shieldF, 1, false) : '—');
-
     const shieldBudget = s ? enchantData[s.city][s.lvl].h1 * shieldF : 0;
     const weapBudget   = w ? enchantData[w.city][w.lvl].h1 * weapF   : 0;
     const useBudget    = Math.max(shieldBudget, weapBudget);
     const equivResult  = useBudget > 0 ? lookupEquivByBudget(useBudget) : '—';
     setEnchantLineResult(`s1-e${i}-city`, `s1-e${i}-lvl`, equivResult);
-
     const buildTip = () => {
       const parsed = parseEnchantResult(equivResult);
       if (!parsed) return '';
@@ -2555,13 +2334,11 @@ function calculate() {
     };
     setEnchantLineTip(`s1-e${i}-tip`, buildTip());
   });
-
   const poring    = el('chk-poring').checked;
   const pUpgrade  = applyPoring(upgradeBudget, poring);
   const pRefine   = applyPoring(refineBudget,  poring);
   const pEnchant  = applyPoring(enchantBudget, poring);
   const pTotal    = applyPoring(upgradeBudget + refineBudget + enchantBudget, poring);
-
   el('out-upgrade-cost').textContent      = fmt(pUpgrade);
   el('out-upgrade-dreamsand').textContent = fmt(roundUp10k(pUpgrade));
   el('out-refine-cost').textContent       = fmt(pRefine);
@@ -2571,27 +2348,22 @@ function calculate() {
   el('out-normal').textContent            = fmt(pTotal);
   el('out-dreamsand').textContent         = fmt(roundUp10k(pTotal));
   renderCombinations(roundUp10k(pTotal));
-
   renderSlide1H(slots, show1H ? slots1H : null, shieldF, weapF);
   if (show1H) { slide0El.remove(); dot0El.remove(); }
   renderDynamicSlides([], null, show1H ? slots1H : null, shieldF, weapF);
-
   awkActive = highestLevel15 && quality === 'gold' && (!show1H || quality1H === 'gold');
   if (awkActive) {
     const upgResult = lookupUpgrade2H(upgradeBudget);
     const refResult = qualityMismatch ? 0 : lookupRefine2H(refineBudget, quality);
     awkBase     = (upgradeData[upgResult]?.score ?? 0) + (refineData[refResult]?.gold?.score ?? 0);
     slideAwkMap = {};
-
     if (el('slide-1h'))
       slideAwkMap['slide-1h'] = slotNums.reduce((sum, i) =>
         sum + enchantResultScore(lookupCombined1H(slots[i-1], slots1H[i-1], shieldF, weapF)), 0);
-
     slideAwkMap['slide-0'] = slotNums.reduce((sum, i) => {
       const s = slots[i-1];
       return s ? sum + enchantResultScore(lookupLevelInCity(s.city, enchantData[s.city][s.lvl].h1 * shieldF, 1, false)) : sum;
     }, 0);
-
     if (el('slide-1'))
       slideAwkMap['slide-1'] = slotNums.reduce((sum, i) => {
         const s  = slots[i-1];
@@ -2606,7 +2378,6 @@ function calculate() {
         return sum;
       }, 0);
   }
-
   const showDD = highestLevel15 && show1H;
   el('btn-dd').classList.toggle('hidden', !showDD);
   if (showDD) {
@@ -2615,19 +2386,15 @@ function calculate() {
   } else if (!show1H) {
     ddMode = false;
   }
-
   el('result-panel').classList.add('visible');
   renderAwkNote(currentSlide);
 }
-
 const COMBO_SHIELD_LABEL = 'Shield/Accessories/Revolver/Shotgun';
 const COMBO_1H_LABEL     = '1H/Talisman';
 const COMBO_ALL_TIERS    = ['T1','T2','T3','T4','T5','T6'];
 let   comboCurrentSlide  = 0;
-
 const COMBO_BIG_TYPES    = ['2H','1H','Dagger'];
 const COMBO_SMALL_TYPE   = 'Shield';
-
 function buildComboPool(tierKeys, smallOnly) {
   const types = smallOnly ? [COMBO_SMALL_TYPE] : [...COMBO_BIG_TYPES, COMBO_SMALL_TYPE];
   const pool  = [];
@@ -2635,48 +2402,34 @@ function buildComboPool(tierKeys, smallOnly) {
     const td = dreamSand[t];
     for (const type of types) {
       if (td[type] !== undefined)
-        pool.push({ type, tier: t, value: td[type], monsters: td.monsters });
+        pool.push({ type, tier: t, value: td[type].ds, diamond: td[type].diamond, monsters: td.monsters });
     }
   }
   pool.sort((a, b) => b.value - a.value);
   return pool;
 }
-
 function makeComboPlan(pool, targetCost) {
   if (!pool.length || !targetCost || targetCost <= 0) return null;
-
-  const primary   = pool[0];
-  const mainFloor = Math.floor(targetCost / primary.value);
-  const remainder = targetCost - mainFloor * primary.value;
-
-  if (remainder === 0 && mainFloor > 0)
-    return { items: [{ count: mainFloor, ...primary }], total: mainFloor * primary.value };
-
-  const secondary =
-    pool.find(i => i.tier === primary.tier && i.type !== primary.type) ||
-    pool.find(i => !(i.tier === primary.tier && i.type === primary.type));
-
-  if (!secondary) {
-    const cnt = Math.ceil(targetCost / primary.value);
-    return { items: [{ count: cnt, ...primary }], total: cnt * primary.value };
+  const items = [];
+  let remaining = targetCost;
+  for (let i = 0; i < pool.length; i++) {
+    const item   = pool[i];
+    const isLast = i === pool.length - 1;
+    const cnt    = isLast ? Math.ceil(remaining / item.value) : Math.floor(remaining / item.value);
+    if (cnt > 0) items.push({ count: cnt, ...item });
+    remaining -= cnt * item.value;
+    if (remaining <= 0) break;
   }
-
-  const secCount = Math.ceil(Math.max(remainder, 1) / secondary.value);
-  const items    = [
-    ...(mainFloor > 0 ? [{ count: mainFloor, ...primary }] : []),
-    { count: secCount, ...secondary }
-  ];
-  return { items, total: mainFloor * primary.value + secCount * secondary.value };
+  if (!items.length) return null;
+  const total = items.reduce((sum, i) => sum + i.count * i.value, 0);
+  return { items, total };
 }
-
 function comboDisplayType(type) {
   if (type === COMBO_SMALL_TYPE) return COMBO_SHIELD_LABEL;
   if (type === '1H')             return COMBO_1H_LABEL;
   return type;
 }
-
 const MONSTERS_PREVIEW = 3;
-
 function renderMonsters(monsters) {
   if (monsters.length <= MONSTERS_PREVIEW)
     return monsters.join(', ');
@@ -2689,31 +2442,24 @@ function renderMonsters(monsters) {
     this.textContent=show?'+${monsters.length - MONSTERS_PREVIEW} more':'show less';
   ">+${monsters.length - MONSTERS_PREVIEW} more</button>`;
 }
-
 function renderCombinations(totalDreamsand) {
   const target = totalDreamsand || 0;
-
   const plans = [
     { tierKeys: ['T1'],           smallOnly: false, badge: 'T1 Only'   },
     { tierKeys: ['T1','T2'],      smallOnly: false, badge: 'T1 or T2'   },
     { tierKeys: COMBO_ALL_TIERS,  smallOnly: false, badge: 'Any EQ' },
     { tierKeys: COMBO_ALL_TIERS,  smallOnly: true,  badge: 'Any EQ' },
   ];
-
   plans.forEach((plan, idx) => {
     const slide = el(`combo-slide-${idx}`);
     if (!slide) return;
-
     const pool  = buildComboPool(plan.tierKeys, plan.smallOnly);
     const combo = target > 0 ? makeComboPlan(pool, target) : null;
-
     slide.innerHTML = `<div class="combo-tier-badge">${plan.badge}</div>`;
-
     if (!combo) {
       slide.innerHTML += `<div class="combo-empty">Calculate transfer cost first</div>`;
       return;
     }
-
     const itemsHTML = combo.items.map((item, i) => `
       ${i > 0 ? '<div class="combo-plus">+</div>' : ''}
       <div class="combo-item-block">
@@ -2724,20 +2470,22 @@ function renderCombinations(totalDreamsand) {
         </div>
         <div class="combo-item-monsters">${renderMonsters(item.monsters)}</div>
       </div>`).join('');
-
+    const totalDiamond = combo.items.reduce((sum, i) => sum + i.count * i.diamond, 0);
     slide.innerHTML += `
       <div class="combo-card">
         ${itemsHTML}
         <div class="combo-total-row">
-          <span class="combo-total-label">Total Dreamsand</span>
+          <span class="combo-total-label">Buy at Lowest Price</span>
+          <span class="combo-total-value blue">${fmt(totalDiamond)}</span>
+        </div>
+        <div class="combo-total-row">
+          <span class="combo-total-label">Dreamsand Obtained</span>
           <span class="combo-total-value">${fmt(combo.total)}</span>
         </div>
       </div>`;
   });
-
   goComboSlide(Math.min(comboCurrentSlide, 3));
 }
-
 function goComboSlide(n) {
   comboCurrentSlide = n;
   el('combo-track').style.transform = `translateX(-${n * 100}%)`;
@@ -2746,27 +2494,21 @@ function goComboSlide(n) {
   el('combo-prev').disabled = n === 0;
   el('combo-next').disabled = n === 3;
 }
-
 buildEnchantSlots('',    'enchant-slots');
 buildEnchantSlots('1h-', 'enchant-slots-1h');
-
 const slide0El = el('slide-0');
 const dot0El   = el('dot-0');
-
 ['sel-refine', 'sel-refine-1h'].forEach(id => {
   el(id).innerHTML = Array.from({length: 16}, (_, i) => `<option value="${i}">${i}</option>`).join('');
 });
-
 applyQualityClass('panel-shield', el('sel-quality').value);
 applyQualityClass('panel-1h',     el('sel-quality-1h').value);
-
 el('btn-transfer').addEventListener('click', () => {
   live = true;
   calculate();
   el('btn-transfer').classList.add('hidden');
   el('btn-hint').classList.add('visible');
 });
-
 el('btn-toggle-1h').addEventListener('click', () => {
   show1H = !show1H;
   el('section-1h').classList.toggle('hidden', !show1H);
@@ -2775,11 +2517,9 @@ el('btn-toggle-1h').addEventListener('click', () => {
   if (live) calculate();
   updateBtn();
 });
-
 ['sel-refine', 'sel-refine-1h'].forEach(id =>
   el(id).addEventListener('change', () => { if (live) calculate(); })
 );
-
 ['sel-upgrade', 'sel-upgrade-1h'].forEach(id =>
   el(id).addEventListener('input', ({ target }) => {
     if (target.value === '88888888') {
@@ -2787,21 +2527,18 @@ el('btn-toggle-1h').addEventListener('click', () => {
       if (!eggCracked) { eggCracked = true; el('egg-toast').classList.add('show'); }
     }
     if (live) calculate();
+    updateBtn();
   })
 );
-
 ['egg-modal-close', 'egg-modal-btn'].forEach(id =>
   el(id).addEventListener('click', () => el('egg-toast').classList.remove('show'))
 );
-
 el('chk-poring').addEventListener('change',   () => { if (live) calculate(); });
 el('btn-dd').addEventListener('click',         () => { ddMode = !ddMode; calculate(); });
 el('arrow-prev').addEventListener('click',     () => goSlide(Math.max(0, currentSlide - 1)));
 el('arrow-next').addEventListener('click',     () => goSlide(Math.min(totalSlides - 1, currentSlide + 1)));
-
 el('combo-prev').addEventListener('click', () => goComboSlide(Math.max(0, comboCurrentSlide - 1)));
 el('combo-next').addEventListener('click', () => goComboSlide(Math.min(3, comboCurrentSlide + 1)));
-
 let comboTouchStartX = 0;
 el('combo-track').addEventListener('touchstart', ({ touches }) => { comboTouchStartX = touches[0].clientX; }, { passive: true });
 el('combo-track').addEventListener('touchend',   ({ changedTouches }) => {
@@ -2809,7 +2546,6 @@ el('combo-track').addEventListener('touchend',   ({ changedTouches }) => {
   if (Math.abs(dx) <= 40) return;
   goComboSlide(dx < 0 ? Math.min(3, comboCurrentSlide + 1) : Math.max(0, comboCurrentSlide - 1));
 }, { passive: true });
-
 el('sel-quality').addEventListener('change', ({ target }) => {
   applyQualityClass('panel-shield', target.value);
   if (live) calculate();
@@ -2818,12 +2554,10 @@ el('sel-quality-1h').addEventListener('change', ({ target }) => {
   applyQualityClass('panel-1h', target.value);
   if (live) calculate();
 });
-
 el('info-toggle').addEventListener('click', () => {
   const isOpen = el('info-collapse').classList.toggle('open');
   el('info-toggle-icon').classList.toggle('open', isOpen);
 });
-
 let touchStartX = 0;
 el('slider-track').addEventListener('touchstart', ({ touches })    => { touchStartX = touches[0].clientX; }, { passive: true });
 el('slider-track').addEventListener('touchend',   ({ changedTouches }) => {
@@ -2831,12 +2565,10 @@ el('slider-track').addEventListener('touchend',   ({ changedTouches }) => {
   if (Math.abs(dx) <= 40) return;
   goSlide(dx < 0 ? Math.min(totalSlides - 1, currentSlide + 1) : Math.max(0, currentSlide - 1));
 }, { passive: true });
-
 document.addEventListener('click', ({ target }) => {
   if (!target.closest('.enchant-line-main'))
     document.querySelectorAll('.enchant-line-main.tip-open').forEach(m => m.classList.remove('tip-open'));
 });
-
 updateBtn();</script>
 </body>
 </html>
