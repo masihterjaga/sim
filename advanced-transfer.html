@@ -1542,7 +1542,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
         </div>
       </div>
 
-      <p class="combo-desc">Here are some equipment options you can convert to cover your total cost.</p>
+      <p class="combo-desc">Below are equipment options for conversion.</p>
 
       <div class="combo-slider-wrap">
         <div class="combo-slider-track" id="combo-track">
@@ -1551,7 +1551,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
             <div class="combo-empty">Calculate transfer cost first</div>
           </div>
           <div class="combo-slide" id="combo-slide-1">
-            <div class="combo-tier-badge">T1 / T2</div>
+            <div class="combo-tier-badge">T1 or T2</div>
             <div class="combo-empty">Calculate transfer cost first</div>
           </div>
           <div class="combo-slide" id="combo-slide-2">
@@ -2695,7 +2695,7 @@ function renderCombinations(totalDreamsand) {
 
   const plans = [
     { tierKeys: ['T1'],           smallOnly: false, badge: 'T1 Only'   },
-    { tierKeys: ['T1','T2'],      smallOnly: false, badge: 'T1 + T2'   },
+    { tierKeys: ['T1','T2'],      smallOnly: false, badge: 'T1 or T2'   },
     { tierKeys: COMBO_ALL_TIERS,  smallOnly: false, badge: 'Any EQ' },
     { tierKeys: COMBO_ALL_TIERS,  smallOnly: true,  badge: 'Any EQ' },
   ];
@@ -2730,7 +2730,7 @@ function renderCombinations(totalDreamsand) {
         ${itemsHTML}
         <div class="combo-total-row">
           <span class="combo-total-label">Total Dreamsand</span>
-          <span class="combo-total-value">≥ ${fmt(combo.total)}</span>
+          <span class="combo-total-value">${fmt(combo.total)}</span>
         </div>
       </div>`;
   });
