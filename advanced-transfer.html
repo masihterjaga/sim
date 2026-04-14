@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -210,6 +211,18 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   gap: 8px;
   align-items: end;
 }
+#section-1h {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition: grid-template-rows .38s ease, opacity .28s ease;
+}
+#section-1h > * { min-height: 0; overflow: hidden; }
+#section-1h.hidden {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
 .btn-toggle-1h {
   display: flex;
   align-items: center;
@@ -263,6 +276,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   opacity: .55;
   box-shadow: none;
 }
+@keyframes resultReveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
 .result {
   display: none;
   background: var(--c-surface);
@@ -271,7 +288,10 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,.35);
 }
-.result.visible { display: block; }
+.result.visible {
+  display: block;
+  animation: resultReveal .4s ease forwards;
+}
 .result-header {
   display: flex;
   align-items: center;
@@ -552,7 +572,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .col-labels {
   display: flex;
   gap: 8px;
-  padding: 0 0 6px;
+  padding: 0 12px 6px;
 }
 .col-spacer { flex: 1; }
 .col-label {
@@ -561,7 +581,8 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   color: var(--c-dim-2);
   letter-spacing: .8px;
   text-transform: uppercase;
-  min-width: 72px;
+  width: 90px;
+  flex-shrink: 0;
   text-align: right;
 }
 .cost-rows { display: flex; flex-direction: column; gap: 5px; }
@@ -592,7 +613,8 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   letter-spacing: .4px;
 }
 .cost-col {
-  min-width: 72px;
+  width: 90px;
+  flex-shrink: 0;
   text-align: right;
 }
 .cost-value {
@@ -1095,15 +1117,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   font-weight: 600;
   color: var(--c-text);
   flex: 1;
-}
-.combo-item-tier {
-  font-size: 11px;
-  font-weight: 900;
-  color: #000;
-  background: var(--c-green);
-  border-radius: 4px;
-  padding: 2px 6px;
-  flex-shrink: 0;
 }
 .combo-item-monsters {
   font-size: 10px;
@@ -2466,7 +2479,6 @@ function renderCombinations(totalDreamsand) {
         <div class="combo-item-row">
           <span class="combo-item-qty">${item.count}x</span>
           <span class="combo-item-type">${comboDisplayType(item.type)}</span>
-          <span class="combo-item-tier">${item.tier}</span>
         </div>
         <div class="combo-item-monsters">${renderMonsters(item.monsters)}</div>
       </div>`).join('');
