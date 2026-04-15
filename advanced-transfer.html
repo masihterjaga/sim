@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -550,6 +549,9 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   flex-shrink: 0;
   transition: background .2s, border-color .2s;
 }
+.poring-label input[type="checkbox"]:checked {
+  /*border-color: var(--c-accent)*/
+}
 .poring-label input[type="checkbox"]::before {
   content: '';
   position: absolute;
@@ -559,14 +561,16 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   background: var(--c-muted);
   top: 2px;
   left: 2px;
-  transition: transform .2s, background .2s;
-}
-.poring-label input[type="checkbox"]:checked {
-  background: var(--c-accent-dim);
-  border-color: rgba(245,166,35,.45);
+  transition: transform .25s, background .25s, width .25s, height .25s, top .25s, left .25s, border-radius .25s, clip-path .25s;
 }
 .poring-label input[type="checkbox"]:checked::before {
-  background: conic-gradient(#a078ff, #5b9cf6, #22d3ee, #3ecf8e, #f5a623, #f2605a, #a078ff);
+  width: 21px;
+  height: 21px;
+  border-radius: 0;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+  background: conic-gradient(var(--c-purple), var(--c-cyan), var(--c-purple));
+  top: -4px;
+  left: 0px;
   transform: translateX(12px);
 }
 .col-labels {
@@ -853,9 +857,9 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 .egg-toast {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.65);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -863,7 +867,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   z-index: 200;
   opacity: 0;
   pointer-events: none;
-  transition: opacity .3s ease;
+  transition: opacity .5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .egg-toast.show {
   opacity: 1;
@@ -871,19 +875,19 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 }
 .egg-modal {
   background: var(--c-surface);
-  border: 1px solid rgba(245,166,35,.25);
+  border: 1px solid rgba(245,166,35,.18);
   border-radius: var(--r-lg);
   width: 100%;
   max-width: 400px;
   position: relative;
   overflow: hidden;
-  box-shadow: 0 24px 64px rgba(0,0,0,.8);
-  transform: translateY(12px);
+  box-shadow: 0 32px 80px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.03) inset;
+  transform: translateY(28px) scale(0.97);
   opacity: 0;
-  transition: transform .35s cubic-bezier(.2, 0, 0, 1), opacity .3s ease;
+  transition: transform .6s cubic-bezier(0.16, 1, 0.3, 1), opacity .45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .egg-toast.show .egg-modal {
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
   opacity: 1;
 }
 .egg-modal::before {
@@ -932,6 +936,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   text-transform: uppercase;
   color: var(--c-accent-text);
   margin-bottom: 10px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.egg-toast.show .egg-modal-eyebrow {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: .15s;
 }
 .egg-modal-eyebrow-dot {
   width: 5px;
@@ -947,11 +959,27 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   letter-spacing: -.4px;
   line-height: 1.2;
   margin-bottom: 6px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.egg-toast.show .egg-modal-heading {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: .22s;
 }
 .egg-modal-sub {
   font-size: 12px;
   color: var(--c-muted);
   line-height: 1.6;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.egg-toast.show .egg-modal-sub {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: .28s;
 }
 .egg-toast-features {
   padding: 4px 20px 4px;
@@ -965,7 +993,13 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   padding: 13px 0;
   border-bottom: 1px solid var(--c-border);
   align-items: start;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity .4s ease, transform .4s ease;
 }
+.egg-toast.show .egg-toast-feature:nth-child(1) { opacity: 1; transform: translateY(0); transition-delay: .34s; }
+.egg-toast.show .egg-toast-feature:nth-child(2) { opacity: 1; transform: translateY(0); transition-delay: .42s; }
+.egg-toast.show .egg-toast-feature:nth-child(3) { opacity: 1; transform: translateY(0); transition-delay: .50s; }
 .egg-toast-feature:last-child {
   border-bottom: none;
 }
@@ -991,6 +1025,14 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
 }
 .egg-modal-footer {
   padding: 0 16px 16px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .38s ease, transform .38s ease;
+}
+.egg-toast.show .egg-modal-footer {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: .58s;
 }
 .egg-modal-btn {
   width: 100%;
@@ -1977,16 +2019,16 @@ const DEFAULT_SHIELD_F  = 0.5;
 const DEFAULT_WEAP_F    = 1.0;
 const CLS_ENCHANT_EMPTY = 'enchant-line-city enchant-line-empty';
 const weaponAwk = [
-  {tier:'T1',  score:250,   need:2},
-  {tier:'T2',  score:500,   need:2},
-  {tier:'T3',  score:1200,  need:2},
-  {tier:'T4',  score:2000,  need:2},
-  {tier:'T5',  score:2500,  need:3},
-  {tier:'T6',  score:5000,  need:3},
-  {tier:'T7',  score:6500,  need:4},
-  {tier:'T8',  score:9000,  need:4},
-  {tier:'T9',  score:12000, need:5},
-  {tier:'T10', score:14000, need:6},
+  { tier: 'T1', score: 250, need: 2, bonus: 12 },
+  { tier: 'T2', score: 500, need: 2, bonus: 25 },
+  { tier: 'T3', score: 1200, need: 2, bonus: 45 },
+  { tier: 'T4', score: 2000, need: 2, bonus: 65 },
+  { tier: 'T5', score: 2500, need: 3, bonus: 85 },
+  { tier: 'T6', score: 5000, need: 3, bonus: 110 },
+  { tier: 'T7', score: 6500, need: 4, bonus: 135 },
+  { tier: 'T8', score: 9000, need: 4, bonus: 170 },
+  { tier: 'T9', score: 12000, need: 5, bonus: 210 },
+  { tier: 'T10', score: 14000, need: 6, bonus: 250 },
 ];
 const refineColorMap = { gold: 'var(--c-accent)', blue: 'var(--c-blue)', white: 'rgba(180,195,215,.75)' };
 const cityLabelMap = {
@@ -2182,7 +2224,7 @@ function renderAwkNote(n) {
   const total     = awkBase + enchScore;
   const awk       = lookupWeaponAwk(total);
   if (!awk) { awkEl.classList.add('hidden'); return; }
-  awkEl.innerHTML = `Result in 2H has <span class="awk-hl">${total} score</span>, that's mean ready for <span class="awk-hl">${awk.tier} Weapon Awakening</span>, need <span class="awk-hl">${awk.need - 1}x more</span> with same progress to activate.`;
+  awkEl.innerHTML = `Result in 2H has <span class="awk-hl">${total} score</span>, that's mean ready for <span class="awk-hl">${awk.tier} Weapon Awakening (+${awk.bonus}%)</span>, need <span class="awk-hl">${awk.need - 1}x more</span> with same progress to activate.`;
   awkEl.classList.remove('hidden');
 }
 function goSlide(n) {
