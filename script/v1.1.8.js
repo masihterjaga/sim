@@ -1305,6 +1305,7 @@ const processMainCalculation = (() => {
     bindInputLockGuard();
     renderMultiplierBreakdown(calculationState);
     generateRecommendationTable(calculationState);
+    renderCardOptimizer(calculationState, DOM_ELEMENTS.rec); 
     enableResultButtons();
   };
 
