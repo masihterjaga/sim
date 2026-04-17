@@ -26,7 +26,7 @@ const BUFF_STAT_OPTIONS = [
   { label: 'Final Damage Stack',  field: 'dmgStack' },
 ];
 
-const MAX_EVAL_LIMIT = 66_666;
+const MAX_EVAL_LIMIT = 88_888;
 
 const STAT_RESOLVERS = {
   'Final P.PEN':  (ctx) => ctx.atkType === 'pen'  ? 'pen'  : null,
@@ -57,6 +57,16 @@ const STAT_RESOLVERS = {
   'Bonus DMG to Dragon':     (ctx) => ctx.tRace === 'Dragon'     ? 'race'    : null,
   'Bonus DMG to Plant':      (ctx) => ctx.tRace === 'Plant'      ? 'race'    : null,
   'Bonus DMG to Undead':     (ctx) => ctx.tRace === 'Undead'     ? 'race'    : null,
+  'Bonus DMG to Fire Attribute Monster':    (ctx) => ctx.tAttr === 'Fire'    ? 'attr' : null,
+  'Bonus DMG to Water Attribute Monster':   (ctx) => ctx.tAttr === 'Water'   ? 'attr' : null,
+  'Bonus DMG to Wind Attribute Monster':    (ctx) => ctx.tAttr === 'Wind'    ? 'attr' : null,
+  'Bonus DMG to Earth Attribute Monster':   (ctx) => ctx.tAttr === 'Earth'   ? 'attr' : null,
+  'Bonus DMG to Holy Attribute Monster':    (ctx) => ctx.tAttr === 'Holy'    ? 'attr' : null,
+  'Bonus DMG to Shadow Attribute Monster':  (ctx) => ctx.tAttr === 'Shadow'  ? 'attr' : null,
+  'Bonus DMG to Ghost Attribute Monster':   (ctx) => ctx.tAttr === 'Ghost'   ? 'attr' : null,
+  'Bonus DMG to Poison Attribute Monster':  (ctx) => ctx.tAttr === 'Poison'  ? 'attr' : null,
+  'Bonus DMG to Undead Attribute Monster':  (ctx) => ctx.tAttr === 'Undead'  ? 'attr' : null,
+  'Bonus DMG to Neutral Attribute Monster': (ctx) => ctx.tAttr === 'Neutral' ? 'attr' : null,
 };
 
 function parseStatValue(raw) {
@@ -162,7 +172,6 @@ function runOptimizer(baseState, cardPool, slotCounts, ctx, currentMult) {
       break;
     }
   }
-  console.log('Total combos:', totalCombos, '| Mode:', overflowed ? 'GREEDY' : 'EXACT');
 
   return overflowed
     ? runGreedyOptimizer(baseState, cardPool, slotCounts, equipTypes, ctx, combosPerEquip)
@@ -194,9 +203,7 @@ function runExactOptimizer(baseState, combosPerEquip, equipTypes, ctx, currentMu
 
   recurse(0, [], baseState);
 
-  if (!bestCards) {
-    return { topResults: [], mode: 'exact' };
-  }
+  if (!bestCards) return { topResults: [], mode: 'exact' };
 
   return { topResults: [{ cards: bestCards, mult: bestMult }], mode: 'exact' };
 }
@@ -233,13 +240,12 @@ function runGreedyOptimizer(baseState, cardPool, slotCounts, equipTypes, ctx, co
 }
 
 function renderCardOptimizer(calcState, container) {
-  injectStyles();
-
   const ctx = {
     atkType: calcState.atkType,
     wElem:   calcState.wElem,
     tSize:   calcState.tSize,
     tRace:   calcState.tRace,
+    tAttr:   calcState.tAttr,
   };
 
   const existing = container.querySelector('#card-optimizer');
@@ -319,10 +325,10 @@ function buildOptimizerHTML() {
 
         <div class="co-block">
           <div class="co-block-title">Equipment Effect / Buffs</div>
-<p class="co-block-desc">
-  If there are exclusive effects (elemental bonus, damage bonus, etc.) from card / eq (except headgear), add them here. Make sure these haven't already been included in the base inputs before Calculate.<br/><br/>
-  It is highly recommended to always add the Dancer's/Bard's Eternal Chaos or GS's Glorious Command bonus here for better accuracy.
-</p>
+          <p class="co-block-desc">
+            If there are exclusive effects (elemental bonus, damage bonus, etc.) from card / eq (except headgear), add them here. Make sure these haven't already been included in the base inputs before Calculate.<br/><br/>
+            It is highly recommended to always add the Dancer's/Bard's Eternal Chaos or GS's Glorious Command bonus here for better accuracy.
+          </p>
           <div id="co-buff-list" class="co-buff-list"></div>
           <div class="co-btn-group">
             <button class="co-add-btn" id="co-add-buff" type="button">+ Add Buff</button>
@@ -513,11 +519,10 @@ function restoreOptimizerState(section) {
 
     for (const btn of section.querySelectorAll('.co-lock-btn')) {
       const key = `${btn.dataset.equip}_${btn.dataset.slot}`;
-      if (locked[key]) {
-        btn.dataset.locked = 'true';
-        btn.innerHTML      = LOCK_CLOSED_SVG;
-        btn.title          = 'Unlock slot';
-      }
+      if (!locked[key]) continue;
+      btn.dataset.locked = 'true';
+      btn.innerHTML      = LOCK_CLOSED_SVG;
+      btn.title          = 'Unlock slot';
     }
 
     for (const { stat, val } of buffs) addBuffRow(section, stat, val);
@@ -614,10 +619,9 @@ function runAndRender(section, calcState, ctx) {
         if (field in baseState) baseState[field] += val;
       }
 
-      const lockedBaseState = applyCards(baseState, allLockedNames, ctx);
-
+      const lockedBaseState   = applyCards(baseState, allLockedNames, ctx);
       const currentSetupState = applyCards(lockedBaseState, nonLockedEquipped, ctx);
-      const currentMult = calculateMultiplier(currentSetupState).mult;
+      const currentMult       = calculateMultiplier(currentSetupState).mult;
 
       const { topResults } = runOptimizer(lockedBaseState, cardPool, slotCounts, ctx, currentMult);
 
@@ -679,7 +683,7 @@ function renderResults(container, topResults, baseState, currentMult, lockedCard
         <span class="co-res-equip-lbl">${EQUIP_LABELS[equip] ?? equip}</span>
         <span class="co-res-cards">${chipsHTML}</span>
       </div>`;
-    }).join('') || '<em style="font-size:var(--font-size-sm);color:var(--text-muted)">No cards</em>';
+    }).join('') || '<em class="co-empty">No cards</em>';
 
   const byEquip = {};
   for (const name of best.cards) {
@@ -746,9 +750,9 @@ function renderResults(container, topResults, baseState, currentMult, lockedCard
       </div>
     </div>`;
 
-  const slides = container.querySelectorAll('.co-slide');
+  const slides      = container.querySelectorAll('.co-slide');
   const slideLabels = ['Recommendation', 'Before Optimization'];
-  let current  = 0;
+  let current       = 0;
 
   const goTo = (idx) => {
     slides[current].classList.remove('co-slide--active');
@@ -773,369 +777,4 @@ function fmtNum(n) {
   if (Math.abs(v) > 999999) return `${(v / 1000000).toFixed(2)}M`;
   if (Math.abs(v) > 9999)   return `${Math.floor(v / 1000)}K`;
   return v % 1 === 0 ? v.toString() : (Math.floor(v * 100) / 100).toString();
-}
-
-let _stylesInjected = false;
-function injectStyles() {
-  if (_stylesInjected) return;
-  _stylesInjected = true;
-
-  const css = `
-.spoiler {
-  transition: .333ms;
-  filter: blur(5px);
-}
-
-.spoiler:hover {
-  filter: blur(0);
-}
-.co-section-wrap { margin-top: 1.5rem; }
-
-.co-panel {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.co-panel-hd {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: .6rem 1rem;
-  cursor: pointer;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  color: var(--label);
-  user-select: none;
-  outline: none;
-}
-.co-panel-hd:hover { background: rgba(128,128,128,.06); }
-.co-panel-hd:focus-visible { box-shadow: inset 0 0 0 2px var(--primary, #5a7de8); }
-
-.co-chevron {
-  font-size: .75rem;
-  line-height: 1;
-  transition: transform var(--transition-fast);
-}
-.co-panel-hd[aria-expanded="false"] .co-chevron { transform: rotate(-90deg); }
-.co-panel-hd[aria-expanded="false"] + .co-body { display: none; }
-
-.co-body {
-  padding: .75rem 1rem 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  border-top: 1px solid var(--border);
-}
-
-.co-block { display: flex; flex-direction: column; gap: .5rem; }
-.co-block-title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-  color: var(--text-muted);
-}
-.co-block-desc {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-  margin: .15rem 0 .6rem;
-  line-height: 1.55;
-}
-
-.co-equipped-wrap { display: flex; flex-direction: column; gap: .4rem; }
-.co-equip-group { display: flex; flex-direction: column; gap: .3rem; }
-.co-equip-lbl {
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  color: var(--label);
-}
-.co-slots-row { display: flex; flex-wrap: wrap; gap: .35rem; }
-.co-slot { display: flex; align-items: center; gap: .3rem; }
-.co-slot-lbl {
-  font-size: var(--font-size-xs);
-  color: var(--text-subtle);
-  min-width: 1.3rem;
-}
-
-.co-slot .select-wrap { max-width: 11rem; }
-
-.co-lock-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 28px;
-  height: 34px;
-  font-size: .9rem;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  padding: 0;
-  opacity: .4;
-  transition:
-    opacity var(--transition-fast),
-    background var(--transition-fast),
-    border-color var(--transition-fast);
-}
-.co-lock-btn:hover { opacity: 1; }
-.co-lock-btn[data-locked="true"] {
-  opacity: 1;
-  border-color: #e5a020;
-  background: rgba(229,160,32,.12);
-}
-.co-unused-name-wrap { flex: 1; min-width: 0; }
-.co-unused-qty-wrap { width: 5rem; flex-shrink: 0; }
-
-.co-unused-list { display: flex; flex-direction: column; gap: .35rem; }
-.co-unused-row { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
-
-.co-buff-list { display: flex; flex-direction: column; gap: .35rem; }
-.co-buff-row { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
-.co-buff-stat-wrap { flex: 1; min-width: 9rem; max-width: 13rem; }
-.co-buff-val-wrap { width: 6rem; flex-shrink: 0; }
-.co-buff-val-wrap input {
-  width: 100%;
-  height: 34px;
-  padding: 0 .5rem;
-  font-size: var(--font-size-sm);
-  background: var(--input-bg, var(--surface));
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text);
-  outline: none;
-  transition: border-color var(--transition-fast);
-}
-.co-buff-val-wrap input:focus { border-color: var(--primary, #5a7de8); }
-
-.co-btn-group { display: flex; gap: .5rem; flex-wrap: wrap; }
-
-.co-clear-btn { background: var(--danger, #c0392b); }
-.co-clear-btn:hover { background: #a93226; }
-.co-clear-btn:active { background: #922b21; }
-
-.co-add-btn {
-  display: inline-flex;
-  align-items: center;
-  align-self: flex-start;
-  height: 34px;
-  padding: 0 14px;
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--letter-spacing-wide);
-  color: #fff;
-  background: var(--secondary);
-  border: none;
-  border-radius: var(--radius);
-  cursor: pointer;
-  box-shadow: var(--shadow);
-  transition:
-    background var(--transition-base),
-    transform var(--transition-base),
-    box-shadow var(--transition-base);
-}
-.co-add-btn:hover {
-  background: #5a5f6b;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-hover);
-}
-.co-add-btn:active {
-  transform: translateY(0) scale(.97);
-  box-shadow: var(--shadow);
-}
-
-.co-rm-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: 30px;
-  height: 30px;
-  font-size: 1.1rem;
-  font-weight: var(--font-weight-medium);
-  color: var(--text-muted);
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  cursor: pointer;
-  line-height: 1;
-  padding: 0;
-  transition:
-    color var(--transition-fast),
-    background var(--transition-fast),
-    border-color var(--transition-fast),
-    transform var(--transition-fast);
-}
-.co-rm-btn:hover {
-  color: #fff;
-  background: var(--danger);
-  border-color: var(--danger);
-  transform: scale(1.05);
-}
-.co-rm-btn:active { transform: scale(.95); }
-
-.co-run-row { justify-content: flex-end; }
-#co-run-btn { background: #3a9648; }
-#co-run-btn:hover { background: #32823e; }
-#co-run-btn:active, #co-run-btn:focus { background: #286e34; }
-#co-run-btn:focus-visible {
-  box-shadow: 0 0 0 2px rgba(58, 150, 72, .5), 0 3px 8px rgba(0, 0, 0, .3);
-}
-
-.co-result { margin-top: .5rem; display: flex; flex-direction: column; gap: .85rem; }
-.co-loading, .co-empty, .co-error {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-  padding: .5rem 0;
-}
-.co-error { color: #e55; }
-
-.co-res-hero {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: .6rem;
-}
-.co-res-hero-block {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: .65rem .75rem;
-  border-radius: var(--radius);
-  background: rgba(128,128,128,.07);
-  border: 1px solid var(--border);
-  gap: .15rem;
-}
-.co-res-hero-block.pos { border-color: rgba(87,171,104,.35); background: rgba(87,171,104,.07); }
-.co-res-hero-block.neg { border-color: rgba(221,85,85,.3);   background: rgba(221,85,85,.06); }
-.co-res-hero-val {
-  font-size: var(--font-size-lg, 1.15rem);
-  font-weight: var(--font-weight-bold);
-  color: var(--text);
-  letter-spacing: -.01em;
-  line-height: 1.2;
-}
-.co-res-hero-block.pos .co-res-hero-val { color: #57ab68; }
-.co-res-hero-block.neg .co-res-hero-val { color: #e55; }
-.co-res-hero-lbl {
-  font-size: var(--font-size-xs);
-  color: var(--text-muted);
-  text-align: center;
-}
-
-.co-res-section { display: flex; flex-direction: column; gap: .4rem; }
-.co-res-section-title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-  color: var(--text-muted);
-}
-
-.co-res-breakdown { display: flex; flex-direction: column; gap: .35rem; }
-.co-res-equip { display: flex; gap: .5rem; align-items: flex-start; }
-.co-res-equip-lbl {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--label);
-  min-width: 5.5rem;
-  padding-top: .2rem;
-  flex-shrink: 0;
-}
-.co-res-cards { display: flex; flex-wrap: wrap; gap: .25rem; }
-.co-chip {
-  font-size: var(--font-size-xs);
-  padding: .2rem .5rem;
-  border-radius: 4px;
-  background: rgba(128,128,128,.12);
-  color: var(--text);
-  border: 1px solid var(--border-subtle);
-  white-space: nowrap;
-}
-.co-chip--locked {
-  display: inline-flex;
-  align-items: center;
-  gap: .25rem;
-  background: rgba(229,160,32,.15);
-}
-.co-chip--locked svg { flex-shrink: 0; }
-.co-chip-qty {
-  color: var(--text-muted);
-  font-weight: var(--font-weight-medium);
-}
-.co-res-note {
-  font-size: var(--font-size-xs);
-  color: var(--text-muted);
-  line-height: 1.55;
-  padding: .4rem .65rem;
-  border-left: 2px solid var(--border);
-}
-
-.co-slider { display: flex; flex-direction: column; gap: .75rem; }
-.co-slider-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding-bottom: .4rem;
-  border-bottom: 1px solid var(--border);
-}
-.co-slide { display: none; flex-direction: column; gap: .85rem; }
-.co-slide--active { display: flex; }
-.co-slider-label {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-  color: var(--text-muted);
-}
-.co-slider-nav {
-  display: flex;
-  align-items: center;
-  gap: .4rem;
-}
-.co-slide-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  font-size: 1.15rem;
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-  transition:
-    color var(--transition-fast),
-    border-color var(--transition-fast),
-    background var(--transition-fast);
-}
-.co-slide-btn:hover {
-  color: var(--text);
-  border-color: var(--text-muted);
-  background: rgba(128,128,128,.08);
-}
-.co-slide-dots { display: flex; gap: .35rem; align-items: center; }
-.co-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--border);
-  cursor: pointer;
-  transition:
-    background var(--transition-fast),
-    transform var(--transition-fast);
-}
-.co-dot--active {
-  background: var(--primary, #5a7de8);
-  transform: scale(1.3);
-}
-`;
-
-  const style = document.createElement('style');
-  style.id = 'co-styles';
-  style.textContent = css;
-  document.head.appendChild(style);
 }
