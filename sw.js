@@ -28,6 +28,8 @@ const urlsToCache = [
   '/sim/icons/web-app-manifest-512x512.png'
 ];
 
+let isPWAMode = false;
+
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -47,27 +49,29 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
+  if (!isPWAMode) return;
+
   if (event.request.method !== 'GET' || !event.request.url.startsWith('http')) {
     return;
   }
-  
+
   event.respondWith(
     caches.match(event.request)
     .then(response => {
       if (response) return response;
-      
+
       return fetch(event.request)
         .then(fetchResponse => {
           if (!fetchResponse || fetchResponse.status !== 200) {
             return fetchResponse;
           }
-          
+
           if (fetchResponse.type === 'basic' || fetchResponse.type === 'cors') {
             const responseToCache = fetchResponse.clone();
             caches.open(CACHE_NAME)
               .then(cache => cache.put(event.request, responseToCache));
           }
-          
+
           return fetchResponse;
         })
         .catch(() => caches.match(event.request));
@@ -78,5 +82,8 @@ self.addEventListener('fetch', event => {
 self.addEventListener('message', event => {
   if (event.data?.action === 'skipWaiting') {
     self.skipWaiting();
+  }
+  if (event.data?.type === 'SET_MODE') {
+    isPWAMode = event.data.isPWA;
   }
 });

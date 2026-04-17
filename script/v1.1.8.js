@@ -6008,6 +6008,18 @@ const PWAServiceWorker = (() => {
         scheduleUpdateCheck(reg);
         setupUpdateListener(reg);
         setInterval(() => reg.update().catch(() => {}), CONSTANTS.SW_UPDATE_INTERVAL);
+        const sendMode = () => {
+          const target = reg.active || reg.installing || reg.waiting;
+          target?.postMessage({ type: 'SET_MODE', isPWA: IS_PWA });
+        };
+        if (reg.active) {
+          sendMode();
+        } else {
+          const w = reg.installing || reg.waiting;
+          w?.addEventListener('statechange', function() {
+            if (this.state === 'activated') sendMode();
+          });
+        }
       })
       .catch(() => {});
   };
@@ -6846,6 +6858,7 @@ const PWAPersistenceInit = (() => {
     return true;
   };
 })();
+
 
 // ========== RESET SYSTEM ==========
 const ResetHelpers = {
