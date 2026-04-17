@@ -70,13 +70,28 @@ function lookupCard(cardName) {
   return cardData[cardName] ?? null;
 }
 
+const STAT_DEDUP_GROUPS = [
+  ['Final P.DMG Bonus', 'Final M.DMG Bonus'],
+  ['Final P.PEN',       'Final M.PEN'      ],
+  ['P.PEN',             'M.PEN'            ],
+];
+
 function getCardStatDelta(cardName, ctx) {
   const card = lookupCard(cardName);
   if (!card) return null;
 
   const delta = { pen: 0, crit: 0, dmg: 0, elemEnh: 0, sizeEnh: 0, race: 0, attr: 0, dmgStack: 0 };
 
+  const skipStats = new Set();
+  for (const group of STAT_DEDUP_GROUPS) {
+    const present = group.filter(s => s in card.stats);
+    if (present.length > 1) {
+      for (const s of present.slice(1)) skipStats.add(s);
+    }
+  }
+
   for (const [statName, rawVal] of Object.entries(card.stats)) {
+    if (skipStats.has(statName)) continue;
     const resolver = STAT_RESOLVERS[statName];
     if (!resolver) continue;
     const field = resolver(ctx);
@@ -287,7 +302,7 @@ function buildOptimizerHTML() {
 
         <div class="co-block">
           <div class="co-block-title">Unused Cards (owned but not equipped)</div>
-          <p class="spoiler co-block-desc">Or any cards you're dreaming of and definitely can't afford <img src="https://masihterjaga.github.io/sim/img/dogekek.png" width="14" height="14"></img></p>
+          <p class="spoiler co-block-desc">Or any cards you're dreaming of and definitely can't afford <img alt=":dogekek:" src="https://masihterjaga.github.io/sim/img/dogekek.png" width="14" height="14"></img></p>
           <div id="co-unused-list" class="co-unused-list"></div>
           <div class="co-btn-group">
             <button class="co-add-btn" id="co-add-unused" type="button">+ Add Card</button>
@@ -298,7 +313,7 @@ function buildOptimizerHTML() {
         <div class="co-block">
           <div class="co-block-title">Equipment Effect / Buffs</div>
           <p class="co-block-desc">
-            If your gear has exclusive effects (elemental bonus, damage bonus, etc.), add them here. Make sure you haven't already included them in the base inputs before Calculate.<br/><br/>It is highly recommended to always add your Dancer's/Bard's Eternal Chaos or GS's Glorious Command bonus here for better accuracy.
+            If you have some exclusive effects (elemental bonus, damage bonus, etc.) from card / eq (except headgear), add them here. Make sure you haven't already included them in the base inputs before Calculate.<br/><br/>It is highly recommended to always add your Dancer's/Bard's Eternal Chaos or GS's Glorious Command bonus here for better accuracy.
           </p>
           <div id="co-buff-list" class="co-buff-list"></div>
           <div class="co-btn-group">
@@ -321,7 +336,7 @@ function buildUnusedRowHTML() {
   const allOptions = Object.keys(cardData).sort()
     .map(n => `<option value="${esc(n)}">${esc(n)}</option>`)
     .join('');
-  const qtyOptions = Array.from({ length: 10 }, (_, i) =>
+  const qtyOptions = Array.from({ length: 6 }, (_, i) =>
     `<option value="${i + 1}">${i + 1}</option>`
   ).join('');
 
@@ -505,7 +520,7 @@ function restoreOptimizerState(section) {
 function runAndRender(section, calcState, ctx) {
   const resultEl = section.querySelector('#co-result');
   resultEl.hidden = false;
-  resultEl.innerHTML = '<div class="co-loading">Calculating…</div>';
+  resultEl.innerHTML = '<div class="co-loading">Still finding…</div>';
 
   const equippedNames = [...section.querySelectorAll('.co-card-select')].map(sel => sel.value || '');
   const slotCounts = { ...SLOT_COUNTS };
@@ -759,7 +774,8 @@ function injectStyles() {
 
   const css = `
 .spoiler {
-  filter: blur(8px);
+  transition: .333ms;
+  filter: blur(5px);
 }
 
 .spoiler:hover {
