@@ -3669,3 +3669,49 @@ td.build {
   background: var(--primary, #5a7de8);
   transform: scale(1.3);
 }
+
+.co-res-final-stats { margin-top: .15rem; }
+
+.co-final-stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.co-final-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .35rem .65rem;
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--transition-fast);
+}
+
+.co-final-stat-row:last-child { border-bottom: none; }
+
+.co-final-stat-row:nth-child(odd) { background: rgba(128,128,128,.05); }
+.co-final-stat-row:nth-child(even) { background: rgba(128,128,128,.02); }
+
+.co-final-stat-lbl {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+}
+
+.co-final-stat-val {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--label);
+  font-variant-numeric: tabular-nums;
+}
+.co-final-stat-val {
+  display: inline-flex;
+  align-items: center;
+  gap: .2rem;
+}
+
+.co-stat-arrow { flex-shrink: 0; margin: 0; }
+.co-stat-arrow--up   { color: #57ab68; }
+.co-stat-arrow--down { color: #e55; }

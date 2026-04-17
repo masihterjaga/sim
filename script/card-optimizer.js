@@ -636,14 +636,14 @@ function runAndRender(section, calcState, ctx) {
         });
       }
 
-      renderResults(resultEl, topResults, baseState, currentMult, lockedCards, equippedNames);
+      renderResults(resultEl, topResults, baseState, currentMult, lockedCards, equippedNames, ctx);
     } catch (err) {
       resultEl.innerHTML = `<div class="co-error">Error: ${esc(err.message)}</div>`;
     }
   }, 30);
 }
 
-function renderResults(container, topResults, baseState, currentMult, lockedCards = {}, equippedNames = []) {
+function renderResults(container, topResults, baseState, currentMult, lockedCards = {}, equippedNames = [], ctx = {}) {
   if (!topResults?.length) {
     container.innerHTML = '<div class="co-empty">No valid combinations found. Add cards to the pool.</div>';
     return;
@@ -697,11 +697,55 @@ function renderResults(container, topResults, baseState, currentMult, lockedCard
     ? `<div class="co-res-note">Current setup is good already. Feel free to use these or just stick with what's in use.</div>`
     : '';
 
+  const finalState  = applyCards(baseState, best.cards, ctx);
+  const beforeState = applyCards(baseState, equippedNames.filter(n => n && n !== '—'), ctx);
+
+  const beforeByEquip = {};
+  for (const name of equippedNames) {
+    if (!name || name === '—') continue;
+    const card = lookupCard(name);
+    if (!card) continue;
+    const pool = (beforeByEquip[card.equip] ??= {});
+    pool[name] = (pool[name] || 0) + 1;
+  }
+
+  const FINAL_STAT_LABELS = [
+    { field: 'pen',      label: 'Final PEN'            },
+    { field: 'dmg',      label: 'Final P/M DMG Bonus'  },
+    { field: 'elemEnh',  label: 'Element Enhance'       },
+    { field: 'sizeEnh',  label: 'DMG to Size'           },
+    { field: 'race',     label: 'DMG to Race'           },
+    { field: 'attr',     label: 'DMG to Attribute'      },
+    { field: 'dmgStack', label: 'Final DMG Bonus'       },
+  ];
+
+  const finalStatsHTML = `
+    <div class="co-res-section co-res-final-stats">
+      <div class="co-res-section-title">Final Stats</div>
+      <div class="co-final-stats-grid">
+        ${FINAL_STAT_LABELS.map(({ field, label }) => {
+          const val     = finalState[field] ?? 0;
+          const prevVal = beforeState[field] ?? 0;
+          const diff    = val - prevVal;
+          const arrow   = diff > 0
+            ? '<svg class="co-stat-arrow co-stat-arrow--up" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8-12 8 12z"/></svg>'
+            : diff < 0
+            ? '<svg class="co-stat-arrow co-stat-arrow--down" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6l8 12 8-12z"/></svg>'
+            : '';
+          return '<div class="co-final-stat-row">'
+            + '<span class="co-final-stat-lbl">' + label + '</span>'
+            + '<span class="co-final-stat-val">' + fmtNum(val) + '%' + arrow + '</span>'
+            + '</div>';
+        }).join('')}
+      </div>
+    </div>`;
+
   const slide1HTML = `
     <div class="co-res-section">
       <div class="co-res-section-title">Recommended Cards</div>
       <div class="co-res-breakdown">${buildBreakdownHTML(byEquip, lockedCountByEquip)}</div>
     </div>
+    ${finalStatsHTML}
     <div class="co-res-hero">
       <div class="co-res-hero-block">
         <div class="co-res-hero-val">×${fmtNum(best.mult / rawAttack)}</div>
@@ -714,24 +758,34 @@ function renderResults(container, topResults, baseState, currentMult, lockedCard
     </div>
     ${noteHTML}`;
 
-  const beforeByEquip = {};
-  for (const name of equippedNames) {
-    if (!name || name === '—') continue;
-    const card = lookupCard(name);
-    if (!card) continue;
-    const pool = (beforeByEquip[card.equip] ??= {});
-    pool[name] = (pool[name] || 0) + 1;
-  }
+  const beforeStatsHTML = `
+    <div class="co-res-section co-res-final-stats">
+      <div class="co-res-section-title">Final Stats</div>
+      <div class="co-final-stats-grid">
+        ${FINAL_STAT_LABELS.map(({ field, label }) => {
+          const val = beforeState[field] ?? 0;
+          return `<div class="co-final-stat-row">
+            <span class="co-final-stat-lbl">${label}</span>
+            <span class="co-final-stat-val">${fmtNum(val)}%</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
 
   const slide2HTML = `
     <div class="co-res-section">
       <div class="co-res-section-title">Current Cards</div>
       <div class="co-res-breakdown">${buildBreakdownHTML(beforeByEquip)}</div>
     </div>
+    ${beforeStatsHTML}
     <div class="co-res-hero">
       <div class="co-res-hero-block">
         <div class="co-res-hero-val">×${fmtNum(currentMult / rawAttack)}</div>
         <div class="co-res-hero-lbl">Current Multiplier</div>
+      </div>
+      <div class="co-res-hero-block">
+        <div class="co-res-hero-val">BASE</div>
+        <div class="co-res-hero-lbl">Current</div>
       </div>
     </div>`;
 
