@@ -30,9 +30,7 @@ const MAX_EVAL_LIMIT = 66_666;
 
 const STAT_RESOLVERS = {
   'Final P.PEN':  (ctx) => ctx.atkType === 'pen'  ? 'pen'  : null,
-  'P.PEN':        (ctx) => ctx.atkType === 'pen'  ? 'pen'  : null,
   'Final M.PEN':  (ctx) => ctx.atkType === 'pen'  ? 'pen'  : null,
-  'M.PEN':        (ctx) => ctx.atkType === 'pen'  ? 'pen'  : null,
   'Crit DMG Bonus':    (ctx) => ctx.atkType === 'crit' ? 'crit' : null,
   'Final P.DMG Bonus': () => 'dmg',
   'Final M.DMG Bonus': () => 'dmg',
@@ -73,7 +71,6 @@ function lookupCard(cardName) {
 const STAT_DEDUP_GROUPS = [
   ['Final P.DMG Bonus', 'Final M.DMG Bonus'],
   ['Final P.PEN',       'Final M.PEN'      ],
-  ['P.PEN',             'M.PEN'            ],
 ];
 
 function getCardStatDelta(cardName, ctx) {
@@ -148,7 +145,7 @@ function generateEquipCombinations(pool, slots) {
   return results;
 }
 
-function runOptimizer(baseState, cardPool, slotCounts, ctx) {
+function runOptimizer(baseState, cardPool, slotCounts, ctx, currentMult) {
   const equipTypes = Object.keys(SLOT_COUNTS).filter(e => (slotCounts[e] ?? 0) > 0);
 
   const combosPerEquip = {};
@@ -167,31 +164,41 @@ function runOptimizer(baseState, cardPool, slotCounts, ctx) {
   }
   console.log('Total combos:', totalCombos, '| Mode:', overflowed ? 'GREEDY' : 'EXACT');
 
-
   return overflowed
     ? runGreedyOptimizer(baseState, cardPool, slotCounts, equipTypes, ctx, combosPerEquip)
-    : runExactOptimizer(baseState, combosPerEquip, equipTypes, ctx);
+    : runExactOptimizer(baseState, combosPerEquip, equipTypes, ctx, currentMult);
 }
 
-function runExactOptimizer(baseState, combosPerEquip, equipTypes, ctx) {
-  const allResults = [];
+function runExactOptimizer(baseState, combosPerEquip, equipTypes, ctx, currentMult) {
+  let bestMult = currentMult;
+  let bestCards = null;
 
-  function recurse(equipIdx, cardsSoFar) {
+  function recurse(equipIdx, cardsSoFar, currentState) {
     if (equipIdx === equipTypes.length) {
-      const state = applyCards(baseState, cardsSoFar, ctx);
-      const { mult } = calculateMultiplier(state);
-      allResults.push({ cards: [...cardsSoFar], mult });
+      const { mult } = calculateMultiplier(currentState);
+      if (mult > bestMult) {
+        bestMult = mult;
+        bestCards = [...cardsSoFar];
+      }
       return;
     }
     for (const combo of combosPerEquip[equipTypes[equipIdx]]) {
-      recurse(equipIdx + 1, cardsSoFar.concat(combo));
+      const nextState = applyCards(currentState, combo, ctx);
+      if (equipIdx === equipTypes.length - 1) {
+        const { mult } = calculateMultiplier(nextState);
+        if (mult <= bestMult) continue;
+      }
+      recurse(equipIdx + 1, cardsSoFar.concat(combo), nextState);
     }
   }
 
-  recurse(0, []);
-  allResults.sort((a, b) => b.mult - a.mult);
+  recurse(0, [], baseState);
 
-  return { topResults: allResults.slice(0, 1), mode: 'exact' };
+  if (!bestCards) {
+    return { topResults: [], mode: 'exact' };
+  }
+
+  return { topResults: [{ cards: bestCards, mult: bestMult }], mode: 'exact' };
 }
 
 function runGreedyOptimizer(baseState, cardPool, slotCounts, equipTypes, ctx, combosPerEquip) {
@@ -294,7 +301,7 @@ function buildOptimizerHTML() {
         <div class="co-block">
           <div class="co-block-title">Equipped Cards</div>
           <p class="co-block-desc">
-            Select your currently equipped cards, then add any cards in your inventory relevant to your target.<br/><br/>Results may not fully match in-game values, especially for cards with ATK% stats. This feature is still a work in progress and some stats might be missing.<br/><br/>Lock slots if specific cards are needed for exclusive set.
+            Select the currently equipped cards, then add any cards relevant to the target. Lock slots if specific cards are needed for an exclusive set.<br/><br/>Results may not fully match in-game values, especially for cards with ATK% because this feature is still a work in progress, and some stats may be missing.
           </p>
           <div id="co-equipped-slots" class="co-equipped-wrap">${equippedSlotsHTML}</div>
           <button class="co-add-btn co-clear-btn" id="co-unequip-all" type="button">Unequip All</button>
@@ -312,9 +319,10 @@ function buildOptimizerHTML() {
 
         <div class="co-block">
           <div class="co-block-title">Equipment Effect / Buffs</div>
-          <p class="co-block-desc">
-            If you have some exclusive effects (elemental bonus, damage bonus, etc.) from card / eq (except headgear), add them here. Make sure you haven't already included them in the base inputs before Calculate.<br/><br/>It is highly recommended to always add your Dancer's/Bard's Eternal Chaos or GS's Glorious Command bonus here for better accuracy.
-          </p>
+<p class="co-block-desc">
+  If there are exclusive effects (elemental bonus, damage bonus, etc.) from card / eq (except headgear), add them here. Make sure these haven't already been included in the base inputs before Calculate.<br/><br/>
+  It is highly recommended to always add the Dancer's/Bard's Eternal Chaos or GS's Glorious Command bonus here for better accuracy.
+</p>
           <div id="co-buff-list" class="co-buff-list"></div>
           <div class="co-btn-group">
             <button class="co-add-btn" id="co-add-buff" type="button">+ Add Buff</button>
@@ -611,7 +619,7 @@ function runAndRender(section, calcState, ctx) {
       const currentSetupState = applyCards(lockedBaseState, nonLockedEquipped, ctx);
       const currentMult = calculateMultiplier(currentSetupState).mult;
 
-      const { topResults } = runOptimizer(lockedBaseState, cardPool, slotCounts, ctx);
+      const { topResults } = runOptimizer(lockedBaseState, cardPool, slotCounts, ctx, currentMult);
 
       if (topResults.length && allLockedNames.length) {
         topResults[0].cards = [...allLockedNames, ...topResults[0].cards];
@@ -681,7 +689,7 @@ function renderResults(container, topResults, baseState, currentMult, lockedCard
     equipPool[name] = (equipPool[name] || 0) + 1;
   }
 
-  const noteHTML = pctRaw >= 0 && pctRaw <= 8
+  const noteHTML = pctRaw >= 0 && pctRaw <= 5
     ? `<div class="co-res-note">Current setup is good already. Feel free to use these or just stick with what's in use.</div>`
     : '';
 
