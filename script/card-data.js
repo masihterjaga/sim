@@ -1,724 +1,4796 @@
 const cardData = {
-  "Abysmal Knight Card": { equip: "weapon", stats: { "Final Haste": "6%" } },
-  "Alien Pedant Card": { equip: "weapon", stats: { "Bonus DMG to Small": "25%", "Bonus DMG to Medium": "25%" } },
-  "Ambernite Card": { equip: "weapon", stats: { "P.ATK": "30", "P.PEN": "30" } },
-  "Amon Ra Card [Day]": { equip: "weapon", stats: { "PVP Final M.DMG Bonus": "4.50%", "PVP M.DMG Bonus": "270" } },
-  "Amon Ra Card [Day] [★]": { equip: "weapon", stats: { "PVP Final M.DMG Bonus": "7.50%", "PVP M.DMG Bonus": "450" } },
-  "Amon Ra Card [Night]": { equip: "weapon", stats: { "Final P.PEN": "9%", "Final P.DMG Bonus": "9%" } },
-  "Amon Ra Card [Night] [★]": { equip: "weapon", stats: { "Final P.PEN": "15%", "Final P.DMG Bonus": "15%" } },
-  "Amon Ra Card [Void]": { equip: "weapon", stats: { "PVP Final P.DMG Bonus": "4.50%", "PVP P.DMG Bonus": "270" } },
-  "Amon Ra Card [Void] [★]": { equip: "weapon", stats: { "PVP Final P.DMG Bonus": "7.50%", "PVP P.DMG Bonus": "450" } },
-  "Andre Card": { equip: "weapon", stats: { "P.ATK%": "3%", "Final P.PEN": "3%" } },
-  "Angeling Card [Night]": { equip: "weapon", stats: { "P.ATK%": "15%" } },
-  "Angeling Card [Night] [★]": { equip: "weapon", stats: { "P.ATK%": "27%" } },
-  "Anubis Card": { equip: "weapon", stats: { "Final Crit": "8%" } },
-  "Arc Angeling Card [Night]": { equip: "weapon", stats: { "HP Regen per 5s": "7.50", "PVP Final M.DMG RED": "7.50" } },
-  "Arc Angeling Card [Void]": { equip: "weapon", stats: { "HP Regen per 5s": "7.50", "PVP Final P.DMG RED": "7.50" } },
-  "Archer Skeleton Card": { equip: "weapon", stats: { "M.ATK%": "3%", "Final M.PEN": "3%" } },
-  "Arclouze Card": { equip: "weapon", stats: { "Water Enhance": "10%", "Wind Enhance": "10%" } },
-  "Argos Card": { equip: "weapon", stats: { "P.ATK": "60", "P.PEN": "60" } },
-  "Aster Card": { equip: "weapon", stats: { "Ghost Enhance": "17.50%", "Poison Enhance": "17.50%" } },
-  "Beast Titan Card [Day]": { equip: "weapon", stats: { "Final P.PEN": "18%", "Final M.PEN": "18%", "Crit DMG Bonus": "36%" } },
-  "Beelzebub Card [Day]": { equip: "weapon", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "M.ATK%": "18.60%", "Final M.DMG Bonus": "18.60%" } },
-  "Beetle King Card": { equip: "weapon", stats: { "P.DMG Bonus": "1,920", "PVP P.DMG Bonus": "240" } },
-  "Bigfoot Card": { equip: "weapon", stats: { "Holy Enhance": "10%", "Neutral Enhance": "10%" } },
-  "Bloody Murderer Card": { equip: "weapon", stats: { "Crit DMG Bonus": "16%", "Physical Lifesteal": "8%" } },
-  "Blue Venatu Card": { equip: "weapon", stats: { "Bonus DMG to Small": "25%" } },
-  "Brown Venatu Card": { equip: "weapon", stats: { "Bonus DMG to Medium": "25%" } },
-  "Caramel Card": { equip: "weapon", stats: { "M.ATK": "60", "M.PEN": "60" } },
-  "Coelacanth Card [Day]": { equip: "weapon", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "Final M.PEN": "18.60%", "Final M.DMG Bonus": "18.60%" } },
-  "Crab Card": { equip: "weapon", stats: { "Final M.PEN": "14%" } },
-  "Cursed Grave Keeper Card": { equip: "weapon", stats: { "Bonus DMG to Large": "25%" } },
-  "Dagger-wielding Skel Pirate Card": { equip: "weapon", stats: { "Haste": "120" } },
-  "Desert Wolf Card": { equip: "weapon", stats: { "M.ATK%": "3%", "Final M.DMG Bonus": "3%" } },
-  "Despero of Thanatos Card": { equip: "weapon", stats: { "Final P.DMG Bonus": "20%", "Final M.DMG Bonus": "20%", "Bonus DMG to Demi-Human": "5%" } },
-  "Deviace Card": { equip: "weapon", stats: { "Bonus DMG to Small": "10%" } },
-  "Deviling Card [Night]": { equip: "weapon", stats: { "P.ATK%": "7.50%", "Final P.DMG Bonus": "7.50%" } },
-  "Deviling Card [Night] [★]": { equip: "weapon", stats: { "P.ATK%": "13.50%", "Final P.DMG Bonus": "13.50%" } },
-  "Dolor of Thanatos Card": { equip: "weapon", stats: { "M.ATK%": "20%", "Bonus DMG to Angel": "5%" } },
-  "Doppelganger Card [Void]": { equip: "weapon", stats: { "Final M.PEN": "9%", "Final M.DMG Bonus": "9%" } },
-  "Doppelganger Card [Void] [★]": { equip: "weapon", stats: { "Final M.PEN": "15%", "Final M.DMG Bonus": "15%" } },
-  "Dracula Card [Void]": { equip: "weapon", stats: { "Final Crit": "15%" } },
-  "Dracula Card [Void] [★]": { equip: "weapon", stats: { "Final Crit": "27%" } },
-  "Dragon Fly Card [Night]": { equip: "weapon", stats: { "Ghost Enhance": "15%", "Poison Enhance": "15%" } },
-  "Dragon Fly Card [Night] [★]": { equip: "weapon", stats: { "Ghost Enhance": "30%", "Poison Enhance": "30%" } },
-  "Drainliar Card": { equip: "weapon", stats: { "P.ATK": "60" } },
-  "Drake Card [Day]": { equip: "weapon", stats: { "Earth Enhance": "15%", "Fire Enhance": "15%" } },
-  "Drake Card [Day] [★]": { equip: "weapon", stats: { "Earth Enhance": "30%", "Fire Enhance": "30%" } },
-  "Driller Card": { equip: "weapon", stats: { "Final M.PEN": "8%", "Magic Lifesteal": "8%" } },
-  "Dullahan Card": { equip: "weapon", stats: { "M.DMG Bonus": "1,920", "PVP M.DMG Bonus": "240" } },
-  "Eddga Card [Void]": { equip: "weapon", stats: { "Bonus DMG to Small": "15%" } },
-  "Eddga Card [Void] [★]": { equip: "weapon", stats: { "Bonus DMG to Small": "30%" } },
-  "Evil Druid Card": { equip: "weapon", stats: { "Crit DMG Bonus": "24%" } },
-  "Fabre Card": { equip: "weapon", stats: { "ASPD": "60" } },
-  "Familiar Card": { equip: "weapon", stats: { "M.ATK": "30", "M.PEN": "30" } },
-  "Female Thief Bug Card": { equip: "weapon", stats: { "Crit": "60" } },
-  "Flame Skull Card": { equip: "weapon", stats: { "Final P.DMG RED": "8%", "P.DMG Reflect": "8%" } },
-  "Flora Card": { equip: "weapon", stats: { "M.ATK": "60", "M.DMG Bonus": "120" } },
-  "Garm Baby Card [2023]": { equip: "weapon", stats: { "Water Enhance": "38.80%", "Neutral Enhance": "38.80%" } },
-  "Ghostring Card [Night]": { equip: "weapon", stats: { "Final ASPD": "60%" } },
-  "Ghostring Card [Night] [★]": { equip: "weapon", stats: { "Final ASPD": "120%" } },
-  "Gioia Card [Day]": { equip: "weapon", stats: { "Wind Enhance": "37.50%", "Ghost Enhance": "37.50%" } },
-  "Goat Card": { equip: "weapon", stats: { "P.ATK%": "20%" } },
-  "Goblin Archer Card": { equip: "weapon", stats: { "Bonus DMG to Insect": "12.50%" } },
-  "Goblin Steamrider Card": { equip: "weapon", stats: { "Bonus DMG to Dragon": "12.50%" } },
-  "Golden Thief Bug Card [Day]": { equip: "weapon", stats: { "Water Enhance": "15%", "Wind Enhance": "15%" } },
-  "Golden Thief Bug Card [Day] [★]": { equip: "weapon", stats: { "Water Enhance": "30%", "Wind Enhance": "30%" } },
-  "Ground Petite Card": { equip: "weapon", stats: { "Bonus DMG to Formless": "12.50%" } },
-  "Harpy Card": { equip: "weapon", stats: { "M.ATK%": "20%" } },
-  "Horn Card": { equip: "weapon", stats: { "ASPD": "120" } },
-  "Hornet Card": { equip: "weapon", stats: { "P.ATK": "30", "P.DMG Bonus": "30" } },
-  "Hunter Fly Card": { equip: "weapon", stats: { "P.ATK": "60", "P.DMG Bonus": "120" } },
-  "Hydra Card": { equip: "weapon", stats: { "M.ATK": "120" } },
-  "Khalitzburg Card": { equip: "weapon", stats: { "PVP Final P.DMG Bonus": "6%" } },
-  "Kobold Archer Card": { equip: "weapon", stats: { "Bonus DMG to Fish": "12.50%" } },
-  "Kraken Card [Night]": { equip: "weapon", stats: { "Bonus DMG to Medium": "15%" } },
-  "Kraken Card [Night] [★]": { equip: "weapon", stats: { "Bonus DMG to Medium": "30%" } },
-  "Light of Goblin Card [Weapon]": { equip: "weapon", stats: { "P.ATK%": "9%", "Neutral Enhance": "11.30%" } },
-  "Lord of the Dead Card [Night]": { equip: "weapon", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "P.ATK%": "18.60%", "Final P.DMG Bonus": "18.60%" } },
-  "Lost Dragon Card [Night]": { equip: "weapon", stats: { "Bonus DMG to Large": "30%" } },
-  "Magnolia Card": { equip: "weapon", stats: { "Final Crit": "6%" } },
-  "Marina Card": { equip: "weapon", stats: { "P.ATK%": "6%" } },
-  "Maya Card [Day]": { equip: "weapon", stats: { "M.ATK%": "7.50%", "Final M.PEN": "7.50%" } },
-  "Maya Card [Day] [★]": { equip: "weapon", stats: { "M.ATK%": "13.50%", "Final M.PEN": "13.50%" } },
-  "Megalodon Card": { equip: "weapon", stats: { "Holy Enhance": "17.50%", "Neutral Enhance": "17.50%" } },
-  "Memory of Thanatos Card [Day]": { equip: "weapon", stats: { "Bonus DMG to Angel": "15%", "Final P.DMG Bonus": "15%", "Final M.DMG Bonus": "15%" } },
-  "Memory of Thanatos Card [Night]": { equip: "weapon", stats: { "Bonus DMG to Demi-Human": "15%", "Physical Lifesteal": "15%", "Magic Lifesteal": "15%" } },
-  "Menblatt Card": { equip: "weapon", stats: { "P.DMG Bonus%": "34%" } },
-  "Metaller Card": { equip: "weapon", stats: { "P.ATK": "120" } },
-  "Milim Card": { equip: "weapon", stats: { "Magic Lifesteal": "8%" } },
-  "Minorous Card": { equip: "weapon", stats: { "M.ATK%": "6%" } },
-  "Mistress Card [Night]": { equip: "weapon", stats: { "Final Crit": "12%" } },
-  "Mistress Card [Night] [★]": { equip: "weapon", stats: { "Final Crit": "24%" } },
-  "Moonlight Flower Card [Void]": { equip: "weapon", stats: { "Final Haste": "7.50%" } },
-  "Moonlight Flower Card [Void] [★]": { equip: "weapon", stats: { "Final Haste": "13.50%" } },
-  "Munak Card": { equip: "weapon", stats: { "Bonus DMG to Medium": "10%" } },
-  "Mutant Dragonoid Card [Void]": { equip: "weapon", stats: { "Final Crit": "24%" } },
-  "Naght Sieger Card [Night]": { equip: "weapon", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "Final P.PEN": "18.60%", "Final P.DMG Bonus": "18.60%" } },
-  "Naght Sieger Card [Void]": { equip: "weapon", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "Final Crit": "18.60%", "Crit DMG Bonus": "37%" } },
-  "Necromancer Card [Day]": { equip: "weapon", stats: { "Crit DMG Bonus": "48%" } },
-  "Necromancer Card [Void]": { equip: "weapon", stats: { "P.DMG Reflect": "16.80%", "M.DMG Reflect": "16.80%" } },
-  "Nezuko Kamado Card (Gold)": { equip: "weapon", stats: { "Final P.DMG Bonus": "29%", "Final M.DMG Bonus": "29%" } },
-  "Observation Card [Night]": { equip: "weapon", stats: { "Final M.PEN": "30%", "Final P.PEN": "30%" } },
-  "Ogre Tooth Card [Day]": { equip: "weapon", stats: { "Final P.DMG Bonus": "12%", "Final Crit": "12%" } },
-  "Orc Disaster Card [Day]": { equip: "weapon", stats: { "P.DMG Reflect": "14%", "M.DMG Reflect": "14%" } },
-  "Orc Disaster Card II [Day]": { equip: "weapon", stats: { "P.ATK%": "29%", "M.ATK%": "29%" } },
-  "Orc General Card [Weapon]": { equip: "weapon", stats: { "M.ATK%": "9%", "Fire Enhance": "11.30%" } },
-  "Orc Lady Card": { equip: "weapon", stats: { "Bonus DMG to Demi-Human": "12.50%" } },
-  "Orc Lord Card [Night]": { equip: "weapon", stats: { "M.ATK%": "15%" } },
-  "Orc Lord Card [Night] [★]": { equip: "weapon", stats: { "M.ATK%": "27%" } },
-  "Orc Skeleton Card": { equip: "weapon", stats: { "Bonus DMG to Demon": "12.50%" } },
-  "Osiris Card [Void]": { equip: "weapon", stats: { "Holy Enhance": "15%", "Neutral Enhance": "15%" } },
-  "Osiris Card [Void] [★]": { equip: "weapon", stats: { "Holy Enhance": "30%", "Neutral Enhance": "30%" } },
-  "Pecopeco Egg Card": { equip: "weapon", stats: { "Haste": "60" } },
-  "Pharaoh Card [Night]": { equip: "weapon", stats: { "M.ATK%": "7.50%", "Final M.DMG Bonus": "7.50%" } },
-  "Pharaoh Card [Night] [★]": { equip: "weapon", stats: { "M.ATK%": "13.50%", "Final M.DMG Bonus": "13.50%" } },
-  "Phendark Card": { equip: "weapon", stats: { "PVP Final M.DMG Bonus": "6%" } },
-  "Phreeoni Card [Day]": { equip: "weapon", stats: { "Bonus DMG to Large": "15%" } },
-  "Phreeoni Card [Day] [★]": { equip: "weapon", stats: { "Bonus DMG to Large": "30%" } },
-  "Plankton Card": { equip: "weapon", stats: { "M.ATK": "60" } },
-  "Raydric Archer Card": { equip: "weapon", stats: { "Final Crit": "12%" } },
-  "Requiem Card": { equip: "weapon", stats: { "Earth Enhance": "10%", "Fire Enhance": "10%" } },
-  "Rimuru Card": { equip: "weapon", stats: { "Physical Lifesteal": "8%" } },
-  "Rotar Zairo Card": { equip: "weapon", stats: { "Bonus DMG to Brute": "12.50%" } },
-  "Saitama (Soul) Card [Day]": { equip: "weapon", stats: { "PVP Final P.DMG Bonus": "15.50%", "PVP Final M.DMG Bonus": "15.50%" } },
-  "Saitama Card": { equip: "accessory", stats: { "PVP Final P.DMG Bonus": "10.50%", "PVP Final M.DMG Bonus": "10.50%" } },
-  "Savage Bebe Card": { equip: "weapon", stats: { "M.ATK": "30", "M.DMG Bonus": "30" } },
-  "Scorpion Card": { equip: "weapon", stats: { "Final ASPD": "30%" } },
-  "Seal Card": { equip: "weapon", stats: { "Final P.PEN": "14%" } },
-  "Shellfish Card": { equip: "weapon", stats: { "Earth Enhance": "17.50%", "Fire Enhance": "17.50%" } },
-  "Shizue Card": { equip: "weapon", stats: { "Crit DMG Bonus": "16%" } },
-  "Side Winder Card": { equip: "weapon", stats: { "Final Haste": "3%" } },
-  "Skeleton Card": { equip: "weapon", stats: { "Bonus DMG to Large": "10%" } },
-  "Skeleton Worker Card": { equip: "weapon", stats: { "Crit": "120" } },
-  "Sleeper Card": { equip: "weapon", stats: { "M.DMG Bonus%": "34%" } },
-  "Snake Card": { equip: "weapon", stats: { "Ghost Enhance": "10%", "Poison Enhance": "10%" } },
-  "Speed-o-Sonic (Soul) Card [Night]": { equip: "weapon", stats: { "Final Crit": "15.50%", "Crit DMG Bonus": "31%" } },
-  "Speed-o-Sonic Card": { equip: "shoes", stats: { "PVP Final P.DMG RED": "5.30%", "Max HP%": "21%" } },
-  "Sting Card": { equip: "weapon", stats: { "Final ASPD": "50%" } },
-  "Stone Shooter Card": { equip: "weapon", stats: { "Final P.DMG Bonus": "16%" } },
-  "Storm Dragon Card [Day]": { equip: "weapon", stats: { "P.ATK%": "14%", "M.ATK%": "14%" } },
-  "Strouf Card [Void]": { equip: "weapon", stats: { "Final ASPD": "75%" } },
-  "Strouf Card [Void] [★]": { equip: "weapon", stats: { "Final ASPD": "135%" } },
-  "Tanjiro Kamado Card (Blue)": { equip: "weapon", stats: { "Bonus DMG to Medium": "18.80%", "Bonus DMG to Small": "18.80%" } },
-  "Toad Card [Night]": { equip: "weapon", stats: { "P.ATK%": "7.50%", "Final P.PEN": "7.50%" } },
-  "Toad Card [Night] [★]": { equip: "weapon", stats: { "P.ATK%": "13.50%", "Final P.PEN": "13.50%" } },
-  "Tri Joint Card": { equip: "weapon", stats: { "Water Enhance": "17.50%", "Wind Enhance": "17.50%" } },
-  "Vadon Card": { equip: "weapon", stats: { "P.ATK%": "3%", "Final P.DMG Bonus": "3%" } },
-  "Vagabond Wolf Card [Night]": { equip: "weapon", stats: { "Crit DMG Bonus": "18%", "Final P.DMG Bonus": "9%" } },
-  "Vagabond Wolf Card [Night] [★]": { equip: "weapon", stats: { "Crit DMG Bonus": "30%", "Final P.DMG Bonus": "15%" } },
-  "Wolf Card": { equip: "weapon", stats: { "Final ASPD": "40%" } },
-  "Zenitsu Agatsuma Card (Blue)": { equip: "weapon", stats: { "Final Crit": "7.50%", "Crit DMG Bonus": "15%" } },
-  "Zenitsu Agatsuma Card (Gold)": { equip: "weapon", stats: { "Final M.DMG Bonus": "10.50%", "Final M.PEN": "10.50%" } },
-  "Zenorc Card": { equip: "weapon", stats: { "Bonus DMG to Undead": "12.50%" } },
-  "Zombie Prisoner Card": { equip: "weapon", stats: { "Bonus DMG to Plant": "12.50%" } },
-  "Noxious Card": { equip: "weapon", stats: { "Final P.DMG Bonus": "11.50%", "P.ATK%": "11.50%" } },
-  "Venomous Card": { equip: "weapon", stats: { "Final M.DMG Bonus": "11.50%", "M.ATK%": "11.50%" } },
-  "Obsidian Card": { equip: "weapon", stats: { "Final M.DMG Bonus": "11.50%", "Final M.PEN": "11.50%" } },
-  "Mineral Card": { equip: "weapon", stats: { "Final Haste": "5.80%", "P.ATK%": "11.50%" } },
-  "Pitman Card": { equip: "weapon", stats: { "Final P.DMG Bonus": "11.50%", "Final P.PEN": "11.50%" } },
-  "Waste Stove Card": { equip: "weapon", stats: { "Final Haste": "5.80%", "M.ATK%": "11.50%" } },
-  "RSX-0806 Card [Night]": { equip: "weapon", stats: { "Final P.DMG Bonus": "33%", "Final M.DMG Bonus": "33%" } },
-  "Nidhoggr's Shadow Card [Night]": { equip: "weapon", stats: { "Final M.DMG Bonus": "16.50%", "Final M.PEN": "16.50%" } },
-  "Queen Scaraba Card [Day]": { equip: "weapon", stats: { "Final P.PEN": "33%", "Final M.PEN": "33%" } },
-  "Faceworm Queen Card [Void]": { equip: "weapon", stats: { "Final P.DMG Bonus": "16.50%", "Crit DMG Bonus": "33%" } },
-  "Elite Apocalypse Card [Night]": { equip: "weapon", stats: { "Final P.DMG Bonus": "13.80%", "Debuff PEN": "11.5" } },
-  "Maero of Thanatos Card": { equip: "weapon", stats: { "P.ATK%": "20%", "Bonus DMG to Angel": "5%" } },
-  "Kenshiro Card [Weapon]": { equip: "weapon", stats: { "Bonus DMG to Medium": "30%", "Bonus DMG to Small": "30%" } },
-  "Rei Card [Weapon]": { equip: "weapon", stats: { "Shadow Enhance": "30%", "Ghost Enhance": "30%", "Poison Enhance": "30%" } },
-  "Legendary Savior Card [Day]": { equip: "weapon", stats: { "P.ATK%": "35%" } },
-  "Conqueror Card [Night]": { equip: "weapon", stats: { "Final P.DMG Bonus": "35%", "Final M.DMG Bonus": "35%" } },
-  "Ram Card [Weapon]": { equip: "weapon", stats: { "Max SP%": "-5%", "M.ATK%": "31.50%" } },
-  "Rem Card [Weapon]": { equip: "weapon", stats: { "Max SP%": "-5%", "P.ATK%": "31.50%" } },
-  "Natsuki Subaru Card [Night]": { equip: "weapon", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "P.ATK%": "31.50%", "Final P.PEN": "31.50%" } },
-  "Ram Card [Day]": { equip: "weapon", stats: { "Max SP%": "-25%", "M.ATK%": "31.50%", "Final M.DMG Bonus": "31.50%" } },
-  "Siroma Card": { equip: "weapon", stats: { "P.DMG Bonus": "6720" } },
-  "Iceicle Card": { equip: "weapon", stats: { "Crit DMG Bonus": "56%" } },
-  "Snowier Card": { equip: "weapon", stats: { "M.DMG Bonus": "6720" } },
-  "Ice Titan Card": { equip: "weapon", stats: { "Final P.DMG Bonus": "28%" } },
-  "Ice Wolf Card": { equip: "weapon", stats: { "Final M.PEN": "14%", "Final M.DMG Bonus": "14%" } },
-  "Gazeti Card": { equip: "weapon", stats: { "Bonus DMG to Medium": "35%" } },
-  "Gloom Under Night Card [Night]": { equip: "weapon", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "Final M.PEN": "29.40%", "Final M.DMG Bonus": "29.40%" } },
-  "Retribution Card [Void]": { equip: "weapon", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "Final Crit": "29.40%", "Crit DMG Bonus": "58.80%" } },
-  "Shelter Card [Void]": { equip: "weapon", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "HP Regen per 5s": "14.70%", "Debuff RED": "36.8" } },
-  "Ktullanux Card [Void]": { equip: "weapon", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "P.ATK": "29.40%", "Final P.DMG Bonus": "29.40%" } },
-  "Downhill Fat Tiger Card [Day]": { equip: "weapon", stats: { "Final ASPD": "-100%", "Final Haste": "-10%", "P.ATK%": "31.50%", "Crit DMG Bonus": "63%" } },
-  "Baoku Lee Card [Weapon]": { equip: "weapon", stats: { "Final ASPD": "-100%", "Final Haste": "-10%", "P.DMG Reflect": "19.50%", "M.DMG Reflect": "19.50%" } },
-  "Astronaut Capoo Card": { equip: "weapon", stats: { "PVP Final P.DMG Bonus": "11.60%", "P.ATK%": "11.60%" } },
-  "Mage Capoo Card": { equip: "weapon", stats: { "PVP Final M.DMG Bonus": "11.60%", "M.ATK%": "11.60%" } },
-  "Angel Capoo Card [Day]": { equip: "weapon", stats: { "PVP Final P.DMG Bonus": "28.60%", "PVP Final M.DMG Bonus": "28.60%" } },
-  "Bijou Card [Day]": { equip: "weapon", stats: { "Final ASPD": "-100%", "Final Haste": "-10%", "Fire Enhance": "37.80%", "Final M.DMG Bonus": "31.50%" } },
-  "Angemon Card [Day]": { equip: "weapon", stats: { "Final ASPD": "-100%", "Final Haste": "-10%", "P.ATK%": "28%", "Final P.PEN": "35%" } },
-  "Angewomon Card [Day]": { equip: "weapon", stats: { "Final ASPD": "-100%", "Final Haste": "-10%", "M.ATK%": "28%", "Final M.PEN": "35%" } },
-  "WarGreyman Card [Day]": { equip: "weapon", stats: { "Bonus DMG to Large": "35%", "Crit DMG Bonus": "42%" } },
-  "WarGreyman Card [Night]": { equip: "weapon", stats: { "Bonus DMG to Large": "35%", "Final P.PEN": "21%" } },
-  "MetalGarurumon Card [Day]": { equip: "weapon", stats: { "Bonus DMG to Large": "35%", "Final M.PEN": "21%" } },
-  "Ryujinmaru Card [Day]": { equip: "weapon", stats: { "Bonus DMG to Small": "35%", "Crit DMG Bonus": "46%", "Final P.PEN": "23%", "Final M.PEN": "23%" } },
-  "Toraoh Card [Weapon]": { equip: "weapon", stats: { "PVP Final M.DMG Bonus": "12%", "Final M.DMG Bonus": "12%" } },
-  "Shibaraku Tsurugibe Card [Weapon]": { equip: "weapon", stats: { "Bonus DMG to Large": "30%", "Debuff Enhancement": "7.5" } },
-  "Wataru Ikusabe Card [Weapon]": { equip: "weapon", stats: { "PVP Final P.DMG Bonus": "12%", "Final P.DMG Bonus": "12%" } },
-  "Jyakomaru Card [Day]": { equip: "weapon", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "M.ATK%": "26%", "Final M.DMG Bonus": "38%" } },
-  "Ryuoumaru Card [Day]": { equip: "weapon", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "Crit DMG Bonus": "52%", "Final P.DMG Bonus": "38%" } },
-  "Senoumaru Card [Day]": { equip: "weapon", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "P.ATK%": "26%", "Crit DMG Bonus": "76%" } },
-  "Cecil Damon Card": { equip: "weapon", stats: { "Final P.DMG Bonus": "15.50%", "Crit DMG Bonus": "31%" } },
-  "Eremes Guile Card": { equip: "weapon", stats: { "Final P.DMG Bonus": "15.50%", "Final P.PEN": "15.50%" } },
-  "Celia Card": { equip: "weapon", stats: { "Final M.DMG Bonus": "31%" } },
-  "Shadow Chaser Gertie Card [Day]": { equip: "weapon", stats: { "Final P.DMG Bonus": "24%", "Poison Enhance": "30%", "Ghost Enhance": "30%" } },
-  "Genetic Flamel Card [Day]": { equip: "weapon", stats: { "Final P.DMG Bonus": "24%", "Fire Enhance": "30%", "Earth Enhance": "30%" } },
-  "Sorcerer Celia Card [Day]": { equip: "weapon", stats: { "Final M.DMG Bonus": "24%", "Shadow Enhance": "30%", "Holy Enhance": "30%" } },
-  "Ranger Cecil Card [Day]": { equip: "weapon", stats: { "Final P.PEN": "24%", "Neutral Enhance": "30%", "Wind Enhance": "30%" } },
-  "Kitty Duckyo Card [Weapon]": { equip: "weapon", stats: { "Final M.DMG RED": "17.50%", "M.DMG Reflect": "9%" } },
-  "Angel Biko [Day]": { equip: "weapon", stats: { "Final M.DMG Bonus": "24.40%", "Final M.PEN": "24.40%" } },
-  "Demon Duckyo [Day]": { equip: "weapon", stats: { "Final P.DMG Bonus": "24.40%", "Final P.PEN": "24.40%" } },
-  "Angeling Card [Day]": { equip: "clothes", stats: { "Final P.DEF": "15%" } },
-  "Angeling Card [Day] [★]": { equip: "clothes", stats: { "Final P.DEF": "27%" } },
-  "Anolian Card": { equip: "clothes", stats: { "Max HP%": "14%", "Final M.DEF": "7%" } },
-  "Argiope Card": { equip: "clothes", stats: { "Final P.DEF": "6%" } },
-  "Armored Titan Card [Day]": { equip: "clothes", stats: { "PVP Final P.DMG RED": "5.75%", "PVP Final M.DMG RED": "5.75%" } },
-  "Bane Dragon Card [Day]": { equip: "clothes", stats: { "Final P.DMG RED": "14.50%", "Final M.DMG RED": "14.50%" } },
-  "Bathory Card": { equip: "clothes", stats: { "PVP Final M.DMG RED": "3.60%", "PVP Debuff Duration RED": "3.60" } },
-  "Breeze Card": { equip: "clothes", stats: { "Max HP%": "20%", "Holy Attribute RES": "37.50%" } },
-  "Brilight Card": { equip: "clothes", stats: { "PVP Final P.DMG RED": "3.60%", "PVP Debuff RES": "3.60" } },
-  "Colossal Titan Card [Day]": { equip: "clothes", stats: { "Final P.DMG RED": "11.50%", "Final M.DMG RED": "11.50%" } },
-  "Dark Priest Card [Night]": { equip: "clothes", stats: { "PVP M.DMG RED": "270", "PVP P.DMG RED": "270" } },
-  "Dark Priest Card [Night] [★]": { equip: "clothes", stats: { "PVP M.DMG RED": "450", "PVP P.DMG RED": "450" } },
-  "Diablo Card": { equip: "clothes", stats: { "HP Regen per 5s": "2%", "Max HP%": "8%" } },
-  "Dokebi Card": { equip: "clothes", stats: { "Reduce DMG from Water Attribute Monster": "10%", "Reduce DMG from Undead Attribute Monster": "10%", "Reduce DMG from Poison Attribute Monster": "10%" } },
-  "Dragon Fly Card [Day]": { equip: "clothes", stats: { "Reduce DMG from Neutral Attribute Monster": "15%", "Reduce DMG from Shadow Attribute Monster": "15%", "Reduce DMG from Wind Attribute Monster": "15%" } },
-  "Dragon Fly Card [Day] [★]": { equip: "clothes", stats: { "Reduce DMG from Neutral Attribute Monster": "30%", "Reduce DMG from Shadow Attribute Monster": "30%", "Reduce DMG from Wind Attribute Monster": "30%" } },
-  "Garm Card [2023]": { equip: "clothes", stats: { "Water Attribute RES": "46.50%", "VIT": "93" } },
-  "Genos (Soul) Card [Day]": { equip: "clothes", stats: { "PVP Final P.DMG RED": "7.80%", "PVP Final M.DMG RED": "7.80%" } },
-  "Genos Card": { equip: "accessory", stats: { "PVP Final P.DMG Bonus": "10.50%", "PVP Final M.DMG Bonus": "10.50%" } },
-  "Ghostring Card [Day]": { equip: "clothes", stats: { "Reduce DMG from Fire Attribute Monster": "15%", "Reduce DMG from Ghost Attribute Monster": "15%", "Reduce DMG from Earth Attribute Monster": "15%" } },
-  "Ghostring Card [Day] [★]": { equip: "clothes", stats: { "Reduce DMG from Fire Attribute Monster": "30%", "Reduce DMG from Ghost Attribute Monster": "30%", "Reduce DMG from Earth Attribute Monster": "30%" } },
-  "High Orc Card": { equip: "clothes", stats: { "Final M.DEF": "10%" } },
-  "Levi Card": { equip: "clothes", stats: { "PVP Final P.DMG RED": "3.25%", "PVP Final M.DMG RED": "3.25%" } },
-  "Loli Ruri Card": { equip: "clothes", stats: { "HP Regen per 5s": "2.40%", "PVP Final M.DMG RED": "5.60%" } },
-  "Lord of the Dead Card [Void]": { equip: "clothes", stats: { "Bonus DMG to Undead": "17%", "Bonus DMG to Demon": "17%" } },
-  "Marc Card": { equip: "clothes", stats: { "Reduce DMG from Fire Attribute Monster": "10%", "Reduce DMG from Ghost Attribute Monster": "10%", "Reduce DMG from Earth Attribute Monster": "10%" } },
-  "Marin Card": { equip: "clothes", stats: { "Max HP%": "20%", "Neutral Attribute RES": "37.50%" } },
-  "Observation Card [Void]": { equip: "clothes", stats: { "Max HP%": "30%", "Holy Attribute RES": "56.30%" } },
-  "Ogre Tooth Card [Night]": { equip: "clothes", stats: { "PVP Final M.DMG RED": "6%", "PVP Final P.DMG RED": "6%" } },
-  "Orc General Card [Armor]": { equip: "clothes", stats: { "Wind Attribute RES": "33.80%", "Max HP%": "18%" } },
-  "Orc Lord Card [Day]": { equip: "clothes", stats: { "Final M.DEF": "15%" } },
-  "Orc Lord Card [Day] [★]": { equip: "clothes", stats: { "Final M.DEF": "27%" } },
-  "Pasana Card": { equip: "clothes", stats: { "Reduce DMG from Neutral Attribute Monster": "10%", "Reduce DMG from Shadow Attribute Monster": "10%", "Reduce DMG from Wind Attribute Monster": "10%" } },
-  "Pest Card": { equip: "clothes", stats: { "PVP M.DMG RED": "420" } },
-  "Phreeoni Card [Night]": { equip: "clothes", stats: { "Reduce DMG from Water Attribute Monster": "15%", "Reduce DMG from Undead Attribute Monster": "15%", "Reduce DMG from Poison Attribute Monster": "15%" } },
-  "Phreeoni Card [Night] [★]": { equip: "clothes", stats: { "Reduce DMG from Water Attribute Monster": "30%", "Reduce DMG from Undead Attribute Monster": "30%", "Reduce DMG from Poison Attribute Monster": "30%" } },
-  "Picky (Shell) Card": { equip: "clothes", stats: { "P.DEF": "60" } },
-  "Picky Card": { equip: "clothes", stats: { "Max HP": "1,200" } },
-  "Rocker Card": { equip: "clothes", stats: { "Max HP": "4,800" } },
-  "Roda Frog Card": { equip: "clothes", stats: { "P.DEF": "120" } },
-  "Rybio Card": { equip: "clothes", stats: { "Final P.DEF": "10%" } },
-  "Sasquatch Card": { equip: "clothes", stats: { "Max HP%": "12%" } },
-  "Savage Card": { equip: "clothes", stats: { "M.DEF": "120" } },
-  "Sky Petite Card": { equip: "clothes", stats: { "Max HP%": "20%" } },
-  "Slayer of Shadows Card [Armor]": { equip: "clothes", stats: { "Holy Attribute RES": "33.80%", "Max HP%": "18%" } },
-  "Steel Chonchon Card": { equip: "clothes", stats: { "M.DEF": "60" } },
-  "Strouf Card [Day]": { equip: "clothes", stats: { "Max HP%": "30%" } },
-  "Strouf Card [Day] [★]": { equip: "clothes", stats: { "Max HP%": "54%" } },
-  "Swordfish Card": { equip: "clothes", stats: { "Final M.DEF": "6%" } },
-  "Ultraman Card": { equip: "clothes", stats: { "Final P.DMG RED": "25%" } },
-  "Ultraman Zoffy Card": { equip: "clothes", stats: { "Final P.DMG RED": "15%" } },
-  "Wooden Golem Card": { equip: "clothes", stats: { "HP Regen per 5s": "2.40%", "PVP Final P.DMG RED": "5.60%" } },
-  "Year of the Rabbit Nian Card [Night]": { equip: "clothes", stats: { "Bonus DMG to Plant": "30%" } },
-  "Metaling Card": { equip: "clothes", stats: { "Max HP%": "23%", "PVP Final P.DMG RED": "6.90%" } },
-  "Porcellia Card": { equip: "clothes", stats: { "Max HP%": "23%", "PVP M.DMG RED": "6.90%" } },
-  "RSX-0806 Card [Void]": { equip: "clothes", stats: { "Final P.DMG RED": "16.50%", "Final M.DMG RED": "16.50%" } },
-  "Elite Archdam Card [Night]": { equip: "clothes", stats: { "Final P.DMG RED": "11.50%", "VIT": "57.5" } },
-  "Raoh Card [Armor]": { equip: "clothes", stats: { "VIT": "60", "Max HP%": "24%" } },
-  "Undefeatable Ken-Oh Card [Day]": { equip: "clothes", stats: { "Max HP%": "42%", "VIT": "70" } },
-  "Emilia Card [Clothes]": { equip: "clothes", stats: { "HP Regen per 5s": "7.30%", "SP Regen per 5s": "7.30%" } },
-  "Emilia Card [Night]": { equip: "clothes", stats: { "Final M.DEF": "21.50%", "VIT": "108" } },
-  "Anopheles Card": { equip: "clothes", stats: { "HP Regen per 5s": "7%", "PVP Final P.DMG RED": "8.40%" } },
-  "Roween Card": { equip: "clothes", stats: { "Reduce DMG from Demon": "17.50%", "M.DMG RED": "3360" } },
-  "Gloom Under Night Card [Void]": { equip: "clothes", stats: { "Fire Attribute RES": "78.80%", "Max HP%": "42%" } },
-  "Skyward Baoku Lee Card [Day]": { equip: "clothes", stats: { "Max HP%": "38%", "PVP Final P.DMG RED": "16%" } },
-  "Baoku Lee Card [Armor]": { equip: "clothes", stats: { "Max HP%": "28%", "Final M.DEF": "15%" } },
-  "Meat Capoo Card": { equip: "clothes", stats: { "PVP Final P.DMG RED": "11.60%", "Final P.DEF": "11.60%" } },
-  "Taichi Kamiya Card [Armor]": { equip: "clothes", stats: { "VIT": "70", "Final P.DMG RED": "15%" } },
-  "Himika Shinobibe Card [Armor]": { equip: "clothes", stats: { "PVP Final P.DMG RED": "10%", "PVP Final M.DMG RED": "10%" } },
-  "Howard Alt-Eisen Card": { equip: "clothes", stats: { "Max HP%": "31%", "Crit DMG RED": "31%" } },
-  "Shadow Chaser Gertie Card [Void]": { equip: "clothes", stats: { "Max HP%": "48%", "Holy Attribute RES": "90%" } },
-  "Genetic Flamel Card [Void]": { equip: "clothes", stats: { "Max HP%": "48%", "Crit DMG RED": "48%" } },
-  "Sorcerer Celia Card [Void]": { equip: "clothes", stats: { "Max HP%": "48%", "Ghost Attribute RES": "90%" } },
-  "Ranger Cecil Card [Void]": { equip: "clothes", stats: { "Max HP%": "48%", "Neutral Attribute RES": "90%" } },
-  "Garm Card [Night] (2025)": { equip: "clothes", stats: { "VIT": "90", "PVP Final M.DMG RED": "20%" } },
-  "Garm Baby Card [Night] (2025)": { equip: "clothes", stats: { "VIT": "90", "PVP Final P.DMG RED": "20%" } },
-  "Armored Titan Card [Night]": { equip: "cloak", stats: { "P.DMG Reflect": "11.50%", "M.DMG Reflect": "11.50%" } },
-  "Bane Dragon Card [Night]": { equip: "cloak", stats: { "Max HP%": "29%", "VIT": "72.50" } },
-  "Bapho Jr. Card": { equip: "cloak", stats: { "Final M.DMG RED": "10%" } },
-  "Choco Card": { equip: "cloak", stats: { "Bonus DMG to Brute": "12%", "P.DMG RED": "1,536" } },
-  "Colossal Titan Card [Night]": { equip: "cloak", stats: { "VIT": "57", "HP Regen per 5s": "5.75%" } },
-  "Condor Card": { equip: "cloak", stats: { "P.DMG RED": "60" } },
-  "Dark Lord Card [Void]": { equip: "cloak", stats: { "PVP Final M.DMG  RED": "9%" } },
-  "Dark Lord Card [Void] [★]": { equip: "cloak", stats: { "PVP Final M.DMG  RED": "15%" } },
-  "Demon Pungus Card": { equip: "cloak", stats: { "Max HP%": "20%", "Fire Attribute RES": "37.50%" } },
-  "Deviling Card [Day]": { equip: "cloak", stats: { "Final M.DMG RED": "15%" } },
-  "Deviling Card [Day] [★]": { equip: "cloak", stats: { "Final M.DMG RED": "27%" } },
-  "Dracula Card [Day]": { equip: "cloak", stats: { "Max HP%": "30%" } },
-  "Dracula Card [Day] [★]": { equip: "cloak", stats: { "Max HP%": "54%" } },
-  "Dragon Tail Card": { equip: "cloak", stats: { "Bonus DMG to Insect": "12%", "M.DMG RED": "1,536" } },
-  "Dragonewt Prince Card [Muffler]": { equip: "cloak", stats: { "Poison Attribute RES": "33.80%", "Max HP%": "18%" } },
-  "Dustiness Card": { equip: "cloak", stats: { "Max HP": "4,800" } },
-  "Eclipse Card [Day]": { equip: "cloak", stats: { "Reduce DMG from Demon": "15%", "Reduce DMG from Fish": "15%", "Reduce DMG from Dragon": "15%" } },
-  "Eclipse Card [Day] [★]": { equip: "cloak", stats: { "Reduce DMG from Demon": "30%", "Reduce DMG from Fish": "30%", "Reduce DMG from Dragon": "30%" } },
-  "Frildora Card": { equip: "cloak", stats: { "Final P.DMG RED": "6%" } },
-  "Giant Whisper Card": { equip: "cloak", stats: { "Final P.DMG RED": "10%" } },
-  "Hode Card": { equip: "cloak", stats: { "Max HP%": "12%" } },
-  "Jakk Card": { equip: "cloak", stats: { "Reduce DMG from Insect": "10%", "Reduce DMG from Undead": "10%", "Reduce DMG from Brute": "10%" } },
-  "Kraken Card [Day]": { equip: "cloak", stats: { "Reduce DMG from Insect": "15%", "Reduce DMG from Undead": "15%", "Reduce DMG from Brute": "15%" } },
-  "Kraken Card [Day] [★]": { equip: "cloak", stats: { "Reduce DMG from Insect": "30%", "Reduce DMG from Undead": "30%", "Reduce DMG from Brute": "30%" } },
-  "Lord of the Dead Card [Day]": { equip: "cloak", stats: { "Bonus DMG to Wind Attribute Monster": "17%", "Bonus DMG to Water Attribute Monster": "17%" } },
-  "Marionette Card": { equip: "cloak", stats: { "Max HP%": "20%" } },
-  "Marse Card": { equip: "cloak", stats: { "Final M.DMG RED": "6%" } },
-  "Mastering Card [Day]": { equip: "cloak", stats: { "Reduce DMG from Formless": "15%", "Reduce DMG from Demi-Human": "15%", "Reduce DMG from Plant": "15%" } },
-  "Mastering Card [Day] [★]": { equip: "cloak", stats: { "Reduce DMG from Formless": "30%", "Reduce DMG from Demi-Human": "30%", "Reduce DMG from Plant": "30%" } },
-  "Megalith Card": { equip: "cloak", stats: { "PVP P.DMG RED": "420" } },
-  "Mikasa Card": { equip: "cloak", stats: { "Final P.DEF": "6.50%", "Final M.DEF": "6.50%" } },
-  "Myst Card": { equip: "cloak", stats: { "P.DMG RED": "240" } },
-  "Nine Tail Card": { equip: "cloak", stats: { "Reduce DMG from Demon": "10%", "Reduce DMG from Fish": "10%", "Reduce DMG from Dragon": "10%" } },
-  "Observation Card [Day]": { equip: "cloak", stats: { "Max HP%": "30%", "Neutral Attribute RES": "56.30%" } },
-  "Odium of Thanatos": { equip: "cloak", stats: { "Holy Attribute RES": "37.50%", "Neutral Attribute RES": "37.50%" } },
-  "Ogre Tooth Card [Void]": { equip: "cloak", stats: { "Final M.DMG RED": "12%", "Final P.DMG RED": "12%" } },
-  "Orc Zombie Card": { equip: "cloak", stats: { "Reduce DMG from Formless": "10%", "Reduce DMG from Demi-Human": "10%", "Reduce DMG from Plant": "10%" } },
-  "Punk Card": { equip: "cloak", stats: { "PVP Final P.DMG RED": "3.60%", "PVP Debuff RES": "3.60" } },
-  "Pupa Card": { equip: "cloak", stats: { "Max HP": "1,200" } },
-  "Rafflesia Card": { equip: "cloak", stats: { "Max HP%": "20%", "Poison Attribute RES": "37.50%" } },
-  "Shion Card": { equip: "cloak", stats: { "Final P.DEF": "4%", "Final M.DEF": "4%" } },
-  "Slayer of Shadows Card [Muffler]": { equip: "cloak", stats: { "Fire Attribute RES": "33.80%", "Max HP%": "18%" } },
-  "Terrible Tornado (Soul) Card [Day]": { equip: "cloak", stats: { "PVP Final P.DMG RED": "7.80%", "Max HP%": "31%" } },
-  "Terrible Tornado Card": { equip: "headgear", stats: { "Physical Lifesteal": "21%", "Magic Lifesteal": "21%" } },
-  "Thara Frog": { equip: "cloak", stats: { "Max HP%": "14%", "Final P.DEF": "7%" } },
-  "Thief Bug Card": { equip: "cloak", stats: { "M.DMG RED": "60" } },
-  "Toad Card [Day]": { equip: "cloak", stats: { "Final P.DMG RED": "15%" } },
-  "Toad Card [Day] [★]": { equip: "cloak", stats: { "Final P.DMG RED": "27%" } },
-  "Ultraman Seven Card": { equip: "cloak", stats: { "Final M.DMG RED": "15%" } },
-  "Ultraman Taro Card": { equip: "cloak", stats: { "Final M.DMG RED": "25%" } },
-  "Wanderer Card": { equip: "cloak", stats: { "PVP Final M.DMG RED": "3.60%", "PVP Debuff Duration RED": "3.60" } },
-  "Whisper Card": { equip: "cloak", stats: { "M.DMG RED": "240" } },
-  "Mole Card": { equip: "cloak", stats: { "Max HP%": "23%", "Shadow Attribute RES": "43.10%" } },
-  "Ungoliant Card": { equip: "cloak", stats: { "HP Regen per 5s": "5.80%", "Final P.DEF": "11.50%" } },
-  "Queen Scaraba Card [Void]": { equip: "cloak", stats: { "Bonus DMG to Insect": "16.50%", "Final P.DEF": "19.80%" } },
-  "Vesper Card [Night]": { equip: "cloak", stats: { "HP Regen per 5s": "8.25%", "Max HP%": "33%" } },
-  "Toki Card [Cloak]": { equip: "cloak", stats: { "Wind Attribute RES": "45%", "VIT": "60" } },
-  "Shinken Successor Card [Day]": { equip: "cloak", stats: { "Fire Attribute RES": "52.50%", "Max HP%": "42%" } },
-  "Emilia Card [Cloak]": { equip: "cloak", stats: { "Earth Attribute RES": "54.40%", "Wind Attribute RES": "54.40%" } },
-  "Emilia Card [Day]": { equip: "cloak", stats: { "Final P.DEF": "21.50%", "Max HP%": "43%" } },
-  "Drosera Card": { equip: "cloak", stats: { "HP Regen per 5s": "7%", "PVP Final M.DMG RED": "8.40%" } },
-  "Hill Wind Card": { equip: "cloak", stats: { "Reduce DMG from Angel": "17.50%", "P.DMG RED": "3360" } },
-  "Ktullanux Card [Day]": { equip: "cloak", stats: { "Wind Attribute RES": "78.80%", "Max HP%": "42%" } },
-  "Skyward Baoku Lee Card [Night]": { equip: "cloak", stats: { "Max HP%": "0.38", "PVP Final M.DMG RED": "0.16" } },
-  "Alexander Card [Cloak]": { equip: "cloak", stats: { "HP Regen per 5s": "7.50%", "Reduce DMG from Brute": "17.50%" } },
-  "Toast Capoo Card": { equip: "cloak", stats: { "PVP Final M.DMG RED": "11.60%", "Final M.DEF": "11.60%" } },
-  "Hikari Yagami Card [Cloak]": { equip: "cloak", stats: { "VIT": "70", "Final M.DMG RED": "15%" } },
-  "Himika Shinobibe Card [Cloak]": { equip: "cloak", stats: { "Max HP%": "24%", "PVP Final M.DMG RED": "12%" } },
-  "Randel Card": { equip: "cloak", stats: { "Max HP%": "31%", "Crit DMG RED": "31%" } },
-  "Armored Titan Card [Void]": { equip: "shoes", stats: { "LUK": "57" } },
-  "Axe-wielding Kobold Card": { equip: "shoes", stats: { "Final M.DEF": "5%", "Final M.DMG RED": "5%" } },
-  "Axe-wielding Skel Pirate Card": { equip: "shoes", stats: { "P.DEF": "60", "P.DMG RED": "120" } },
-  "Baby Desert Wolf Card": { equip: "shoes", stats: { "M.DEF": "30", "M.DMG RED": "30" } },
-  "Bane Dragon Card [Void]": { equip: "shoes", stats: { "PVP Debuff RES": "7.30", "Max HP%": "29%" } },
-  "Chonchon Card": { equip: "shoes", stats: { "Max HP": "1,200" } },
-  "Colossal Titan Card [Void]": { equip: "shoes", stats: { "AGI": "57" } },
-  "Cornutus Card": { equip: "shoes", stats: { "Final P.DEF": "3%", "Final P.DMG RED": "3%" } },
-  "Dagger-wielding Goblin Card": { equip: "shoes", stats: { "Max HP%": "20%" } },
-  "Dark Lord Card [Day]": { equip: "shoes", stats: { "PVP Final P.DMG RED": "9%" } },
-  "Dark Lord Card [Day] [★]": { equip: "shoes", stats: { "PVP Final P.DMG RED": "15%" } },
-  "Dragonewt Prince Card [Boots]": { equip: "shoes", stats: { "Water Attribute RES": "33.80%", "Max HP%": "18%" } },
-  "Eddga Card [Day]": { equip: "shoes", stats: { "Reduce DMG from Small": "15%", "Max HP%": "-25%" } },
-  "Eddga Card [Day] [★]": { equip: "shoes", stats: { "Reduce DMG from Small": "30%", "Max HP%": "-25%" } },
-  "Eggyra Card": { equip: "shoes", stats: { "Reduce DMG from Medium": "10%" } },
-  "Eren Card": { equip: "shoes", stats: { "VIT": "32", "Movement Speed%": "15%" } },
-  "Fallen Bishop Card [Night]": { equip: "shoes", stats: { "Bonus DMG to Demi-Human": "17%", "Bonus DMG to Brute": "17%" } },
-  "Geographer Card": { equip: "shoes", stats: { "Max HP%": "20%", "Wind Attribute RES": "37.50%" } },
-  "Ghostring Card [Void]": { equip: "shoes", stats: { "Reduce DMG from Large": "15%" } },
-  "Ghostring Card [Void] [★]": { equip: "shoes", stats: { "Reduce DMG from Large": "30%" } },
-  "Grand Peco Card": { equip: "shoes", stats: { "Max HP%": "20%", "Ghost Attribute RES": "37.50%" } },
-  "Injustice Card": { equip: "shoes", stats: { "PVP M.DMG RED": "360" } },
-  "Isis Card": { equip: "shoes", stats: { "Final M.DEF": "3%", "Final M.DMG RED": "3%" } },
-  "King Dramoh Card [Night]": { equip: "shoes", stats: { "Final P.DEF": "7.50%", "Final P.DMG RED": "7.50%" } },
-  "King Dramoh Card [Night] [★]": { equip: "shoes", stats: { "Final P.DEF": "13.50%", "Final P.DMG RED": "13.50%" } },
-  "Light of Goblin Card [Shoes]": { equip: "shoes", stats: { "Neutral Attribute RES": "33.80%", "Max HP%": "18%" } },
-  "Lost Dragon Card [Day]": { equip: "shoes", stats: { "Max HP%": "48%" } },
-  "Male Thief Bug Card": { equip: "shoes", stats: { "P.DEF": "30", "P.DMG RED": "30" } },
-  "Matyr Card": { equip: "shoes", stats: { "Max HP%": "12%" } },
-  "Medusa Card": { equip: "shoes", stats: { "PETRIFY RES": "36%", "Max HP%": "12.80%" } },
-  "Merman Card": { equip: "shoes", stats: { "PVP Final P.DMG RED": "3.50%", "Max HP%": "14%" } },
-  "Mistress Card [Void]": { equip: "shoes", stats: { "Reduce DMG from Medium": "15%" } },
-  "Mistress Card [Void] [★]": { equip: "shoes", stats: { "Reduce DMG from Medium": "30%" } },
-  "Moonlight Flower Card [Day]": { equip: "shoes", stats: { "Max HP%": "30%", "Movement Speed%": "25%" } },
-  "Moonlight Flower Card [Day] [★]": { equip: "shoes", stats: { "Max HP%": "54%", "Movement Speed%": "25%" } },
-  "Orc Hero Card [Night]": { equip: "shoes", stats: { "Final M.DEF": "7.50%", "Final M.DMG RED": "7.50%" } },
-  "Orc Hero Card [Night] [★]": { equip: "shoes", stats: { "Final M.DEF": "13.50%", "Final M.DMG RED": "13.50%" } },
-  "Pecopeco Card": { equip: "shoes", stats: { "M.DEF": "60", "M.DMG RED": "120" } },
-  "Raggler Card": { equip: "shoes", stats: { "PVP Final M.DMG RED": "3.50%", "Max HP%": "14%" } },
-  "Ranga Card": { equip: "shoes", stats: { "Final P.DMG RED": "4%", "Final M.DMG RED": "4%" } },
-  "Raydric Card": { equip: "shoes", stats: { "Final P.DEF": "5%", "Final P.DMG RED": "5%" } },
-  "Skeggiold Card [Night]": { equip: "shoes", stats: { "Max HP%": "30%", "Wind Attribute RES": "56.30%" } },
-  "Skeleton General Card": { equip: "shoes", stats: { "Reduce DMG from Small": "10%" } },
-  "Skeleton Prisoner Card": { equip: "shoes", stats: { "PVP P.DMG RED": "360" } },
-  "Sohee Card": { equip: "shoes", stats: { "Reduce DMG from Large": "10%" } },
-  "Speed-o-Sonic (Soul) Card [Day]": { equip: "shoes", stats: { "PVP Final P.DMG RED": "7.80%", "Max HP%": "31%" } },
-  "Ultraman Jack Card": { equip: "shoes", stats: { "Final P.DMG RED": "7.50%", "Final M.DMG RED": "7.50%" } },
-  "Zombie Card": { equip: "shoes", stats: { "Max HP": "4,800" } },
-  "Zombie Slaughter": { equip: "shoes", stats: { "Bonus DMG to Undead": "12%", "P.DMG RED": "1,536" } },
-  "Earth Deleter Card": { equip: "shoes", stats: { "HP Regen per 5s": "5.80%", "Reduce DMG from Insect": "14.40%" } },
-  "Sky Deleter Card": { equip: "shoes", stats: { "HP Regen per 5s": "5.80%", "Reduce DMG from Demon": "14.40%" } },
-  "Faceworm Queen Card [Night]": { equip: "shoes", stats: { "Max HP%": "23.10%", "VIT": "82.5" } },
-  "Elite Apocalypse Card [Day]": { equip: "shoes", stats: { "Final M.DMG RED": "11.50%", "VIT": "57.5" } },
-  "Rei Card [Boots]": { equip: "shoes", stats: { "Fire Attribute RES": "45%", "VIT": "60" } },
-  "Conqueror Card [Day]": { equip: "shoes", stats: { "Neutral Attribute RES": "52.50%", "VIT": "105" } },
-  "Natsuki Subaru Card [Shoes]": { equip: "shoes", stats: { "VIT": "73", "Reduce DMG from Demi-Human": "18.10%" } },
-  "Natsuki Subaru Card [Day]": { equip: "shoes", stats: { "Max HP%": "38%", "Reduce DMG from Dragon": "30%" } },
-  "Water Spirit Card": { equip: "shoes", stats: { "Max HP%": "28%", "Bleed RES": "52.50%" } },
-  "Phylla Card": { equip: "shoes", stats: { "Reduce DMG from Fish": "17.50%", "P.DMG RED": "3360" } },
-  "Shelter Card [Night]": { equip: "shoes", stats: { "Neutral Attribute RES": "78.80%", "Max HP%": "42%" } },
-  "Alexander Card [Shoes]": { equip: "shoes", stats: { "Max HP%": "28%", "Final P.DEF": "15%" } },
-  "Wealthy Capoo Card [Day]": { equip: "shoes", stats: { "PVP Final P.DMG RED": "14.30%", "PVP Final M.DMG RED": "14.30%" } },
-  "Shibaraku Tsurugibe Card [Shoes]": { equip: "shoes", stats: { "Max HP%": "24%", "PVP Final P.DMG RED": "12%" } },
-  "Trentini Card": { equip: "shoes", stats: { "Max HP%": "31%", "Crit DMG RED": "31%" } },
-  "Angeling Card [Void]": { equip: "accessory", stats: { "Magic Lifesteal": "15%" } },
-  "Angeling Card [Void] [★]": { equip: "accessory", stats: { "Magic Lifesteal": "27%" } },
-  "Arc Angeling Card [Day]": { equip: "accessory", stats: { "PVP Debuff RES": "7.50", "PVP Debuff Duration RED": "7.50" } },
-  "Archdam Card": { equip: "accessory", stats: { "Debuff Duration RED": "12.50", "Final P.DMG RED": "10%" } },
-  "Armin Card": { equip: "accessory", stats: { "SLOW RES": "25%", "PETRIFY RES": "25%" } },
-  "Banshee Card": { equip: "accessory", stats: { "Bonus DMG to Wind Attribute Monster": "12%", "Bonus DMG to Shadow Attribute Monster": "12%" } },
-  "Beast Titan Card [Night]": { equip: "accessory", stats: { "SLOW RES": "35%", "VIT": "69" } },
-  "Beelzebub Card [Void]": { equip: "accessory", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "P.ATK%": "18.60%", "Final P.DMG Bonus": "18.60%" } },
-  "Bloody Knight Card": { equip: "accessory", stats: { "Crit DMG Bonus": "20%" } },
-  "Bongun Card": { equip: "accessory", stats: { "IMMOBILIZE RES": "30%" } },
-  "Coelacanth Card [Void]": { equip: "accessory", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "M.ATK%": "18.60%", "Final M.DMG Bonus": "18.60%" } },
-  "Cramp Card": { equip: "accessory", stats: { "Earth Enhance": "15%" } },
-  "Creamy Card": { equip: "accessory", stats: { "P.DMG Bonus": "60" } },
-  "Dark Frame Card": { equip: "accessory", stats: { "Water Enhance": "15%" } },
-  "Doppelganger Card [Day]": { equip: "accessory", stats: { "PVP M.DMG Bonus": "540" } },
-  "Doppelganger Card [Day] [★]": { equip: "accessory", stats: { "PVP M.DMG Bonus": "900" } },
-  "Drake Card [Void]": { equip: "accessory", stats: { "Final Haste": "6%" } },
-  "Drake Card [Void] [★]": { equip: "accessory", stats: { "Final Haste": "12%" } },
-  "Eclipse Card [Void]": { equip: "accessory", stats: { "Final M.PEN": "12%" } },
-  "Eclipse Card [Void] [★]": { equip: "accessory", stats: { "Final M.PEN": "24%" } },
-  "Galapago Card": { equip: "accessory", stats: { "Final Crit": "14%" } },
-  "Gargoyle Card": { equip: "accessory", stats: { "P.DMG Reflect": "14%" } },
-  "Genos (Soul) Card [Night]": { equip: "accessory", stats: { "PVP Final P.DMG Bonus": "15.50%", "PVP Final M.DMG Bonus": "15.50%" } },
-  "Gibbet Card": { equip: "accessory", stats: { "Bonus DMG to Water Attribute Monster": "12%", "Bonus DMG to Holy Attribute Monster": "12%" } },
-  "Gioia Card [Void]": { equip: "accessory", stats: { "Final M.DMG Bonus": "15%", "M.ATK%": "15%" } },
-  "Golden Thief Bug Card [Void]": { equip: "accessory", stats: { "Final ASPD": "60%" } },
-  "Golden Thief Bug Card [Void] [★]": { equip: "accessory", stats: { "Final ASPD": "120%" } },
-  "Golem Card": { equip: "accessory", stats: { "Final ASPD": "30%" } },
-  "Greatest General Card": { equip: "accessory", stats: { "PETRIFY RES": "30%" } },
-  "Green Venatu Card": { equip: "accessory", stats: { "Debuff PEN": "12.50", "Final M.DMG Bonus": "10%" } },
-  "Hammer-wielding Kobold Card": { equip: "accessory", stats: { "Physical Lifesteal": "10%" } },
-  "Horong Card": { equip: "accessory", stats: { "SLEEP RES": "30%" } },
-  "Inosuke Hashibira Card (Blue)": { equip: "accessory", stats: { "Final M.PEN": "15%" } },
-  "Inosuke Hashibira Card (Gold)": { equip: "accessory", stats: { "M.PEN%": "21%", "M.ATK%": "10.50%" } },
-  "King Dramoh Card [Void]": { equip: "accessory", stats: { "Physical Lifesteal": "15%" } },
-  "King Dramoh Card [Void] [★]": { equip: "accessory", stats: { "Physical Lifesteal": "27%" } },
-  "Kraken Card [Void]": { equip: "accessory", stats: { "Final M.DMG Bonus": "12%" } },
-  "Kraken Card [Void] [★]": { equip: "accessory", stats: { "Final M.DMG Bonus": "24%" } },
-  "Kukre Card": { equip: "accessory", stats: { "Haste": "120" } },
-  "Light of Goblin Card [Accessory]": { equip: "accessory", stats: { "M.ATK%": "9%", "Wind Enhance": "11.30%" } },
-  "Lost Dragon Card [Void]": { equip: "accessory", stats: { "P.ATK%": "24%", "M.ATK%": "24%" } },
-  "Mantis Card": { equip: "accessory", stats: { "M.DMG Bonus": "240" } },
-  "Marine Sphere Card": { equip: "accessory", stats: { "Final P.DMG Bonus": "6%" } },
-  "Mastering Card [Void]": { equip: "accessory", stats: { "Final P.DMG Bonus": "12%" } },
-  "Mastering Card [Void] [★]": { equip: "accessory", stats: { "Final P.DMG Bonus": "24%" } },
-  "Maya Card [Night]": { equip: "accessory", stats: { "M.DMG Reflect": "15%" } },
-  "Maya Card [Night] [★]": { equip: "accessory", stats: { "M.DMG Reflect": "27%" } },
-  "Muka Card": { equip: "accessory", stats: { "P.DMG Bonus": "240" } },
-  "Mutant Dragonoid Card [Day]": { equip: "accessory", stats: { "Final M.PEN": "24%" } },
-  "Naght Sieger Card [Day]": { equip: "accessory", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "Final P.DMG Bonus": "18.60%", "Final Crit": "18.60%" } },
-  "Necromancer Card [Night]": { equip: "accessory", stats: { "Ghost Enhance": "30%", "Poison Enhance": "30%" } },
-  "Nezuko Kamado Card (Blue)": { equip: "accessory", stats: { "Final P.PEN": "15%" } },
-  "Obeaune Card": { equip: "accessory", stats: { "STUN RES": "30%" } },
-  "Orange Venatu Card": { equip: "accessory", stats: { "Debuff PEN": "12.50", "Final P.DMG Bonus": "10%" } },
-  "Orc Archer Card": { equip: "accessory", stats: { "Magic Lifesteal": "10%" } },
-  "Orc Baby Card": { equip: "accessory", stats: { "SILENCE RES": "30%" } },
-  "Orc Disaster Card [Night]": { equip: "accessory", stats: { "Final P.DEF": "7%", "Final M.DEF": "7%" } },
-  "Orc Disaster Card II [Night]": { equip: "accessory", stats: { "Final P.DMG Bonus": "29%", "Final M.DMG Bonus": "29%" } },
-  "Orc Hero Card [Void]": { equip: "accessory", stats: { "Crit DMG Bonus": "30%" } },
-  "Orc Hero Card [Void] [★]": { equip: "accessory", stats: { "Crit DMG Bonus": "54%" } },
-  "Osiris Card [Day]": { equip: "accessory", stats: { "Final P.PEN": "12%" } },
-  "Osiris Card [Day] [★]": { equip: "accessory", stats: { "Final P.PEN": "24%" } },
-  "Parasite Card": { equip: "accessory", stats: { "Bonus DMG to Earth Attribute Monster": "12%", "Bonus DMG to Ghost Attribute Monster": "12%" } },
-  "Penomena Card": { equip: "accessory", stats: { "Fire Enhance": "15%" } },
-  "Pharaoh Card [Void]": { equip: "accessory", stats: { "Crit DMG RED": "30%" } },
-  "Pharaoh Card [Void] [★]": { equip: "accessory", stats: { "Crit DMG RED": "54%" } },
-  "Phen Card": { equip: "accessory", stats: { "Final M.PEN": "6%" } },
-  "Pirate Skeleton Card": { equip: "accessory", stats: { "M.PEN": "120" } },
-  "Poison Spore Card": { equip: "accessory", stats: { "M.DMG Bonus": "60" } },
-  "Poporing Card": { equip: "accessory", stats: { "M.PEN": "60" } },
-  "Sageworm Card": { equip: "accessory", stats: { "P.DMG Reflect": "10%" } },
-  "Saitama (Soul) Card [Night]": { equip: "accessory", stats: { "Final P.PEN": "31%", "Final M.PEN": "31%" } },
-  "Sea Otter Card": { equip: "accessory", stats: { "STUN RES": "33.60%", "CURSE RES": "33.60%" } },
-  "Shuna Card": { equip: "accessory", stats: { "P.ATK%": "8%", "M.ATK%": "8%" } },
-  "Slayer of Shadows Card [Accessory]": { equip: "accessory", stats: { "P.ATK%": "9%", "Fire Enhance": "11.30%" } },
-  "Smokie Card": { equip: "accessory", stats: { "ASPD": "120" } },
-  "Soldier Skeleton Card": { equip: "accessory", stats: { "Final Haste": "3%" } },
-  "Spore Card": { equip: "accessory", stats: { "P.PEN": "60" } },
-  "Stem Worm Card": { equip: "accessory", stats: { "FREEZE RES": "33.60%", "BLIND RES": "33.60%" } },
-  "Storm Dragon Card [Night]": { equip: "accessory", stats: { "Final ASPD": "70%", "Final Haste": "7%" } },
-  "Tanjiro Kamado Card": { equip: "accessory", stats: { "Final M.DMG Bonus": "10.50%", "M.ATK%": "10.50%" } },
-  "Tarou Card": { equip: "accessory", stats: { "Haste": "60" } },
-  "Tempest Dimik Card": { equip: "accessory", stats: { "Debuff Duration RED": "12.50", "Final M.DMG RED": "10%" } },
-  "Thief Bug Egg Card": { equip: "accessory", stats: { "ASPD": "60" } },
-  "Toad Card [Void]": { equip: "accessory", stats: { "P.DMG Reflect": "15%" } },
-  "Toad Card [Void] [★]": { equip: "accessory", stats: { "P.DMG Reflect": "27%" } },
-  "Ultraman Ace Card": { equip: "accessory", stats: { "P.ATK%": "15%", "M.ATK%": "15%" } },
-  "Vagabond Wolf Card [Day]": { equip: "accessory", stats: { "PVP P.DMG Bonus": "540" } },
-  "Vagabond Wolf Card [Day] [★]": { equip: "accessory", stats: { "PVP P.DMG Bonus": "900" } },
-  "Vagabond Wolf Card [Void]": { equip: "accessory", stats: { "PVP Debuff RES": "9" } },
-  "Vagabond Wolf Card [Void] [★]": { equip: "accessory", stats: { "PVP Debuff RES": "15" } },
-  "Vitata Card": { equip: "accessory", stats: { "Final P.PEN": "6%" } },
-  "Wind Ghost Card": { equip: "accessory", stats: { "M.DMG Reflect": "10%" } },
-  "Wootan Fighter Card": { equip: "accessory", stats: { "Bonus DMG to Fire Attribute Monster": "12%", "Bonus DMG to Poison Attribute Monster": "12%" } },
-  "Wormtail Card": { equip: "accessory", stats: { "FREEZE RES": "30%" } },
-  "Wraith Card": { equip: "accessory", stats: { "Crit DMG RED": "20%" } },
-  "Yoyo Card": { equip: "accessory", stats: { "P.PEN": "120" } },
-  "Zerom Card": { equip: "accessory", stats: { "Final M.DMG Bonus": "6%" } },
-  "Zherlthsh Card": { equip: "accessory", stats: { "Wind Enhance": "15%" } },
-  "Blazzer Card": { equip: "accessory", stats: { "IMMOBILIZE RES": "34.50%", "PVP Debuff RES": "6.9" } },
-  "Explosion Card": { equip: "accessory", stats: { "STUN RES": "34.50%", "PVP Debuff RES": "6.9" } },
-  "Gig Card": { equip: "accessory", stats: { "SLOW RES": "34.50%", "PVP Debuff RES": "6.9" } },
-  "Teddy Bear Card": { equip: "accessory", stats: { "BLEED RES": "34.50%", "PVP Debuff RES": "6.9" } },
-  "RSX-0806 Card [Day]": { equip: "accessory", stats: { "Physical Lifesteal": "16.50%", "Magic Lifesteal": "16.50%" } },
-  "Nidhoggr's Shadow Card [Day]": { equip: "accessory", stats: { "Max SP%": "66%" } },
-  "Faceworm Queen Card [Day]": { equip: "accessory", stats: { "P.ATK%": "16.50%", "Physical Lifesteal": "16.50%" } },
-  "Vesper Card [Day]": { equip: "accessory", stats: { "Neutral Enhance": "41.25%", "Holy Enhance": "41.25%" } },
-  "Kenshiro Card [Accessory]": { equip: "accessory", stats: { "Earth Enhance": "30%", "Water Enhance": "30%" } },
-  "Raoh Card [Accessory]": { equip: "accessory", stats: { "Fire Enhance": "30%", "Wind Enhance": "30%" } },
-  "Legendary Savior Card [Night]": { equip: "accessory", stats: { "Final P.DMG Bonus": "35%" } },
-  "Undefeatable Ken-Oh Card [Night]": { equip: "accessory", stats: { "Crit DMG Bonus": "35%", "Final Crit": "17.50%" } },
-  "Natsuki Subaru Card [Accessory]": { equip: "accessory", stats: { "Bonus DMG to Dragon": "36.30%" } },
-  "Rem Card [Accessory]": { equip: "accessory", stats: { "Water Enhance": "36.30%", "Neutral Enhance": "36.30%" } },
-  "Ram Card [Night]": { equip: "accessory", stats: { "SP Regen per 5s": "-10%", "M.ATK%": "31.50%", "Final M.PEN": "31.50%" } },
-  "Rem Card [Night]": { equip: "accessory", stats: { "SP Regen per 5s": "-10%", "P.ATK%": "31.50%", "Final P.DMG Bonus": "31.50%" } },
-  "Beholder Card": { equip: "accessory", stats: { "Neutral Attribute RES": "52.50%", "P.DMG Reflect": "14%" } },
-  "Gremlin Card": { equip: "accessory", stats: { "Bonus DMG to Small": "35%" } },
-  "Hodremlin Card": { equip: "accessory", stats: { "M.ATK%": "28%" } },
-  "Vanberk Card": { equip: "accessory", stats: { "Bonus DMG to Large": "35%" } },
-  "Gloom Under Night Card [Day]": { equip: "accessory", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "Final P.PEN": "29.40%", "Final P.DMG Bonus": "29.40%" } },
-  "Retribution Card [Night]": { equip: "accessory", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "M.ATK%": "29.40%", "Final M.DMG Bonus": "29.40%" } },
-  "Shelter Card [Day]": { equip: "accessory", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "Final P.DMG Bonus": "29.40%", "Final P.PEN": "29.40%" } },
-  "Downhill Fat Tiger Card [Night]": { equip: "accessory", stats: { "Final ASPD": "-100%", "Final Haste": "-10%", "Neutral Enhance": "50%", "Ghost Enhance": "50%" } },
-  "Wealthy Capoo Card [Night]": { equip: "accessory", stats: { "PVP Final P.DMG Bonus": "28.60%", "PVP Final M.DMG Bonus": "28.60%" } },
-  "Mind-Controlled Ktullanux Card": { equip: "accessory", stats: { "Physical Lifesteal": "25%", "Magic Lifesteal": "25%" } },
-  "Mind-Controlled Retribution Card": { equip: "accessory", stats: { "Shadow Enhance": "36.30%", "Poison Enhance": "36.30%" } },
-  "MetalGarurumon Card [Night]": { equip: "accessory", stats: { "Bonus DMG to Medium": "35%", "Final P.DMG Bonus": "21%", "Final M.DMG Bonus": "21%" } },
-  "Takeru Takaishi Card [Accessory]": { equip: "accessory", stats: { "Debuff Enhancement": "15", "Final P.DMG Bonus": "17%" } },
-  "Yamato Ishida Card [Accessory]": { equip: "accessory", stats: { "Debuff Enhancement": "15", "Final M.DMG Bonus": "17%" } },
-  "Thanatos' Expedition Card [Day]": { equip: "accessory", stats: { "PVP Final P.DMG Bonus": "22.50%", "P.DMG Bonus": "4600" } },
-  "Morroc's Creation Card [Day]": { equip: "accessory", stats: { "PVP Final M.DMG Bonus": "22.50%", "M.DMG Bonus": "4600" } },
-  "Ryujinmaru Card [Night]": { equip: "accessory", stats: { "Bonus DMG to Large": "35%", "Final P.DMG Bonus": "23%", "Final M.DMG Bonus": "23%" } },
-  "Wataru Ikusabe Card [Accessory]": { equip: "accessory", stats: { "PVP Final P.DMG Bonus": "12%", "P.ATK%": "12%" } },
-  "Toraoh Card [Accessory]": { equip: "accessory", stats: { "PVP Final M.DMG Bonus": "12%", "M.ATK%": "12%" } },
-  "Margaretha Sorin Card": { equip: "accessory", stats: { "Holy Attribute RES": "53.80%", "PVP Debuff RES": "10" } },
-  "Chen Card": { equip: "accessory", stats: { "Bonus DMG to Medium": "30%", "Debuff Enhancement": "8.8" } },
-  "Gertie Card": { equip: "accessory", stats: { "Ghost Attribute RES": "53.80%", "PVP Debuff RES": "10" } },
-  "Garm Card [Day] (2025)": { equip: "accessory", stats: { "PVP Final P.DMG Bonus": "22.50%", "Final P.DMG Bonus": "15%" } },
-  "Garm Baby Card [Day] (2025)": { equip: "accessory", stats: { "PVP Final M.DMG Bonus": "22.50%", "Final M.DMG Bonus": "15%" } },
-  "Garm's Despair Card": { equip: "accessory", stats: { "PVP Debuff Duration RED": "9", "Wind Attribute RES": "60%" } },
-  "Garm Baby's Protection Card": { equip: "accessory", stats: { "PVP Debuff Duration RED": "9", "Fire Attribute RES": "60%" } },
-  "Doggy Duckyo Card [Accessory]": { equip: "accessory", stats: { "M.DMG Bonus": "3900", "Final M.DMG Bonus": "18%" } },
-  "Baby Duckyo Card [Accessory]": { equip: "accessory", stats: { "P.DMG Bonus": "3900", "Final P.DMG Bonus": "18%" } },
-  "Alarm Card": { equip: "headgear", stats: { "Neutral Enhance": "15%" } },
-  "Alien Adacic Card": { equip: "headgear", stats: { "Physical Lifesteal": "25%", "Magic Lifesteal": "25%" } },
-  "Alligator Card": { equip: "headgear", stats: { "Bonus Heal": "14%" } },
-  "Anacondaq Card": { equip: "headgear", stats: { "M.DMG Bonus": "240" } },
-  "Ant Larva Card": { equip: "headgear", stats: { "P.ATK%": "6%" } },
-  "Apocalypse Card": { equip: "headgear", stats: { "Neutral Enhance": "25%", "Holy Enhance": "25%" } },
-  "Axe-wielding Goblin Card": { equip: "headgear", stats: { "Variable CD RED": "2.50" } },
-  "Beast Titan Card [Void]": { equip: "headgear", stats: { "PVP Debuff Duration RED": "5.75", "PVP Debuff RES": "5.75" } },
-  "Benimaru Card": { equip: "headgear", stats: { "Final P.DMG Bonus": "8%", "Final M.DMG Bonus": "8%" } },
-  "Carat Card": { equip: "headgear", stats: { "Bonus Heal": "10%" } },
-  "Clock Card": { equip: "headgear", stats: { "Holy Enhance": "15%" } },
-  "Clock Tower Manager Card": { equip: "headgear", stats: { "Ghost Enhance": "15%" } },
-  "Coco Card": { equip: "headgear", stats: { "M.ATK": "120" } },
-  "Coelacanth Card [Night]": { equip: "headgear", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "Final M.DMG Bonus": "18.60%", "Final M.PEN": "18.60%" } },
-  "Dark Priest Card [Day]": { equip: "headgear", stats: { "PVP Debuff Duration RED": "9" } },
-  "Dark Priest Card [Day] [★]": { equip: "headgear", stats: { "PVP Debuff Duration RED": "15" } },
-  "Dark Priest Card [Void]": { equip: "headgear", stats: { "PVP Final P.DMG Bonus": "9%" } },
-  "Dark Priest Card [Void] [★]": { equip: "headgear", stats: { "PVP Final P.DMG Bonus": "15%" } },
-  "Dead Plankton Card": { equip: "headgear", stats: { "P.PEN": "120" } },
-  "Deniro Card": { equip: "headgear", stats: { "Final P.PEN": "6%" } },
-  "Deviling Card [Void]": { equip: "headgear", stats: { "Debuff RES": "18.75" } },
-  "Deviling Card [Void] [★]": { equip: "headgear", stats: { "Debuff RES": "33.75" } },
-  "Deviruchi Card": { equip: "headgear", stats: { "Bonus Heal Received": "10%" } },
-  "Doppelganger Card [Night]": { equip: "headgear", stats: { "PVP Final M.DMG Bonus": "9%" } },
-  "Doppelganger Card [Night] [★]": { equip: "headgear", stats: { "PVP Final M.DMG Bonus": "15%" } },
-  "Dragon Fly Card [Void]": { equip: "headgear", stats: { "M.ATK%": "12%" } },
-  "Dragon Fly Card [Void] [★]": { equip: "headgear", stats: { "M.ATK%": "24%" } },
-  "Dragonewt Prince Card [Headgear]": { equip: "headgear", stats: { "P.ATK%": "9%", "Poison Enhance": "11.30%" } },
-  "Drops Card": { equip: "headgear", stats: { "P.PEN": "60" } },
-  "Dryad Card": { equip: "headgear", stats: { "Final P.PEN": "16%" } },
-  "Eclipse Card [Night]": { equip: "headgear", stats: { "P.ATK%": "12%" } },
-  "Eclipse Card [Night] [★]": { equip: "headgear", stats: { "P.ATK%": "24%" } },
-  "Eddga Card [Night]": { equip: "headgear", stats: { "Final M.DMG Bonus": "12%" } },
-  "Eddga Card [Night] [★]": { equip: "headgear", stats: { "Final M.DMG Bonus": "24%" } },
-  "Elder Willow Card": { equip: "headgear", stats: { "BLIND RES": "30%" } },
-  "Fallen Bishop Card [Day]": { equip: "headgear", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "Final P.DMG Bonus": "18.60%", "Final P.PEN": "18.60%" } },
-  "Fallen Bishop Card [Void]": { equip: "headgear", stats: { "Final Haste": "-10%", "Final ASPD": "-100%", "HP Regen per 5s": "9.30%", "Debuff Duration RED": "23" } },
-  "Fiery Dimik Card": { equip: "headgear", stats: { "Fire Enhance": "25%", "Earth Enhance": "25%" } },
-  "Flail-wielding Goblin Card": { equip: "headgear", stats: { "CURSE RES": "30%" } },
-  "Frost Dimik Card": { equip: "headgear", stats: { "Water Enhance": "25%", "Wind Enhance": "25%" } },
-  "Ghoul Card": { equip: "headgear", stats: { "Variable CT RED": "62.50%" } },
-  "Giearth Card": { equip: "headgear", stats: { "P.DMG Bonus": "240" } },
-  "Gioia Card [Night]": { equip: "headgear", stats: { "Final M.DMG Bonus": "15%", "Final M.PEN": "15%" } },
-  "Grasshopper Card": { equip: "headgear", stats: { "P.DMG Bonus": "60" } },
-  "Hammer-wielding Goblin Card": { equip: "headgear", stats: { "Armor Break RES": "30%" } },
-  "Hellhound Card": { equip: "headgear", stats: { "P.ATK%": "16%" } },
-  "Hinokami Tanjiro Kamado Card": { equip: "headgear", stats: { "Final P.DMG Bonus": "21%", "Final M.DMG Bonus": "21%" } },
-  "Joker Card": { equip: "headgear", stats: { "Poison Enhance": "15%" } },
-  "King Dramoh Card [Day]": { equip: "headgear", stats: { "Debuff Duration RED": "18.75" } },
-  "King Dramoh Card [Day] [★]": { equip: "headgear", stats: { "Debuff Duration RED": "33.75" } },
-  "Lunatic Card": { equip: "headgear", stats: { "M.ATK": "60" } },
-  "Mace-wielding Goblin Card": { equip: "headgear", stats: { "POISON RES": "30%" } },
-  "Mace-wielding Kobold Card": { equip: "headgear", stats: { "BLEED RES": "30%" } },
-  "Majoruros Card": { equip: "headgear", stats: { "SP Regen per 5s": "5%" } },
-  "Mandragora Card": { equip: "headgear", stats: { "M.DMG Bonus": "60" } },
-  "Marduk Card": { equip: "headgear", stats: { "Final P.DMG Bonus": "6%" } },
-  "Martin Card": { equip: "headgear", stats: { "M.PEN": "120" } },
-  "Mastering Card [Night]": { equip: "headgear", stats: { "Final P.PEN": "12%" } },
-  "Mastering Card [Night] [★]": { equip: "headgear", stats: { "Final P.PEN": "24%" } },
-  "Maya Card [Void]": { equip: "headgear", stats: { "Bonus Heal Received": "15%" } },
-  "Maya Card [Void] [★]": { equip: "headgear", stats: { "Bonus Heal Received": "27%" } },
-  "Mistress Card [Day]": { equip: "headgear", stats: { "Final M.PEN": "12%" } },
-  "Mistress Card [Day] [★]": { equip: "headgear", stats: { "Final M.PEN": "24%" } },
-  "Mummy Card": { equip: "headgear", stats: { "Final M.PEN": "6%" } },
-  "Nereid Card": { equip: "headgear", stats: { "Final P.DMG Bonus": "14%" } },
-  "Nightmare Card": { equip: "headgear", stats: { "HP Regen per 5s": "5%" } },
-  "Nightmare Evil Druid Card": { equip: "headgear", stats: { "Shadow Enhance": "25%", "Undead Enhance": "25%" } },
-  "Orc Disaster Card [Void]": { equip: "headgear", stats: { "Final P.DMG RED": "7%", "Final M.DMG RED": "7%" } },
-  "Orc Disaster Card II [Void]": { equip: "headgear", stats: { "Bonus DMG to Large": "38.80%", "Bonus DMG to Small": "38.80%" } },
-  "Orc General Card [Headgear]": { equip: "headgear", stats: { "P.ATK%": "9%", "Holy Enhance": "11.30%" } },
-  "Orc Hero Card [Day]": { equip: "headgear", stats: { "Bonus Heal": "15%", "STUN RES": "100%" } },
-  "Orc Hero Card [Day] [★]": { equip: "headgear", stats: { "Bonus Heal": "27%", "STUN RES": "100%" } },
-  "Orc Lord Card [Void]": { equip: "headgear", stats: { "SP Regen per 5s": "7.50%" } },
-  "Orc Lord Card [Void] [★]": { equip: "headgear", stats: { "SP Regen per 5s": "13.50%" } },
-  "Orc Warrior Card": { equip: "headgear", stats: { "Weapon Break RES": "30%" } },
-  "Owl Duke Card [Void]": { equip: "headgear", stats: {  } },
-  "Pharaoh Card [Day]": { equip: "headgear", stats: { "HP Regen per 5s": "7.50%" } },
-  "Pharaoh Card [Day] [★]": { equip: "headgear", stats: { "HP Regen per 5s": "13.50%" } },
-  "Phreeoni Card [Void]": { equip: "headgear", stats: { "Final P.DMG Bonus": "12%" } },
-  "Phreeoni Card [Void] [★]": { equip: "headgear", stats: { "Final P.DMG Bonus": "24%" } },
-  "Piere Card": { equip: "headgear", stats: { "M.ATK%": "6%" } },
-  "Poring Card": { equip: "headgear", stats: { "P.ATK": "60" } },
-  "Ragged Zombie Card": { equip: "headgear", stats: { "M.ATK%": "16%" } },
-  "Rogue Card": { equip: "headgear", stats: { "Final Crit": "7%", "Crit DMG Bonus": "14%" } },
-  "Skeggiold Card [Day]": { equip: "headgear", stats: { "Final P.DMG Bonus": "15%", "Final P.PEN": "15%" } },
-  "Skeggiold Card [Void]": { equip: "headgear", stats: { "PVP Debuff PEN": "7.50", "PVP Debuff RES": "7.50" } },
-  "Stainer Card": { equip: "headgear", stats: { "P.ATK": "120" } },
-  "Stalactic Golem Card": { equip: "headgear", stats: { "Final M.DMG Bonus": "14%" } },
-  "Storm Dragon Card [Void]": { equip: "headgear", stats: { "Physical Lifesteal": "14%", "Magic Lifesteal": "14%" } },
-  "Sundering Dimik Card": { equip: "headgear", stats: { "Poison Enhance": "25%", "Ghost Enhance": "25%" } },
-  "Tao Gunka Card [Day]": { equip: "headgear", stats: { "Holy Enhance": "30%", "Neutral Enhance": "30%" } },
-  "Tao Gunka Card [Night]": { equip: "headgear", stats: { "Earth Enhance": "30%", "Fire Enhance": "30%" } },
-  "Tao Gunka Card [Void]": { equip: "headgear", stats: { "Water Enhance": "30%", "Wind Enhance": "30%" } },
-  "Terrible Tornado (Soul) Card [Night]": { equip: "headgear", stats: { "Physical Lifesteal": "31%", "Magic Lifesteal": "31%" } },
-  "Verit Card": { equip: "headgear", stats: { "Final M.DMG Bonus": "6%" } },
-  "Willow Card": { equip: "headgear", stats: { "M.PEN": "60" } },
-  "Wootan Shooter Card": { equip: "headgear", stats: { "Final M.PEN": "16%" } },
-  "Year of the Dragon Nian Card [Day]": { equip: "headgear", stats: { "Final P.DMG Bonus": "31%" } },
-  "Year of the Dragon Nian Card [Night]": { equip: "headgear", stats: { "Final M.DMG Bonus": "31%" } },
-  "Year of the Rabbit Nian Card [Day]": { equip: "headgear", stats: { "Bonus DMG to Plant": "30%" } },
-  "Year of the Tiger Nian Card [Day]": { equip: "headgear", stats: { "PVP Final P.DMG BOnus": "10.50%", "PVP Final M.DMG Bonus": "10.50%" } },
-  "Year of the Tiger Nian Card [Night]": { equip: "headgear", stats: { "Final P.DMG Bonus": "21%", "Final M.DMG Bonus": "21%" } },
-  "Zeke Card": { equip: "headgear", stats: { "Final P.PEN": "13%", "Final M.PEN": "13%" } },
-  "Diabolic Card": { equip: "headgear", stats: { "Final P.DMG Bonus": "11.50%", "P.ATK%": "11.50%" } },
-  "Grizzly Card": { equip: "headgear", stats: { "Final M.DMG Bonus": "11.50%", "M.ATK%": "11.50%" } },
-  "Lava Golem Card": { equip: "headgear", stats: { "Final Haste": "5.80%", "Final P.DMG Bonus": "11.50%" } },
-  "Nightmare Terror Card": { equip: "headgear", stats: { "Final Haste": "5.80%", "Final M.DMG Bonus": "11.50%" } },
-  "Nidhoggr's Shadow Card [Void]": { equip: "headgear", stats: { "M.ATK%": "16.50%", "Magic Lifesteal": "16.50%" } },
-  "Queen Scaraba Card [Night]": { equip: "headgear", stats: { "Final Haste": "16.50%", "Final ASPD": "165%" } },
-  "Elite Archdam Card [Day]": { equip: "headgear", stats: { "Final Haste": "6.90%", "Debuff PEN": "11.5" } },
-  "Toki Card [Headgear]": { equip: "headgear", stats: { "Holy Enhance": "30%", "Neutral Enhance": "30%" } },
-  "Shinken Successor Card [Night]": { equip: "headgear", stats: { "Final M.DMG Bonus": "17.50%", "M.ATK%": "17.50%" } },
-  "Ram Card [Headgear]": { equip: "headgear", stats: { "Fire Enhance": "36.30%", "Wind Enhance": "36.30%" } },
-  "Rem Card [Day]": { equip: "headgear", stats: { "SP Regen per 5s": "-10%", "Final Crit": "31.50%", "Crit DMG Bonus": "63%" } },
-  "Explorer Card": { equip: "headgear", stats: { "STUN RES": "42%", "Max HP%": "33.60%" } },
-  "Isra Card": { equip: "headgear", stats: { "P.ATK%": "28%" } },
-  "Echio Card": { equip: "headgear", stats: { "Final P.PEN": "28%" } },
-  "Agav Card": { equip: "headgear", stats: { "Final M.PEN": "28%" } },
-  "Retribution Card [Day]": { equip: "headgear", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "P.ATK%": "29.40%", "Final P.DMG Bonus": "29.40%" } },
-  "Ktullanux Card [Night]": { equip: "headgear", stats: { "Final Haste": "-10.50%", "Final ASPD": "-105%", "Final P.DMG Bonus": "29.40%", "Final Crit": "29.40%" } },
-  "Angel Capoo Card [Night]": { equip: "headgear", stats: { "PVP Debuff RES": "12.9", "PVP Debuff Duration RED": "12.9" } },
-  "Bijou Card [Night]": { equip: "headgear", stats: { "Final ASPD": "-100%", "Final Haste": "-10%", "M.ATK%": "31.50%", "Final M.PEN": "31.50%" } },
-  "Angemon Card [Night]": { equip: "headgear", stats: { "Neutral Enhance": "40%", "Shadow Enhance": "40%" } },
-  "Angewomon Card [Night]": { equip: "headgear", stats: { "Holy Enhance": "40%", "Ghost Enhance": "40%" } },
-  "Taichi Kamiya Card [Headgear]": { equip: "headgear", stats: { "Debuff PEN": "15", "Crit DMG Bonus": "34%" } },
-  "Takeru Takaishi Card [Headgear]": { equip: "headgear", stats: { "Debuff PEN": "15", "Final M.PEN": "17%" } },
-  "Yamato Ishida Card [Headgear]": { equip: "headgear", stats: { "Debuff PEN": "15", "Final P.PEN": "17%" } },
-  "Hikari Yagami Card [Headgear]": { equip: "headgear", stats: { "Final Haste": "7%", "Final P.DMG Bonus": "15%", "Final M.DMG Bonus": "15%" } },
-  "Thanatos' Expedition [Night]": { equip: "headgear", stats: { "PVP Final P.DMG Bonus": "22.50%", "P.DMG Bonus%": "30%" } },
-  "Morroc's Creation [Night]": { equip: "headgear", stats: { "PVP Final M.DMG Bonus": "22.50%", "M.DMG Bonus%": "30%" } },
-  "Jyakomaru Card [Night]": { equip: "headgear", stats: { "Wind Enhance": "40%", "Water Enhance": "40%" } },
-  "Ryuoumaru Card [Night]": { equip: "headgear", stats: { "Fire Enhance": "40%", "Ghost Enhance": "40%" } },
-  "Senoumaru Card [Night]": { equip: "headgear", stats: { "Neutral Enhance": "40%", "Holy Enhance": "40%" } },
-  "Flamel Card": { equip: "headgear", stats: { "M.ATK%": "31%" } },
-  "Shadow Chaser Gertie Card [Night]": { equip: "headgear", stats: { "Crit DMG Bonus": "96%", "Final P.PEN": "48%" } },
-  "Genetic Flamel Card [Night]": { equip: "headgear", stats: { "Final P.DMG Bonus": "28%", "P.ATK%": "20%" } },
-  "Sorcerer Celia Card [Night]": { equip: "headgear", stats: { "Final M.DMG Bonus": "28%", "M.ATK%": "20%" } },
-  "Ranger Cecil Card [Night]": { equip: "headgear", stats: { "Final P.DMG Bonus": "24%", "Final P.PEN": "24%" } },
-  "Garm's Agony Card": { equip: "headgear", stats: { "PVP Final P.DMG Bonus": "12%", "Physical Lifesteal": "13%" } },
-  "Garm Baby's Slaughter Card": { equip: "headgear", stats: { "PVP Final M.DMG Bonus": "12%", "Magic Lifesteal": "13%" } },
-  "Year of the Horse Nian Card [Day]": { equip: "headgear", stats: { "Final P.DMG Bonus": "48%", "Final M.DMG Bonus": "48%" } },
-  "Blossom Duckyo Card [Headgear]": { equip: "headgear", stats: { "Final Crit": "15%", "Crit DMG Bonus": "32%" } },
-  "Angel Biko [Night]": { equip: "headgear", stats: { "Earth Enhance": "40%", "Fire Enhance": "40%" } },
-  "Demon Duckyo [Night]": { equip: "headgear", stats: { "Holy Enhance": "40%", "Poison Enhance": "40%" } },
-  "Radiant Spring Steed Card [Backpack]": { equip: "backpack", stats: { "Max HP": "96000", "Crit DMG RED": "22%" } },
-  "Gilded Snowland Card [Backpack]": { equip: "backpack", stats: { "Max HP": "96000", "Final P.DEF": "11%" } },
-  "Spring Chasing Card [Backpack]": { equip: "backpack", stats: { "Max HP": "96000", "Final M.DEF": "11%" } },
-  "Year of the Horse Nian Shiny Card [Night]": { equip: "backpack", stats: { "Final P.DEF": "24%", "Final P.DMG RED": "24%" } },
-  "Year of the Horse Nian Blessing Card [Night]": { equip: "backpack", stats: { "Crit DMG RED": "48%", "Final P.DMG RED": "24%" } },
-  "Year of the Horse Nian Protection Card [Night]": { equip: "backpack", stats: { "Final M.DEF": "24%", "Final M.DMG RED": "24%" } },
-};
-const cardsByEquip = {
-  weapon: ["Abysmal Knight Card", "Alien Pedant Card", "Ambernite Card", "Amon Ra Card [Day]", "Amon Ra Card [Day] [★]", "Amon Ra Card [Night]", "Amon Ra Card [Night] [★]", "Amon Ra Card [Void]", "Amon Ra Card [Void] [★]", "Andre Card", "Angeling Card [Night]", "Angeling Card [Night] [★]", "Anubis Card", "Arc Angeling Card [Night]", "Arc Angeling Card [Void]", "Archer Skeleton Card", "Arclouze Card", "Argos Card", "Aster Card", "Beast Titan Card [Day]", "Beelzebub Card [Day]", "Beetle King Card", "Bigfoot Card", "Bloody Murderer Card", "Blue Venatu Card", "Brown Venatu Card", "Caramel Card", "Coelacanth Card [Day]", "Crab Card", "Cursed Grave Keeper Card", "Dagger-wielding Skel Pirate Card", "Desert Wolf Card", "Despero of Thanatos Card", "Deviace Card", "Deviling Card [Night]", "Deviling Card [Night] [★]", "Dolor of Thanatos Card", "Doppelganger Card [Void]", "Doppelganger Card [Void] [★]", "Dracula Card [Void]", "Dracula Card [Void] [★]", "Dragon Fly Card [Night]", "Dragon Fly Card [Night] [★]", "Drainliar Card", "Drake Card [Day]", "Drake Card [Day] [★]", "Driller Card", "Dullahan Card", "Eddga Card [Void]", "Eddga Card [Void] [★]", "Evil Druid Card", "Fabre Card", "Familiar Card", "Female Thief Bug Card", "Flame Skull Card", "Flora Card", "Garm Baby Card [2023]", "Ghostring Card [Night]", "Ghostring Card [Night] [★]", "Gioia Card [Day]", "Goat Card", "Goblin Archer Card", "Goblin Steamrider Card", "Golden Thief Bug Card [Day]", "Golden Thief Bug Card [Day] [★]", "Ground Petite Card", "Harpy Card", "Horn Card", "Hornet Card", "Hunter Fly Card", "Hydra Card", "Khalitzburg Card", "Kobold Archer Card", "Kraken Card [Night]", "Kraken Card [Night] [★]", "Light of Goblin Card [Weapon]", "Lord of the Dead Card [Night]", "Lost Dragon Card [Night]", "Magnolia Card", "Marina Card", "Maya Card [Day]", "Maya Card [Day] [★]", "Megalodon Card", "Memory of Thanatos Card [Day]", "Memory of Thanatos Card [Night]", "Menblatt Card", "Metaller Card", "Milim Card", "Minorous Card", "Mistress Card [Night]", "Mistress Card [Night] [★]", "Moonlight Flower Card [Void]", "Moonlight Flower Card [Void] [★]", "Munak Card", "Mutant Dragonoid Card [Void]", "Naght Sieger Card [Night]", "Naght Sieger Card [Void]", "Necromancer Card [Day]", "Necromancer Card [Void]", "Nezuko Kamado Card (Gold)", "Observation Card [Night]", "Ogre Tooth Card [Day]", "Orc Disaster Card [Day]", "Orc Disaster Card II [Day]", "Orc General Card [Weapon]", "Orc Lady Card", "Orc Lord Card [Night]", "Orc Lord Card [Night] [★]", "Orc Skeleton Card", "Osiris Card [Void]", "Osiris Card [Void] [★]", "Pecopeco Egg Card", "Pharaoh Card [Night]", "Pharaoh Card [Night] [★]", "Phendark Card", "Phreeoni Card [Day]", "Phreeoni Card [Day] [★]", "Plankton Card", "Raydric Archer Card", "Requiem Card", "Rimuru Card", "Rimuru Card", "Rotar Zairo Card", "Saitama (Soul) Card [Day]", "Saitama Card", "Savage Bebe Card", "Scorpion Card", "Seal Card", "Shellfish Card", "Shizue Card", "Side Winder Card", "Skeleton Card", "Skeleton Worker Card", "Sleeper Card", "Snake Card", "Speed-o-Sonic (Soul) Card [Night]", "Speed-o-Sonic Card", "Sting Card", "Stone Shooter Card", "Storm Dragon Card [Day]", "Strouf Card [Void]", "Strouf Card [Void] [★]", "Tanjiro Kamado Card (Blue)", "Toad Card [Night]", "Toad Card [Night] [★]", "Tri Joint Card", "Vadon Card", "Vagabond Wolf Card [Night]", "Vagabond Wolf Card [Night] [★]", "Wolf Card", "Zenitsu Agatsuma Card (Blue)", "Zenitsu Agatsuma Card (Gold)", "Zenorc Card", "Zombie Prisoner Card", "Noxious Card", "Venomous Card", "Obsidian Card", "Mineral Card", "Pitman Card", "Waste Stove Card", "RSX-0806 Card [Night]", "Nidhoggr's Shadow Card [Night]", "Queen Scaraba Card [Day]", "Faceworm Queen Card [Void]", "Elite Apocalypse Card [Night]", "Maero of Thanatos Card", "Kenshiro Card [Weapon]", "Rei Card [Weapon]", "Legendary Savior Card [Day]", "Conqueror Card [Night]", "Ram Card [Weapon]", "Rem Card [Weapon]", "Natsuki Subaru Card [Night]", "Ram Card [Day]", "Siroma Card", "Iceicle Card", "Snowier Card", "Ice Titan Card", "Ice Wolf Card", "Gazeti Card", "Gloom Under Night Card [Night]", "Retribution Card [Void]", "Shelter Card [Void]", "Ktullanux Card [Void]", "Downhill Fat Tiger Card [Day]", "Baoku Lee Card [Weapon]", "Astronaut Capoo Card", "Mage Capoo Card", "Angel Capoo Card [Day]", "Bijou Card [Day]", "Angemon Card [Day]", "Angewomon Card [Day]", "WarGreyman Card [Day]", "WarGreyman Card [Night]", "MetalGarurumon Card [Day]", "Ryujinmaru Card [Day]", "Toraoh Card [Weapon]", "Shibaraku Tsurugibe Card [Weapon]", "Wataru Ikusabe Card [Weapon]", "Jyakomaru Card [Day]", "Ryuoumaru Card [Day]", "Senoumaru Card [Day]", "Cecil Damon Card", "Eremes Guile Card", "Celia Card", "Shadow Chaser Gertie Card [Day]", "Genetic Flamel Card [Day]", "Sorcerer Celia Card [Day]", "Ranger Cecil Card [Day]", "Kitty Duckyo Card [Weapon]", "Angel Biko [Day]", "Demon Duckyo [Day]"],
-  clothes: ["Angeling Card [Day]", "Angeling Card [Day] [★]", "Anolian Card", "Argiope Card", "Armored Titan Card [Day]", "Bane Dragon Card [Day]", "Bathory Card", "Breeze Card", "Brilight Card", "Colossal Titan Card [Day]", "Dark Priest Card [Night]", "Dark Priest Card [Night] [★]", "Diablo Card", "Dokebi Card", "Dragon Fly Card [Day]", "Dragon Fly Card [Day] [★]", "Garm Card [2023]", "Genos (Soul) Card [Day]", "Genos Card", "Ghostring Card [Day]", "Ghostring Card [Day] [★]", "High Orc Card", "Levi Card", "Loli Ruri Card", "Lord of the Dead Card [Void]", "Marc Card", "Marin Card", "Observation Card [Void]", "Ogre Tooth Card [Night]", "Orc General Card [Armor]", "Orc Lord Card [Day]", "Orc Lord Card [Day] [★]", "Pasana Card", "Pest Card", "Phreeoni Card [Night]", "Phreeoni Card [Night] [★]", "Picky (Shell) Card", "Picky Card", "Rocker Card", "Roda Frog Card", "Rybio Card", "Sasquatch Card", "Savage Card", "Sky Petite Card", "Slayer of Shadows Card [Armor]", "Steel Chonchon Card", "Strouf Card [Day]", "Strouf Card [Day] [★]", "Swordfish Card", "Ultraman Card", "Ultraman Zoffy Card", "Wooden Golem Card", "Year of the Rabbit Nian Card [Night]", "Metaling Card", "Porcellia Card", "RSX-0806 Card [Void]", "Elite Archdam Card [Night]", "Raoh Card [Armor]", "Undefeatable Ken-Oh Card [Day]", "Emilia Card [Clothes]", "Emilia Card [Night]", "Anopheles Card", "Roween Card", "Gloom Under Night Card [Void]", "Skyward Baoku Lee Card [Day]", "Baoku Lee Card [Armor]", "Meat Capoo Card", "Taichi Kamiya Card [Armor]", "Himika Shinobibe Card [Armor]", "Howard Alt-Eisen Card", "Shadow Chaser Gertie Card [Void]", "Genetic Flamel Card [Void]", "Sorcerer Celia Card [Void]", "Ranger Cecil Card [Void]", "Garm Card [Night] (2025)", "Garm Baby Card [Night] (2025)"],
-  cloak: ["Armored Titan Card [Night]", "Bane Dragon Card [Night]", "Bapho Jr. Card", "Choco Card", "Colossal Titan Card [Night]", "Condor Card", "Dark Lord Card [Void]", "Dark Lord Card [Void] [★]", "Demon Pungus Card", "Deviling Card [Day]", "Deviling Card [Day] [★]", "Dracula Card [Day]", "Dracula Card [Day] [★]", "Dragon Tail Card", "Dragonewt Prince Card [Muffler]", "Dustiness Card", "Eclipse Card [Day]", "Eclipse Card [Day] [★]", "Frildora Card", "Giant Whisper Card", "Hode Card", "Jakk Card", "Kraken Card [Day]", "Kraken Card [Day] [★]", "Lord of the Dead Card [Day]", "Marionette Card", "Marse Card", "Mastering Card [Day]", "Mastering Card [Day] [★]", "Megalith Card", "Mikasa Card", "Myst Card", "Nine Tail Card", "Observation Card [Day]", "Odium of Thanatos", "Ogre Tooth Card [Void]", "Orc Zombie Card", "Punk Card", "Pupa Card", "Rafflesia Card", "Shion Card", "Slayer of Shadows Card [Muffler]", "Terrible Tornado (Soul) Card [Day]", "Terrible Tornado Card", "Thara Frog", "Thief Bug Card", "Toad Card [Day]", "Toad Card [Day] [★]", "Ultraman Seven Card", "Ultraman Taro Card", "Wanderer Card", "Whisper Card", "Mole Card", "Ungoliant Card", "Queen Scaraba Card [Void]", "Vesper Card [Night]", "Toki Card [Cloak]", "Shinken Successor Card [Day]", "Emilia Card [Cloak]", "Emilia Card [Day]", "Drosera Card", "Hill Wind Card", "Ktullanux Card [Day]", "Skyward Baoku Lee Card [Night]", "Alexander Card [Cloak]", "Toast Capoo Card", "Hikari Yagami Card [Cloak]", "Himika Shinobibe Card [Cloak]", "Randel Card"],
-  shoes: ["Armored Titan Card [Void]", "Axe-wielding Kobold Card", "Axe-wielding Skel Pirate Card", "Baby Desert Wolf Card", "Bane Dragon Card [Void]", "Chonchon Card", "Colossal Titan Card [Void]", "Cornutus Card", "Dagger-wielding Goblin Card", "Dark Lord Card [Day]", "Dark Lord Card [Day] [★]", "Dragonewt Prince Card [Boots]", "Eddga Card [Day]", "Eddga Card [Day] [★]", "Eggyra Card", "Eren Card", "Fallen Bishop Card [Night]", "Geographer Card", "Ghostring Card [Void]", "Ghostring Card [Void] [★]", "Grand Peco Card", "Injustice Card", "Isis Card", "King Dramoh Card [Night]", "King Dramoh Card [Night] [★]", "Light of Goblin Card [Shoes]", "Lost Dragon Card [Day]", "Male Thief Bug Card", "Matyr Card", "Medusa Card", "Merman Card", "Mistress Card [Void]", "Mistress Card [Void] [★]", "Moonlight Flower Card [Day]", "Moonlight Flower Card [Day] [★]", "Orc Hero Card [Night]", "Orc Hero Card [Night] [★]", "Pecopeco Card", "Raggler Card", "Ranga Card", "Raydric Card", "Skeggiold Card [Night]", "Skeleton General Card", "Skeleton Prisoner Card", "Sohee Card", "Speed-o-Sonic (Soul) Card [Day]", "Speed-o-Sonic Card", "Ultraman Jack Card", "Zombie Card", "Zombie Slaughter", "Earth Deleter Card", "Sky Deleter Card", "Faceworm Queen Card [Night]", "Elite Apocalypse Card [Day]", "Rei Card [Boots]", "Conqueror Card [Day]", "Natsuki Subaru Card [Shoes]", "Natsuki Subaru Card [Day]", "Water Spirit Card", "Phylla Card", "Shelter Card [Night]", "Alexander Card [Shoes]", "Wealthy Capoo Card [Day]", "Shibaraku Tsurugibe Card [Shoes]", "Trentini Card"],
-  accessory: ["Angeling Card [Void]", "Angeling Card [Void] [★]", "Arc Angeling Card [Day]", "Archdam Card", "Armin Card", "Banshee Card", "Beast Titan Card [Night]", "Beelzebub Card [Void]", "Bloody Knight Card", "Bongun Card", "Coelacanth Card [Void]", "Cramp Card", "Creamy Card", "Dark Frame Card", "Doppelganger Card [Day]", "Doppelganger Card [Day] [★]", "Drake Card [Void]", "Drake Card [Void] [★]", "Eclipse Card [Void]", "Eclipse Card [Void] [★]", "Galapago Card", "Gargoyle Card", "Genos (Soul) Card [Night]", "Genos Card", "Gibbet Card", "Gioia Card [Void]", "Golden Thief Bug Card [Void]", "Golden Thief Bug Card [Void] [★]", "Golem Card", "Greatest General Card", "Green Venatu Card", "Hammer-wielding Kobold Card", "Horong Card", "Inosuke Hashibira Card (Blue)", "Inosuke Hashibira Card (Gold)", "King Dramoh Card [Void]", "King Dramoh Card [Void] [★]", "Kraken Card [Void]", "Kraken Card [Void] [★]", "Kukre Card", "Light of Goblin Card [Accessory]", "Lost Dragon Card [Void]", "Mantis Card", "Marine Sphere Card", "Mastering Card [Void]", "Mastering Card [Void] [★]", "Maya Card [Night]", "Maya Card [Night] [★]", "Muka Card", "Mutant Dragonoid Card [Day]", "Naght Sieger Card [Day]", "Necromancer Card [Night]", "Nezuko Kamado Card (Blue)", "Obeaune Card", "Orange Venatu Card", "Orc Archer Card", "Orc Baby Card", "Orc Disaster Card [Night]", "Orc Disaster Card II [Night]", "Orc Hero Card [Void]", "Orc Hero Card [Void] [★]", "Osiris Card [Day]", "Osiris Card [Day] [★]", "Parasite Card", "Penomena Card", "Pharaoh Card [Void]", "Pharaoh Card [Void] [★]", "Phen Card", "Pirate Skeleton Card", "Poison Spore Card", "Poporing Card", "Sageworm Card", "Saitama (Soul) Card [Night]", "Saitama Card", "Sea Otter Card", "Shuna Card", "Slayer of Shadows Card [Accessory]", "Smokie Card", "Soldier Skeleton Card", "Spore Card", "Stem Worm Card", "Storm Dragon Card [Night]", "Tanjiro Kamado Card", "Tarou Card", "Tempest Dimik Card", "Thief Bug Egg Card", "Toad Card [Void]", "Toad Card [Void] [★]", "Ultraman Ace Card", "Vagabond Wolf Card [Day]", "Vagabond Wolf Card [Day] [★]", "Vagabond Wolf Card [Void]", "Vagabond Wolf Card [Void] [★]", "Vitata Card", "Wind Ghost Card", "Wootan Fighter Card", "Wormtail Card", "Wraith Card", "Yoyo Card", "Zerom Card", "Zherlthsh Card", "Blazzer Card", "Explosion Card", "Gig Card", "Teddy Bear Card", "RSX-0806 Card [Day]", "Nidhoggr's Shadow Card [Day]", "Faceworm Queen Card [Day]", "Vesper Card [Day]", "Kenshiro Card [Accessory]", "Raoh Card [Accessory]", "Legendary Savior Card [Night]", "Undefeatable Ken-Oh Card [Night]", "Natsuki Subaru Card [Accessory]", "Rem Card [Accessory]", "Ram Card [Night]", "Rem Card [Night]", "Beholder Card", "Gremlin Card", "Hodremlin Card", "Vanberk Card", "Gloom Under Night Card [Day]", "Retribution Card [Night]", "Shelter Card [Day]", "Downhill Fat Tiger Card [Night]", "Wealthy Capoo Card [Night]", "Mind-Controlled Ktullanux Card", "Mind-Controlled Retribution Card", "MetalGarurumon Card [Night]", "Takeru Takaishi Card [Accessory]", "Yamato Ishida Card [Accessory]", "Thanatos' Expedition Card [Day]", "Morroc's Creation Card [Day]", "Ryujinmaru Card [Night]", "Wataru Ikusabe Card [Accessory]", "Toraoh Card [Accessory]", "Margaretha Sorin Card", "Chen Card", "Gertie Card", "Garm Card [Day] (2025)", "Garm Baby Card [Day] (2025)", "Garm's Despair Card", "Garm Baby's Protection Card", "Doggy Duckyo Card [Accessory]", "Baby Duckyo Card [Accessory]"],
-  headgear: ["Alarm Card", "Alien Adacic Card", "Alligator Card", "Anacondaq Card", "Ant Larva Card", "Apocalypse Card", "Axe-wielding Goblin Card", "Beast Titan Card [Void]", "Benimaru Card", "Carat Card", "Clock Card", "Clock Tower Manager Card", "Coco Card", "Coelacanth Card [Night]", "Dark Priest Card [Day]", "Dark Priest Card [Day] [★]", "Dark Priest Card [Void]", "Dark Priest Card [Void] [★]", "Dead Plankton Card", "Deniro Card", "Deviling Card [Void]", "Deviling Card [Void] [★]", "Deviruchi Card", "Doppelganger Card [Night]", "Doppelganger Card [Night] [★]", "Dragon Fly Card [Void]", "Dragon Fly Card [Void] [★]", "Dragonewt Prince Card [Headgear]", "Drops Card", "Dryad Card", "Eclipse Card [Night]", "Eclipse Card [Night] [★]", "Eddga Card [Night]", "Eddga Card [Night] [★]", "Elder Willow Card", "Fallen Bishop Card [Day]", "Fallen Bishop Card [Void]", "Fiery Dimik Card", "Flail-wielding Goblin Card", "Frost Dimik Card", "Ghoul Card", "Giearth Card", "Gioia Card [Night]", "Grasshopper Card", "Hammer-wielding Goblin Card", "Hellhound Card", "Hinokami Tanjiro Kamado Card", "Joker Card", "King Dramoh Card [Day]", "King Dramoh Card [Day] [★]", "Lunatic Card", "Mace-wielding Goblin Card", "Mace-wielding Kobold Card", "Majoruros Card", "Mandragora Card", "Marduk Card", "Martin Card", "Mastering Card [Night]", "Mastering Card [Night] [★]", "Maya Card [Void]", "Maya Card [Void] [★]", "Mistress Card [Day]", "Mistress Card [Day] [★]", "Mummy Card", "Nereid Card", "Nightmare Card", "Nightmare Evil Druid Card", "Orc Disaster Card [Void]", "Orc Disaster Card II [Void]", "Orc General Card [Headgear]", "Orc Hero Card [Day]", "Orc Hero Card [Day] [★]", "Orc Lord Card [Void]", "Orc Lord Card [Void] [★]", "Orc Warrior Card", "Owl Duke Card [Void]", "Pharaoh Card [Day]", "Pharaoh Card [Day] [★]", "Phreeoni Card [Void]", "Phreeoni Card [Void] [★]", "Piere Card", "Poring Card", "Ragged Zombie Card", "Rogue Card", "Skeggiold Card [Day]", "Skeggiold Card [Void]", "Stainer Card", "Stalactic Golem Card", "Storm Dragon Card [Void]", "Sundering Dimik Card", "Tao Gunka Card [Day]", "Tao Gunka Card [Night]", "Tao Gunka Card [Void]", "Terrible Tornado (Soul) Card [Night]", "Terrible Tornado Card", "Verit Card", "Willow Card", "Wootan Shooter Card", "Year of the Dragon Nian Card [Day]", "Year of the Dragon Nian Card [Night]", "Year of the Rabbit Nian Card [Day]", "Year of the Tiger Nian Card [Day]", "Year of the Tiger Nian Card [Night]", "Zeke Card", "Diabolic Card", "Grizzly Card", "Lava Golem Card", "Nightmare Terror Card", "Nidhoggr's Shadow Card [Void]", "Queen Scaraba Card [Night]", "Elite Archdam Card [Day]", "Toki Card [Headgear]", "Shinken Successor Card [Night]", "Ram Card [Headgear]", "Rem Card [Day]", "Explorer Card", "Isra Card", "Echio Card", "Agav Card", "Retribution Card [Day]", "Ktullanux Card [Night]", "Angel Capoo Card [Night]", "Bijou Card [Night]", "Angemon Card [Night]", "Angewomon Card [Night]", "Taichi Kamiya Card [Headgear]", "Takeru Takaishi Card [Headgear]", "Yamato Ishida Card [Headgear]", "Hikari Yagami Card [Headgear]", "Thanatos' Expedition [Night]", "Morroc's Creation [Night]", "Jyakomaru Card [Night]", "Ryuoumaru Card [Night]", "Senoumaru Card [Night]", "Flamel Card", "Shadow Chaser Gertie Card [Night]", "Genetic Flamel Card [Night]", "Sorcerer Celia Card [Night]", "Ranger Cecil Card [Night]", "Garm's Agony Card", "Garm Baby's Slaughter Card", "Year of the Horse Nian Card [Day]", "Blossom Duckyo Card [Headgear]", "Angel Biko [Night]", "Demon Duckyo [Night]"],
-  backpack: ["Radiant Spring Steed Card [Backpack]", "Gilded Snowland Card [Backpack]", "Spring Chasing Card [Backpack]", "Year of the Horse Nian Shiny Card [Night]", "Year of the Horse Nian Blessing Card [Night]", "Year of the Horse Nian Protection Card [Night]"],
+  "Abysmal Knight Card": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "6%"
+    }
+  },
+  "Alien Pedant Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Small": "25%",
+      "Bonus DMG to Medium": "25%"
+    }
+  },
+  "Ambernite Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK": "30",
+      "P.PEN": "30"
+    }
+  },
+  "Amon Ra Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "PVP Final M.DMG Bonus": "4.50%",
+      "PVP M.DMG Bonus": "270"
+    }
+  },
+  "Amon Ra Card [Day] [★]": {
+    equip: "weapon",
+    stats: {
+      "PVP Final M.DMG Bonus": "7.50%",
+      "PVP M.DMG Bonus": "450"
+    }
+  },
+  "Amon Ra Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final P.PEN": "9%",
+      "Final P.DMG Bonus": "9%"
+    }
+  },
+  "Amon Ra Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "Final P.PEN": "15%",
+      "Final P.DMG Bonus": "15%"
+    }
+  },
+  "Amon Ra Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "PVP Final P.DMG Bonus": "4.50%",
+      "PVP P.DMG Bonus": "270"
+    }
+  },
+  "Amon Ra Card [Void] [★]": {
+    equip: "weapon",
+    stats: {
+      "PVP Final P.DMG Bonus": "7.50%",
+      "PVP P.DMG Bonus": "450"
+    }
+  },
+  "Andre Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "3%",
+      "Final P.PEN": "3%"
+    }
+  },
+  "Angeling Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "15%"
+    }
+  },
+  "Angeling Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "27%"
+    }
+  },
+  "Anubis Card": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "8%"
+    }
+  },
+  "Arc Angeling Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "HP Regen per 5s": "7.50",
+      "PVP Final M.DMG RED": "7.50"
+    }
+  },
+  "Arc Angeling Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "HP Regen per 5s": "7.50",
+      "PVP Final P.DMG RED": "7.50"
+    }
+  },
+  "Archer Skeleton Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "3%",
+      "Final M.PEN": "3%"
+    }
+  },
+  "Arclouze Card": {
+    equip: "weapon",
+    stats: {
+      "Water Enhance": "10%",
+      "Wind Enhance": "10%"
+    }
+  },
+  "Argos Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK": "60",
+      "P.PEN": "60"
+    }
+  },
+  "Aster Card": {
+    equip: "weapon",
+    stats: {
+      "Ghost Enhance": "17.50%",
+      "Poison Enhance": "17.50%"
+    }
+  },
+  "Beast Titan Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final P.PEN": "18%",
+      "Final M.PEN": "18%",
+      "Crit DMG Bonus": "36%"
+    }
+  },
+  "Beelzebub Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "M.ATK%": "18.60%",
+      "Final M.DMG Bonus": "18.60%"
+    }
+  },
+  "Beetle King Card": {
+    equip: "weapon",
+    stats: {
+      "P.DMG Bonus": "1,920",
+      "PVP P.DMG Bonus": "240"
+    }
+  },
+  "Bigfoot Card": {
+    equip: "weapon",
+    stats: {
+      "Holy Enhance": "10%",
+      "Neutral Enhance": "10%"
+    }
+  },
+  "Bloody Murderer Card": {
+    equip: "weapon",
+    stats: {
+      "Crit DMG Bonus": "16%",
+      "Physical Lifesteal": "8%"
+    }
+  },
+  "Blue Venatu Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Small": "25%"
+    }
+  },
+  "Brown Venatu Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Medium": "25%"
+    }
+  },
+  "Caramel Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK": "60",
+      "M.PEN": "60"
+    }
+  },
+  "Coelacanth Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "Final M.PEN": "18.60%",
+      "Final M.DMG Bonus": "18.60%"
+    }
+  },
+  "Crab Card": {
+    equip: "weapon",
+    stats: {
+      "Final M.PEN": "14%"
+    }
+  },
+  "Cursed Grave Keeper Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "25%"
+    }
+  },
+  "Dagger-wielding Skel Pirate Card": {
+    equip: "weapon",
+    stats: {
+      "Haste": "120"
+    }
+  },
+  "Desert Wolf Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "3%",
+      "Final M.DMG Bonus": "3%"
+    }
+  },
+  "Despero of Thanatos Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "20%",
+      "Final M.DMG Bonus": "20%",
+      "Bonus DMG to Demi-Human": "5%"
+    }
+  },
+  "Deviace Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Small": "10%"
+    }
+  },
+  "Deviling Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "7.50%",
+      "Final P.DMG Bonus": "7.50%"
+    }
+  },
+  "Deviling Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "13.50%",
+      "Final P.DMG Bonus": "13.50%"
+    }
+  },
+  "Dolor of Thanatos Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "20%",
+      "Bonus DMG to Angel": "5%"
+    }
+  },
+  "Doppelganger Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final M.PEN": "9%",
+      "Final M.DMG Bonus": "9%"
+    }
+  },
+  "Doppelganger Card [Void] [★]": {
+    equip: "weapon",
+    stats: {
+      "Final M.PEN": "15%",
+      "Final M.DMG Bonus": "15%"
+    }
+  },
+  "Dracula Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "15%"
+    }
+  },
+  "Dracula Card [Void] [★]": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "27%"
+    }
+  },
+  "Dragon Fly Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Ghost Enhance": "15%",
+      "Poison Enhance": "15%"
+    }
+  },
+  "Dragon Fly Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "Ghost Enhance": "30%",
+      "Poison Enhance": "30%"
+    }
+  },
+  "Drainliar Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK": "60"
+    }
+  },
+  "Drake Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Earth Enhance": "15%",
+      "Fire Enhance": "15%"
+    }
+  },
+  "Drake Card [Day] [★]": {
+    equip: "weapon",
+    stats: {
+      "Earth Enhance": "30%",
+      "Fire Enhance": "30%"
+    }
+  },
+  "Driller Card": {
+    equip: "weapon",
+    stats: {
+      "Final M.PEN": "8%",
+      "Magic Lifesteal": "8%"
+    }
+  },
+  "Dullahan Card": {
+    equip: "weapon",
+    stats: {
+      "M.DMG Bonus": "1,920",
+      "PVP M.DMG Bonus": "240"
+    }
+  },
+  "Eddga Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Small": "15%"
+    }
+  },
+  "Eddga Card [Void] [★]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Small": "30%"
+    }
+  },
+  "Evil Druid Card": {
+    equip: "weapon",
+    stats: {
+      "Crit DMG Bonus": "24%"
+    }
+  },
+  "Fabre Card": {
+    equip: "weapon",
+    stats: {
+      "ASPD": "60"
+    }
+  },
+  "Familiar Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK": "30",
+      "M.PEN": "30"
+    }
+  },
+  "Female Thief Bug Card": {
+    equip: "weapon",
+    stats: {
+      "Crit": "60"
+    }
+  },
+  "Flame Skull Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG RED": "8%",
+      "P.DMG Reflect": "8%"
+    }
+  },
+  "Flora Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK": "60",
+      "M.DMG Bonus": "120"
+    }
+  },
+  "Garm Baby Card [2023]": {
+    equip: "weapon",
+    stats: {
+      "Water Enhance": "38.80%",
+      "Neutral Enhance": "38.80%"
+    }
+  },
+  "Ghostring Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "60%"
+    }
+  },
+  "Ghostring Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "120%"
+    }
+  },
+  "Gioia Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Wind Enhance": "37.50%",
+      "Ghost Enhance": "37.50%"
+    }
+  },
+  "Goat Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "20%"
+    }
+  },
+  "Goblin Archer Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Insect": "12.50%"
+    }
+  },
+  "Goblin Steamrider Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Dragon": "12.50%"
+    }
+  },
+  "Golden Thief Bug Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Water Enhance": "15%",
+      "Wind Enhance": "15%"
+    }
+  },
+  "Golden Thief Bug Card [Day] [★]": {
+    equip: "weapon",
+    stats: {
+      "Water Enhance": "30%",
+      "Wind Enhance": "30%"
+    }
+  },
+  "Ground Petite Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Formless": "12.50%"
+    }
+  },
+  "Harpy Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "20%"
+    }
+  },
+  "Horn Card": {
+    equip: "weapon",
+    stats: {
+      "ASPD": "120"
+    }
+  },
+  "Hornet Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK": "30",
+      "P.DMG Bonus": "30"
+    }
+  },
+  "Hunter Fly Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK": "60",
+      "P.DMG Bonus": "120"
+    }
+  },
+  "Hydra Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK": "120"
+    }
+  },
+  "Khalitzburg Card": {
+    equip: "weapon",
+    stats: {
+      "PVP Final P.DMG Bonus": "6%"
+    }
+  },
+  "Kobold Archer Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Fish": "12.50%"
+    }
+  },
+  "Kraken Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Medium": "15%"
+    }
+  },
+  "Kraken Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Medium": "30%"
+    }
+  },
+  "Light of Goblin Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "9%",
+      "Neutral Enhance": "11.30%"
+    }
+  },
+  "Lord of the Dead Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "P.ATK%": "18.60%",
+      "Final P.DMG Bonus": "18.60%"
+    }
+  },
+  "Lost Dragon Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "30%"
+    }
+  },
+  "Magnolia Card": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "6%"
+    }
+  },
+  "Marina Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "6%"
+    }
+  },
+  "Maya Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "7.50%",
+      "Final M.PEN": "7.50%"
+    }
+  },
+  "Maya Card [Day] [★]": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "13.50%",
+      "Final M.PEN": "13.50%"
+    }
+  },
+  "Megalodon Card": {
+    equip: "weapon",
+    stats: {
+      "Holy Enhance": "17.50%",
+      "Neutral Enhance": "17.50%"
+    }
+  },
+  "Memory of Thanatos Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Angel": "15%",
+      "Final P.DMG Bonus": "15%",
+      "Final M.DMG Bonus": "15%"
+    }
+  },
+  "Memory of Thanatos Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Demi-Human": "15%",
+      "Physical Lifesteal": "15%",
+      "Magic Lifesteal": "15%"
+    }
+  },
+  "Menblatt Card": {
+    equip: "weapon",
+    stats: {
+      "P.DMG Bonus%": "34%"
+    }
+  },
+  "Metaller Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK": "120"
+    }
+  },
+  "Milim Card": {
+    equip: "weapon",
+    stats: {
+      "Magic Lifesteal": "8%"
+    }
+  },
+  "Minorous Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "6%"
+    }
+  },
+  "Mistress Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "12%"
+    }
+  },
+  "Mistress Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "24%"
+    }
+  },
+  "Moonlight Flower Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "7.50%"
+    }
+  },
+  "Moonlight Flower Card [Void] [★]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "13.50%"
+    }
+  },
+  "Munak Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Medium": "10%"
+    }
+  },
+  "Mutant Dragonoid Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "24%"
+    }
+  },
+  "Naght Sieger Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "Final P.PEN": "18.60%",
+      "Final P.DMG Bonus": "18.60%"
+    }
+  },
+  "Naght Sieger Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "Final Crit": "18.60%",
+      "Crit DMG Bonus": "37%"
+    }
+  },
+  "Necromancer Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Crit DMG Bonus": "48%"
+    }
+  },
+  "Necromancer Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "P.DMG Reflect": "16.80%",
+      "M.DMG Reflect": "16.80%"
+    }
+  },
+  "Nezuko Kamado Card (Gold)": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "29%",
+      "Final M.DMG Bonus": "29%"
+    }
+  },
+  "Observation Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final M.PEN": "30%",
+      "Final P.PEN": "30%"
+    }
+  },
+  "Ogre Tooth Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "12%",
+      "Final Crit": "12%"
+    }
+  },
+  "Orc Disaster Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "P.DMG Reflect": "14%",
+      "M.DMG Reflect": "14%"
+    }
+  },
+  "Orc Disaster Card II [Day]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "29%",
+      "M.ATK%": "29%"
+    }
+  },
+  "Orc General Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "9%",
+      "Fire Enhance": "11.30%"
+    }
+  },
+  "Orc Lady Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Demi-Human": "12.50%"
+    }
+  },
+  "Orc Lord Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "15%"
+    }
+  },
+  "Orc Lord Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "27%"
+    }
+  },
+  "Orc Skeleton Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Demon": "12.50%"
+    }
+  },
+  "Osiris Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Holy Enhance": "15%",
+      "Neutral Enhance": "15%"
+    }
+  },
+  "Osiris Card [Void] [★]": {
+    equip: "weapon",
+    stats: {
+      "Holy Enhance": "30%",
+      "Neutral Enhance": "30%"
+    }
+  },
+  "Pecopeco Egg Card": {
+    equip: "weapon",
+    stats: {
+      "Haste": "60"
+    }
+  },
+  "Pharaoh Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "7.50%",
+      "Final M.DMG Bonus": "7.50%"
+    }
+  },
+  "Pharaoh Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "M.ATK%": "13.50%",
+      "Final M.DMG Bonus": "13.50%"
+    }
+  },
+  "Phendark Card": {
+    equip: "weapon",
+    stats: {
+      "PVP Final M.DMG Bonus": "6%"
+    }
+  },
+  "Phreeoni Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "15%"
+    }
+  },
+  "Phreeoni Card [Day] [★]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "30%"
+    }
+  },
+  "Plankton Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK": "60"
+    }
+  },
+  "Raydric Archer Card": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "12%"
+    }
+  },
+  "Requiem Card": {
+    equip: "weapon",
+    stats: {
+      "Earth Enhance": "10%",
+      "Fire Enhance": "10%"
+    }
+  },
+  "Rimuru Card": {
+    equip: "weapon",
+    stats: {
+      "Physical Lifesteal": "8%"
+    }
+  },
+  "Rotar Zairo Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Brute": "12.50%"
+    }
+  },
+  "Saitama (Soul) Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "PVP Final P.DMG Bonus": "15.50%",
+      "PVP Final M.DMG Bonus": "15.50%"
+    }
+  },
+  "Saitama Card": {
+    equip: "accessory",
+    stats: {
+      "PVP Final P.DMG Bonus": "10.50%",
+      "PVP Final M.DMG Bonus": "10.50%"
+    }
+  },
+  "Savage Bebe Card": {
+    equip: "weapon",
+    stats: {
+      "M.ATK": "30",
+      "M.DMG Bonus": "30"
+    }
+  },
+  "Scorpion Card": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "30%"
+    }
+  },
+  "Seal Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.PEN": "14%"
+    }
+  },
+  "Shellfish Card": {
+    equip: "weapon",
+    stats: {
+      "Earth Enhance": "17.50%",
+      "Fire Enhance": "17.50%"
+    }
+  },
+  "Shizue Card": {
+    equip: "weapon",
+    stats: {
+      "Crit DMG Bonus": "16%"
+    }
+  },
+  "Side Winder Card": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "3%"
+    }
+  },
+  "Skeleton Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "10%"
+    }
+  },
+  "Skeleton Worker Card": {
+    equip: "weapon",
+    stats: {
+      "Crit": "120"
+    }
+  },
+  "Sleeper Card": {
+    equip: "weapon",
+    stats: {
+      "M.DMG Bonus%": "34%"
+    }
+  },
+  "Snake Card": {
+    equip: "weapon",
+    stats: {
+      "Ghost Enhance": "10%",
+      "Poison Enhance": "10%"
+    }
+  },
+  "Speed-o-Sonic (Soul) Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "15.50%",
+      "Crit DMG Bonus": "31%"
+    }
+  },
+  "Speed-o-Sonic Card": {
+    equip: "shoes",
+    stats: {
+      "PVP Final P.DMG RED": "5.30%",
+      "Max HP%": "21%"
+    }
+  },
+  "Sting Card": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "50%"
+    }
+  },
+  "Stone Shooter Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "16%"
+    }
+  },
+  "Storm Dragon Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "14%",
+      "M.ATK%": "14%"
+    }
+  },
+  "Strouf Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "75%"
+    }
+  },
+  "Strouf Card [Void] [★]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "135%"
+    }
+  },
+  "Tanjiro Kamado Card (Blue)": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Medium": "18.80%",
+      "Bonus DMG to Small": "18.80%"
+    }
+  },
+  "Toad Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "7.50%",
+      "Final P.PEN": "7.50%"
+    }
+  },
+  "Toad Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "13.50%",
+      "Final P.PEN": "13.50%"
+    }
+  },
+  "Tri Joint Card": {
+    equip: "weapon",
+    stats: {
+      "Water Enhance": "17.50%",
+      "Wind Enhance": "17.50%"
+    }
+  },
+  "Vadon Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "3%",
+      "Final P.DMG Bonus": "3%"
+    }
+  },
+  "Vagabond Wolf Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Crit DMG Bonus": "18%",
+      "Final P.DMG Bonus": "9%"
+    }
+  },
+  "Vagabond Wolf Card [Night] [★]": {
+    equip: "weapon",
+    stats: {
+      "Crit DMG Bonus": "30%",
+      "Final P.DMG Bonus": "15%"
+    }
+  },
+  "Wolf Card": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "40%"
+    }
+  },
+  "Zenitsu Agatsuma Card (Blue)": {
+    equip: "weapon",
+    stats: {
+      "Final Crit": "7.50%",
+      "Crit DMG Bonus": "15%"
+    }
+  },
+  "Zenitsu Agatsuma Card (Gold)": {
+    equip: "weapon",
+    stats: {
+      "Final M.DMG Bonus": "10.50%",
+      "Final M.PEN": "10.50%"
+    }
+  },
+  "Zenorc Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Undead": "12.50%"
+    }
+  },
+  "Zombie Prisoner Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Plant": "12.50%"
+    }
+  },
+  "Noxious Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "11.50%",
+      "P.ATK%": "11.50%"
+    }
+  },
+  "Venomous Card": {
+    equip: "weapon",
+    stats: {
+      "Final M.DMG Bonus": "11.50%",
+      "M.ATK%": "11.50%"
+    }
+  },
+  "Obsidian Card": {
+    equip: "weapon",
+    stats: {
+      "Final M.DMG Bonus": "11.50%",
+      "Final M.PEN": "11.50%"
+    }
+  },
+  "Mineral Card": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "5.80%",
+      "P.ATK%": "11.50%"
+    }
+  },
+  "Pitman Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "11.50%",
+      "Final P.PEN": "11.50%"
+    }
+  },
+  "Waste Stove Card": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "5.80%",
+      "M.ATK%": "11.50%"
+    }
+  },
+  "RSX-0806 Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "33%",
+      "Final M.DMG Bonus": "33%"
+    }
+  },
+  "Nidhoggr's Shadow Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final M.DMG Bonus": "16.50%",
+      "Final M.PEN": "16.50%"
+    }
+  },
+  "Queen Scaraba Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final P.PEN": "33%",
+      "Final M.PEN": "33%"
+    }
+  },
+  "Faceworm Queen Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "16.50%",
+      "Crit DMG Bonus": "33%"
+    }
+  },
+  "Elite Apocalypse Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "13.80%",
+      "Debuff PEN": "11.5"
+    }
+  },
+  "Maero of Thanatos Card": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "20%",
+      "Bonus DMG to Angel": "5%"
+    }
+  },
+  "Kenshiro Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Medium": "30%",
+      "Bonus DMG to Small": "30%"
+    }
+  },
+  "Rei Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "Shadow Enhance": "30%",
+      "Ghost Enhance": "30%",
+      "Poison Enhance": "30%"
+    }
+  },
+  "Legendary Savior Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "P.ATK%": "35%"
+    }
+  },
+  "Conqueror Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "35%",
+      "Final M.DMG Bonus": "35%"
+    }
+  },
+  "Ram Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "Max SP%": "-5%",
+      "M.ATK%": "31.50%"
+    }
+  },
+  "Rem Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "Max SP%": "-5%",
+      "P.ATK%": "31.50%"
+    }
+  },
+  "Natsuki Subaru Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "P.ATK%": "31.50%",
+      "Final P.PEN": "31.50%"
+    }
+  },
+  "Ram Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Max SP%": "-25%",
+      "M.ATK%": "31.50%",
+      "Final M.DMG Bonus": "31.50%"
+    }
+  },
+  "Siroma Card": {
+    equip: "weapon",
+    stats: {
+      "P.DMG Bonus": "6720"
+    }
+  },
+  "Iceicle Card": {
+    equip: "weapon",
+    stats: {
+      "Crit DMG Bonus": "56%"
+    }
+  },
+  "Snowier Card": {
+    equip: "weapon",
+    stats: {
+      "M.DMG Bonus": "6720"
+    }
+  },
+  "Ice Titan Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "28%"
+    }
+  },
+  "Ice Wolf Card": {
+    equip: "weapon",
+    stats: {
+      "Final M.PEN": "14%",
+      "Final M.DMG Bonus": "14%"
+    }
+  },
+  "Gazeti Card": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Medium": "35%"
+    }
+  },
+  "Gloom Under Night Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "Final M.PEN": "29.40%",
+      "Final M.DMG Bonus": "29.40%"
+    }
+  },
+  "Retribution Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "Final Crit": "29.40%",
+      "Crit DMG Bonus": "58.80%"
+    }
+  },
+  "Shelter Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "HP Regen per 5s": "14.70%",
+      "Debuff RED": "36.8"
+    }
+  },
+  "Ktullanux Card [Void]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "P.ATK": "29.40%",
+      "Final P.DMG Bonus": "29.40%"
+    }
+  },
+  "Downhill Fat Tiger Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "-100%",
+      "Final Haste": "-10%",
+      "P.ATK%": "31.50%",
+      "Crit DMG Bonus": "63%"
+    }
+  },
+  "Baoku Lee Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "-100%",
+      "Final Haste": "-10%",
+      "P.DMG Reflect": "19.50%",
+      "M.DMG Reflect": "19.50%"
+    }
+  },
+  "Astronaut Capoo Card": {
+    equip: "weapon",
+    stats: {
+      "PVP Final P.DMG Bonus": "11.60%",
+      "P.ATK%": "11.60%"
+    }
+  },
+  "Mage Capoo Card": {
+    equip: "weapon",
+    stats: {
+      "PVP Final M.DMG Bonus": "11.60%",
+      "M.ATK%": "11.60%"
+    }
+  },
+  "Angel Capoo Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "PVP Final P.DMG Bonus": "28.60%",
+      "PVP Final M.DMG Bonus": "28.60%"
+    }
+  },
+  "Bijou Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "-100%",
+      "Final Haste": "-10%",
+      "Fire Enhance": "37.80%",
+      "Final M.DMG Bonus": "31.50%"
+    }
+  },
+  "Angemon Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "-100%",
+      "Final Haste": "-10%",
+      "P.ATK%": "28%",
+      "Final P.PEN": "35%"
+    }
+  },
+  "Angewomon Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final ASPD": "-100%",
+      "Final Haste": "-10%",
+      "M.ATK%": "28%",
+      "Final M.PEN": "35%"
+    }
+  },
+  "WarGreyman Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "35%",
+      "Crit DMG Bonus": "42%"
+    }
+  },
+  "WarGreyman Card [Night]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "35%",
+      "Final P.PEN": "21%"
+    }
+  },
+  "MetalGarurumon Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "35%",
+      "Final M.PEN": "21%"
+    }
+  },
+  "Ryujinmaru Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Small": "35%",
+      "Crit DMG Bonus": "46%",
+      "Final P.PEN": "23%",
+      "Final M.PEN": "23%"
+    }
+  },
+  "Toraoh Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "PVP Final M.DMG Bonus": "12%",
+      "Final M.DMG Bonus": "12%"
+    }
+  },
+  "Shibaraku Tsurugibe Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "Bonus DMG to Large": "30%",
+      "Debuff Enhancement": "7.5"
+    }
+  },
+  "Wataru Ikusabe Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "PVP Final P.DMG Bonus": "12%",
+      "Final P.DMG Bonus": "12%"
+    }
+  },
+  "Jyakomaru Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "M.ATK%": "26%",
+      "Final M.DMG Bonus": "38%"
+    }
+  },
+  "Ryuoumaru Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "Crit DMG Bonus": "52%",
+      "Final P.DMG Bonus": "38%"
+    }
+  },
+  "Senoumaru Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "P.ATK%": "26%",
+      "Crit DMG Bonus": "76%"
+    }
+  },
+  "Cecil Damon Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "15.50%",
+      "Crit DMG Bonus": "31%"
+    }
+  },
+  "Eremes Guile Card": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "15.50%",
+      "Final P.PEN": "15.50%"
+    }
+  },
+  "Celia Card": {
+    equip: "weapon",
+    stats: {
+      "Final M.DMG Bonus": "31%"
+    }
+  },
+  "Shadow Chaser Gertie Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "24%",
+      "Poison Enhance": "30%",
+      "Ghost Enhance": "30%"
+    }
+  },
+  "Genetic Flamel Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "24%",
+      "Fire Enhance": "30%",
+      "Earth Enhance": "30%"
+    }
+  },
+  "Sorcerer Celia Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final M.DMG Bonus": "24%",
+      "Shadow Enhance": "30%",
+      "Holy Enhance": "30%"
+    }
+  },
+  "Ranger Cecil Card [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final P.PEN": "24%",
+      "Neutral Enhance": "30%",
+      "Wind Enhance": "30%"
+    }
+  },
+  "Kitty Duckyo Card [Weapon]": {
+    equip: "weapon",
+    stats: {
+      "Final M.DMG RED": "17.50%",
+      "M.DMG Reflect": "9%"
+    }
+  },
+  "Angel Biko [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final M.DMG Bonus": "24.40%",
+      "Final M.PEN": "24.40%"
+    }
+  },
+  "Demon Duckyo [Day]": {
+    equip: "weapon",
+    stats: {
+      "Final P.DMG Bonus": "24.40%",
+      "Final P.PEN": "24.40%"
+    }
+  },
+  "Angeling Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Final P.DEF": "15%"
+    }
+  },
+  "Angeling Card [Day] [★]": {
+    equip: "clothes",
+    stats: {
+      "Final P.DEF": "27%"
+    }
+  },
+  "Anolian Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "14%",
+      "Final M.DEF": "7%"
+    }
+  },
+  "Argiope Card": {
+    equip: "clothes",
+    stats: {
+      "Final P.DEF": "6%"
+    }
+  },
+  "Armored Titan Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "PVP Final P.DMG RED": "5.75%",
+      "PVP Final M.DMG RED": "5.75%"
+    }
+  },
+  "Bane Dragon Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Final P.DMG RED": "14.50%",
+      "Final M.DMG RED": "14.50%"
+    }
+  },
+  "Bathory Card": {
+    equip: "clothes",
+    stats: {
+      "PVP Final M.DMG RED": "3.60%",
+      "PVP Debuff Duration RED": "3.60"
+    }
+  },
+  "Breeze Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "20%",
+      "Holy Attribute RES": "37.50%"
+    }
+  },
+  "Brilight Card": {
+    equip: "clothes",
+    stats: {
+      "PVP Final P.DMG RED": "3.60%",
+      "PVP Debuff RES": "3.60"
+    }
+  },
+  "Colossal Titan Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Final P.DMG RED": "11.50%",
+      "Final M.DMG RED": "11.50%"
+    }
+  },
+  "Dark Priest Card [Night]": {
+    equip: "clothes",
+    stats: {
+      "PVP M.DMG RED": "270",
+      "PVP P.DMG RED": "270"
+    }
+  },
+  "Dark Priest Card [Night] [★]": {
+    equip: "clothes",
+    stats: {
+      "PVP M.DMG RED": "450",
+      "PVP P.DMG RED": "450"
+    }
+  },
+  "Diablo Card": {
+    equip: "clothes",
+    stats: {
+      "HP Regen per 5s": "2%",
+      "Max HP%": "8%"
+    }
+  },
+  "Dokebi Card": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Water Attribute Monster": "10%",
+      "Reduce DMG from Undead Attribute Monster": "10%",
+      "Reduce DMG from Poison Attribute Monster": "10%"
+    }
+  },
+  "Dragon Fly Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Neutral Attribute Monster": "15%",
+      "Reduce DMG from Shadow Attribute Monster": "15%",
+      "Reduce DMG from Wind Attribute Monster": "15%"
+    }
+  },
+  "Dragon Fly Card [Day] [★]": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Neutral Attribute Monster": "30%",
+      "Reduce DMG from Shadow Attribute Monster": "30%",
+      "Reduce DMG from Wind Attribute Monster": "30%"
+    }
+  },
+  "Garm Card [2023]": {
+    equip: "clothes",
+    stats: {
+      "Water Attribute RES": "46.50%",
+      "VIT": "93"
+    }
+  },
+  "Genos (Soul) Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "PVP Final P.DMG RED": "7.80%",
+      "PVP Final M.DMG RED": "7.80%"
+    }
+  },
+  "Genos Card": {
+    equip: "accessory",
+    stats: {
+      "PVP Final P.DMG Bonus": "10.50%",
+      "PVP Final M.DMG Bonus": "10.50%"
+    }
+  },
+  "Ghostring Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Fire Attribute Monster": "15%",
+      "Reduce DMG from Ghost Attribute Monster": "15%",
+      "Reduce DMG from Earth Attribute Monster": "15%"
+    }
+  },
+  "Ghostring Card [Day] [★]": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Fire Attribute Monster": "30%",
+      "Reduce DMG from Ghost Attribute Monster": "30%",
+      "Reduce DMG from Earth Attribute Monster": "30%"
+    }
+  },
+  "High Orc Card": {
+    equip: "clothes",
+    stats: {
+      "Final M.DEF": "10%"
+    }
+  },
+  "Levi Card": {
+    equip: "clothes",
+    stats: {
+      "PVP Final P.DMG RED": "3.25%",
+      "PVP Final M.DMG RED": "3.25%"
+    }
+  },
+  "Loli Ruri Card": {
+    equip: "clothes",
+    stats: {
+      "HP Regen per 5s": "2.40%",
+      "PVP Final M.DMG RED": "5.60%"
+    }
+  },
+  "Lord of the Dead Card [Void]": {
+    equip: "clothes",
+    stats: {
+      "Bonus DMG to Undead": "17%",
+      "Bonus DMG to Demon": "17%"
+    }
+  },
+  "Marc Card": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Fire Attribute Monster": "10%",
+      "Reduce DMG from Ghost Attribute Monster": "10%",
+      "Reduce DMG from Earth Attribute Monster": "10%"
+    }
+  },
+  "Marin Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "20%",
+      "Neutral Attribute RES": "37.50%"
+    }
+  },
+  "Observation Card [Void]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "30%",
+      "Holy Attribute RES": "56.30%"
+    }
+  },
+  "Ogre Tooth Card [Night]": {
+    equip: "clothes",
+    stats: {
+      "PVP Final M.DMG RED": "6%",
+      "PVP Final P.DMG RED": "6%"
+    }
+  },
+  "Orc General Card [Armor]": {
+    equip: "clothes",
+    stats: {
+      "Wind Attribute RES": "33.80%",
+      "Max HP%": "18%"
+    }
+  },
+  "Orc Lord Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Final M.DEF": "15%"
+    }
+  },
+  "Orc Lord Card [Day] [★]": {
+    equip: "clothes",
+    stats: {
+      "Final M.DEF": "27%"
+    }
+  },
+  "Pasana Card": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Neutral Attribute Monster": "10%",
+      "Reduce DMG from Shadow Attribute Monster": "10%",
+      "Reduce DMG from Wind Attribute Monster": "10%"
+    }
+  },
+  "Pest Card": {
+    equip: "clothes",
+    stats: {
+      "PVP M.DMG RED": "420"
+    }
+  },
+  "Phreeoni Card [Night]": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Water Attribute Monster": "15%",
+      "Reduce DMG from Undead Attribute Monster": "15%",
+      "Reduce DMG from Poison Attribute Monster": "15%"
+    }
+  },
+  "Phreeoni Card [Night] [★]": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Water Attribute Monster": "30%",
+      "Reduce DMG from Undead Attribute Monster": "30%",
+      "Reduce DMG from Poison Attribute Monster": "30%"
+    }
+  },
+  "Picky (Shell) Card": {
+    equip: "clothes",
+    stats: {
+      "P.DEF": "60"
+    }
+  },
+  "Picky Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP": "1,200"
+    }
+  },
+  "Rocker Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP": "4,800"
+    }
+  },
+  "Roda Frog Card": {
+    equip: "clothes",
+    stats: {
+      "P.DEF": "120"
+    }
+  },
+  "Rybio Card": {
+    equip: "clothes",
+    stats: {
+      "Final P.DEF": "10%"
+    }
+  },
+  "Sasquatch Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "12%"
+    }
+  },
+  "Savage Card": {
+    equip: "clothes",
+    stats: {
+      "M.DEF": "120"
+    }
+  },
+  "Sky Petite Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "20%"
+    }
+  },
+  "Slayer of Shadows Card [Armor]": {
+    equip: "clothes",
+    stats: {
+      "Holy Attribute RES": "33.80%",
+      "Max HP%": "18%"
+    }
+  },
+  "Steel Chonchon Card": {
+    equip: "clothes",
+    stats: {
+      "M.DEF": "60"
+    }
+  },
+  "Strouf Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "30%"
+    }
+  },
+  "Strouf Card [Day] [★]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "54%"
+    }
+  },
+  "Swordfish Card": {
+    equip: "clothes",
+    stats: {
+      "Final M.DEF": "6%"
+    }
+  },
+  "Ultraman Card": {
+    equip: "clothes",
+    stats: {
+      "Final P.DMG RED": "25%"
+    }
+  },
+  "Ultraman Zoffy Card": {
+    equip: "clothes",
+    stats: {
+      "Final P.DMG RED": "15%"
+    }
+  },
+  "Wooden Golem Card": {
+    equip: "clothes",
+    stats: {
+      "HP Regen per 5s": "2.40%",
+      "PVP Final P.DMG RED": "5.60%"
+    }
+  },
+  "Year of the Rabbit Nian Card [Night]": {
+    equip: "clothes",
+    stats: {
+      "Bonus DMG to Plant": "30%"
+    }
+  },
+  "Metaling Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "23%",
+      "PVP Final P.DMG RED": "6.90%"
+    }
+  },
+  "Porcellia Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "23%",
+      "PVP M.DMG RED": "6.90%"
+    }
+  },
+  "RSX-0806 Card [Void]": {
+    equip: "clothes",
+    stats: {
+      "Final P.DMG RED": "16.50%",
+      "Final M.DMG RED": "16.50%"
+    }
+  },
+  "Elite Archdam Card [Night]": {
+    equip: "clothes",
+    stats: {
+      "Final P.DMG RED": "11.50%",
+      "VIT": "57.5"
+    }
+  },
+  "Raoh Card [Armor]": {
+    equip: "clothes",
+    stats: {
+      "VIT": "60",
+      "Max HP%": "24%"
+    }
+  },
+  "Undefeatable Ken-Oh Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "42%",
+      "VIT": "70"
+    }
+  },
+  "Emilia Card [Clothes]": {
+    equip: "clothes",
+    stats: {
+      "HP Regen per 5s": "7.30%",
+      "SP Regen per 5s": "7.30%"
+    }
+  },
+  "Emilia Card [Night]": {
+    equip: "clothes",
+    stats: {
+      "Final M.DEF": "21.50%",
+      "VIT": "108"
+    }
+  },
+  "Anopheles Card": {
+    equip: "clothes",
+    stats: {
+      "HP Regen per 5s": "7%",
+      "PVP Final P.DMG RED": "8.40%"
+    }
+  },
+  "Roween Card": {
+    equip: "clothes",
+    stats: {
+      "Reduce DMG from Demon": "17.50%",
+      "M.DMG RED": "3360"
+    }
+  },
+  "Gloom Under Night Card [Void]": {
+    equip: "clothes",
+    stats: {
+      "Fire Attribute RES": "78.80%",
+      "Max HP%": "42%"
+    }
+  },
+  "Skyward Baoku Lee Card [Day]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "38%",
+      "PVP Final P.DMG RED": "16%"
+    }
+  },
+  "Baoku Lee Card [Armor]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "28%",
+      "Final M.DEF": "15%"
+    }
+  },
+  "Meat Capoo Card": {
+    equip: "clothes",
+    stats: {
+      "PVP Final P.DMG RED": "11.60%",
+      "Final P.DEF": "11.60%"
+    }
+  },
+  "Taichi Kamiya Card [Armor]": {
+    equip: "clothes",
+    stats: {
+      "VIT": "70",
+      "Final P.DMG RED": "15%"
+    }
+  },
+  "Himika Shinobibe Card [Armor]": {
+    equip: "clothes",
+    stats: {
+      "PVP Final P.DMG RED": "10%",
+      "PVP Final M.DMG RED": "10%"
+    }
+  },
+  "Howard Alt-Eisen Card": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "31%",
+      "Crit DMG RED": "31%"
+    }
+  },
+  "Shadow Chaser Gertie Card [Void]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "48%",
+      "Holy Attribute RES": "90%"
+    }
+  },
+  "Genetic Flamel Card [Void]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "48%",
+      "Crit DMG RED": "48%"
+    }
+  },
+  "Sorcerer Celia Card [Void]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "48%",
+      "Ghost Attribute RES": "90%"
+    }
+  },
+  "Ranger Cecil Card [Void]": {
+    equip: "clothes",
+    stats: {
+      "Max HP%": "48%",
+      "Neutral Attribute RES": "90%"
+    }
+  },
+  "Garm Card [Night] (2025)": {
+    equip: "clothes",
+    stats: {
+      "VIT": "90",
+      "PVP Final M.DMG RED": "20%"
+    }
+  },
+  "Garm Baby Card [Night] (2025)": {
+    equip: "clothes",
+    stats: {
+      "VIT": "90",
+      "PVP Final P.DMG RED": "20%"
+    }
+  },
+  "Armored Titan Card [Night]": {
+    equip: "cloak",
+    stats: {
+      "P.DMG Reflect": "11.50%",
+      "M.DMG Reflect": "11.50%"
+    }
+  },
+  "Bane Dragon Card [Night]": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "29%",
+      "VIT": "72.50"
+    }
+  },
+  "Bapho Jr. Card": {
+    equip: "cloak",
+    stats: {
+      "Final M.DMG RED": "10%"
+    }
+  },
+  "Choco Card": {
+    equip: "cloak",
+    stats: {
+      "Bonus DMG to Brute": "12%",
+      "P.DMG RED": "1,536"
+    }
+  },
+  "Colossal Titan Card [Night]": {
+    equip: "cloak",
+    stats: {
+      "VIT": "57",
+      "HP Regen per 5s": "5.75%"
+    }
+  },
+  "Condor Card": {
+    equip: "cloak",
+    stats: {
+      "P.DMG RED": "60"
+    }
+  },
+  "Dark Lord Card [Void]": {
+    equip: "cloak",
+    stats: {
+      "PVP Final M.DMG  RED": "9%"
+    }
+  },
+  "Dark Lord Card [Void] [★]": {
+    equip: "cloak",
+    stats: {
+      "PVP Final M.DMG  RED": "15%"
+    }
+  },
+  "Demon Pungus Card": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "20%",
+      "Fire Attribute RES": "37.50%"
+    }
+  },
+  "Deviling Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Final M.DMG RED": "15%"
+    }
+  },
+  "Deviling Card [Day] [★]": {
+    equip: "cloak",
+    stats: {
+      "Final M.DMG RED": "27%"
+    }
+  },
+  "Dracula Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "30%"
+    }
+  },
+  "Dracula Card [Day] [★]": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "54%"
+    }
+  },
+  "Dragon Tail Card": {
+    equip: "cloak",
+    stats: {
+      "Bonus DMG to Insect": "12%",
+      "M.DMG RED": "1,536"
+    }
+  },
+  "Dragonewt Prince Card [Muffler]": {
+    equip: "cloak",
+    stats: {
+      "Poison Attribute RES": "33.80%",
+      "Max HP%": "18%"
+    }
+  },
+  "Dustiness Card": {
+    equip: "cloak",
+    stats: {
+      "Max HP": "4,800"
+    }
+  },
+  "Eclipse Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Demon": "15%",
+      "Reduce DMG from Fish": "15%",
+      "Reduce DMG from Dragon": "15%"
+    }
+  },
+  "Eclipse Card [Day] [★]": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Demon": "30%",
+      "Reduce DMG from Fish": "30%",
+      "Reduce DMG from Dragon": "30%"
+    }
+  },
+  "Frildora Card": {
+    equip: "cloak",
+    stats: {
+      "Final P.DMG RED": "6%"
+    }
+  },
+  "Giant Whisper Card": {
+    equip: "cloak",
+    stats: {
+      "Final P.DMG RED": "10%"
+    }
+  },
+  "Hode Card": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "12%"
+    }
+  },
+  "Jakk Card": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Insect": "10%",
+      "Reduce DMG from Undead": "10%",
+      "Reduce DMG from Brute": "10%"
+    }
+  },
+  "Kraken Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Insect": "15%",
+      "Reduce DMG from Undead": "15%",
+      "Reduce DMG from Brute": "15%"
+    }
+  },
+  "Kraken Card [Day] [★]": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Insect": "30%",
+      "Reduce DMG from Undead": "30%",
+      "Reduce DMG from Brute": "30%"
+    }
+  },
+  "Lord of the Dead Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Bonus DMG to Wind Attribute Monster": "17%",
+      "Bonus DMG to Water Attribute Monster": "17%"
+    }
+  },
+  "Marionette Card": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "20%"
+    }
+  },
+  "Marse Card": {
+    equip: "cloak",
+    stats: {
+      "Final M.DMG RED": "6%"
+    }
+  },
+  "Mastering Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Formless": "15%",
+      "Reduce DMG from Demi-Human": "15%",
+      "Reduce DMG from Plant": "15%"
+    }
+  },
+  "Mastering Card [Day] [★]": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Formless": "30%",
+      "Reduce DMG from Demi-Human": "30%",
+      "Reduce DMG from Plant": "30%"
+    }
+  },
+  "Megalith Card": {
+    equip: "cloak",
+    stats: {
+      "PVP P.DMG RED": "420"
+    }
+  },
+  "Mikasa Card": {
+    equip: "cloak",
+    stats: {
+      "Final P.DEF": "6.50%",
+      "Final M.DEF": "6.50%"
+    }
+  },
+  "Myst Card": {
+    equip: "cloak",
+    stats: {
+      "P.DMG RED": "240"
+    }
+  },
+  "Nine Tail Card": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Demon": "10%",
+      "Reduce DMG from Fish": "10%",
+      "Reduce DMG from Dragon": "10%"
+    }
+  },
+  "Observation Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "30%",
+      "Neutral Attribute RES": "56.30%"
+    }
+  },
+  "Odium of Thanatos": {
+    equip: "cloak",
+    stats: {
+      "Holy Attribute RES": "37.50%",
+      "Neutral Attribute RES": "37.50%"
+    }
+  },
+  "Ogre Tooth Card [Void]": {
+    equip: "cloak",
+    stats: {
+      "Final M.DMG RED": "12%",
+      "Final P.DMG RED": "12%"
+    }
+  },
+  "Orc Zombie Card": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Formless": "10%",
+      "Reduce DMG from Demi-Human": "10%",
+      "Reduce DMG from Plant": "10%"
+    }
+  },
+  "Punk Card": {
+    equip: "cloak",
+    stats: {
+      "PVP Final P.DMG RED": "3.60%",
+      "PVP Debuff RES": "3.60"
+    }
+  },
+  "Pupa Card": {
+    equip: "cloak",
+    stats: {
+      "Max HP": "1,200"
+    }
+  },
+  "Rafflesia Card": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "20%",
+      "Poison Attribute RES": "37.50%"
+    }
+  },
+  "Shion Card": {
+    equip: "cloak",
+    stats: {
+      "Final P.DEF": "4%",
+      "Final M.DEF": "4%"
+    }
+  },
+  "Slayer of Shadows Card [Muffler]": {
+    equip: "cloak",
+    stats: {
+      "Fire Attribute RES": "33.80%",
+      "Max HP%": "18%"
+    }
+  },
+  "Terrible Tornado (Soul) Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "PVP Final P.DMG RED": "7.80%",
+      "Max HP%": "31%"
+    }
+  },
+  "Terrible Tornado Card": {
+    equip: "headgear",
+    stats: {
+      "Physical Lifesteal": "21%",
+      "Magic Lifesteal": "21%"
+    }
+  },
+  "Thara Frog": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "14%",
+      "Final P.DEF": "7%"
+    }
+  },
+  "Thief Bug Card": {
+    equip: "cloak",
+    stats: {
+      "M.DMG RED": "60"
+    }
+  },
+  "Toad Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Final P.DMG RED": "15%"
+    }
+  },
+  "Toad Card [Day] [★]": {
+    equip: "cloak",
+    stats: {
+      "Final P.DMG RED": "27%"
+    }
+  },
+  "Ultraman Seven Card": {
+    equip: "cloak",
+    stats: {
+      "Final M.DMG RED": "15%"
+    }
+  },
+  "Ultraman Taro Card": {
+    equip: "cloak",
+    stats: {
+      "Final M.DMG RED": "25%"
+    }
+  },
+  "Wanderer Card": {
+    equip: "cloak",
+    stats: {
+      "PVP Final M.DMG RED": "3.60%",
+      "PVP Debuff Duration RED": "3.60"
+    }
+  },
+  "Whisper Card": {
+    equip: "cloak",
+    stats: {
+      "M.DMG RED": "240"
+    }
+  },
+  "Mole Card": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "23%",
+      "Shadow Attribute RES": "43.10%"
+    }
+  },
+  "Ungoliant Card": {
+    equip: "cloak",
+    stats: {
+      "HP Regen per 5s": "5.80%",
+      "Final P.DEF": "11.50%"
+    }
+  },
+  "Queen Scaraba Card [Void]": {
+    equip: "cloak",
+    stats: {
+      "Bonus DMG to Insect": "16.50%",
+      "Final P.DEF": "19.80%"
+    }
+  },
+  "Vesper Card [Night]": {
+    equip: "cloak",
+    stats: {
+      "HP Regen per 5s": "8.25%",
+      "Max HP%": "33%"
+    }
+  },
+  "Toki Card [Cloak]": {
+    equip: "cloak",
+    stats: {
+      "Wind Attribute RES": "45%",
+      "VIT": "60"
+    }
+  },
+  "Shinken Successor Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Fire Attribute RES": "52.50%",
+      "Max HP%": "42%"
+    }
+  },
+  "Emilia Card [Cloak]": {
+    equip: "cloak",
+    stats: {
+      "Earth Attribute RES": "54.40%",
+      "Wind Attribute RES": "54.40%"
+    }
+  },
+  "Emilia Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Final P.DEF": "21.50%",
+      "Max HP%": "43%"
+    }
+  },
+  "Drosera Card": {
+    equip: "cloak",
+    stats: {
+      "HP Regen per 5s": "7%",
+      "PVP Final M.DMG RED": "8.40%"
+    }
+  },
+  "Hill Wind Card": {
+    equip: "cloak",
+    stats: {
+      "Reduce DMG from Angel": "17.50%",
+      "P.DMG RED": "3360"
+    }
+  },
+  "Ktullanux Card [Day]": {
+    equip: "cloak",
+    stats: {
+      "Wind Attribute RES": "78.80%",
+      "Max HP%": "42%"
+    }
+  },
+  "Skyward Baoku Lee Card [Night]": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "0.38",
+      "PVP Final M.DMG RED": "0.16"
+    }
+  },
+  "Alexander Card [Cloak]": {
+    equip: "cloak",
+    stats: {
+      "HP Regen per 5s": "7.50%",
+      "Reduce DMG from Brute": "17.50%"
+    }
+  },
+  "Toast Capoo Card": {
+    equip: "cloak",
+    stats: {
+      "PVP Final M.DMG RED": "11.60%",
+      "Final M.DEF": "11.60%"
+    }
+  },
+  "Hikari Yagami Card [Cloak]": {
+    equip: "cloak",
+    stats: {
+      "VIT": "70",
+      "Final M.DMG RED": "15%"
+    }
+  },
+  "Himika Shinobibe Card [Cloak]": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "24%",
+      "PVP Final M.DMG RED": "12%"
+    }
+  },
+  "Randel Card": {
+    equip: "cloak",
+    stats: {
+      "Max HP%": "31%",
+      "Crit DMG RED": "31%"
+    }
+  },
+  "Armored Titan Card [Void]": {
+    equip: "shoes",
+    stats: {
+      "LUK": "57"
+    }
+  },
+  "Axe-wielding Kobold Card": {
+    equip: "shoes",
+    stats: {
+      "Final M.DEF": "5%",
+      "Final M.DMG RED": "5%"
+    }
+  },
+  "Axe-wielding Skel Pirate Card": {
+    equip: "shoes",
+    stats: {
+      "P.DEF": "60",
+      "P.DMG RED": "120"
+    }
+  },
+  "Baby Desert Wolf Card": {
+    equip: "shoes",
+    stats: {
+      "M.DEF": "30",
+      "M.DMG RED": "30"
+    }
+  },
+  "Bane Dragon Card [Void]": {
+    equip: "shoes",
+    stats: {
+      "PVP Debuff RES": "7.30",
+      "Max HP%": "29%"
+    }
+  },
+  "Chonchon Card": {
+    equip: "shoes",
+    stats: {
+      "Max HP": "1,200"
+    }
+  },
+  "Colossal Titan Card [Void]": {
+    equip: "shoes",
+    stats: {
+      "AGI": "57"
+    }
+  },
+  "Cornutus Card": {
+    equip: "shoes",
+    stats: {
+      "Final P.DEF": "3%",
+      "Final P.DMG RED": "3%"
+    }
+  },
+  "Dagger-wielding Goblin Card": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "20%"
+    }
+  },
+  "Dark Lord Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "PVP Final P.DMG RED": "9%"
+    }
+  },
+  "Dark Lord Card [Day] [★]": {
+    equip: "shoes",
+    stats: {
+      "PVP Final P.DMG RED": "15%"
+    }
+  },
+  "Dragonewt Prince Card [Boots]": {
+    equip: "shoes",
+    stats: {
+      "Water Attribute RES": "33.80%",
+      "Max HP%": "18%"
+    }
+  },
+  "Eddga Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Small": "15%",
+      "Max HP%": "-25%"
+    }
+  },
+  "Eddga Card [Day] [★]": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Small": "30%",
+      "Max HP%": "-25%"
+    }
+  },
+  "Eggyra Card": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Medium": "10%"
+    }
+  },
+  "Eren Card": {
+    equip: "shoes",
+    stats: {
+      "VIT": "32",
+      "Movement Speed%": "15%"
+    }
+  },
+  "Fallen Bishop Card [Night]": {
+    equip: "shoes",
+    stats: {
+      "Bonus DMG to Demi-Human": "17%",
+      "Bonus DMG to Brute": "17%"
+    }
+  },
+  "Geographer Card": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "20%",
+      "Wind Attribute RES": "37.50%"
+    }
+  },
+  "Ghostring Card [Void]": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Large": "15%"
+    }
+  },
+  "Ghostring Card [Void] [★]": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Large": "30%"
+    }
+  },
+  "Grand Peco Card": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "20%",
+      "Ghost Attribute RES": "37.50%"
+    }
+  },
+  "Injustice Card": {
+    equip: "shoes",
+    stats: {
+      "PVP M.DMG RED": "360"
+    }
+  },
+  "Isis Card": {
+    equip: "shoes",
+    stats: {
+      "Final M.DEF": "3%",
+      "Final M.DMG RED": "3%"
+    }
+  },
+  "King Dramoh Card [Night]": {
+    equip: "shoes",
+    stats: {
+      "Final P.DEF": "7.50%",
+      "Final P.DMG RED": "7.50%"
+    }
+  },
+  "King Dramoh Card [Night] [★]": {
+    equip: "shoes",
+    stats: {
+      "Final P.DEF": "13.50%",
+      "Final P.DMG RED": "13.50%"
+    }
+  },
+  "Light of Goblin Card [Shoes]": {
+    equip: "shoes",
+    stats: {
+      "Neutral Attribute RES": "33.80%",
+      "Max HP%": "18%"
+    }
+  },
+  "Lost Dragon Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "48%"
+    }
+  },
+  "Male Thief Bug Card": {
+    equip: "shoes",
+    stats: {
+      "P.DEF": "30",
+      "P.DMG RED": "30"
+    }
+  },
+  "Matyr Card": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "12%"
+    }
+  },
+  "Medusa Card": {
+    equip: "shoes",
+    stats: {
+      "PETRIFY RES": "36%",
+      "Max HP%": "12.80%"
+    }
+  },
+  "Merman Card": {
+    equip: "shoes",
+    stats: {
+      "PVP Final P.DMG RED": "3.50%",
+      "Max HP%": "14%"
+    }
+  },
+  "Mistress Card [Void]": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Medium": "15%"
+    }
+  },
+  "Mistress Card [Void] [★]": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Medium": "30%"
+    }
+  },
+  "Moonlight Flower Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "30%",
+      "Movement Speed%": "25%"
+    }
+  },
+  "Moonlight Flower Card [Day] [★]": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "54%",
+      "Movement Speed%": "25%"
+    }
+  },
+  "Orc Hero Card [Night]": {
+    equip: "shoes",
+    stats: {
+      "Final M.DEF": "7.50%",
+      "Final M.DMG RED": "7.50%"
+    }
+  },
+  "Orc Hero Card [Night] [★]": {
+    equip: "shoes",
+    stats: {
+      "Final M.DEF": "13.50%",
+      "Final M.DMG RED": "13.50%"
+    }
+  },
+  "Pecopeco Card": {
+    equip: "shoes",
+    stats: {
+      "M.DEF": "60",
+      "M.DMG RED": "120"
+    }
+  },
+  "Raggler Card": {
+    equip: "shoes",
+    stats: {
+      "PVP Final M.DMG RED": "3.50%",
+      "Max HP%": "14%"
+    }
+  },
+  "Ranga Card": {
+    equip: "shoes",
+    stats: {
+      "Final P.DMG RED": "4%",
+      "Final M.DMG RED": "4%"
+    }
+  },
+  "Raydric Card": {
+    equip: "shoes",
+    stats: {
+      "Final P.DEF": "5%",
+      "Final P.DMG RED": "5%"
+    }
+  },
+  "Skeggiold Card [Night]": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "30%",
+      "Wind Attribute RES": "56.30%"
+    }
+  },
+  "Skeleton General Card": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Small": "10%"
+    }
+  },
+  "Skeleton Prisoner Card": {
+    equip: "shoes",
+    stats: {
+      "PVP P.DMG RED": "360"
+    }
+  },
+  "Sohee Card": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Large": "10%"
+    }
+  },
+  "Speed-o-Sonic (Soul) Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "PVP Final P.DMG RED": "7.80%",
+      "Max HP%": "31%"
+    }
+  },
+  "Ultraman Jack Card": {
+    equip: "shoes",
+    stats: {
+      "Final P.DMG RED": "7.50%",
+      "Final M.DMG RED": "7.50%"
+    }
+  },
+  "Zombie Card": {
+    equip: "shoes",
+    stats: {
+      "Max HP": "4,800"
+    }
+  },
+  "Zombie Slaughter": {
+    equip: "shoes",
+    stats: {
+      "Bonus DMG to Undead": "12%",
+      "P.DMG RED": "1,536"
+    }
+  },
+  "Earth Deleter Card": {
+    equip: "shoes",
+    stats: {
+      "HP Regen per 5s": "5.80%",
+      "Reduce DMG from Insect": "14.40%"
+    }
+  },
+  "Sky Deleter Card": {
+    equip: "shoes",
+    stats: {
+      "HP Regen per 5s": "5.80%",
+      "Reduce DMG from Demon": "14.40%"
+    }
+  },
+  "Faceworm Queen Card [Night]": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "23.10%",
+      "VIT": "82.5"
+    }
+  },
+  "Elite Apocalypse Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "Final M.DMG RED": "11.50%",
+      "VIT": "57.5"
+    }
+  },
+  "Rei Card [Boots]": {
+    equip: "shoes",
+    stats: {
+      "Fire Attribute RES": "45%",
+      "VIT": "60"
+    }
+  },
+  "Conqueror Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "Neutral Attribute RES": "52.50%",
+      "VIT": "105"
+    }
+  },
+  "Natsuki Subaru Card [Shoes]": {
+    equip: "shoes",
+    stats: {
+      "VIT": "73",
+      "Reduce DMG from Demi-Human": "18.10%"
+    }
+  },
+  "Natsuki Subaru Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "38%",
+      "Reduce DMG from Dragon": "30%"
+    }
+  },
+  "Water Spirit Card": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "28%",
+      "Bleed RES": "52.50%"
+    }
+  },
+  "Phylla Card": {
+    equip: "shoes",
+    stats: {
+      "Reduce DMG from Fish": "17.50%",
+      "P.DMG RED": "3360"
+    }
+  },
+  "Shelter Card [Night]": {
+    equip: "shoes",
+    stats: {
+      "Neutral Attribute RES": "78.80%",
+      "Max HP%": "42%"
+    }
+  },
+  "Alexander Card [Shoes]": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "28%",
+      "Final P.DEF": "15%"
+    }
+  },
+  "Wealthy Capoo Card [Day]": {
+    equip: "shoes",
+    stats: {
+      "PVP Final P.DMG RED": "14.30%",
+      "PVP Final M.DMG RED": "14.30%"
+    }
+  },
+  "Shibaraku Tsurugibe Card [Shoes]": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "24%",
+      "PVP Final P.DMG RED": "12%"
+    }
+  },
+  "Trentini Card": {
+    equip: "shoes",
+    stats: {
+      "Max HP%": "31%",
+      "Crit DMG RED": "31%"
+    }
+  },
+  "Angeling Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Magic Lifesteal": "15%"
+    }
+  },
+  "Angeling Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Magic Lifesteal": "27%"
+    }
+  },
+  "Arc Angeling Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "PVP Debuff RES": "7.50",
+      "PVP Debuff Duration RED": "7.50"
+    }
+  },
+  "Archdam Card": {
+    equip: "accessory",
+    stats: {
+      "Debuff Duration RED": "12.50",
+      "Final P.DMG RED": "10%"
+    }
+  },
+  "Armin Card": {
+    equip: "accessory",
+    stats: {
+      "SLOW RES": "25%",
+      "PETRIFY RES": "25%"
+    }
+  },
+  "Banshee Card": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Wind Attribute Monster": "12%",
+      "Bonus DMG to Shadow Attribute Monster": "12%"
+    }
+  },
+  "Beast Titan Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "SLOW RES": "35%",
+      "VIT": "69"
+    }
+  },
+  "Beelzebub Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "P.ATK%": "18.60%",
+      "Final P.DMG Bonus": "18.60%"
+    }
+  },
+  "Bloody Knight Card": {
+    equip: "accessory",
+    stats: {
+      "Crit DMG Bonus": "20%"
+    }
+  },
+  "Bongun Card": {
+    equip: "accessory",
+    stats: {
+      "IMMOBILIZE RES": "30%"
+    }
+  },
+  "Coelacanth Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "M.ATK%": "18.60%",
+      "Final M.DMG Bonus": "18.60%"
+    }
+  },
+  "Cramp Card": {
+    equip: "accessory",
+    stats: {
+      "Earth Enhance": "15%"
+    }
+  },
+  "Creamy Card": {
+    equip: "accessory",
+    stats: {
+      "P.DMG Bonus": "60"
+    }
+  },
+  "Dark Frame Card": {
+    equip: "accessory",
+    stats: {
+      "Water Enhance": "15%"
+    }
+  },
+  "Doppelganger Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "PVP M.DMG Bonus": "540"
+    }
+  },
+  "Doppelganger Card [Day] [★]": {
+    equip: "accessory",
+    stats: {
+      "PVP M.DMG Bonus": "900"
+    }
+  },
+  "Drake Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "6%"
+    }
+  },
+  "Drake Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "12%"
+    }
+  },
+  "Eclipse Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Final M.PEN": "12%"
+    }
+  },
+  "Eclipse Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Final M.PEN": "24%"
+    }
+  },
+  "Galapago Card": {
+    equip: "accessory",
+    stats: {
+      "Final Crit": "14%"
+    }
+  },
+  "Gargoyle Card": {
+    equip: "accessory",
+    stats: {
+      "P.DMG Reflect": "14%"
+    }
+  },
+  "Genos (Soul) Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "PVP Final P.DMG Bonus": "15.50%",
+      "PVP Final M.DMG Bonus": "15.50%"
+    }
+  },
+  "Gibbet Card": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Water Attribute Monster": "12%",
+      "Bonus DMG to Holy Attribute Monster": "12%"
+    }
+  },
+  "Gioia Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Final M.DMG Bonus": "15%",
+      "M.ATK%": "15%"
+    }
+  },
+  "Golden Thief Bug Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Final ASPD": "60%"
+    }
+  },
+  "Golden Thief Bug Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Final ASPD": "120%"
+    }
+  },
+  "Golem Card": {
+    equip: "accessory",
+    stats: {
+      "Final ASPD": "30%"
+    }
+  },
+  "Greatest General Card": {
+    equip: "accessory",
+    stats: {
+      "PETRIFY RES": "30%"
+    }
+  },
+  "Green Venatu Card": {
+    equip: "accessory",
+    stats: {
+      "Debuff PEN": "12.50",
+      "Final M.DMG Bonus": "10%"
+    }
+  },
+  "Hammer-wielding Kobold Card": {
+    equip: "accessory",
+    stats: {
+      "Physical Lifesteal": "10%"
+    }
+  },
+  "Horong Card": {
+    equip: "accessory",
+    stats: {
+      "SLEEP RES": "30%"
+    }
+  },
+  "Inosuke Hashibira Card (Blue)": {
+    equip: "accessory",
+    stats: {
+      "Final M.PEN": "15%"
+    }
+  },
+  "Inosuke Hashibira Card (Gold)": {
+    equip: "accessory",
+    stats: {
+      "M.PEN%": "21%",
+      "M.ATK%": "10.50%"
+    }
+  },
+  "King Dramoh Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Physical Lifesteal": "15%"
+    }
+  },
+  "King Dramoh Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Physical Lifesteal": "27%"
+    }
+  },
+  "Kraken Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Final M.DMG Bonus": "12%"
+    }
+  },
+  "Kraken Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Final M.DMG Bonus": "24%"
+    }
+  },
+  "Kukre Card": {
+    equip: "accessory",
+    stats: {
+      "Haste": "120"
+    }
+  },
+  "Light of Goblin Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "M.ATK%": "9%",
+      "Wind Enhance": "11.30%"
+    }
+  },
+  "Lost Dragon Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "P.ATK%": "24%",
+      "M.ATK%": "24%"
+    }
+  },
+  "Mantis Card": {
+    equip: "accessory",
+    stats: {
+      "M.DMG Bonus": "240"
+    }
+  },
+  "Marine Sphere Card": {
+    equip: "accessory",
+    stats: {
+      "Final P.DMG Bonus": "6%"
+    }
+  },
+  "Mastering Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Final P.DMG Bonus": "12%"
+    }
+  },
+  "Mastering Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Final P.DMG Bonus": "24%"
+    }
+  },
+  "Maya Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "M.DMG Reflect": "15%"
+    }
+  },
+  "Maya Card [Night] [★]": {
+    equip: "accessory",
+    stats: {
+      "M.DMG Reflect": "27%"
+    }
+  },
+  "Muka Card": {
+    equip: "accessory",
+    stats: {
+      "P.DMG Bonus": "240"
+    }
+  },
+  "Mutant Dragonoid Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "Final M.PEN": "24%"
+    }
+  },
+  "Naght Sieger Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "Final P.DMG Bonus": "18.60%",
+      "Final Crit": "18.60%"
+    }
+  },
+  "Necromancer Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Ghost Enhance": "30%",
+      "Poison Enhance": "30%"
+    }
+  },
+  "Nezuko Kamado Card (Blue)": {
+    equip: "accessory",
+    stats: {
+      "Final P.PEN": "15%"
+    }
+  },
+  "Obeaune Card": {
+    equip: "accessory",
+    stats: {
+      "STUN RES": "30%"
+    }
+  },
+  "Orange Venatu Card": {
+    equip: "accessory",
+    stats: {
+      "Debuff PEN": "12.50",
+      "Final P.DMG Bonus": "10%"
+    }
+  },
+  "Orc Archer Card": {
+    equip: "accessory",
+    stats: {
+      "Magic Lifesteal": "10%"
+    }
+  },
+  "Orc Baby Card": {
+    equip: "accessory",
+    stats: {
+      "SILENCE RES": "30%"
+    }
+  },
+  "Orc Disaster Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Final P.DEF": "7%",
+      "Final M.DEF": "7%"
+    }
+  },
+  "Orc Disaster Card II [Night]": {
+    equip: "accessory",
+    stats: {
+      "Final P.DMG Bonus": "29%",
+      "Final M.DMG Bonus": "29%"
+    }
+  },
+  "Orc Hero Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Crit DMG Bonus": "30%"
+    }
+  },
+  "Orc Hero Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Crit DMG Bonus": "54%"
+    }
+  },
+  "Osiris Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "Final P.PEN": "12%"
+    }
+  },
+  "Osiris Card [Day] [★]": {
+    equip: "accessory",
+    stats: {
+      "Final P.PEN": "24%"
+    }
+  },
+  "Parasite Card": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Earth Attribute Monster": "12%",
+      "Bonus DMG to Ghost Attribute Monster": "12%"
+    }
+  },
+  "Penomena Card": {
+    equip: "accessory",
+    stats: {
+      "Fire Enhance": "15%"
+    }
+  },
+  "Pharaoh Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "Crit DMG RED": "30%"
+    }
+  },
+  "Pharaoh Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "Crit DMG RED": "54%"
+    }
+  },
+  "Phen Card": {
+    equip: "accessory",
+    stats: {
+      "Final M.PEN": "6%"
+    }
+  },
+  "Pirate Skeleton Card": {
+    equip: "accessory",
+    stats: {
+      "M.PEN": "120"
+    }
+  },
+  "Poison Spore Card": {
+    equip: "accessory",
+    stats: {
+      "M.DMG Bonus": "60"
+    }
+  },
+  "Poporing Card": {
+    equip: "accessory",
+    stats: {
+      "M.PEN": "60"
+    }
+  },
+  "Sageworm Card": {
+    equip: "accessory",
+    stats: {
+      "P.DMG Reflect": "10%"
+    }
+  },
+  "Saitama (Soul) Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Final P.PEN": "31%",
+      "Final M.PEN": "31%"
+    }
+  },
+  "Sea Otter Card": {
+    equip: "accessory",
+    stats: {
+      "STUN RES": "33.60%",
+      "CURSE RES": "33.60%"
+    }
+  },
+  "Shuna Card": {
+    equip: "accessory",
+    stats: {
+      "P.ATK%": "8%",
+      "M.ATK%": "8%"
+    }
+  },
+  "Slayer of Shadows Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "P.ATK%": "9%",
+      "Fire Enhance": "11.30%"
+    }
+  },
+  "Smokie Card": {
+    equip: "accessory",
+    stats: {
+      "ASPD": "120"
+    }
+  },
+  "Soldier Skeleton Card": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "3%"
+    }
+  },
+  "Spore Card": {
+    equip: "accessory",
+    stats: {
+      "P.PEN": "60"
+    }
+  },
+  "Stem Worm Card": {
+    equip: "accessory",
+    stats: {
+      "FREEZE RES": "33.60%",
+      "BLIND RES": "33.60%"
+    }
+  },
+  "Storm Dragon Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Final ASPD": "70%",
+      "Final Haste": "7%"
+    }
+  },
+  "Tanjiro Kamado Card": {
+    equip: "accessory",
+    stats: {
+      "Final M.DMG Bonus": "10.50%",
+      "M.ATK%": "10.50%"
+    }
+  },
+  "Tarou Card": {
+    equip: "accessory",
+    stats: {
+      "Haste": "60"
+    }
+  },
+  "Tempest Dimik Card": {
+    equip: "accessory",
+    stats: {
+      "Debuff Duration RED": "12.50",
+      "Final M.DMG RED": "10%"
+    }
+  },
+  "Thief Bug Egg Card": {
+    equip: "accessory",
+    stats: {
+      "ASPD": "60"
+    }
+  },
+  "Toad Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "P.DMG Reflect": "15%"
+    }
+  },
+  "Toad Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "P.DMG Reflect": "27%"
+    }
+  },
+  "Ultraman Ace Card": {
+    equip: "accessory",
+    stats: {
+      "P.ATK%": "15%",
+      "M.ATK%": "15%"
+    }
+  },
+  "Vagabond Wolf Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "PVP P.DMG Bonus": "540"
+    }
+  },
+  "Vagabond Wolf Card [Day] [★]": {
+    equip: "accessory",
+    stats: {
+      "PVP P.DMG Bonus": "900"
+    }
+  },
+  "Vagabond Wolf Card [Void]": {
+    equip: "accessory",
+    stats: {
+      "PVP Debuff RES": "9"
+    }
+  },
+  "Vagabond Wolf Card [Void] [★]": {
+    equip: "accessory",
+    stats: {
+      "PVP Debuff RES": "15"
+    }
+  },
+  "Vitata Card": {
+    equip: "accessory",
+    stats: {
+      "Final P.PEN": "6%"
+    }
+  },
+  "Wind Ghost Card": {
+    equip: "accessory",
+    stats: {
+      "M.DMG Reflect": "10%"
+    }
+  },
+  "Wootan Fighter Card": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Fire Attribute Monster": "12%",
+      "Bonus DMG to Poison Attribute Monster": "12%"
+    }
+  },
+  "Wormtail Card": {
+    equip: "accessory",
+    stats: {
+      "FREEZE RES": "30%"
+    }
+  },
+  "Wraith Card": {
+    equip: "accessory",
+    stats: {
+      "Crit DMG RED": "20%"
+    }
+  },
+  "Yoyo Card": {
+    equip: "accessory",
+    stats: {
+      "P.PEN": "120"
+    }
+  },
+  "Zerom Card": {
+    equip: "accessory",
+    stats: {
+      "Final M.DMG Bonus": "6%"
+    }
+  },
+  "Zherlthsh Card": {
+    equip: "accessory",
+    stats: {
+      "Wind Enhance": "15%"
+    }
+  },
+  "Blazzer Card": {
+    equip: "accessory",
+    stats: {
+      "IMMOBILIZE RES": "34.50%",
+      "PVP Debuff RES": "6.9"
+    }
+  },
+  "Explosion Card": {
+    equip: "accessory",
+    stats: {
+      "STUN RES": "34.50%",
+      "PVP Debuff RES": "6.9"
+    }
+  },
+  "Gig Card": {
+    equip: "accessory",
+    stats: {
+      "SLOW RES": "34.50%",
+      "PVP Debuff RES": "6.9"
+    }
+  },
+  "Teddy Bear Card": {
+    equip: "accessory",
+    stats: {
+      "BLEED RES": "34.50%",
+      "PVP Debuff RES": "6.9"
+    }
+  },
+  "RSX-0806 Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "Physical Lifesteal": "16.50%",
+      "Magic Lifesteal": "16.50%"
+    }
+  },
+  "Nidhoggr's Shadow Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "Max SP%": "66%"
+    }
+  },
+  "Faceworm Queen Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "P.ATK%": "16.50%",
+      "Physical Lifesteal": "16.50%"
+    }
+  },
+  "Vesper Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "Neutral Enhance": "41.25%",
+      "Holy Enhance": "41.25%"
+    }
+  },
+  "Kenshiro Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "Earth Enhance": "30%",
+      "Water Enhance": "30%"
+    }
+  },
+  "Raoh Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "Fire Enhance": "30%",
+      "Wind Enhance": "30%"
+    }
+  },
+  "Legendary Savior Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Final P.DMG Bonus": "35%"
+    }
+  },
+  "Undefeatable Ken-Oh Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Crit DMG Bonus": "35%",
+      "Final Crit": "17.50%"
+    }
+  },
+  "Natsuki Subaru Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Dragon": "36.30%"
+    }
+  },
+  "Rem Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "Water Enhance": "36.30%",
+      "Neutral Enhance": "36.30%"
+    }
+  },
+  "Ram Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "SP Regen per 5s": "-10%",
+      "M.ATK%": "31.50%",
+      "Final M.PEN": "31.50%"
+    }
+  },
+  "Rem Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "SP Regen per 5s": "-10%",
+      "P.ATK%": "31.50%",
+      "Final P.DMG Bonus": "31.50%"
+    }
+  },
+  "Beholder Card": {
+    equip: "accessory",
+    stats: {
+      "Neutral Attribute RES": "52.50%",
+      "P.DMG Reflect": "14%"
+    }
+  },
+  "Gremlin Card": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Small": "35%"
+    }
+  },
+  "Hodremlin Card": {
+    equip: "accessory",
+    stats: {
+      "M.ATK%": "28%"
+    }
+  },
+  "Vanberk Card": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Large": "35%"
+    }
+  },
+  "Gloom Under Night Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "Final P.PEN": "29.40%",
+      "Final P.DMG Bonus": "29.40%"
+    }
+  },
+  "Retribution Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "M.ATK%": "29.40%",
+      "Final M.DMG Bonus": "29.40%"
+    }
+  },
+  "Shelter Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "Final P.DMG Bonus": "29.40%",
+      "Final P.PEN": "29.40%"
+    }
+  },
+  "Downhill Fat Tiger Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Final ASPD": "-100%",
+      "Final Haste": "-10%",
+      "Neutral Enhance": "50%",
+      "Ghost Enhance": "50%"
+    }
+  },
+  "Wealthy Capoo Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "PVP Final P.DMG Bonus": "28.60%",
+      "PVP Final M.DMG Bonus": "28.60%"
+    }
+  },
+  "Mind-Controlled Ktullanux Card": {
+    equip: "accessory",
+    stats: {
+      "Physical Lifesteal": "25%",
+      "Magic Lifesteal": "25%"
+    }
+  },
+  "Mind-Controlled Retribution Card": {
+    equip: "accessory",
+    stats: {
+      "Shadow Enhance": "36.30%",
+      "Poison Enhance": "36.30%"
+    }
+  },
+  "MetalGarurumon Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Medium": "35%",
+      "Final P.DMG Bonus": "21%",
+      "Final M.DMG Bonus": "21%"
+    }
+  },
+  "Takeru Takaishi Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "Debuff Enhancement": "15",
+      "Final P.DMG Bonus": "17%"
+    }
+  },
+  "Yamato Ishida Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "Debuff Enhancement": "15",
+      "Final M.DMG Bonus": "17%"
+    }
+  },
+  "Thanatos' Expedition Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "PVP Final P.DMG Bonus": "22.50%",
+      "P.DMG Bonus": "4600"
+    }
+  },
+  "Morroc's Creation Card [Day]": {
+    equip: "accessory",
+    stats: {
+      "PVP Final M.DMG Bonus": "22.50%",
+      "M.DMG Bonus": "4600"
+    }
+  },
+  "Ryujinmaru Card [Night]": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Large": "35%",
+      "Final P.DMG Bonus": "23%",
+      "Final M.DMG Bonus": "23%"
+    }
+  },
+  "Wataru Ikusabe Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "PVP Final P.DMG Bonus": "12%",
+      "P.ATK%": "12%"
+    }
+  },
+  "Toraoh Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "PVP Final M.DMG Bonus": "12%",
+      "M.ATK%": "12%"
+    }
+  },
+  "Margaretha Sorin Card": {
+    equip: "accessory",
+    stats: {
+      "Holy Attribute RES": "53.80%",
+      "PVP Debuff RES": "10"
+    }
+  },
+  "Chen Card": {
+    equip: "accessory",
+    stats: {
+      "Bonus DMG to Medium": "30%",
+      "Debuff Enhancement": "8.8"
+    }
+  },
+  "Gertie Card": {
+    equip: "accessory",
+    stats: {
+      "Ghost Attribute RES": "53.80%",
+      "PVP Debuff RES": "10"
+    }
+  },
+  "Garm Card [Day] (2025)": {
+    equip: "accessory",
+    stats: {
+      "PVP Final P.DMG Bonus": "22.50%",
+      "Final P.DMG Bonus": "15%"
+    }
+  },
+  "Garm Baby Card [Day] (2025)": {
+    equip: "accessory",
+    stats: {
+      "PVP Final M.DMG Bonus": "22.50%",
+      "Final M.DMG Bonus": "15%"
+    }
+  },
+  "Garm's Despair Card": {
+    equip: "accessory",
+    stats: {
+      "PVP Debuff Duration RED": "9",
+      "Wind Attribute RES": "60%"
+    }
+  },
+  "Garm Baby's Protection Card": {
+    equip: "accessory",
+    stats: {
+      "PVP Debuff Duration RED": "9",
+      "Fire Attribute RES": "60%"
+    }
+  },
+  "Doggy Duckyo Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "M.DMG Bonus": "3900",
+      "Final M.DMG Bonus": "18%"
+    }
+  },
+  "Baby Duckyo Card [Accessory]": {
+    equip: "accessory",
+    stats: {
+      "P.DMG Bonus": "3900",
+      "Final P.DMG Bonus": "18%"
+    }
+  },
+  "Alarm Card": {
+    equip: "headgear",
+    stats: {
+      "Neutral Enhance": "15%"
+    }
+  },
+  "Alien Adacic Card": {
+    equip: "headgear",
+    stats: {
+      "Physical Lifesteal": "25%",
+      "Magic Lifesteal": "25%"
+    }
+  },
+  "Alligator Card": {
+    equip: "headgear",
+    stats: {
+      "Bonus Heal": "14%"
+    }
+  },
+  "Anacondaq Card": {
+    equip: "headgear",
+    stats: {
+      "M.DMG Bonus": "240"
+    }
+  },
+  "Ant Larva Card": {
+    equip: "headgear",
+    stats: {
+      "P.ATK%": "6%"
+    }
+  },
+  "Apocalypse Card": {
+    equip: "headgear",
+    stats: {
+      "Neutral Enhance": "25%",
+      "Holy Enhance": "25%"
+    }
+  },
+  "Axe-wielding Goblin Card": {
+    equip: "headgear",
+    stats: {
+      "Variable CD RED": "2.50"
+    }
+  },
+  "Beast Titan Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "PVP Debuff Duration RED": "5.75",
+      "PVP Debuff RES": "5.75"
+    }
+  },
+  "Benimaru Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "8%",
+      "Final M.DMG Bonus": "8%"
+    }
+  },
+  "Carat Card": {
+    equip: "headgear",
+    stats: {
+      "Bonus Heal": "10%"
+    }
+  },
+  "Clock Card": {
+    equip: "headgear",
+    stats: {
+      "Holy Enhance": "15%"
+    }
+  },
+  "Clock Tower Manager Card": {
+    equip: "headgear",
+    stats: {
+      "Ghost Enhance": "15%"
+    }
+  },
+  "Coco Card": {
+    equip: "headgear",
+    stats: {
+      "M.ATK": "120"
+    }
+  },
+  "Coelacanth Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "Final M.DMG Bonus": "18.60%",
+      "Final M.PEN": "18.60%"
+    }
+  },
+  "Dark Priest Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "PVP Debuff Duration RED": "9"
+    }
+  },
+  "Dark Priest Card [Day] [★]": {
+    equip: "headgear",
+    stats: {
+      "PVP Debuff Duration RED": "15"
+    }
+  },
+  "Dark Priest Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "PVP Final P.DMG Bonus": "9%"
+    }
+  },
+  "Dark Priest Card [Void] [★]": {
+    equip: "headgear",
+    stats: {
+      "PVP Final P.DMG Bonus": "15%"
+    }
+  },
+  "Dead Plankton Card": {
+    equip: "headgear",
+    stats: {
+      "P.PEN": "120"
+    }
+  },
+  "Deniro Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.PEN": "6%"
+    }
+  },
+  "Deviling Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "Debuff RES": "18.75"
+    }
+  },
+  "Deviling Card [Void] [★]": {
+    equip: "headgear",
+    stats: {
+      "Debuff RES": "33.75"
+    }
+  },
+  "Deviruchi Card": {
+    equip: "headgear",
+    stats: {
+      "Bonus Heal Received": "10%"
+    }
+  },
+  "Doppelganger Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "PVP Final M.DMG Bonus": "9%"
+    }
+  },
+  "Doppelganger Card [Night] [★]": {
+    equip: "headgear",
+    stats: {
+      "PVP Final M.DMG Bonus": "15%"
+    }
+  },
+  "Dragon Fly Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "M.ATK%": "12%"
+    }
+  },
+  "Dragon Fly Card [Void] [★]": {
+    equip: "headgear",
+    stats: {
+      "M.ATK%": "24%"
+    }
+  },
+  "Dragonewt Prince Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "P.ATK%": "9%",
+      "Poison Enhance": "11.30%"
+    }
+  },
+  "Drops Card": {
+    equip: "headgear",
+    stats: {
+      "P.PEN": "60"
+    }
+  },
+  "Dryad Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.PEN": "16%"
+    }
+  },
+  "Eclipse Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "P.ATK%": "12%"
+    }
+  },
+  "Eclipse Card [Night] [★]": {
+    equip: "headgear",
+    stats: {
+      "P.ATK%": "24%"
+    }
+  },
+  "Eddga Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "12%"
+    }
+  },
+  "Eddga Card [Night] [★]": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "24%"
+    }
+  },
+  "Elder Willow Card": {
+    equip: "headgear",
+    stats: {
+      "BLIND RES": "30%"
+    }
+  },
+  "Fallen Bishop Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "Final P.DMG Bonus": "18.60%",
+      "Final P.PEN": "18.60%"
+    }
+  },
+  "Fallen Bishop Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "-10%",
+      "Final ASPD": "-100%",
+      "HP Regen per 5s": "9.30%",
+      "Debuff Duration RED": "23"
+    }
+  },
+  "Fiery Dimik Card": {
+    equip: "headgear",
+    stats: {
+      "Fire Enhance": "25%",
+      "Earth Enhance": "25%"
+    }
+  },
+  "Flail-wielding Goblin Card": {
+    equip: "headgear",
+    stats: {
+      "CURSE RES": "30%"
+    }
+  },
+  "Frost Dimik Card": {
+    equip: "headgear",
+    stats: {
+      "Water Enhance": "25%",
+      "Wind Enhance": "25%"
+    }
+  },
+  "Ghoul Card": {
+    equip: "headgear",
+    stats: {
+      "Variable CT RED": "62.50%"
+    }
+  },
+  "Giearth Card": {
+    equip: "headgear",
+    stats: {
+      "P.DMG Bonus": "240"
+    }
+  },
+  "Gioia Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "15%",
+      "Final M.PEN": "15%"
+    }
+  },
+  "Grasshopper Card": {
+    equip: "headgear",
+    stats: {
+      "P.DMG Bonus": "60"
+    }
+  },
+  "Hammer-wielding Goblin Card": {
+    equip: "headgear",
+    stats: {
+      "Armor Break RES": "30%"
+    }
+  },
+  "Hellhound Card": {
+    equip: "headgear",
+    stats: {
+      "P.ATK%": "16%"
+    }
+  },
+  "Hinokami Tanjiro Kamado Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "21%",
+      "Final M.DMG Bonus": "21%"
+    }
+  },
+  "Joker Card": {
+    equip: "headgear",
+    stats: {
+      "Poison Enhance": "15%"
+    }
+  },
+  "King Dramoh Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Debuff Duration RED": "18.75"
+    }
+  },
+  "King Dramoh Card [Day] [★]": {
+    equip: "headgear",
+    stats: {
+      "Debuff Duration RED": "33.75"
+    }
+  },
+  "Lunatic Card": {
+    equip: "headgear",
+    stats: {
+      "M.ATK": "60"
+    }
+  },
+  "Mace-wielding Goblin Card": {
+    equip: "headgear",
+    stats: {
+      "POISON RES": "30%"
+    }
+  },
+  "Mace-wielding Kobold Card": {
+    equip: "headgear",
+    stats: {
+      "BLEED RES": "30%"
+    }
+  },
+  "Majoruros Card": {
+    equip: "headgear",
+    stats: {
+      "SP Regen per 5s": "5%"
+    }
+  },
+  "Mandragora Card": {
+    equip: "headgear",
+    stats: {
+      "M.DMG Bonus": "60"
+    }
+  },
+  "Marduk Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "6%"
+    }
+  },
+  "Martin Card": {
+    equip: "headgear",
+    stats: {
+      "M.PEN": "120"
+    }
+  },
+  "Mastering Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final P.PEN": "12%"
+    }
+  },
+  "Mastering Card [Night] [★]": {
+    equip: "headgear",
+    stats: {
+      "Final P.PEN": "24%"
+    }
+  },
+  "Maya Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "Bonus Heal Received": "15%"
+    }
+  },
+  "Maya Card [Void] [★]": {
+    equip: "headgear",
+    stats: {
+      "Bonus Heal Received": "27%"
+    }
+  },
+  "Mistress Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Final M.PEN": "12%"
+    }
+  },
+  "Mistress Card [Day] [★]": {
+    equip: "headgear",
+    stats: {
+      "Final M.PEN": "24%"
+    }
+  },
+  "Mummy Card": {
+    equip: "headgear",
+    stats: {
+      "Final M.PEN": "6%"
+    }
+  },
+  "Nereid Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "14%"
+    }
+  },
+  "Nightmare Card": {
+    equip: "headgear",
+    stats: {
+      "HP Regen per 5s": "5%"
+    }
+  },
+  "Nightmare Evil Druid Card": {
+    equip: "headgear",
+    stats: {
+      "Shadow Enhance": "25%",
+      "Undead Enhance": "25%"
+    }
+  },
+  "Orc Disaster Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG RED": "7%",
+      "Final M.DMG RED": "7%"
+    }
+  },
+  "Orc Disaster Card II [Void]": {
+    equip: "headgear",
+    stats: {
+      "Bonus DMG to Large": "38.80%",
+      "Bonus DMG to Small": "38.80%"
+    }
+  },
+  "Orc General Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "P.ATK%": "9%",
+      "Holy Enhance": "11.30%"
+    }
+  },
+  "Orc Hero Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Bonus Heal": "15%",
+      "STUN RES": "100%"
+    }
+  },
+  "Orc Hero Card [Day] [★]": {
+    equip: "headgear",
+    stats: {
+      "Bonus Heal": "27%",
+      "STUN RES": "100%"
+    }
+  },
+  "Orc Lord Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "SP Regen per 5s": "7.50%"
+    }
+  },
+  "Orc Lord Card [Void] [★]": {
+    equip: "headgear",
+    stats: {
+      "SP Regen per 5s": "13.50%"
+    }
+  },
+  "Orc Warrior Card": {
+    equip: "headgear",
+    stats: {
+      "Weapon Break RES": "30%"
+    }
+  },
+  "Owl Duke Card [Void]": {
+    equip: "headgear",
+    stats: {}
+  },
+  "Pharaoh Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "HP Regen per 5s": "7.50%"
+    }
+  },
+  "Pharaoh Card [Day] [★]": {
+    equip: "headgear",
+    stats: {
+      "HP Regen per 5s": "13.50%"
+    }
+  },
+  "Phreeoni Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "12%"
+    }
+  },
+  "Phreeoni Card [Void] [★]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "24%"
+    }
+  },
+  "Piere Card": {
+    equip: "headgear",
+    stats: {
+      "M.ATK%": "6%"
+    }
+  },
+  "Poring Card": {
+    equip: "headgear",
+    stats: {
+      "P.ATK": "60"
+    }
+  },
+  "Ragged Zombie Card": {
+    equip: "headgear",
+    stats: {
+      "M.ATK%": "16%"
+    }
+  },
+  "Rogue Card": {
+    equip: "headgear",
+    stats: {
+      "Final Crit": "7%",
+      "Crit DMG Bonus": "14%"
+    }
+  },
+  "Skeggiold Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "15%",
+      "Final P.PEN": "15%"
+    }
+  },
+  "Skeggiold Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "PVP Debuff PEN": "7.50",
+      "PVP Debuff RES": "7.50"
+    }
+  },
+  "Stainer Card": {
+    equip: "headgear",
+    stats: {
+      "P.ATK": "120"
+    }
+  },
+  "Stalactic Golem Card": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "14%"
+    }
+  },
+  "Storm Dragon Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "Physical Lifesteal": "14%",
+      "Magic Lifesteal": "14%"
+    }
+  },
+  "Sundering Dimik Card": {
+    equip: "headgear",
+    stats: {
+      "Poison Enhance": "25%",
+      "Ghost Enhance": "25%"
+    }
+  },
+  "Tao Gunka Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Holy Enhance": "30%",
+      "Neutral Enhance": "30%"
+    }
+  },
+  "Tao Gunka Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Earth Enhance": "30%",
+      "Fire Enhance": "30%"
+    }
+  },
+  "Tao Gunka Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "Water Enhance": "30%",
+      "Wind Enhance": "30%"
+    }
+  },
+  "Terrible Tornado (Soul) Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Physical Lifesteal": "31%",
+      "Magic Lifesteal": "31%"
+    }
+  },
+  "Verit Card": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "6%"
+    }
+  },
+  "Willow Card": {
+    equip: "headgear",
+    stats: {
+      "M.PEN": "60"
+    }
+  },
+  "Wootan Shooter Card": {
+    equip: "headgear",
+    stats: {
+      "Final M.PEN": "16%"
+    }
+  },
+  "Year of the Dragon Nian Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "31%"
+    }
+  },
+  "Year of the Dragon Nian Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "31%"
+    }
+  },
+  "Year of the Rabbit Nian Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Bonus DMG to Plant": "30%"
+    }
+  },
+  "Year of the Tiger Nian Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "PVP Final P.DMG BOnus": "10.50%",
+      "PVP Final M.DMG Bonus": "10.50%"
+    }
+  },
+  "Year of the Tiger Nian Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "21%",
+      "Final M.DMG Bonus": "21%"
+    }
+  },
+  "Zeke Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.PEN": "13%",
+      "Final M.PEN": "13%"
+    }
+  },
+  "Diabolic Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "11.50%",
+      "P.ATK%": "11.50%"
+    }
+  },
+  "Grizzly Card": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "11.50%",
+      "M.ATK%": "11.50%"
+    }
+  },
+  "Lava Golem Card": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "5.80%",
+      "Final P.DMG Bonus": "11.50%"
+    }
+  },
+  "Nightmare Terror Card": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "5.80%",
+      "Final M.DMG Bonus": "11.50%"
+    }
+  },
+  "Nidhoggr's Shadow Card [Void]": {
+    equip: "headgear",
+    stats: {
+      "M.ATK%": "16.50%",
+      "Magic Lifesteal": "16.50%"
+    }
+  },
+  "Queen Scaraba Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "16.50%",
+      "Final ASPD": "165%"
+    }
+  },
+  "Elite Archdam Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "6.90%",
+      "Debuff PEN": "11.5"
+    }
+  },
+  "Toki Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "Holy Enhance": "30%",
+      "Neutral Enhance": "30%"
+    }
+  },
+  "Shinken Successor Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "17.50%",
+      "M.ATK%": "17.50%"
+    }
+  },
+  "Ram Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "Fire Enhance": "36.30%",
+      "Wind Enhance": "36.30%"
+    }
+  },
+  "Rem Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "SP Regen per 5s": "-10%",
+      "Final Crit": "31.50%",
+      "Crit DMG Bonus": "63%"
+    }
+  },
+  "Explorer Card": {
+    equip: "headgear",
+    stats: {
+      "STUN RES": "42%",
+      "Max HP%": "33.60%"
+    }
+  },
+  "Isra Card": {
+    equip: "headgear",
+    stats: {
+      "P.ATK%": "28%"
+    }
+  },
+  "Echio Card": {
+    equip: "headgear",
+    stats: {
+      "Final P.PEN": "28%"
+    }
+  },
+  "Agav Card": {
+    equip: "headgear",
+    stats: {
+      "Final M.PEN": "28%"
+    }
+  },
+  "Retribution Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "P.ATK%": "29.40%",
+      "Final P.DMG Bonus": "29.40%"
+    }
+  },
+  "Ktullanux Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "-10.50%",
+      "Final ASPD": "-105%",
+      "Final P.DMG Bonus": "29.40%",
+      "Final Crit": "29.40%"
+    }
+  },
+  "Angel Capoo Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "PVP Debuff RES": "12.9",
+      "PVP Debuff Duration RED": "12.9"
+    }
+  },
+  "Bijou Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final ASPD": "-100%",
+      "Final Haste": "-10%",
+      "M.ATK%": "31.50%",
+      "Final M.PEN": "31.50%"
+    }
+  },
+  "Angemon Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Neutral Enhance": "40%",
+      "Shadow Enhance": "40%"
+    }
+  },
+  "Angewomon Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Holy Enhance": "40%",
+      "Ghost Enhance": "40%"
+    }
+  },
+  "Taichi Kamiya Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "Debuff PEN": "15",
+      "Crit DMG Bonus": "34%"
+    }
+  },
+  "Takeru Takaishi Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "Debuff PEN": "15",
+      "Final M.PEN": "17%"
+    }
+  },
+  "Yamato Ishida Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "Debuff PEN": "15",
+      "Final P.PEN": "17%"
+    }
+  },
+  "Hikari Yagami Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "Final Haste": "7%",
+      "Final P.DMG Bonus": "15%",
+      "Final M.DMG Bonus": "15%"
+    }
+  },
+  "Thanatos' Expedition [Night]": {
+    equip: "headgear",
+    stats: {
+      "PVP Final P.DMG Bonus": "22.50%",
+      "P.DMG Bonus%": "30%"
+    }
+  },
+  "Morroc's Creation [Night]": {
+    equip: "headgear",
+    stats: {
+      "PVP Final M.DMG Bonus": "22.50%",
+      "M.DMG Bonus%": "30%"
+    }
+  },
+  "Jyakomaru Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Wind Enhance": "40%",
+      "Water Enhance": "40%"
+    }
+  },
+  "Ryuoumaru Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Fire Enhance": "40%",
+      "Ghost Enhance": "40%"
+    }
+  },
+  "Senoumaru Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Neutral Enhance": "40%",
+      "Holy Enhance": "40%"
+    }
+  },
+  "Flamel Card": {
+    equip: "headgear",
+    stats: {
+      "M.ATK%": "31%"
+    }
+  },
+  "Shadow Chaser Gertie Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Crit DMG Bonus": "96%",
+      "Final P.PEN": "48%"
+    }
+  },
+  "Genetic Flamel Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "28%",
+      "P.ATK%": "20%"
+    }
+  },
+  "Sorcerer Celia Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final M.DMG Bonus": "28%",
+      "M.ATK%": "20%"
+    }
+  },
+  "Ranger Cecil Card [Night]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "24%",
+      "Final P.PEN": "24%"
+    }
+  },
+  "Garm's Agony Card": {
+    equip: "headgear",
+    stats: {
+      "PVP Final P.DMG Bonus": "12%",
+      "Physical Lifesteal": "13%"
+    }
+  },
+  "Garm Baby's Slaughter Card": {
+    equip: "headgear",
+    stats: {
+      "PVP Final M.DMG Bonus": "12%",
+      "Magic Lifesteal": "13%"
+    }
+  },
+  "Year of the Horse Nian Card [Day]": {
+    equip: "headgear",
+    stats: {
+      "Final P.DMG Bonus": "48%",
+      "Final M.DMG Bonus": "48%"
+    }
+  },
+  "Blossom Duckyo Card [Headgear]": {
+    equip: "headgear",
+    stats: {
+      "Final Crit": "15%",
+      "Crit DMG Bonus": "32%"
+    }
+  },
+  "Angel Biko [Night]": {
+    equip: "headgear",
+    stats: {
+      "Earth Enhance": "40%",
+      "Fire Enhance": "40%"
+    }
+  },
+  "Demon Duckyo [Night]": {
+    equip: "headgear",
+    stats: {
+      "Holy Enhance": "40%",
+      "Poison Enhance": "40%"
+    }
+  },
+  "Radiant Spring Steed Card [Backpack]": {
+    equip: "backpack",
+    stats: {
+      "Max HP": "96000",
+      "Crit DMG RED": "22%"
+    }
+  },
+  "Gilded Snowland Card [Backpack]": {
+    equip: "backpack",
+    stats: {
+      "Max HP": "96000",
+      "Final P.DEF": "11%"
+    }
+  },
+  "Spring Chasing Card [Backpack]": {
+    equip: "backpack",
+    stats: {
+      "Max HP": "96000",
+      "Final M.DEF": "11%"
+    }
+  },
+  "Year of the Horse Nian Shiny Card [Night]": {
+    equip: "backpack",
+    stats: {
+      "Final P.DEF": "24%",
+      "Final P.DMG RED": "24%"
+    }
+  },
+  "Year of the Horse Nian Blessing Card [Night]": {
+    equip: "backpack",
+    stats: {
+      "Crit DMG RED": "48%",
+      "Final P.DMG RED": "24%"
+    }
+  },
+  "Year of the Horse Nian Protection Card [Night]": {
+    equip: "backpack",
+    stats: {
+      "Final M.DEF": "24%",
+      "Final M.DMG RED": "24%"
+    }
+  },
 };
