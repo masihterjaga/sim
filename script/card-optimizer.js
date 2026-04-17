@@ -309,7 +309,7 @@ function buildOptimizerHTML() {
 
         <div class="co-block">
           <div class="co-block-title">Unused Cards (owned but not equipped)</div>
-          <p class="spoiler co-block-desc">Or any cards you're dreaming of and definitely can't afford <img alt=":dogekek:" src="https://masihterjaga.github.io/sim/img/dogekek.png" width="14" height="14"></img></p>
+          <p class="spoiler co-block-desc">Or any cards you're dreaming of and definitely can't afford, here you GO! <img alt=":dogekek:" src="https://masihterjaga.github.io/sim/img/dogekek.png" width="14" height="14"></img></p>
           <div id="co-unused-list" class="co-unused-list"></div>
           <div class="co-btn-group">
             <button class="co-add-btn" id="co-add-unused" type="button">+ Add Card</button>
