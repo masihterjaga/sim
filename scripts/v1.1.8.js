@@ -5422,7 +5422,7 @@ const preventPullToRefresh = (() => {
   };
 })();
 const PWAPersistenceInit = (() => {
-  if (IS_PWA) return;
+  //if (IS_PWA) return;
   
   let cachedElements = null;
   let restoreInProgress = false;
