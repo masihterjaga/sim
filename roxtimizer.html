@@ -573,6 +573,11 @@
     .tag-lightning.tag-disabled { opacity: 0.2; pointer-events: none; cursor: default; }
     .tag-lightning svg { width: 8px; height: 8px; }
 
+    .tag-lock { color: var(--muted); }
+    .tag-lock svg { width: 9px; height: 9px; }
+    .tag-lock:hover { border-color: rgba(91,142,240,0.4); background: rgba(91,142,240,0.08); color: var(--accent); }
+    .tag-lock.active { border-color: rgba(91,142,240,0.5); background: var(--accent-bg); color: var(--accent); }
+
     .close-btn,
     .nav-btn {
       width: 28px;
@@ -1518,19 +1523,6 @@
       letter-spacing: 0.04em;
     }
 
-    .co-div-modal-badge {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 2px 8px;
-      border-radius: 20px;
-    }
-
-    .co-div-modal-badge.blue   { color: var(--accent); background: var(--accent-bg); border: 1px solid var(--accent-bd); }
-    .co-div-modal-badge.purple { color: var(--violet); background: var(--violet-bg); border: 1px solid var(--violet-bd); }
-    .co-div-modal-badge.gold   { color: var(--gold);   background: var(--gold-bg);   border: 1px solid var(--gold-bd);   }
-
     .co-div-modal-close {
       width: 26px;
       height: 26px;
@@ -1600,14 +1592,15 @@
 
     .co-chip-swap { flex-shrink: 0; color: var(--accent); opacity: 0.85; }
 
-    .co-div-swap {
+    .co-div-swap,
+    .co-div-lock {
       position: absolute;
       bottom: -4px;
       right: -4px;
-      width: 13px;
-      height: 13px;
+      width: 12px;
+      height: 12px;
       pointer-events: none;
-      color: rgba(255,255,255,0.88);
+      color: rgba(255,255,255,0.9);
       filter: drop-shadow(0 0 2px rgba(0,0,0,0.85));
     }
     .spoiler {
@@ -1797,7 +1790,10 @@
               <div class="help-item"><span class="help-num">2.</span><span class="help-text">3 dots above the title to set your div quality! Also, you can have multiple sepir & riper flash here!</span></div>
               <div class="help-item"><span class="help-num">3.</span><span class="help-text">Top right arrows to switch slots. Bottom left arrows to switch between divinities in the same slot.</span></div>
               <div class="help-item"><span class="help-num">4.</span><span class="help-text">You can add up to 8 divinities per slot with + Add Div. Hit Use to mark which one is currently equipped.</span></div>
-              <div class="help-item"><span class="help-num">5.</span><span class="help-text">This tool only supports main-offensive stats. Stat/%, HP%, ATK%, Haste not included! So yeah, it might not be acurate <span class="spoiler">for ED ED ED / SB SB SB enjoyer! <img alt=":pepekekcry:" src="https://masihterjaga.github.io/sim/img/pepekekcry.png" width="12" height="12"></span></span></div>
+<div class="help-item"><span class="help-num">5.</span><span class="help-text">All divs added here will be used by the optimizer to find the most effective slot combination.</span></div>
+              <div class="help-item"><span class="help-num">6.</span><span class="help-text">Lock a div to protect it from being deleted or replaced by the optimizer.</span></div>
+<div class="help-item"><span class="help-num">7.</span><span class="help-text">No worries, nothing resets on refresh or tab close. All your divs & stats are saved locally in your browser until you clear site data.</span></div>
+<div class="help-item"><span class="help-num">8.</span><span class="help-text">This tool only supports main-offensive stats. Stat/%, HP%, ATK%, Haste not included! So yeah, it might not be acurate <span class="spoiler">for ED ED ED / SB SB SB enjoyer! <img alt=":pepekekcry:" src="https://masihterjaga.github.io/sim/img/pepekekcry.png" width="12" height="12"></span></span></div>
             </div>
           </div>
         </div>
@@ -1921,7 +1917,6 @@
             <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>
           </span>
           <span class="co-div-modal-name" id="divModalName"></span>
-          <span class="co-div-modal-badge" id="divModalBadge"></span>
         </div>
         <button class="co-div-modal-close" id="divModalClose">
           <svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -1952,20 +1947,7 @@
   <script src="scripts/calculation-helpers.js"></script>
   <script src="scripts/calculation-core.js"></script>
 
-  <script>function isNodeFlash(id) {
-  if (typeof nodeData === 'undefined' || !nodeData[id]) return false;
-  const data = nodeData[id];
-  if (data.used == null) return false;
-  return !!(data.panels[data.used]?.lightning);
-}
-
-const AppState = {
-  get(key) {
-    if (key === 'isTestSpearActive')  return isNodeFlash('n1');
-    if (key === 'isTestReaperActive') return isNodeFlash('n8');
-    return false;
-  }
-};
+  <script>
 
 const divinityStats = {
   /* 
@@ -2027,27 +2009,6 @@ const MAX_PANELS   = 8;
 const MAX_DIVINITY = { blue: 5, purple: 6, gold: 7 };
 const nodeOrder    = ['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8'];
 
-function readStore() {
-  try { return JSON.parse(localStorage.getItem('roxtimizer') || '{}'); } catch { return {}; }
-}
-function writeStore(section, data) {
-  try { const s = readStore(); s[section] = data; localStorage.setItem('roxtimizer', JSON.stringify(s)); } catch {}
-}
-
-const dirMap = {
-  n7: { axis: 'Y', sign: -1 },
-  n8: { axis: 'Y', sign:  1 },
-  n2: { axis: 'X', sign:  1 },
-  n4: { axis: 'X', sign:  1 },
-  n6: { axis: 'X', sign:  1 },
-  n1: { axis: 'X', sign: -1 },
-  n3: { axis: 'X', sign: -1 },
-  n5: { axis: 'X', sign: -1 },
-};
-
-const LOCK_CLOSED_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
-const LOCK_OPEN_SVG   = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1C9.24 1 7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3h2c0-2.76-2.24-5-5-5zm0 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`;
-
 const SLOT_COUNTS = {
   weapon: 5, clothes: 2, cloak: 2, shoes: 2, accessory: 6, headgear: 6,
 };
@@ -2075,6 +2036,7 @@ const SNAP_FIELDS = [
   ['elemEnh', 'elemEnhance'], ['sizeEnh', 'sizeEnhance'],
   ['race', 'race'], ['attr', 'attr'], ['dmgStack', 'dmgStack'],
 ];
+
 const NUM_FIELDS = ['pen','crit','dmg','elemEnh','sizeEnh','race','attr','dmgStack'];
 
 const STAT_RESOLVERS = {
@@ -2123,8 +2085,56 @@ const STAT_DEDUP_GROUPS = [
   ['Final P.PEN',       'Final M.PEN'      ],
 ];
 
+const dirMap = {
+  n7: { axis: 'Y', sign: -1 },
+  n8: { axis: 'Y', sign:  1 },
+  n2: { axis: 'X', sign:  1 },
+  n4: { axis: 'X', sign:  1 },
+  n6: { axis: 'X', sign:  1 },
+  n1: { axis: 'X', sign: -1 },
+  n3: { axis: 'X', sign: -1 },
+  n5: { axis: 'X', sign: -1 },
+};
+
+const BASE_STAT_LABELS = [
+  { field: 'dmg',      label: 'Final P/M DMG Bonus' },
+  { field: 'elemEnh',  label: 'Element Enhance'      },
+  { field: 'sizeEnh',  label: 'DMG to Size'          },
+  { field: 'race',     label: 'DMG to Race'          },
+  { field: 'attr',     label: 'DMG to Attribute'     },
+  { field: 'dmgStack', label: 'Final DMG Bonus'      },
+];
+
+const ERR_MSG = 'No saved stats found. Use the <a href="https://masihterjaga.github.io/sim" target="_blank" rel="noopener">ratio calculator</a> first so you don\'t have to re-enter your stats each time.';
+
+const DIV_KEY_TO_FIELD = {
+  pen: 'pen', critdmg: 'crit', fpmdmgbns: 'dmg', element: 'elemEnh',
+  size_small: 'sizeEnh', size_medium: 'sizeEnh', size_large: 'sizeEnh',
+};
+
+const DIV_KEY_COND = {
+  size_small:  ctx => ctx.tSize === 'Small',
+  size_medium: ctx => ctx.tSize === 'Medium',
+  size_large:  ctx => ctx.tSize === 'Large',
+};
+
+const LOCK_CLOSED_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>`;
+const LOCK_OPEN_SVG   = `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1C9.24 1 7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3h2c0-2.76-2.24-5-5-5zm0 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>`;
+const LOCK_CLOSED_PATH = `<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>`;
+const LOCK_OPEN_PATH   = `<path d="M12 1C9.24 1 7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3h2c0-2.76-2.24-5-5-5zm0 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>`;
+
+const HORIZ_SWAP_SVG    = `<svg class="co-chip-swap" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4l4 4-4 4M3 8h18"/><path d="M7 20l-4-4 4-4M21 16H3"/></svg>`;
+const VERT_SWAP_SVG     = `<svg class="co-div-swap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l4 4 4-4M8 21V3"/><path d="M20 7l-4-4-4 4M16 3v18"/></svg>`;
+const DIV_LIGHTNING_SVG = `<svg class="co-div-lightning" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`;
+const DIV_LOCK_SVG      = `<svg class="co-div-lock" viewBox="0 0 24 24" fill="currentColor">${LOCK_CLOSED_PATH}</svg>`;
+
+const UP_ARROW   = `<svg class="co-stat-arrow co-stat-arrow--up" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8-12 8 12z"/></svg>`;
+const DOWN_ARROW = `<svg class="co-stat-arrow co-stat-arrow--down" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6l8 12 8-12z"/></svg>`;
+const FLASH_SVG  = `<svg class="co-stat-flash" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`;
+
 const tr    = (axis, pct) => `translate${axis}(${pct}%)`;
 const coEsc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const withVal = (base, val) => val ? `${base} (${val})` : base;
 
 function coFmt(n) {
   const v = Number(n) || 0;
@@ -2133,10 +2143,12 @@ function coFmt(n) {
   return v % 1 === 0 ? v.toString() : (Math.floor(v * 100) / 100).toString();
 }
 
-const container    = document.querySelector('.slider-container');
-const grid         = document.getElementById('grid');
-const summaryModal = document.getElementById('summaryModal');
-const summaryBtn   = document.getElementById('summaryBtn');
+function readStore() {
+  try { return JSON.parse(localStorage.getItem('roxtimizer') || '{}'); } catch { return {}; }
+}
+function writeStore(section, data) {
+  try { const s = readStore(); s[section] = data; localStorage.setItem('roxtimizer', JSON.stringify(s)); } catch {}
+}
 
 const nodeData = {};
 
@@ -2146,14 +2158,14 @@ let activeDir        = null;
 let isAnimating      = false;
 let isNodeNavigating = false;
 
-const defaultTag = () => ({ blue: true, purple: false, gold: false, lightning: false, divinity: [null] });
+const defaultTag = () => ({ blue: true, purple: false, gold: false, lightning: false, locked: false, divinity: [null] });
 
 function getData(id) {
   if (!nodeData[id]) nodeData[id] = { count: 1, current: 0, used: null, panels: [defaultTag()] };
   const d = nodeData[id];
   if (!('used' in d)) d.used = null;
   while (d.panels.length < d.count) d.panels.push(defaultTag());
-  d.panels.forEach(p => { if (!Array.isArray(p.divinity)) p.divinity = [null]; });
+  d.panels.forEach(p => { if (!Array.isArray(p.divinity)) p.divinity = [null]; if (p.locked == null) p.locked = false; });
   return d;
 }
 
@@ -2164,6 +2176,21 @@ function saveState() {
 function loadState() {
   try { Object.assign(nodeData, readStore().divinity || {}); } catch {}
 }
+
+function isNodeFlash(id) {
+  if (typeof nodeData === 'undefined' || !nodeData[id]) return false;
+  const data = nodeData[id];
+  if (data.used == null) return false;
+  return !!(data.panels[data.used]?.lightning);
+}
+
+const AppState = {
+  get(key) {
+    if (key === 'isTestSpearActive')  return isNodeFlash('n1');
+    if (key === 'isTestReaperActive') return isNodeFlash('n8');
+    return false;
+  }
+};
 
 function getQuality(s) {
   if (s.gold)   return 'gold';
@@ -2235,38 +2262,14 @@ function renderSummaryModal() {
   ).join('');
 }
 
-const helpModal = document.getElementById('helpModal');
-
-summaryBtn.addEventListener('click', e => {
-  e.stopPropagation();
-  const isOpen = summaryModal.classList.contains('open');
-  helpModal.classList.remove('open');
-  if (!isOpen) renderSummaryModal();
-  summaryModal.classList.toggle('open', !isOpen);
-});
-
-document.getElementById('summaryClose').addEventListener('click', () => summaryModal.classList.remove('open'));
-summaryModal.addEventListener('click', e => e.stopPropagation());
-
-document.getElementById('helpBtn').addEventListener('click', e => {
-  e.stopPropagation();
-  const isOpen = helpModal.classList.contains('open');
-  summaryModal.classList.remove('open');
-  helpModal.classList.toggle('open', !isOpen);
-});
-document.getElementById('helpClose').addEventListener('click', () => helpModal.classList.remove('open'));
-helpModal.addEventListener('click', e => e.stopPropagation());
-document.addEventListener('click', () => { summaryModal.classList.remove('open'); helpModal.classList.remove('open'); });
-
 function syncUseBtn(btn, isUsed) {
   btn.classList.toggle('active', isUsed);
   btn.querySelector('span').textContent  = isUsed ? 'Used' : 'Use';
   btn.querySelector('svg').style.display = isUsed ? '' : 'none';
 }
 
-function shouldShowTrash(count, idx, used) {
-  if (count <= 1 || used === idx) return false;
-  return idx >= 1 || (count === 2 && used === 1);
+function shouldShowTrash(count, idx, used, locked = false) {
+  return !locked && count > 1 && used !== idx;
 }
 
 function makeDelBtn() {
@@ -2291,6 +2294,10 @@ function buildPanel(id) {
 
   panel.innerHTML = `
     <div class="panel-tags">
+      <button class="tag-btn tag-lock${s.locked ? ' active' : ''}" title="${s.locked ? 'Unlock' : 'Lock'} this divinity">
+        <svg viewBox="0 0 24 24" fill="currentColor">${s.locked ? LOCK_CLOSED_PATH : LOCK_OPEN_PATH}
+        </svg>
+      </button>
       <button class="tag-btn tag-blue${s.blue ? ' active' : ''}"></button>
       <button class="tag-btn tag-purple${s.purple ? ' active' : ''}"></button>
       <button class="tag-btn tag-gold${s.gold ? ' active' : ''}"></button>
@@ -2354,6 +2361,20 @@ function buildPanel(id) {
 
   panel.querySelector('.close-btn').addEventListener('click', () => closePanel());
 
+  const lockBtn = panel.querySelector('.tag-lock');
+  lockBtn.addEventListener('click', () => {
+    const cur = data.panels[data.current];
+    cur.locked = !cur.locked;
+    lockBtn.classList.toggle('active', cur.locked);
+    lockBtn.title = cur.locked ? 'Unlock this divinity' : 'Lock this divinity';
+    lockBtn.querySelector('svg').innerHTML = cur.locked ? LOCK_CLOSED_PATH : LOCK_OPEN_PATH;
+    const trash     = panelNav.querySelector('.del-btn');
+    const showTrash = shouldShowTrash(data.count, data.current, data.used, cur.locked);
+    if (showTrash && !trash)    panelNav.appendChild(makeDelBtn());
+    else if (!showTrash && trash) trash.remove();
+    saveState();
+  });
+
   if (nodeIdx > 0)
     panel.querySelector('.node-prev-btn').addEventListener('click', () => navigateNode(-1));
   if (nodeIdx < nodeOrder.length - 1)
@@ -2369,7 +2390,7 @@ function buildPanel(id) {
   if (canAdd) panel.querySelector('.add-btn').addEventListener('click', addSubPanel);
 
   const panelNav = panel.querySelector('.panel-nav');
-  if (shouldShowTrash(count, idx, data.used)) panelNav.appendChild(makeDelBtn());
+  if (shouldShowTrash(count, idx, data.used, s.locked)) panelNav.appendChild(makeDelBtn());
 
   const useBtn = panel.querySelector('.use-btn');
   useBtn.addEventListener('click', () => {
@@ -2380,7 +2401,7 @@ function buildPanel(id) {
     const nowUsed = data.used === cur;
     syncUseBtn(useBtn, nowUsed);
     const trash        = panelNav.querySelector('.del-btn');
-    const showTrashNow = shouldShowTrash(data.count, cur, data.used);
+    const showTrashNow = shouldShowTrash(data.count, cur, data.used, data.panels[cur]?.locked);
     if (showTrashNow && !trash)    panelNav.appendChild(makeDelBtn());
     else if (!showTrashNow && trash) trash.remove();
   });
@@ -2486,6 +2507,7 @@ function setupTags(panel, data, onQualityChange) {
     purple:    panel.querySelector('.tag-purple'),
     gold:      panel.querySelector('.tag-gold'),
     lightning: panel.querySelector('.tag-lightning'),
+    lock:      panel.querySelector('.tag-lock'),
   };
 
   function sync() {
@@ -2495,6 +2517,9 @@ function setupTags(panel, data, onQualityChange) {
     t.gold.classList.toggle('active', s.gold);
     t.lightning.classList.toggle('active', s.lightning);
     t.lightning.classList.toggle('tag-disabled', !s.gold);
+    t.lock.classList.toggle('active', s.locked);
+    t.lock.querySelector('svg').innerHTML = s.locked ? LOCK_CLOSED_PATH : LOCK_OPEN_PATH;
+    t.lock.title = s.locked ? 'Unlock this divinity' : 'Lock this divinity';
     saveState();
     onQualityChange?.();
   }
@@ -2538,15 +2563,6 @@ function swapPanel(incoming, slideDir) {
   incoming.addEventListener('transitionend', () => { outgoing.remove(); isAnimating = false; }, { once: true });
 }
 
-document.querySelectorAll('.node').forEach(cb => {
-  cb.addEventListener('change', () => {
-    if (isNodeNavigating) return;
-    if (isAnimating) { cb.checked = false; return; }
-    if (!cb.checked) return;
-    activePanel ? closePanel(() => openPanel(cb)) : openPanel(cb);
-  });
-});
-
 function openPanel(cb) {
   const dir  = dirMap[cb.id];
   const data = getData(cb.id);
@@ -2586,7 +2602,7 @@ function navigateTo(newIndex, slideDir) {
 
   const panelNav  = activePanel.querySelector('.panel-nav');
   const trash     = panelNav.querySelector('.del-btn');
-  const showTrash = shouldShowTrash(count, newIndex, data.used);
+  const showTrash = shouldShowTrash(count, newIndex, data.used, data.panels[newIndex]?.locked);
   if (showTrash && !trash)    panelNav.appendChild(makeDelBtn());
   else if (!showTrash && trash) trash.remove();
 
@@ -3048,8 +3064,6 @@ populateSelect(DOM_ELEMENTS.tDef,   Object.keys(DEFENSE_TABLE).filter(k => !k.in
 populateSelect(DOM_ELEMENTS.weapon, Object.keys(WEAPON_SIZE_MODIFIER_TABLE));
 populateSelect(DOM_ELEMENTS.wElem,  Object.keys(ELEMENT_COUNTER_TABLE));
 
-const withVal = (base, val) => val ? `${base} (${val})` : base;
-
 function syncTargetLabels(key) {
   const data = DEFENSE_TABLE[key] ?? {};
   DOM_ELEMENTS.dmgSizeLabel.textContent = withVal('DMG to Size',      data.sizeMob);
@@ -3128,59 +3142,19 @@ function loadStatsState() {
   } catch {}
 }
 
-document.getElementById('loadStatsBtn').addEventListener('click', () => {
-  try {
-    if (readStore().stats) {
-      setFormOpen(true);
-      showStatsMsg('Stats already saved.', 'ok');
-      return;
-    }
-    const raw = localStorage.getItem('pwa_snap');
-    if (!raw) { showStatsMsg(ERR_MSG, 'err'); return; }
-    fillFromSnap(JSON.parse(raw));
-    setFormOpen(true);
-    showStatsMsg('Stats loaded.', 'ok');
-  } catch {
-    showStatsMsg(ERR_MSG, 'err');
-  }
-});
+const container    = document.querySelector('.slider-container');
+const grid         = document.getElementById('grid');
+const summaryModal = document.getElementById('summaryModal');
+const summaryBtn   = document.getElementById('summaryBtn');
+const helpModal    = document.getElementById('helpModal');
+const coSection    = document.getElementById('card-optimizer');
 
-DOM_ELEMENTS.form.addEventListener('input',  saveStatsState);
-DOM_ELEMENTS.form.addEventListener('change', saveStatsState);
-
-const ERR_MSG = 'No saved stats found. Use the <a href="https://masihterjaga.github.io/sim" target="_blank" rel="noopener">ratio calculator</a> first so you don\'t have to re-enter your stats each time.';
-
-document.getElementById('loadStatsBtn').addEventListener('click', () => {
-  try {
-    if (readStore().stats) {
-      setFormOpen(true);
-      showStatsMsg('Stats already saved.', 'ok');
-      return;
-    }
-    const raw = localStorage.getItem('pwa_snap');
-    if (!raw) { showStatsMsg(ERR_MSG, 'err'); return; }
-    fillFromSnap(JSON.parse(raw));
-    setFormOpen(true);
-    showStatsMsg('Stats loaded.', 'ok');
-  } catch {
-    showStatsMsg(ERR_MSG, 'err');
-  }
-});
-
-DOM_ELEMENTS.tDef.addEventListener('change', () => { syncTargetLabels(DOM_ELEMENTS.tDef.value); saveStatsState(); });
-
-DOM_ELEMENTS.atkType.addEventListener('change', () => {
-  const isPen               = DOM_ELEMENTS.atkType.value === 'pen';
-  DOM_ELEMENTS.penField.hidden  = !isPen;
-  DOM_ELEMENTS.critField.hidden = isPen;
-  DOM_ELEMENTS.pen.value    = '';
-  DOM_ELEMENTS.crit.value   = '';
-  saveStatsState();
-});
-
-DOM_ELEMENTS.manualBtn.addEventListener('click', () => {
-  setFormOpen(!DOM_ELEMENTS.form.classList.contains('open'));
-});
+const divModalBackdrop  = document.getElementById('divModalBackdrop');
+const divModalName      = document.getElementById('divModalName');
+const divModalFlash     = document.getElementById('divModalFlash');
+const divModalStatsCur  = document.getElementById('divModalStatsCurrent');
+const divModalArrow     = document.getElementById('divModalArrow');
+const divModalStatsRec  = document.getElementById('divModalStatsRec');
 
 function getCalcStateFromForm() {
   const tDefKey  = DOM_ELEMENTS.tDef.value || '';
@@ -3299,16 +3273,84 @@ function runAndRender(section, calcState, ctx) {
   }, 30);
 }
 
-const DIV_KEY_TO_FIELD = {
-  pen: 'pen', critdmg: 'crit', fpmdmgbns: 'dmg', element: 'elemEnh',
-  size_small: 'sizeEnh', size_medium: 'sizeEnh', size_large: 'sizeEnh',
-};
+document.getElementById('divModalClose').addEventListener('click', closeDivModal);
+divModalBackdrop.addEventListener('click', e => { if (e.target === divModalBackdrop) closeDivModal(); });
 
-const DIV_KEY_COND = {
-  size_small:  ctx => ctx.tSize === 'Small',
-  size_medium: ctx => ctx.tSize === 'Medium',
-  size_large:  ctx => ctx.tSize === 'Large',
-};
+summaryBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  const isOpen = summaryModal.classList.contains('open');
+  helpModal.classList.remove('open');
+  if (!isOpen) renderSummaryModal();
+  summaryModal.classList.toggle('open', !isOpen);
+});
+document.getElementById('summaryClose').addEventListener('click', () => summaryModal.classList.remove('open'));
+summaryModal.addEventListener('click', e => e.stopPropagation());
+
+document.getElementById('helpBtn').addEventListener('click', e => {
+  e.stopPropagation();
+  const isOpen = helpModal.classList.contains('open');
+  summaryModal.classList.remove('open');
+  helpModal.classList.toggle('open', !isOpen);
+});
+document.getElementById('helpClose').addEventListener('click', () => helpModal.classList.remove('open'));
+helpModal.addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', () => { summaryModal.classList.remove('open'); helpModal.classList.remove('open'); });
+
+document.querySelectorAll('.node').forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (isNodeNavigating) return;
+    if (isAnimating) { cb.checked = false; return; }
+    if (!cb.checked) return;
+    activePanel ? closePanel(() => openPanel(cb)) : openPanel(cb);
+  });
+});
+
+DOM_ELEMENTS.tDef.addEventListener('change', () => { syncTargetLabels(DOM_ELEMENTS.tDef.value); saveStatsState(); });
+
+DOM_ELEMENTS.atkType.addEventListener('change', () => {
+  const isPen               = DOM_ELEMENTS.atkType.value === 'pen';
+  DOM_ELEMENTS.penField.hidden  = !isPen;
+  DOM_ELEMENTS.critField.hidden = isPen;
+  DOM_ELEMENTS.pen.value    = '';
+  DOM_ELEMENTS.crit.value   = '';
+  saveStatsState();
+});
+
+DOM_ELEMENTS.manualBtn.addEventListener('click', () => {
+  setFormOpen(!DOM_ELEMENTS.form.classList.contains('open'));
+});
+
+DOM_ELEMENTS.form.addEventListener('input',  saveStatsState);
+DOM_ELEMENTS.form.addEventListener('change', saveStatsState);
+
+document.getElementById('loadStatsBtn').addEventListener('click', () => {
+  try {
+    if (readStore().stats) {
+      setFormOpen(true);
+      showStatsMsg('Stats already saved.', 'ok');
+      return;
+    }
+    const raw = localStorage.getItem('pwa_snap');
+    if (!raw) { showStatsMsg(ERR_MSG, 'err'); return; }
+    fillFromSnap(JSON.parse(raw));
+    setFormOpen(true);
+    showStatsMsg('Stats loaded.', 'ok');
+  } catch {
+    showStatsMsg(ERR_MSG, 'err');
+  }
+});
+
+document.getElementById('calculateBtn').addEventListener('click', () => {
+  const calcState = getCalcStateFromForm();
+  const ctx = {
+    atkType: calcState.atkType,
+    wElem:   calcState.wElem,
+    tSize:   calcState.tSize,
+    tRace:   calcState.tRace,
+    tAttr:   calcState.tAttr,
+  };
+  runAndRender(coSection, calcState, ctx);
+});
 
 function stripCurrentDivinity(state, ctx) {
   const result = { ...state };
@@ -3371,12 +3413,15 @@ function runDivinityOptimizer(cardState, ctx) {
   if (!activeNodes.length) return null;
 
   const pools = activeNodes.map(id => {
-    const d = getData(id);
-    return { id, panels: d.panels.slice(0, d.count) };
+    const d       = getData(id);
+    const usedIdx = d.used;
+    if (usedIdx != null && d.panels[usedIdx]?.locked)
+      return { id, entries: [{ panel: d.panels[usedIdx], idx: usedIdx }] };
+    return { id, entries: d.panels.slice(0, d.count).map((panel, i) => ({ panel, idx: i })) };
   });
 
   const base           = { ...cardState, spearValue: 0, reaperValue: 0 };
-  const totalCombos    = pools.reduce((acc, p) => acc * p.panels.length, 1);
+  const totalCombos    = pools.reduce((acc, p) => acc * p.entries.length, 1);
   let bestMult         = -Infinity;
   let bestSelection    = null;
 
@@ -3388,10 +3433,10 @@ function runDivinityOptimizer(cardState, ctx) {
           if (m > bestMult) { bestMult = m; bestSelection = sel.map(s => ({ ...s })); }
           return;
         }
-        const { id, panels } = pools[poolIdx];
-        for (let i = 0; i < panels.length; i++) {
-          sel.push({ id, panelIndex: i });
-          recurse(poolIdx + 1, sel, applyDivinityPanel(state, panels[i], id, ctx));
+        const { id, entries } = pools[poolIdx];
+        for (const { panel, idx } of entries) {
+          sel.push({ id, panelIndex: idx });
+          recurse(poolIdx + 1, sel, applyDivinityPanel(state, panel, id, ctx));
           sel.pop();
         }
       })(0, [], base);
@@ -3399,14 +3444,14 @@ function runDivinityOptimizer(cardState, ctx) {
     () => {
       let running = { ...base };
       bestSelection = [];
-      for (const { id, panels } of pools) {
-        let localBest = -Infinity, localIdx = 0;
-        for (let i = 0; i < panels.length; i++) {
-          const m = evalMult(applyDivinityPanel(running, panels[i], id, ctx));
-          if (m > localBest) { localBest = m; localIdx = i; }
+      for (const { id, entries } of pools) {
+        let localBest = -Infinity, localIdx = entries[0].idx;
+        for (const { panel, idx } of entries) {
+          const m = evalMult(applyDivinityPanel(running, panel, id, ctx));
+          if (m > localBest) { localBest = m; localIdx = idx; }
         }
         bestSelection.push({ id, panelIndex: localIdx });
-        running = applyDivinityPanel(running, panels[localIdx], id, ctx);
+        running = applyDivinityPanel(running, entries.find(e => e.idx === localIdx).panel, id, ctx);
       }
       bestMult = evalMult(applyAllDivinityPanels(base, bestSelection, ctx));
     }
@@ -3448,17 +3493,6 @@ function runCoordinateDescent(pureBase, lockedBaseState, cardPool, slotCounts, a
   return { bestCards, bestDivSel, bestMult };
 }
 
-const divModalBackdrop  = document.getElementById('divModalBackdrop');
-const divModalName      = document.getElementById('divModalName');
-const divModalBadge     = document.getElementById('divModalBadge');
-const divModalFlash     = document.getElementById('divModalFlash');
-const divModalStatsCur  = document.getElementById('divModalStatsCurrent');
-const divModalArrow     = document.getElementById('divModalArrow');
-const divModalStatsRec  = document.getElementById('divModalStatsRec');
-
-document.getElementById('divModalClose').addEventListener('click', closeDivModal);
-divModalBackdrop.addEventListener('click', e => { if (e.target === divModalBackdrop) closeDivModal(); });
-
 function closeDivModal() {
   divModalBackdrop.classList.remove('open');
 }
@@ -3485,13 +3519,11 @@ function openDivModal({ nodeId, panelIndex, isChanged }) {
   const panel = data.panels[panelIndex];
   if (!panel) return;
 
-  const quality    = getQuality(panel);
-  const qualLabel  = quality.charAt(0).toUpperCase() + quality.slice(1);
-
-  divModalFlash.hidden      = !(panel.lightning && panel.gold);
-  divModalName.textContent  = `${fullNames[nodeId]} #${panelIndex + 1}`;
-  divModalBadge.className   = `co-div-modal-badge ${quality}`;
-  divModalBadge.textContent = qualLabel;
+  divModalFlash.hidden     = !(panel.lightning && panel.gold);
+  const currentNum         = data.used != null ? data.used + 1 : null;
+  divModalName.textContent = isChanged && currentNum != null
+    ? `${fullNames[nodeId]} #${currentNum} \u00bb #${panelIndex + 1}`
+    : `${fullNames[nodeId]} #${panelIndex + 1}`;
 
   if (isChanged && data.used != null && data.panels[data.used]) {
     divModalStatsCur.innerHTML = buildStatRowsHTML(data.panels[data.used]);
@@ -3511,19 +3543,19 @@ function openDivModal({ nodeId, panelIndex, isChanged }) {
 
 function buildDivNodesHTML(selection, currentByNode = null) {
   if (!selection || !selection.length) return '';
-  const LIGHTNING_SVG   = `<svg class="co-div-lightning" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`;
-  const VERT_SWAP_SVG   = `<svg class="co-div-swap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l4 4 4-4M8 21V3"/><path d="M20 7l-4-4-4 4M16 3v18"/></svg>`;
   return selection.map(({ id, panelIndex }) => {
     const data    = getData(id);
     const panel   = data.panels[panelIndex];
     if (!panel) return '';
     const quality    = getQuality(panel);
     const isChanged  = currentByNode ? panelIndex !== currentByNode[id] : false;
+    const isLocked   = currentByNode != null && panel.locked;
+    const hintIcon   = isChanged ? VERT_SWAP_SVG : isLocked ? DIV_LOCK_SVG : '';
     const circleClass = ['co-div-circle', `quality-${quality}`, panel.lightning ? 'has-lightning' : ''].filter(Boolean).join(' ');
     const shortLabel  = fullNames[id].split(' ')[0];
     return `<div class="co-div-node${isChanged ? ' co-div-changed' : ''}"
       data-nodeid="${id}" data-panelindex="${panelIndex}" data-changed="${isChanged}">
-      <div class="${circleClass}">${LIGHTNING_SVG}<span class="co-div-num">${panelIndex + 1}</span>${isChanged ? VERT_SWAP_SVG : ''}</div>
+      <div class="${circleClass}">${DIV_LIGHTNING_SVG}<span class="co-div-num">${panelIndex + 1}</span>${hintIcon}</div>
       <span class="co-div-lbl">${shortLabel}</span>
     </div>`;
   }).join('');
@@ -3539,6 +3571,69 @@ function bindDivNodes(container) {
       });
     });
   });
+}
+
+function buildEquipMap(names) {
+  const map = {};
+  for (const name of names) {
+    if (!name || name === '—') continue;
+    const card = lookupCard(name);
+    if (!card) continue;
+    const ep = (map[card.equip] ??= {});
+    ep[name] = (ep[name] || 0) + 1;
+  }
+  return map;
+}
+
+const buildBreakdownHTML = (equipMap, lockedMap = {}, beforeEquipMap = null) =>
+  Object.entries(equipMap).map(([equip, cards]) => {
+    const lockedInEquip = lockedMap[equip] || {};
+    const beforeInEquip = beforeEquipMap?.[equip] || {};
+    const chipsHTML = Object.entries(cards).map(([n, q]) => {
+      const numLocked = Math.min(lockedInEquip[n] || 0, q);
+      const numFree   = q - numLocked;
+      const parts     = [];
+      if (numLocked > 0)
+        parts.push(`<span class="co-chip co-chip--locked">${LOCK_CLOSED_SVG}${coEsc(n)}${numLocked > 1 ? `<span class="co-chip-qty"> ×${numLocked}</span>` : ''}</span>`);
+      if (numFree > 0) {
+        const freeCurrent = Math.max(0, (beforeInEquip[n] || 0) - (lockedInEquip[n] || 0));
+        const swapIcon    = beforeEquipMap != null && numFree > freeCurrent ? HORIZ_SWAP_SVG : '';
+        parts.push(`<span class="co-chip">${swapIcon}${coEsc(n)}${numFree > 1 ? `<span class="co-chip-qty"> ×${numFree}</span>` : ''}</span>`);
+      }
+      return parts.join('');
+    }).join('');
+    return `<div class="co-res-equip">
+      <span class="co-res-equip-lbl">${EQUIP_LABELS[equip] ?? equip}</span>
+      <span class="co-res-cards">${chipsHTML}</span>
+    </div>`;
+  }).join('') || '<span class="co-empty-state">No cards</span>';
+
+function buildStatsGridHTML(state, compareState, atkType) {
+  const atkField = atkType === 'crit'
+    ? { field: 'crit', label: 'Crit DMG BNS' }
+    : { field: 'pen',  label: 'Final PEN'    };
+  const labels = [
+    atkField,
+    ...BASE_STAT_LABELS.map(item =>
+      item.field === 'dmgStack' && (state.reaperValue || 0) > 0 ? { ...item, isSpear: true } : item
+    ),
+    ...((state.spearValue || 0) > 0 ? [{ field: 'spearValue', label: 'DMG to MVP/MINI, BOSS, and Normal Monsters', isSpear: true }] : []),
+  ];
+  return `
+    <div class="co-res-section">
+      <div class="co-res-section-title">Final Stats</div>
+      <div class="co-final-stats-grid">
+        ${labels.map(({ field, label, isSpear }) => {
+          const val   = state[field] ?? 0;
+          const diff  = compareState != null ? val - (compareState[field] ?? 0) : 0;
+          const arrow = diff > 0 ? UP_ARROW : diff < 0 ? DOWN_ARROW : '';
+          return `<div class="co-final-stat-row${isSpear ? ' co-final-stat-row--spear' : ''}">
+            <span class="co-final-stat-lbl">${isSpear ? `${FLASH_SVG}<span class="co-stat-lbl-text">${label}</span>` : label}</span>
+            <span class="co-final-stat-val">${coFmt(val)}%${arrow}</span>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
 }
 
 function renderResults(container, topResults, pureBase, currentMult, lockedCards = {}, equippedNames = [], ctx = {}, divinityResult = null, currentDivSel = []) {
@@ -3562,86 +3657,8 @@ function renderResults(container, topResults, pureBase, currentMult, lockedCards
       lockedCountByEquip[equip][name] = (lockedCountByEquip[equip][name] || 0) + 1;
   }
 
-  const HORIZ_SWAP_SVG = `<svg class="co-chip-swap" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4l4 4-4 4M3 8h18"/><path d="M7 20l-4-4 4-4M21 16H3"/></svg>`;
-
-  const buildBreakdownHTML = (equipMap, lockedMap = {}, beforeEquipMap = null) =>
-    Object.entries(equipMap).map(([equip, cards]) => {
-      const lockedInEquip  = lockedMap[equip] || {};
-      const beforeInEquip  = beforeEquipMap?.[equip] || {};
-      const chipsHTML = Object.entries(cards).map(([n, q]) => {
-        const numLocked = Math.min(lockedInEquip[n] || 0, q);
-        const numFree   = q - numLocked;
-        const parts     = [];
-        if (numLocked > 0)
-          parts.push(`<span class="co-chip co-chip--locked">${LOCK_CLOSED_SVG}${coEsc(n)}${numLocked > 1 ? `<span class="co-chip-qty"> ×${numLocked}</span>` : ''}</span>`);
-        if (numFree > 0) {
-          const freeCurrent = Math.max(0, (beforeInEquip[n] || 0) - (lockedInEquip[n] || 0));
-          const swapIcon    = beforeEquipMap != null && numFree > freeCurrent ? HORIZ_SWAP_SVG : '';
-          parts.push(`<span class="co-chip">${swapIcon}${coEsc(n)}${numFree > 1 ? `<span class="co-chip-qty"> ×${numFree}</span>` : ''}</span>`);
-        }
-        return parts.join('');
-      }).join('');
-      return `<div class="co-res-equip">
-        <span class="co-res-equip-lbl">${EQUIP_LABELS[equip] ?? equip}</span>
-        <span class="co-res-cards">${chipsHTML}</span>
-      </div>`;
-    }).join('') || '<span class="co-empty-state">No cards</span>';
-
-  const buildEquipMap = names => {
-    const map = {};
-    for (const name of names) {
-      if (!name || name === '—') continue;
-      const card = lookupCard(name);
-      if (!card) continue;
-      const ep = (map[card.equip] ??= {});
-      ep[name] = (ep[name] || 0) + 1;
-    }
-    return map;
-  };
-
   const byEquip       = buildEquipMap(best.cards);
   const beforeByEquip = buildEquipMap(equippedNames);
-
-  const atkField = ctx.atkType === 'crit'
-    ? { field: 'crit', label: 'Crit DMG BNS' }
-    : { field: 'pen',  label: 'Final PEN'    };
-
-  const FINAL_STAT_LABELS = [
-    atkField,
-    { field: 'dmg',      label: 'Final P/M DMG Bonus' },
-    { field: 'elemEnh',  label: 'Element Enhance'      },
-    { field: 'sizeEnh',  label: 'DMG to Size'          },
-    { field: 'race',     label: 'DMG to Race'          },
-    { field: 'attr',     label: 'DMG to Attribute'     },
-    { field: 'dmgStack', label: 'Final DMG Bonus'      },
-  ];
-
-  const UP_ARROW   = `<svg class="co-stat-arrow co-stat-arrow--up" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8-12 8 12z"/></svg>`;
-  const DOWN_ARROW = `<svg class="co-stat-arrow co-stat-arrow--down" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6l8 12 8-12z"/></svg>`;
-  const FLASH_SVG  = `<svg class="co-stat-flash" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`;
-
-  const buildStatsGridHTML = (state, compareState = null) => `
-    <div class="co-res-section">
-      <div class="co-res-section-title">Final Stats</div>
-      <div class="co-final-stats-grid">
-        ${[
-...FINAL_STAT_LABELS.map(item =>
-item.field === 'dmgStack' && (state.reaperValue || 0) > 0
-? { ...item, isSpear: true }
-: item
-),
-...((state.spearValue || 0) > 0 ? [{ field: 'spearValue', label: 'DMG to MVP/MINI, BOSS, and Normal Monsters', isSpear: true }] : [])
-].map(({ field, label, isSpear }) => {
-          const val   = state[field] ?? 0;
-          const diff  = compareState != null ? val - (compareState[field] ?? 0) : 0;
-          const arrow = diff > 0 ? UP_ARROW : diff < 0 ? DOWN_ARROW : '';
-          return `<div class="co-final-stat-row${isSpear ? ' co-final-stat-row--spear' : ''}">
-            <span class="co-final-stat-lbl">${isSpear ? `${FLASH_SVG}<span class="co-stat-lbl-text">${label}</span>` : label}</span>
-            <span class="co-final-stat-val">${coFmt(val)}%${arrow}</span>
-          </div>`;
-        }).join('')}
-      </div>
-    </div>`;
 
   const bestCardsState    = applyCards(pureBase, best.cards, ctx);
   const currentCardsState = applyCards(pureBase, equippedNames.filter(n => n && n !== '—'), ctx);
@@ -3679,7 +3696,7 @@ item.field === 'dmgStack' && (state.reaperValue || 0) > 0
     </div>
     ${bestDivNodesHTML}
     <div class="co-res-divider"></div>
-    ${buildStatsGridHTML(displayFinal, displayBefore)}
+    ${buildStatsGridHTML(displayFinal, displayBefore, ctx.atkType)}
     <div class="co-res-hero">
       <div class="co-res-hero-block">
         <div class="co-res-hero-val">×${coFmt(combinedBestMult)}</div>
@@ -3699,7 +3716,7 @@ item.field === 'dmgStack' && (state.reaperValue || 0) > 0
     </div>
     ${currentDivNodesHTML}
     <div class="co-res-divider"></div>
-    ${buildStatsGridHTML(displayBefore)}
+    ${buildStatsGridHTML(displayBefore, null, ctx.atkType)}
     <div class="co-res-hero">
       <div class="co-res-hero-block">
         <div class="co-res-hero-val">×${coFmt(currentMult)}</div>
@@ -3769,23 +3786,9 @@ item.field === 'dmgStack' && (state.reaperValue || 0) > 0
 loadState();
 nodeOrder.forEach(syncCircle);
 loadStatsState();
-
-const coSection = document.getElementById('card-optimizer');
 coSection.innerHTML = buildOptimizerHTML();
 restoreOptimizerState(coSection);
 bindOptimizerEvents(coSection);
-
-document.getElementById('calculateBtn').addEventListener('click', () => {
-  const calcState = getCalcStateFromForm();
-  const ctx = {
-    atkType: calcState.atkType,
-    wElem:   calcState.wElem,
-    tSize:   calcState.tSize,
-    tRace:   calcState.tRace,
-    tAttr:   calcState.tAttr,
-  };
-  runAndRender(coSection, calcState, ctx);
-});
 </script>
 </body>
 </html>
