@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta content="width=device-width, initial-scale=1" name="viewport"/>
   <title>RöXtimizer</title>
-<meta name="description" content="RöX Divinity & Card Optimizer!" />
+<meta name="description" content="Divinity & Card optimizer for Ragnarok X: Together." />
 <link rel="icon shortcut" type="image/x-icon" href="/sim/icons/favicon.ico">
 <link rel="icon" type="image/svg+xml" href="/sim/icons/favicon.svg">
 <link rel="icon" type="image/png" sizes="96x96" href="/sim/icons/favicon-96x96.png">
@@ -1411,7 +1411,7 @@
 
     .co-div-num {
       font-size: 13px;
-      font-weight: 700;
+      font-weight: 800;
       color: #fff;
       line-height: 1;
     }
@@ -1439,10 +1439,11 @@
 
     .co-div-lbl {
       font-size: 9px;
-      color: var(--muted);
+      margin-top:2px;
+      color: var(--loud);
       letter-spacing: 0.03em;
       text-align: center;
-      max-width: 44px;
+      max-width: 48px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -2866,7 +2867,7 @@ function buildOptimizerHTML() {
 
       <div class="co-block">
         <div class="co-block-title">Extra Buffs</div>
-        <p class="co-block-desc">If there are exclusive effects (elemental bonus, damage bonus, etc.) from card / eq (except headgear), add them here. Make sure these haven't already been included in the base inputs before Calculate.<br /><br />
+        <p class="co-block-desc">If there are exclusive effects (elemental bonus, damage bonus, etc.) from card / eq (except headgear), add them here. Make sure these haven't already been included in the base inputs.<br /><br />
 It is highly recommended to always add the Dancer's/Bard's Eternal Chaos or GS's Glorious Command bonus here for better accuracy.</p>
         <div id="co-buff-list" class="co-buff-list"></div>
         <div class="co-btn-group">
@@ -3658,7 +3659,7 @@ item.field === 'dmgStack' && (state.reaperValue || 0) > 0
 
   const bestDivNodesHTML = divinityResult
     ? `<div class="co-res-section">
-        <div class="co-res-section-title">Divinity</div>
+        <div class="co-res-section-title">Recommended Divinities (tap for details)</div>
         <div class="co-div-nodes">${buildDivNodesHTML(divinityResult.bestSelection, currentByNode)}</div>
        </div>` : '';
 
