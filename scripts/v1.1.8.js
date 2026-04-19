@@ -5479,7 +5479,7 @@ const PWAPersistenceInit = (() => {
 
   const finalizeWithMessage = (message, delay = 150) => {
     setTimeout(() => {
-      OverlayManager.hide();
+      if (IS_PWA) OverlayManager.hide();
       SnackbarQueue.add(message);
       restoreInProgress = false;
     }, delay);
@@ -5492,7 +5492,7 @@ const PWAPersistenceInit = (() => {
       restoreTimeoutId = null;
     }
     PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
-    OverlayManager.forceRemove();
+    if (IS_PWA) OverlayManager.forceRemove();
     restoreInProgress = false;
     setTimeout(() => {
       SnackbarQueue.add('Failed to restore previous data. Starting fresh.');
@@ -5546,7 +5546,7 @@ const PWAPersistenceInit = (() => {
       if (restoredCount === 0) throw new Error('No fields were restored');
 
       if (!state.isResultShown) {
-        OverlayManager.hide();
+        if (IS_PWA) OverlayManager.hide();
         restoreInProgress = false;
         return;
       }
@@ -5584,11 +5584,11 @@ const PWAPersistenceInit = (() => {
     });
   };
 
-  const state = IS_PWA ? shouldRestore() : null;
+  const state = shouldRestore();
   const isUpdating = IS_PWA && PWAUtils.storageGet(CONSTANTS.PWA_UPDATE_MARKER) === 'true';
 
   if (state || isUpdating) {
-    OverlayManager.show();
+    if (IS_PWA) OverlayManager.show();
     restoreInProgress = true;
     if (isUpdating) PWAUtils.storageRemove(CONSTANTS.PWA_UPDATE_MARKER);
   }
@@ -5596,16 +5596,14 @@ const PWAPersistenceInit = (() => {
   document.addEventListener('DOMContentLoaded', () => {
     init();
 
-    if (IS_PWA) {
-      if (state) {
-        try {
-          performRestore(state);
-        } catch (error) {
-          handleRestoreError(error);
-        }
-      } else if (isUpdating) {
-        finalizeWithMessage('Update completed successfully', 300);
+    if (state) {
+      try {
+        performRestore(state);
+      } catch (error) {
+        handleRestoreError(error);
       }
+    } else if (isUpdating) {
+      finalizeWithMessage('Update completed successfully', 300);
     }
 
     dropdownManager?.scheduleUpdate();
