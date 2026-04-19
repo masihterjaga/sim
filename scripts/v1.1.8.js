@@ -5422,34 +5422,27 @@ const preventPullToRefresh = (() => {
   };
 })();
 const PWAPersistenceInit = (() => {
-  //if (IS_PWA) return;
-  
   let cachedElements = null;
   let restoreInProgress = false;
   let restoreTimeoutId = null;
-  
   const RESTORE_TIMEOUT_MS = 3000;
-  
+
   const getFormElements = () => {
     if (!cachedElements) {
       cachedElements = Array.from(document.querySelectorAll(CONSTANTS.FORM_SELECTORS));
     }
     return cachedElements;
   };
-  
+
   const getSelectValue = (el) => {
     const selectedOption = el.options[el.selectedIndex];
-    return selectedOption ? {
-      text: selectedOption.textContent,
-      value: selectedOption.value
-    } : null;
+    return selectedOption ? { text: selectedOption.textContent, value: selectedOption.value } : null;
   };
-  
+
   const collectFormValues = () => {
     const values = {};
     getFormElements().forEach(el => {
       if (!el.id) return;
-      
       if (el.tagName === 'SELECT') {
         const selectValue = getSelectValue(el);
         if (selectValue) values[el.id] = selectValue;
@@ -5459,35 +5452,31 @@ const PWAPersistenceInit = (() => {
     });
     return values;
   };
-  
+
   const snap = () => {
     const data = PWAUtils.safeJSONStringify({
       form: collectFormValues(),
       isResultShown: true,
       ts: Date.now()
     });
-    
     return data ? PWAUtils.storageSet(CONSTANTS.PWA_STORAGE_KEY, data) : false;
   };
-  
+
   const shouldRestore = () => {
     const saved = PWAUtils.storageGet(CONSTANTS.PWA_STORAGE_KEY);
     if (!saved) return null;
-    
     const state = PWAUtils.safeJSONParse(saved);
     if (!state) {
       PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
       return null;
     }
-    
     if (Date.now() - state.ts > CONSTANTS.PWA_EXPIRY_MS) {
       PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
       return null;
     }
-    
     return state;
   };
-  
+
   const finalizeWithMessage = (message, delay = 150) => {
     setTimeout(() => {
       OverlayManager.hide();
@@ -5495,27 +5484,23 @@ const PWAPersistenceInit = (() => {
       restoreInProgress = false;
     }, delay);
   };
-  
+
   const handleRestoreError = (error) => {
     console.error('Restore failed:', error);
-    
     if (restoreTimeoutId) {
       clearTimeout(restoreTimeoutId);
       restoreTimeoutId = null;
     }
-    
     PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
     OverlayManager.forceRemove();
     restoreInProgress = false;
-    
     setTimeout(() => {
       SnackbarQueue.add('Failed to restore previous data. Starting fresh.');
     }, 100);
   };
-  
+
   const checkCalculationDone = () => {
     if (!restoreInProgress) return;
-    
     requestAnimationFrame(() => {
       if (AppState.get('isResultShown')) {
         if (restoreTimeoutId) {
@@ -5528,29 +5513,25 @@ const PWAPersistenceInit = (() => {
       }
     });
   };
-  
+
   const restoreSelectValue = (el, val) => {
     if (typeof val !== 'object' || !val.text || !val.value) return;
-    
     const options = Array.from(el.options);
     const matchedOption = options.find(opt => opt.textContent === val.text);
-    
     if (matchedOption) {
       el.selectedIndex = options.indexOf(matchedOption);
     } else {
       el.value = val.value;
     }
   };
-  
+
   const performRestore = (state) => {
     try {
       let restoredCount = 0;
-      
       Object.entries(state.form).forEach(([id, val]) => {
         try {
           const el = document.getElementById(id);
           if (!el) return;
-          
           if (el.tagName === 'SELECT') {
             restoreSelectValue(el, val);
           } else {
@@ -5561,21 +5542,19 @@ const PWAPersistenceInit = (() => {
           console.warn(`Failed to restore field ${id}:`, fieldError);
         }
       });
-      
-      if (restoredCount === 0) {
-        throw new Error('No fields were restored');
-      }
-      
+
+      if (restoredCount === 0) throw new Error('No fields were restored');
+
       if (!state.isResultShown) {
         OverlayManager.hide();
         restoreInProgress = false;
         return;
       }
-      
+
       restoreTimeoutId = PWAUtils.createTimeout(() => {
         handleRestoreError(new Error('Restore timeout: calculation took too long'));
       }, RESTORE_TIMEOUT_MS);
-      
+
       PWAUtils.scheduleTask(() => {
         try {
           processMainCalculation();
@@ -5584,69 +5563,67 @@ const PWAPersistenceInit = (() => {
           handleRestoreError(calcError);
         }
       }, CONSTANTS.PWA_RESTORE_DELAY_MS);
-      
+
     } catch (error) {
       handleRestoreError(error);
     }
   };
-  
-  const handlePWAExit = () => {
+
+  const handleExit = () => {
     if (AppState.get('isResultShown')) snap();
   };
-  
+
   const init = () => {
     const opts = { capture: true };
     const events = [
-      ['visibilitychange', () => { if (document.hidden) handlePWAExit(); }, opts, document],
-      ['pagehide', handlePWAExit, opts, window]
+      ['visibilitychange', () => { if (document.hidden) handleExit(); }, opts, document],
+      ['pagehide', handleExit, opts, window]
     ];
-    
     events.forEach(([event, handler, options, target]) => {
       EventManager.addNS(CONSTANTS.PWA_NAMESPACE, target, event, handler, options);
     });
   };
-  
-  const state = shouldRestore();
-  const isUpdating = PWAUtils.storageGet(CONSTANTS.PWA_UPDATE_MARKER) === 'true';
-  
+
+  const state = IS_PWA ? shouldRestore() : null;
+  const isUpdating = IS_PWA && PWAUtils.storageGet(CONSTANTS.PWA_UPDATE_MARKER) === 'true';
+
   if (state || isUpdating) {
     OverlayManager.show();
     restoreInProgress = true;
-    
     if (isUpdating) PWAUtils.storageRemove(CONSTANTS.PWA_UPDATE_MARKER);
   }
-  
+
   document.addEventListener('DOMContentLoaded', () => {
     init();
-    
-    if (state) {
-      try {
-        performRestore(state);
-      } catch (error) {
-        handleRestoreError(error);
+
+    if (IS_PWA) {
+      if (state) {
+        try {
+          performRestore(state);
+        } catch (error) {
+          handleRestoreError(error);
+        }
+      } else if (isUpdating) {
+        finalizeWithMessage('Update completed successfully', 300);
       }
-    } else if (isUpdating) {
-      finalizeWithMessage('Update completed successfully', 300);
     }
-    
+
     dropdownManager?.scheduleUpdate();
   }, { passive: true });
-  
+
   window.PWAPersistence = {
     snap,
     isRestoring: () => restoreInProgress
   };
-  
+
   window.clearPWAStorage = () => {
     PWAUtils.storageRemove(CONSTANTS.PWA_STORAGE_KEY);
     EventManager.removeNS(CONSTANTS.PWA_NAMESPACE);
     restoreInProgress = false;
-    
     if (restoreTimeoutId) {
       clearTimeout(restoreTimeoutId);
       restoreTimeoutId = null;
     }
-    
     return true;
   };
 })();
