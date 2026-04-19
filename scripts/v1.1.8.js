@@ -5593,7 +5593,15 @@ const PWAPersistenceInit = (() => {
     if (isUpdating) PWAUtils.storageRemove(CONSTANTS.PWA_UPDATE_MARKER);
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
+  const onReady = (fn) => {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', fn, { passive: true });
+    } else {
+      fn();
+    }
+  };
+
+  onReady(() => {
     init();
 
     if (state) {
@@ -5607,7 +5615,7 @@ const PWAPersistenceInit = (() => {
     }
 
     dropdownManager?.scheduleUpdate();
-  }, { passive: true });
+  });
 
   window.PWAPersistence = {
     snap,
