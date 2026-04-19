@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "version": "1.2.0",
+      "date": "19 Apr, 2026",
+      "changes": [
+        {
+          "category": "Update",
+          "items": [
+            "Auto-save stats after calculating is now available in the browser!"
+          ]
+        }
+      ]
+    }, 
+    {
       "version": "1.1.9",
       "date": "17 Apr, 2026",
       "changes": [

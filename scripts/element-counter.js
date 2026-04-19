@@ -1,0 +1,122 @@
+const ELEMENT_COUNTER_TABLE = {
+  Neutral: {
+    Neutral: 1,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 1,
+    Holy: 1,
+    Shadow: 1,
+    Ghost: 0.70,
+    Undead: 1
+  },
+  Fire: {
+    Neutral: 1,
+    Fire: 0.25,
+    Water: 1,
+    Earth: 1.25,
+    Wind: 1,
+    Poison: 1,
+    Holy: 0.75,
+    Shadow: 1,
+    Ghost: 1,
+    Undead: 1.125
+  },
+  Water: {
+    Neutral: 1,
+    Fire: 1.25,
+    Water: 0.25,
+    Earth: 1,
+    Wind: 0.90,
+    Poison: 1,
+    Holy: 0.75,
+    Shadow: 1,
+    Ghost: 1,
+    Undead: 1
+  },
+  Earth: {
+    Neutral: 1,
+    Fire: 0.90,
+    Water: 1,
+    Earth: 0.25,
+    Wind: 1.25,
+    Poison: 1,
+    Holy: 0.75,
+    Shadow: 1,
+    Ghost: 1,
+    Undead: 1
+  },
+  Wind: {
+    Neutral: 1,
+    Fire: 1,
+    Water: 1.375,
+    Earth: 0.90,
+    Wind: 0.25,
+    Poison: 1,
+    Holy: 0.70,
+    Shadow: 1,
+    Ghost: 1,
+    Undead: 1
+  },
+  Poison: {
+    Neutral: 1,
+    Fire: 1.125,
+    Water: 1,
+    Earth: 1.125,
+    Wind: 1.125,
+    Poison: 0,
+    Holy: 0.75,
+    Shadow: 0.50,
+    Ghost: 1,
+    Undead: -0.25
+  },
+  Holy: {
+    Neutral: 1,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 1,
+    Holy: 0,
+    Shadow: 1.375,
+    Ghost: 1,
+    Undead: 1.375
+  },
+  Shadow: {
+    Neutral: 1.125,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 0.50,
+    Holy: 1.375,
+    Shadow: 0,
+    Ghost: 1,
+    Undead: -0.25
+  },
+  Ghost: {
+    Neutral: 0.90,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 1,
+    Holy: 0.75,
+    Shadow: 0.75,
+    Ghost: 1.375,
+    Undead: 1
+  },
+  Undead: {
+    Neutral: 1,
+    Fire: 1,
+    Water: 1,
+    Earth: 1,
+    Wind: 1,
+    Poison: 0.50,
+    Holy: 1.375,
+    Shadow: 0,
+    Ghost: 1.25,
+    Undead: 0
+  }
+};
