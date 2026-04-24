@@ -602,6 +602,13 @@
   .co-unused-name:focus,
   .co-buff-stat:focus { border-color: var(--accent-hbd); background-color: var(--surface); }
 
+  .co-card-select.card-q-white,
+  .co-unused-name.card-q-white { border-color: var(--border2); }
+  .co-card-select.card-q-blue,
+  .co-unused-name.card-q-blue  { border-color: var(--accent-hbd); color: var(--accent); }
+  .co-card-select.card-q-gold,
+  .co-unused-name.card-q-gold  { border-color: var(--gold-bd);   color: var(--gold); }
+
   /* ── Divinity Add Toggle ── */
   .divinity-add-toggle {
     align-self: flex-start;
@@ -1129,7 +1136,11 @@
     background: var(--accent-bg);
     border-color: var(--accent-bd);
   }
+  .co-chip.card-q-blue { border-color: var(--accent-hbd); color: var(--accent); }
+  .co-chip.card-q-gold { border-color: var(--gold-bd);    color: var(--gold); }
   .co-chip-qty  { color: var(--dim); }
+  .co-chip.card-q-blue .co-chip-qty,
+  .co-chip.card-q-gold .co-chip-qty { color: inherit; }
   .co-chip-swap { flex-shrink: 0; color: var(--accent); opacity: 0.85; }
 
   .co-res-hero { display: flex; gap: 8px; }
@@ -2977,10 +2988,14 @@ function addRow(section, listId, html, populate) {
 }
 
 function addUnusedRow(section, name = '', qty = '1') {
-  return addRow(section, '#co-unused-list', buildUnusedRowHTML(), row => {
+  const row = addRow(section, '#co-unused-list', buildUnusedRowHTML(), row => {
     if (name)        row.querySelector('.co-unused-name').value = name;
     if (qty !== '1') row.querySelector('.co-unused-qty').value  = qty;
   });
+  const nameSel = row.querySelector('.co-unused-name');
+  nameSel.addEventListener('change', () => syncCardSelectQuality(nameSel));
+  if (name) syncCardSelectQuality(nameSel);
+  return row;
 }
 
 function addBuffRow(section, stat = '', val = '') {
@@ -3019,7 +3034,10 @@ function bindOptimizerEvents(section) {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCoPanel(hd); }
   });
 
-  section.querySelector('#co-equipped-slots').addEventListener('change', () => saveOptimizerState(section));
+  section.querySelector('#co-equipped-slots').addEventListener('change', e => {
+    saveOptimizerState(section);
+    if (e.target.classList.contains('co-card-select')) syncCardSelectQuality(e.target);
+  });
   section.querySelector('#co-equipped-slots').addEventListener('click', e => {
     const btn = e.target.closest('.co-lock-btn');
     if (!btn) return;
@@ -3031,7 +3049,7 @@ function bindOptimizerEvents(section) {
   section.querySelector('#co-add-unused').addEventListener('click',    () => { addUnusedRow(section); saveOptimizerState(section); });
   section.querySelector('#co-unequip-all').addEventListener('click',   () => {
     if (!confirm('Unequip all cards? This will clear all equipped cards.')) return;
-    section.querySelectorAll('.co-card-select').forEach(sel => { sel.value = ''; });
+    section.querySelectorAll('.co-card-select').forEach(sel => { sel.value = ''; syncCardSelectQuality(sel); });
     saveOptimizerState(section);
   });
   section.querySelector('#co-dismantle-all').addEventListener('click', () => {
@@ -3096,7 +3114,7 @@ function restoreOptimizerState(section) {
 
     for (const sel of section.querySelectorAll('.co-card-select')) {
       const key = `${sel.dataset.equip}_${sel.dataset.slot}`;
-      if (equipped[key] !== undefined) sel.value = equipped[key];
+      if (equipped[key] !== undefined) { sel.value = equipped[key]; syncCardSelectQuality(sel); }
     }
     for (const btn of section.querySelectorAll('.co-lock-btn')) {
       const key = `${btn.dataset.equip}_${btn.dataset.slot}`;
@@ -3119,7 +3137,7 @@ function switchOptimizerSize(section) {
     const unused   = unusedBySize[activeSize]   || [];
 
     for (const sel of section.querySelectorAll('.co-card-select'))
-      sel.value = equipped[`${sel.dataset.equip}_${sel.dataset.slot}`] ?? '';
+      sel.value = equipped[`${sel.dataset.equip}_${sel.dataset.slot}`] ?? ''; syncCardSelectQuality(sel);
     for (const btn of section.querySelectorAll('.co-lock-btn'))
       setLockState(btn, !!(locked[`${btn.dataset.equip}_${btn.dataset.slot}`]));
 
@@ -3131,6 +3149,12 @@ function switchOptimizerSize(section) {
 
 const lookupCard = name =>
   typeof cardData !== 'undefined' ? (cardData[name] ?? null) : null;
+
+function syncCardSelectQuality(sel) {
+  sel.classList.remove('card-q-white', 'card-q-blue', 'card-q-gold');
+  const quality = sel.value ? lookupCard(sel.value)?.quality : null;
+  if (quality) sel.classList.add(`card-q-${quality}`);
+}
 
 const coParseStatValue = raw =>
   typeof raw === 'string' && raw.includes('%')
@@ -3512,12 +3536,13 @@ const buildBreakdownHTML = (equipMap, lockedMap = {}, beforeEquipMap = null) =>
       const numLocked = Math.min(lockedInEquip[n] || 0, q);
       const numFree   = q - numLocked;
       const parts     = [];
+      const qClass    = ` card-q-${lookupCard(n)?.quality || 'white'}`;
       if (numLocked > 0)
-        parts.push(`<span class="co-chip co-chip--locked">${LOCK_CLOSED_PATH ? `<svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10">${LOCK_CLOSED_PATH}</svg>` : ''}${coEsc(n)}${numLocked > 1 ? `<span class="co-chip-qty"> ×${numLocked}</span>` : ''}</span>`);
+        parts.push(`<span class="co-chip co-chip--locked${qClass}">${LOCK_CLOSED_PATH ? `<svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10">${LOCK_CLOSED_PATH}</svg>` : ''}${coEsc(n)}${numLocked > 1 ? `<span class="co-chip-qty"> ×${numLocked}</span>` : ''}</span>`);
       if (numFree > 0) {
         const freeCurrent = Math.max(0, (beforeInEquip[n] || 0) - (lockedInEquip[n] || 0));
         const swapIcon    = beforeEquipMap != null && numFree > freeCurrent ? HORIZ_SWAP_SVG : '';
-        parts.push(`<span class="co-chip">${swapIcon}${coEsc(n)}${numFree > 1 ? `<span class="co-chip-qty"> ×${numFree}</span>` : ''}</span>`);
+        parts.push(`<span class="co-chip${qClass}">${swapIcon}${coEsc(n)}${numFree > 1 ? `<span class="co-chip-qty"> ×${numFree}</span>` : ''}</span>`);
       }
       return parts.join('');
     }).join('');
@@ -3576,6 +3601,7 @@ function applyBestCardsToSlots(bestCards, section) {
       const lockBtn = section.querySelector(`.co-lock-btn[data-equip="${equip}"][data-slot="${sel.dataset.slot}"]`);
       if (lockBtn?.dataset.locked === 'true') continue;
       sel.value = recCards[nameIdx++] || '';
+      syncCardSelectQuality(sel);
     }
   }
   saveOptimizerState(section);
