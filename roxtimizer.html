@@ -3684,7 +3684,7 @@ function renderResults(container, topResults, pureBase, currentMult, lockedCards
        </div>` : '';
 
   const noteHTML = pctRaw >= 0 && pctRaw <= 5 ?
-  `<div class="co-res-note">This tool only calculates the multiplier based on main offensive stats. Stat%, ATK%, Haste, etc. are not calculated, so in-game results may differ, especially for jobs that need Haste or Max HP.</div>` : `<div class="co-res-note">This tool only calculates the multiplier based on main offensive stats. Stat%, ATK%, Haste, etc. are not calculated, so in-game results may differ, especially for jobs that need Haste or Max HP.</div>`;
+  `<div class="co-res-note">This tool only calculates the multiplier based on main offensive stats (pen, critdmg, p/mbo, elem, size, race, attr). Stat%, ATK%, Haste, etc. are not calculated, so in-game results may differ, especially for jobs that need Haste or Max HP.</div>` : `<div class="co-res-note">This tool only calculates the multiplier based on main offensive stats. Stat%, ATK%, Haste, etc. are not calculated, so in-game results may differ, especially for jobs that need Haste or Max HP.</div>`;
 
   const slide1HTML = `
     <div class="co-res-section">
