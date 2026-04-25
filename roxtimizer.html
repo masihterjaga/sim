@@ -2489,7 +2489,10 @@ function setupSubPanel(contentEl, s) {
   addToggle.className   = 'divinity-add-toggle';
   addToggle.textContent = '+ Add Stat';
 
-  const buildOptionText = (opt, quality) => `${opt.label} · ${formatStatVal(opt.key, quality)}`;
+  const buildOptionText = (opt, quality) => {
+  const label = opt.key === 'element' && DOM.wElem.value ? `Element Enhance (${DOM.wElem.value})` : opt.label;
+  return `${label} · ${formatStatVal(opt.key, quality)}`;
+};
 
   function syncToggle() {
     addToggle.style.display = s.divinity.length >= MAX_DIVINITY[getQuality(s)] ? 'none' : '';
