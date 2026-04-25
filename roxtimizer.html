@@ -3683,8 +3683,8 @@ function renderResults(container, topResults, pureBase, currentMult, lockedCards
         <div class="co-div-nodes">${buildDivNodesHTML(currentDivSel)}</div>
        </div>` : '';
 
-  const noteHTML = pctRaw >= 0 && pctRaw <= 5
-    ? `<div class="co-res-note">Your current setup is already solid. These are the best options available.</div>` : '';
+  const noteHTML = pctRaw >= 0 && pctRaw <= 5 ?
+  `<div class="co-res-note">This tool only calculates the multiplier based on main offensive stats. Stat%, ATK%, Haste, etc. are not calculated, so in-game results may differ, especially for jobs that need Haste or Max HP.</div>` : ``;;
 
   const slide1HTML = `
     <div class="co-res-section">
