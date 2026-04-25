@@ -3725,10 +3725,12 @@ function renderResults(container, topResults, pureBase, currentMult, lockedCards
       </div>
     </div>`;
 
-  container.innerHTML = `
-    <div class="co-slider">
-      <div class="co-slider-header">
-        <div class="co-slider-label" id="co-slider-label">Recommendation</div>
+  const slideLabels = [ctx.tDefKey ? `Recommendation vs ${ctx.tDefKey}` : 'Recommendation', 'Before Optimization'];
+
+container.innerHTML = `
+<div class="co-slider">
+  <div class="co-slider-header">
+    <div class="co-slider-label" id="co-slider-label">${slideLabels[0]}</div>
         <div class="co-slider-nav">
           <button class="co-slide-btn" data-dir="-1" disabled>‹</button>
           <button class="co-slide-btn" data-dir="1">›</button>
@@ -3756,7 +3758,6 @@ function renderResults(container, topResults, pureBase, currentMult, lockedCards
   }
 
   const slides      = container.querySelectorAll('.co-slide');
-  const slideLabels = ['Recommendation', 'Before Optimization'];
   const btnPrev     = container.querySelector('[data-dir="-1"]');
   const btnNext     = container.querySelector('[data-dir="1"]');
   let current       = 0;
@@ -3979,6 +3980,7 @@ document.getElementById('calculateBtn').addEventListener('click', () => {
   const calcState = getCalcStateFromForm();
   runAndRender(coSection, calcState, {
     atkType: calcState.atkType,
+    tDefKey:  calcState.tDefKey,
     wElem:   calcState.wElem,
     tSize:   calcState.tSize,
     tRace:   calcState.tRace,
