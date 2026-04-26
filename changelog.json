@@ -1,6 +1,18 @@
 {
   "versions": [
     {
+      "version": "1.2.1",
+      "date": "27 Apr, 2026",
+      "changes": [
+        {
+          "category": "Update",
+          "items": [
+            "LHZ MVP/MINI + LVL160"
+          ]
+        }
+      ]
+    }, 
+    {
       "version": "1.2.0",
       "date": "19 Apr, 2026",
       "changes": [
