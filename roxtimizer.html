@@ -3139,8 +3139,10 @@ function switchOptimizerSize(section) {
     const locked   = lockedBySize[activeSize]   || {};
     const unused   = unusedBySize[activeSize]   || [];
 
-    for (const sel of section.querySelectorAll('.co-card-select'))
-      sel.value = equipped[`${sel.dataset.equip}_${sel.dataset.slot}`] ?? ''; syncCardSelectQuality(sel);
+    for (const sel of section.querySelectorAll('.co-card-select')) {
+  sel.value = equipped[`${sel.dataset.equip}_${sel.dataset.slot}`] ?? '';
+  syncCardSelectQuality(sel);
+}
     for (const btn of section.querySelectorAll('.co-lock-btn'))
       setLockState(btn, !!(locked[`${btn.dataset.equip}_${btn.dataset.slot}`]));
 
