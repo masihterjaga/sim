@@ -14,7 +14,7 @@ const ELEMENT_COUNTER_TABLE = {
   Fire: {
     Neutral: 1,
     Fire: 0.25,
-    Water: 1,
+    Water: 0.90,
     Earth: 1.25,
     Wind: 1,
     Poison: 1,
