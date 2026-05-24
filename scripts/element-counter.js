@@ -54,7 +54,7 @@ const ELEMENT_COUNTER_TABLE = {
     Earth: 0.90,
     Wind: 0.25,
     Poison: 1,
-    Holy: 0.70,
+    Holy: 0.75,
     Shadow: 1,
     Ghost: 1,
     Undead: 1
