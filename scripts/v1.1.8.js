@@ -3618,7 +3618,7 @@ setupTooltips({
   ".calcTips": "Don't expect too much! This tool calculates some RNG stats and buffs [ Examples: <a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>Album#1</a>, <a href='#' class='job-sim' data-lightbox-gallery='new-version' data-lightbox-trigger>Album#2</a>].",
   //"#attackTypeTips": "This calculator has been tested with physical jobs (PEN). Calculations for magical or critical builds may vary slightly.",
   "#weaponTips": "Physical Suno or Meister can select weapons without size penalty, such as GS, Shuriken, or Book (Weapon Perfection passive).",
-  "#mvpminiTips": "DUMMY has no defense stat. Avg 130, Necro, Ogre, Ktul defs are less accurate than others! New boss (LHZ MAP) still waiting update from community!",
+  "#mvpminiTips": "DUMMY has no defense stat. Avg 130, Necro, Ogre, Ktul defs are less accurate than others!",
   "#targetRaceTips": "Selecting a specific MVP/Mini will <strong>automatically sync and lock</strong> this option. Select <strong>Avg Lvl Boss</strong> to target a specific race.",
   "#targetAttrTips": "Same applies to race.",
   // "#blueTips": "Blue*8 in testing^^",
