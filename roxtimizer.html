@@ -2001,7 +2001,16 @@
   <script src="scripts/calculation-helpers.js"></script>
   <script src="scripts/calculation-core.js"></script>
 
-  <script>
+<script>
+const CFG = {
+  maxPanels:    8,
+  maxDivinity:  { blue: 5, purple: 6, gold: 7 },
+  maxEvalLimit: 8_888_888,
+  sizes:        ['small', 'medium', 'large'],
+  storageKey:   'roxtimizer',
+  snapKey:      'pwa_snap',
+};
+
 const DIVINITY_STATS = {
   pen:         { blue: 0.15, purple: 0.18, gold: 0.21 },
   critdmg:     { blue: 0.29, purple: 0.37, gold: 0.42 },
@@ -2012,117 +2021,99 @@ const DIVINITY_STATS = {
   size_large:  { blue: 0.18, purple: 0.23, gold: 0.26 },
 };
 
+const DIVINITY_KEY_MAP = {
+  pen:         { field: 'pen'     },
+  critdmg:     { field: 'crit'    },
+  fpmdmgbns:   { field: 'dmg'     },
+  element:     { field: 'elemEnh' },
+  size_small:  { field: 'sizeEnh', cond: ctx => ctx.tSize === 'Small'  },
+  size_medium: { field: 'sizeEnh', cond: ctx => ctx.tSize === 'Medium' },
+  size_large:  { field: 'sizeEnh', cond: ctx => ctx.tSize === 'Large'  },
+};
+
 const STAT_OPTIONS = [
-  { key: 'pen',        label: 'F. PEN',          flat: false },
-  { key: 'critdmg',   label: 'Crit DMG BNS',    flat: false },
-  { key: 'fpmdmgbns', label: 'F. P/M DMG BNS',  flat: false },
-  { key: 'element',   label: 'Element Enhance',  flat: false },
-  { key: 'size_small',  label: 'DMG to Small',   flat: false },
-  { key: 'size_medium', label: 'DMG to Medium',  flat: false },
-  { key: 'size_large',  label: 'DMG to Large',   flat: false },
+  { key: 'pen',         label: 'F. PEN'         },
+  { key: 'critdmg',    label: 'Crit DMG BNS'   },
+  { key: 'fpmdmgbns',  label: 'F. P/M DMG BNS' },
+  { key: 'element',    label: 'Element Enhance' },
+  { key: 'size_small',  label: 'DMG to Small'   },
+  { key: 'size_medium', label: 'DMG to Medium'  },
+  { key: 'size_large',  label: 'DMG to Large'   },
 ];
 
-const NODE_NAMES = {
-  n1: 'Spear of Eternity',
-  n2: 'Thunderous Hammer',
-  n3: 'Blade of Godslayer',
-  n4: 'Wolf Shackles',
-  n5: 'Stormrage Halberd',
-  n6: "Chanter's Harp",
-  n7: 'Bow of Winter',
-  n8: "Reaper's Scythe",
+const NODES = [
+  { id: 'n1', name: 'Spear of Eternity',  dir: { axis: 'X', sign: -1 } },
+  { id: 'n2', name: 'Thunderous Hammer',  dir: { axis: 'X', sign:  1 } },
+  { id: 'n3', name: 'Blade of Godslayer', dir: { axis: 'X', sign: -1 } },
+  { id: 'n4', name: 'Wolf Shackles',      dir: { axis: 'X', sign:  1 } },
+  { id: 'n5', name: 'Stormrage Halberd',  dir: { axis: 'X', sign: -1 } },
+  { id: 'n6', name: "Chanter's Harp",     dir: { axis: 'X', sign:  1 } },
+  { id: 'n7', name: 'Bow of Winter',      dir: { axis: 'Y', sign: -1 } },
+  { id: 'n8', name: "Reaper's Scythe",    dir: { axis: 'Y', sign:  1 } },
+];
+
+const nodeOrder  = NODES.map(n => n.id);
+const NODE_NAMES = Object.fromEntries(NODES.map(n => [n.id, n.name]));
+const DIR_MAP    = Object.fromEntries(NODES.map(n => [n.id, n.dir]));
+
+const EQUIP_SLOTS = {
+  weapon:    { label: 'Weapon',    count: 5 },
+  clothes:   { label: 'Clothes',   count: 2 },
+  cloak:     { label: 'Cloak',     count: 2 },
+  shoes:     { label: 'Shoes',     count: 2 },
+  accessory: { label: 'Accessory', count: 6 },
+  headgear:  { label: 'Headgear',  count: 6 },
 };
 
-const nodeOrder = ['n1', 'n2', 'n3', 'n4', 'n5', 'n6', 'n7', 'n8'];
-
-const SLOT_COUNTS = {
-  weapon: 5, clothes: 2, cloak: 2, shoes: 2, accessory: 6, headgear: 6,
-};
-
-const EQUIP_LABELS = {
-  weapon: 'Weapon', clothes: 'Clothes', cloak: 'Cloak',
-  shoes: 'Shoes', accessory: 'Accessory', headgear: 'Headgear',
-};
+const SLOT_COUNTS  = Object.fromEntries(Object.entries(EQUIP_SLOTS).map(([k, v]) => [k, v.count]));
+const EQUIP_LABELS = Object.fromEntries(Object.entries(EQUIP_SLOTS).map(([k, v]) => [k, v.label]));
 
 const BUFF_STAT_OPTIONS = [
-  { label: 'Final P/M DMG Bonus', field: 'dmg'      },
-  { label: 'Final PEN',           field: 'pen'       },
-  { label: 'Crit DMG Bonus',      field: 'crit'      },
-  { label: 'Element Enhance',     field: 'elemEnh'   },
-  { label: 'DMG to Size',         field: 'sizeEnh'   },
-  { label: 'DMG to Race',         field: 'race'      },
-  { label: 'DMG to Attribute',    field: 'attr'      },
-  { label: 'Final Damage Stack',  field: 'dmgStack'  },
-];
-
-const MAX_PANELS    = 8;
-const MAX_DIVINITY  = { blue: 5, purple: 6, gold: 7 };
-const MAX_EVAL_LIMIT = 8_888_888;
-
-const SNAP_FIELDS = [
-  ['pen', 'pen'], ['crit', 'crit'], ['dmg', 'dmg'],
-  ['elemEnh', 'elemEnhance'], ['sizeEnh', 'sizeEnhance'],
-  ['race', 'race'], ['attr', 'attr'], ['dmgStack', 'dmgStack'],
+  { field: 'dmg',      label: 'Final P/M DMG Bonus' },
+  { field: 'pen',      label: 'Final PEN'            },
+  { field: 'crit',     label: 'Crit DMG Bonus'       },
+  { field: 'elemEnh',  label: 'Element Enhance'      },
+  { field: 'sizeEnh',  label: 'DMG to Size'          },
+  { field: 'race',     label: 'DMG to Race'          },
+  { field: 'attr',     label: 'DMG to Attribute'     },
+  { field: 'dmgStack', label: 'Final Damage Stack'   },
 ];
 
 const NUM_FIELDS = ['pen', 'crit', 'dmg', 'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'];
 
+const SNAP_FIELDS = [
+  ['pen',      'pen'          ],
+  ['crit',     'crit'         ],
+  ['dmg',      'dmg'          ],
+  ['elemEnh',  'elemEnhance'  ],
+  ['sizeEnh',  'sizeEnhance'  ],
+  ['race',     'race'         ],
+  ['attr',     'attr'         ],
+  ['dmgStack', 'dmgStack'     ],
+];
+
+const _makeEqResolver  = (ctxKey, ctxVal, field) => ctx => ctx[ctxKey] === ctxVal ? field : null;
+const _ELEM_LIST  = ['Fire','Water','Wind','Earth','Holy','Shadow','Ghost','Poison','Neutral','Undead'];
+const _SIZE_LIST  = ['Small', 'Medium', 'Large'];
+const _RACE_LIST  = ['Demi-Human','Brute','Demon','Angel','Fish','Formless','Insect','Dragon','Plant','Undead'];
+const _ATTR_LIST  = ['Fire','Water','Wind','Earth','Holy','Shadow','Ghost','Poison','Undead','Neutral'];
+
 const STAT_RESOLVERS = {
-  'Final P.PEN':  ctx => ctx.atkType === 'pen'  ? 'pen'  : null,
-  'Final M.PEN':  ctx => ctx.atkType === 'pen'  ? 'pen'  : null,
+  'Final P.PEN':       ctx => ctx.atkType === 'pen'  ? 'pen'  : null,
+  'Final M.PEN':       ctx => ctx.atkType === 'pen'  ? 'pen'  : null,
   'Crit DMG Bonus':    ctx => ctx.atkType === 'crit' ? 'crit' : null,
   'Final P.DMG Bonus': () => 'dmg',
   'Final M.DMG Bonus': () => 'dmg',
-  'Fire Enhance':    ctx => ctx.wElem === 'Fire'    ? 'elemEnh' : null,
-  'Water Enhance':   ctx => ctx.wElem === 'Water'   ? 'elemEnh' : null,
-  'Wind Enhance':    ctx => ctx.wElem === 'Wind'    ? 'elemEnh' : null,
-  'Earth Enhance':   ctx => ctx.wElem === 'Earth'   ? 'elemEnh' : null,
-  'Holy Enhance':    ctx => ctx.wElem === 'Holy'    ? 'elemEnh' : null,
-  'Shadow Enhance':  ctx => ctx.wElem === 'Shadow'  ? 'elemEnh' : null,
-  'Ghost Enhance':   ctx => ctx.wElem === 'Ghost'   ? 'elemEnh' : null,
-  'Poison Enhance':  ctx => ctx.wElem === 'Poison'  ? 'elemEnh' : null,
-  'Neutral Enhance': ctx => ctx.wElem === 'Neutral' ? 'elemEnh' : null,
-  'Undead Enhance':  ctx => ctx.wElem === 'Undead'  ? 'elemEnh' : null,
-  'Bonus DMG to Small':      ctx => ctx.tSize === 'Small'      ? 'sizeEnh' : null,
-  'Bonus DMG to Medium':     ctx => ctx.tSize === 'Medium'     ? 'sizeEnh' : null,
-  'Bonus DMG to Large':      ctx => ctx.tSize === 'Large'      ? 'sizeEnh' : null,
-  'Bonus DMG to Demi-Human': ctx => ctx.tRace === 'Demi-Human' ? 'race'    : null,
-  'Bonus DMG to Brute':      ctx => ctx.tRace === 'Brute'      ? 'race'    : null,
-  'Bonus DMG to Demon':      ctx => ctx.tRace === 'Demon'      ? 'race'    : null,
-  'Bonus DMG to Angel':      ctx => ctx.tRace === 'Angel'      ? 'race'    : null,
-  'Bonus DMG to Fish':       ctx => ctx.tRace === 'Fish'       ? 'race'    : null,
-  'Bonus DMG to Formless':   ctx => ctx.tRace === 'Formless'   ? 'race'    : null,
-  'Bonus DMG to Insect':     ctx => ctx.tRace === 'Insect'     ? 'race'    : null,
-  'Bonus DMG to Dragon':     ctx => ctx.tRace === 'Dragon'     ? 'race'    : null,
-  'Bonus DMG to Plant':      ctx => ctx.tRace === 'Plant'      ? 'race'    : null,
-  'Bonus DMG to Undead':     ctx => ctx.tRace === 'Undead'     ? 'race'    : null,
-  'Bonus DMG to Fire Attribute Monster':    ctx => ctx.tAttr === 'Fire'    ? 'attr' : null,
-  'Bonus DMG to Water Attribute Monster':   ctx => ctx.tAttr === 'Water'   ? 'attr' : null,
-  'Bonus DMG to Wind Attribute Monster':    ctx => ctx.tAttr === 'Wind'    ? 'attr' : null,
-  'Bonus DMG to Earth Attribute Monster':   ctx => ctx.tAttr === 'Earth'   ? 'attr' : null,
-  'Bonus DMG to Holy Attribute Monster':    ctx => ctx.tAttr === 'Holy'    ? 'attr' : null,
-  'Bonus DMG to Shadow Attribute Monster':  ctx => ctx.tAttr === 'Shadow'  ? 'attr' : null,
-  'Bonus DMG to Ghost Attribute Monster':   ctx => ctx.tAttr === 'Ghost'   ? 'attr' : null,
-  'Bonus DMG to Poison Attribute Monster':  ctx => ctx.tAttr === 'Poison'  ? 'attr' : null,
-  'Bonus DMG to Undead Attribute Monster':  ctx => ctx.tAttr === 'Undead'  ? 'attr' : null,
-  'Bonus DMG to Neutral Attribute Monster': ctx => ctx.tAttr === 'Neutral' ? 'attr' : null,
+  ..._ELEM_LIST.reduce((acc, e) => ({ ...acc, [`${e} Enhance`]:                    _makeEqResolver('wElem', e, 'elemEnh') }), {}),
+  ..._SIZE_LIST.reduce((acc, s) => ({ ...acc, [`Bonus DMG to ${s}`]:               _makeEqResolver('tSize', s, 'sizeEnh') }), {}),
+  ..._RACE_LIST.reduce((acc, r) => ({ ...acc, [`Bonus DMG to ${r}`]:               _makeEqResolver('tRace', r, 'race')    }), {}),
+  ..._ATTR_LIST.reduce((acc, a) => ({ ...acc, [`Bonus DMG to ${a} Attribute Monster`]: _makeEqResolver('tAttr', a, 'attr') }), {}),
 };
 
 const STAT_DEDUP_GROUPS = [
   ['Final P.DMG Bonus', 'Final M.DMG Bonus'],
   ['Final P.PEN',       'Final M.PEN'      ],
 ];
-
-const DIR_MAP = {
-  n7: { axis: 'Y', sign: -1 },
-  n8: { axis: 'Y', sign:  1 },
-  n2: { axis: 'X', sign:  1 },
-  n4: { axis: 'X', sign:  1 },
-  n6: { axis: 'X', sign:  1 },
-  n1: { axis: 'X', sign: -1 },
-  n3: { axis: 'X', sign: -1 },
-  n5: { axis: 'X', sign: -1 },
-};
 
 const BASE_STAT_LABELS = [
   { field: 'dmg',      label: 'Final P/M DMG Bonus' },
@@ -2133,37 +2124,40 @@ const BASE_STAT_LABELS = [
   { field: 'dmgStack', label: 'Final DMG Bonus'      },
 ];
 
+const SPECIAL_NODES = {
+  n1: { field: 'spearValue',  calcValue: (_ctx, panel) => panel.lightning ? 84 : 0 },
+  n8: {
+    field: 'reaperValue',
+    calcValue: (ctx, panel) => panel.lightning
+      ? ((ctx.wElem === ctx.tAttr) || (ctx.wElem === 'Neutral' && !ctx.tAttr) ? 84 : 28)
+      : 0,
+  },
+};
+
 const ERR_MSG = 'No saved stats found. Use the <a href="https://masihterjaga.github.io/sim" target="_blank" rel="noopener">ratio calculator</a> first so you don\'t have to re-enter your stats each time.';
 
-const DIV_KEY_TO_FIELD = {
-  pen: 'pen', critdmg: 'crit', fpmdmgbns: 'dmg', element: 'elemEnh',
-  size_small: 'sizeEnh', size_medium: 'sizeEnh', size_large: 'sizeEnh',
+const ICONS = {
+  lockClosed: `<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>`,
+  lockOpen:   `<path d="M12 1C9.24 1 7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3h2c0-2.76-2.24-5-5-5zm0 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>`,
+  horizSwap:  `<svg class="co-chip-swap" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4l4 4-4 4M3 8h18"/><path d="M7 20l-4-4 4-4M21 16H3"/></svg>`,
+  vertSwap:   `<svg class="co-div-swap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l4 4 4-4M8 21V3"/><path d="M20 7l-4-4-4 4M16 3v18"/></svg>`,
+  lightning:  `<svg class="co-div-lightning" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`,
+  arrowUp:    `<svg class="co-stat-arrow co-stat-arrow--up" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8-12 8 12z"/></svg>`,
+  arrowDown:  `<svg class="co-stat-arrow co-stat-arrow--down" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6l8 12 8-12z"/></svg>`,
+  flash:      `<svg class="co-stat-flash" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`,
+  sync:       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
+  check:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg>`,
+  trash:      `<svg viewBox="0 0 12 12" fill="none"><path d="M1.5 3.5h9M4.5 3.5v-1.5h3v1.5M3 3.5l.6 6.5h4.8l.6-6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  close:      `<svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+  chevLeft:   `<svg viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  chevRight:  `<svg viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  person:     `<svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="3.5" r="2" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="5.5" x2="6" y2="10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="3.5" y1="5.5" x2="8.5" y2="5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
 };
 
-const DIV_KEY_COND = {
-  size_small:  ctx => ctx.tSize === 'Small',
-  size_medium: ctx => ctx.tSize === 'Medium',
-  size_large:  ctx => ctx.tSize === 'Large',
-};
+const lockSVG = closed => `<svg viewBox="0 0 24 24" fill="currentColor">${closed ? ICONS.lockClosed : ICONS.lockOpen}</svg>`;
 
-const SIZES = ['small', 'medium', 'large'];
-
-const LOCK_CLOSED_PATH = `<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>`;
-const LOCK_OPEN_PATH   = `<path d="M12 1C9.24 1 7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3h2c0-2.76-2.24-5-5-5zm0 13c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/>`;
-const lockSVG = closed => `<svg viewBox="0 0 24 24" fill="currentColor">${closed ? LOCK_CLOSED_PATH : LOCK_OPEN_PATH}</svg>`;
-
-const HORIZ_SWAP_SVG    = `<svg class="co-chip-swap" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 4l4 4-4 4M3 8h18"/><path d="M7 20l-4-4 4-4M21 16H3"/></svg>`;
-const VERT_SWAP_SVG     = `<svg class="co-div-swap" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17l4 4 4-4M8 21V3"/><path d="M20 7l-4-4-4 4M16 3v18"/></svg>`;
-const DIV_LIGHTNING_SVG = `<svg class="co-div-lightning" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`;
-const UP_ARROW          = `<svg class="co-stat-arrow co-stat-arrow--up" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8-12 8 12z"/></svg>`;
-const DOWN_ARROW        = `<svg class="co-stat-arrow co-stat-arrow--down" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6l8 12 8-12z"/></svg>`;
-const FLASH_SVG         = `<svg class="co-stat-flash" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`;
-const SYNC_SVG          = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`;
-const CHECK_SVG         = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg>`;
-
-
-const tr    = (axis, pct) => `translate${axis}(${pct}%)`;
-const coEsc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+const tr      = (axis, pct) => `translate${axis}(${pct}%)`;
+const coEsc   = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const withVal = (base, val) => val ? `${base} (${val})` : base;
 
 function coFmt(n) {
@@ -2173,42 +2167,57 @@ function coFmt(n) {
   return v % 1 === 0 ? v.toString() : (Math.floor(v * 100) / 100).toString();
 }
 
+function getQuality(panel) {
+  if (panel.gold)   return 'gold';
+  if (panel.purple) return 'purple';
+  return 'blue';
+}
+
+const getStatVal    = (key, quality) => DIVINITY_STATS[key]?.[quality] ?? null;
+const formatRawVal  = (opt, val) => (val * 100).toFixed(0) + '%';
+const formatStatVal = (key, quality) => {
+  const val = getStatVal(key, quality);
+  return val === null ? '' : formatRawVal(null, val);
+};
 
 function readStore() {
-  try { return JSON.parse(localStorage.getItem('roxtimizer') || '{}'); } catch { return {}; }
+  try { return JSON.parse(localStorage.getItem(CFG.storageKey) || '{}'); } catch { return {}; }
 }
 
 function writeStore(section, data) {
   try {
     const s = readStore();
     s[section] = data;
-    localStorage.setItem('roxtimizer', JSON.stringify(s));
+    localStorage.setItem(CFG.storageKey, JSON.stringify(s));
   } catch {}
 }
 
-
 const nodeData = {};
-let activeId         = null;
-let activeSize       = 'small';
-let activePanel      = null;
-let activeDir        = null;
-let isAnimating      = false;
-let isNodeNavigating = false;
 
-const defaultTag = () => ({ blue: true, purple: false, gold: false, lightning: false, locked: false, divinity: [null] });
+const ui = {
+  activeId:         null,
+  activeSize:       'small',
+  activePanel:      null,
+  activeDir:        null,
+  isAnimating:      false,
+  isNodeNavigating: false,
+};
+
+const defaultPanel      = () => ({ blue: true, purple: false, gold: false, lightning: false, locked: false, divinity: [null] });
 const defaultUsedBySize = () => ({ small: null, medium: null, large: null });
 
 function getData(id) {
   if (!nodeData[id]) {
-    nodeData[id] = { count: 1, current: 0, usedBySize: defaultUsedBySize(), panels: [defaultTag()] };
+    nodeData[id] = { count: 1, current: 0, usedBySize: defaultUsedBySize(), panels: [defaultPanel()] };
   }
   const d = nodeData[id];
+
   if ('used' in d) {
     d.usedBySize = { small: d.used, medium: d.used, large: d.used };
     delete d.used;
   }
   if (!d.usedBySize) d.usedBySize = defaultUsedBySize();
-  while (d.panels.length < d.count) d.panels.push(defaultTag());
+  while (d.panels.length < d.count) d.panels.push(defaultPanel());
   for (const p of d.panels) {
     if (!Array.isArray(p.divinity)) p.divinity = [null];
     p.locked ??= false;
@@ -2216,34 +2225,13 @@ function getData(id) {
   return d;
 }
 
-const getUsed         = id  => getData(id).usedBySize[activeSize] ?? null;
-const setUsed         = (id, idx) => { getData(id).usedBySize[activeSize] = idx; };
+const getUsed         = id  => getData(id).usedBySize[ui.activeSize] ?? null;
+const setUsed         = (id, idx) => { getData(id).usedBySize[ui.activeSize] = idx; };
 const isUsedInAnySize = (id, idx) => Object.values(getData(id).usedBySize).some(v => v === idx);
 const saveState       = () => writeStore('divinity', nodeData);
 
 function loadState() {
   try { Object.assign(nodeData, readStore().divinity || {}); } catch {}
-}
-
-
-function getQuality(s) {
-  if (s.gold)   return 'gold';
-  if (s.purple) return 'purple';
-  return 'blue';
-}
-
-function getStatVal(key, quality) {
-  return DIVINITY_STATS[key]?.[quality] ?? null;
-}
-
-function formatRawVal(opt, val) {
-  return opt.flat ? String(val) : (val * 100).toFixed(0) + '%';
-}
-
-function formatStatVal(key, quality) {
-  const val = getStatVal(key, quality);
-  if (val === null) return '';
-  return formatRawVal(STAT_OPTIONS.find(o => o.key === key), val);
 }
 
 function isNodeFlash(id) {
@@ -2252,13 +2240,10 @@ function isNodeFlash(id) {
 }
 
 const AppState = {
-  get(key) {
-    if (key === 'isTestSpearActive')  return isNodeFlash('n1');
-    if (key === 'isTestReaperActive') return isNodeFlash('n8');
-    return false;
-  },
+  get: key => key === 'isTestSpearActive' ? isNodeFlash('n1')
+            : key === 'isTestReaperActive' ? isNodeFlash('n8')
+            : false,
 };
-
 
 function syncCircle(id) {
   const circle = document.querySelector(`[for="${id}"] .circle`);
@@ -2271,10 +2256,7 @@ function syncCircle(id) {
   circle.classList.remove('quality-blue', 'quality-purple', 'quality-gold', 'has-lightning');
 
   let lockEl = circle.querySelector('.circle-lock');
-  if (!hasUsed) {
-    lockEl?.remove();
-    return;
-  }
+  if (!hasUsed) { lockEl?.remove(); return; }
 
   const s = nodeData[id]?.panels[usedIdx];
   if (!s) return;
@@ -2300,71 +2282,39 @@ function syncUseBtn(btn, isUsed) {
   btn.querySelector('svg').style.display = isUsed ? ''     : 'none';
 }
 
-const shouldShowTrash = (id, count, idx, locked = false) =>
-  !locked && count > 1 && !isUsedInAnySize(id, idx);
-
 function setLockState(btn, locked) {
   btn.dataset.locked = String(locked);
   btn.innerHTML      = lockSVG(locked);
   btn.title          = locked ? 'Unlock slot' : 'Lock slot';
 }
 
+const canShowTrash = (id, count, idx, locked = false) =>
+  !locked && count > 1 && !isUsedInAnySize(id, idx);
+
 function syncTrashBtn(panelNav, id, count, idx, locked) {
-  const trash     = panelNav.querySelector('.del-btn');
-  const showTrash = shouldShowTrash(id, count, idx, locked);
-  if (showTrash && !trash) panelNav.appendChild(makeDelBtn());
-  else if (!showTrash && trash) trash.remove();
+  const existing = panelNav.querySelector('.del-btn');
+  const show     = canShowTrash(id, count, idx, locked);
+  if (show && !existing) panelNav.appendChild(makeDelBtn());
+  else if (!show && existing) existing.remove();
 }
 
 function syncAddBtn(footerRight, count) {
-  const addBtn = footerRight.querySelector('.add-btn');
-  if (count < MAX_PANELS && !addBtn) {
+  const existing = footerRight.querySelector('.add-btn');
+  if (count < CFG.maxPanels && !existing) {
     const btn = document.createElement('button');
     btn.className   = 'add-btn';
     btn.textContent = '+ Add Div';
     btn.addEventListener('click', addSubPanel);
     footerRight.appendChild(btn);
-  } else if (count >= MAX_PANELS && addBtn) {
-    addBtn.remove();
+  } else if (count >= CFG.maxPanels && existing) {
+    existing.remove();
   }
 }
-
-
-function computeSummary() {
-  const totals = {};
-  for (const id of nodeOrder) {
-    const usedIdx = getUsed(id);
-    if (usedIdx == null) continue;
-    const s = getData(id).panels[usedIdx];
-    if (!s) continue;
-    const quality = getQuality(s);
-    for (const key of s.divinity) {
-      if (!key) continue;
-      const val = getStatVal(key, quality);
-      if (val === null) continue;
-      totals[key] = (totals[key] ?? 0) + val;
-    }
-  }
-  return totals;
-}
-
-function renderSummaryModal() {
-  const totals  = computeSummary();
-  const list    = document.getElementById('summaryList');
-  const entries = STAT_OPTIONS.filter(o => totals[o.key] !== undefined);
-  list.innerHTML = entries.length
-    ? entries.map(opt => `<div class="summary-row">
-        <span class="summary-label">${opt.label}</span>
-        <span class="summary-value">${formatRawVal(opt, totals[opt.key])}</span>
-      </div>`).join('')
-    : '<span class="summary-empty">No items in use</span>';
-}
-
 
 function makeDelBtn() {
   const btn = document.createElement('button');
   btn.className = 'nav-btn del-btn';
-  btn.innerHTML = `<svg viewBox="0 0 12 12" fill="none"><path d="M1.5 3.5h9M4.5 3.5v-1.5h3v1.5M3 3.5l.6 6.5h4.8l.6-6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  btn.innerHTML = ICONS.trash;
   btn.addEventListener('click', deleteSubPanel);
   return btn;
 }
@@ -2390,81 +2340,57 @@ function buildPanel(id) {
       <button class="tag-btn tag-lightning${s.lightning ? ' active' : ''}${!s.gold ? ' tag-disabled' : ''}">
         <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>
       </button>
-      <button class="close-btn">
-        <svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-      </button>
+      <button class="close-btn">${ICONS.close}</button>
     </div>
     <div class="panel-header">
       <span class="panel-name">${NODE_NAMES[id]}</span>
       <div class="panel-node-nav">
-        <button class="nav-btn node-prev-btn" ${nodeIdx === 0 ? 'disabled' : ''}>
-          <svg viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-        <button class="nav-btn node-next-btn" ${nodeIdx === nodeOrder.length - 1 ? 'disabled' : ''}>
-          <svg viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <button class="nav-btn node-prev-btn" ${nodeIdx === 0 ? 'disabled' : ''}>${ICONS.chevLeft}</button>
+        <button class="nav-btn node-next-btn" ${nodeIdx === nodeOrder.length - 1 ? 'disabled' : ''}>${ICONS.chevRight}</button>
       </div>
     </div>
     <div class="panel-divider"></div>
     <div class="panel-content-wrap"><div class="panel-content"></div></div>
     <div class="panel-footer">
       <div class="panel-nav"${count > 1 ? '' : ' style="visibility:hidden"'}>
-        <button class="nav-btn prev-btn" ${idx === 0 ? 'disabled' : ''}>
-          <svg viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <button class="nav-btn prev-btn" ${idx === 0 ? 'disabled' : ''}>${ICONS.chevLeft}</button>
         <span class="panel-nav-count">${idx + 1}/${count}</span>
-        <button class="nav-btn next-btn" ${idx === count - 1 ? 'disabled' : ''}>
-          <svg viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
+        <button class="nav-btn next-btn" ${idx === count - 1 ? 'disabled' : ''}>${ICONS.chevRight}</button>
       </div>
       <div class="panel-footer-right">
         <button class="use-btn${isUsed ? ' active' : ''}">
-          <svg style="${isUsed ? '' : 'display:none'}" viewBox="0 0 12 12" fill="none">
-            <circle cx="6" cy="3.5" r="2" stroke="currentColor" stroke-width="1.3"/>
-            <line x1="6" y1="5.5" x2="6" y2="10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-            <line x1="3.5" y1="5.5" x2="8.5" y2="5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-          </svg>
+          <svg style="${isUsed ? '' : 'display:none'}" viewBox="0 0 12 12" fill="none">${ICONS.person}</svg>
           <span>${isUsed ? 'Used' : 'Use'}</span>
         </button>
-        ${count < MAX_PANELS ? '<button class="add-btn">+ Add Div</button>' : ''}
+        ${count < CFG.maxPanels ? '<button class="add-btn">+ Add Div</button>' : ''}
       </div>
     </div>`;
-
-  panel.querySelector('.close-btn').addEventListener('click', () => closePanel());
 
   const lockBtn  = panel.querySelector('.tag-lock');
   const panelNav = panel.querySelector('.panel-nav');
 
+  panel.querySelector('.close-btn').addEventListener('click', () => closePanel());
   lockBtn.addEventListener('click', () => {
-    const cur = data.panels[data.current];
+    const cur  = data.panels[data.current];
     cur.locked = !cur.locked;
     lockBtn.classList.toggle('active', cur.locked);
     lockBtn.title   = cur.locked ? 'Unlock this divinity' : 'Lock this divinity';
     lockBtn.innerHTML = lockSVG(cur.locked);
-    syncTrashBtn(panelNav, activeId, data.count, data.current, cur.locked);
+    syncTrashBtn(panelNav, ui.activeId, data.count, data.current, cur.locked);
     saveState();
   });
 
-  if (nodeIdx > 0)
-    panel.querySelector('.node-prev-btn').addEventListener('click', () => navigateNode(-1));
-  if (nodeIdx < nodeOrder.length - 1)
-    panel.querySelector('.node-next-btn').addEventListener('click', () => navigateNode(1));
-
-  panel.querySelector('.prev-btn').addEventListener('click', () => {
-    if (data.current > 0) navigateTo(data.current - 1, -1);
-  });
-  panel.querySelector('.next-btn').addEventListener('click', () => {
-    if (data.current < data.count - 1) navigateTo(data.current + 1, 1);
-  });
-
-  if (count < MAX_PANELS) panel.querySelector('.add-btn').addEventListener('click', addSubPanel);
-  if (shouldShowTrash(id, count, idx, s.locked)) panelNav.appendChild(makeDelBtn());
+  if (nodeIdx > 0) panel.querySelector('.node-prev-btn').addEventListener('click', () => navigateNode(-1));
+  if (nodeIdx < nodeOrder.length - 1) panel.querySelector('.node-next-btn').addEventListener('click', () => navigateNode(1));
+  panel.querySelector('.prev-btn').addEventListener('click', () => { if (data.current > 0) navigateTo(data.current - 1, -1); });
+  panel.querySelector('.next-btn').addEventListener('click', () => { if (data.current < data.count - 1) navigateTo(data.current + 1, 1); });
+  if (count < CFG.maxPanels) panel.querySelector('.add-btn').addEventListener('click', addSubPanel);
+  if (canShowTrash(id, count, idx, s.locked)) panelNav.appendChild(makeDelBtn());
 
   const useBtn = panel.querySelector('.use-btn');
   useBtn.addEventListener('click', () => {
-    const cur      = data.current;
-    const prevUsed = getUsed(id);
-    setUsed(id, prevUsed === cur ? null : cur);
+    const cur = data.current;
+    setUsed(id, getUsed(id) === cur ? null : cur);
     saveState();
     syncCircle(id);
     const nowUsed = getUsed(id) === cur;
@@ -2490,22 +2416,18 @@ function setupSubPanel(contentEl, s) {
   addToggle.textContent = '+ Add Stat';
 
   const buildOptionText = (opt, quality) => {
-  const label = opt.key === 'element' && DOM.wElem.value ? `Element Enhance (${DOM.wElem.value})` : opt.label;
-  return `${label} · ${formatStatVal(opt.key, quality)}`;
-};
+    const label = opt.key === 'element' && DOM.wElem.value
+      ? `Element Enhance (${DOM.wElem.value})` : opt.label;
+    return `${label} · ${formatStatVal(opt.key, quality)}`;
+  };
 
-  function syncToggle() {
-    addToggle.style.display = s.divinity.length >= MAX_DIVINITY[getQuality(s)] ? 'none' : '';
-  }
-
-  function syncDisabled() {
+  const syncToggle   = () => { addToggle.style.display = s.divinity.length >= CFG.maxDivinity[getQuality(s)] ? 'none' : ''; };
+  const syncDisabled = () => {
     list.querySelectorAll('.divinity-select').forEach((sel, i) => {
       const taken = new Set(s.divinity.filter((k, j) => j !== i && k !== null));
-      sel.querySelectorAll('option[value]:not([value=""])').forEach(opt => {
-        opt.disabled = taken.has(opt.value);
-      });
+      sel.querySelectorAll('option[value]:not([value=""])').forEach(opt => { opt.disabled = taken.has(opt.value); });
     });
-  }
+  };
 
   function buildRow(selectedKey, index) {
     const row = document.createElement('div');
@@ -2515,15 +2437,12 @@ function setupSubPanel(contentEl, s) {
     sel.className = 'divinity-select';
 
     const placeholder = document.createElement('option');
-    placeholder.value       = '';
-    placeholder.disabled    = true;
-    placeholder.selected    = !selectedKey;
-    placeholder.textContent = 'Divinity Stats';
+    Object.assign(placeholder, { value: '', disabled: true, selected: !selectedKey, textContent: 'Divinity Stats' });
     sel.appendChild(placeholder);
 
     const quality = getQuality(s);
     for (const opt of STAT_OPTIONS) {
-      const el       = document.createElement('option');
+      const el = document.createElement('option');
       el.value       = opt.key;
       el.textContent = buildOptionText(opt, quality);
       el.selected    = opt.key === selectedKey;
@@ -2550,7 +2469,7 @@ function setupSubPanel(contentEl, s) {
 
   function updateOptions() {
     const quality = getQuality(s);
-    const max     = MAX_DIVINITY[quality];
+    const max     = CFG.maxDivinity[quality];
     if (s.divinity.length > max) { s.divinity.splice(max); saveState(); render(); return; }
     list.querySelectorAll('.divinity-select').forEach(sel => {
       sel.querySelectorAll('option[value]:not([value=""])').forEach(opt => {
@@ -2562,7 +2481,7 @@ function setupSubPanel(contentEl, s) {
   }
 
   addToggle.addEventListener('click', () => {
-    if (s.divinity.length >= MAX_DIVINITY[getQuality(s)]) return;
+    if (s.divinity.length >= CFG.maxDivinity[getQuality(s)]) return;
     s.divinity.push(null);
     saveState();
     render();
@@ -2619,72 +2538,75 @@ function setupTags(panel, data, onQualityChange) {
   return sync;
 }
 
-
-function swapPanel(incoming, slideDir) {
-  const outgoing = activePanel;
+function animateSlide(incoming, outgoing, axis, dirSign, onDone) {
   incoming.style.transition = 'none';
-  incoming.style.transform  = tr('X', slideDir * 100);
-  container.appendChild(incoming);
-  activePanel = incoming;
-  isAnimating = true;
+  incoming.style.transform  = tr(axis, dirSign * 100);
+  ui.isAnimating = true;
   requestAnimationFrame(() => requestAnimationFrame(() => {
     incoming.style.transition = '';
-    incoming.style.transform  = tr('X', 0);
-    outgoing.style.transform  = tr('X', -slideDir * 100);
+    incoming.style.transform  = tr(axis, 0);
+    outgoing.style.transform  = tr(axis, -dirSign * 100);
   }));
-  incoming.addEventListener('transitionend', () => { outgoing.remove(); isAnimating = false; }, { once: true });
+  incoming.addEventListener('transitionend', () => { outgoing.remove(); ui.isAnimating = false; onDone?.(); }, { once: true });
+}
+
+function swapPanel(incoming, slideDir) {
+  const outgoing = ui.activePanel;
+  container.appendChild(incoming);
+  ui.activePanel = incoming;
+  animateSlide(incoming, outgoing, 'X', slideDir);
 }
 
 function openPanel(cb) {
-  const dir  = DIR_MAP[cb.id];
-  const data = getData(cb.id);
+  const dir    = DIR_MAP[cb.id];
+  const data   = getData(cb.id);
   data.current = getUsed(cb.id) ?? 0;
-  activeId  = cb.id;
-  activeDir = dir;
+  ui.activeId  = cb.id;
+  ui.activeDir = dir;
   container.style.height = grid.offsetHeight + 'px';
 
   const panel = buildPanel(cb.id);
   panel.style.transition = 'none';
   panel.style.transform  = tr(dir.axis, dir.sign * 100);
   container.appendChild(panel);
-  activePanel = panel;
-  isAnimating = true;
+  ui.activePanel = panel;
+  ui.isAnimating = true;
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
     panel.style.transition = '';
     panel.style.transform  = tr(dir.axis, 0);
     grid.style.transform   = tr(dir.axis, -dir.sign * 100);
   }));
-  panel.addEventListener('transitionend', () => { isAnimating = false; }, { once: true });
+  panel.addEventListener('transitionend', () => { ui.isAnimating = false; }, { once: true });
 }
 
 function navigateTo(newIndex, slideDir) {
-  if (isAnimating || !activePanel || !activeId) return;
-  const data = getData(activeId);
+  if (ui.isAnimating || !ui.activePanel || !ui.activeId) return;
+  const data = getData(ui.activeId);
   data.current = newIndex;
-  isAnimating  = true;
+  ui.isAnimating = true;
 
   const s      = data.panels[newIndex];
   const count  = data.count;
-  const isUsed = getUsed(activeId) === newIndex;
+  const isUsed = getUsed(ui.activeId) === newIndex;
 
-  activePanel.querySelector('.panel-nav-count').textContent = `${newIndex + 1}/${count}`;
-  activePanel.querySelector('.prev-btn').disabled = newIndex === 0;
-  activePanel.querySelector('.next-btn').disabled = newIndex === count - 1;
-  activePanel.querySelector('.panel-nav').style.visibility = count > 1 ? '' : 'hidden';
+  ui.activePanel.querySelector('.panel-nav-count').textContent        = `${newIndex + 1}/${count}`;
+  ui.activePanel.querySelector('.prev-btn').disabled                  = newIndex === 0;
+  ui.activePanel.querySelector('.next-btn').disabled                  = newIndex === count - 1;
+  ui.activePanel.querySelector('.panel-nav').style.visibility         = count > 1 ? '' : 'hidden';
 
-  syncTrashBtn(activePanel.querySelector('.panel-nav'), activeId, count, newIndex, s?.locked);
-  syncAddBtn(activePanel.querySelector('.panel-footer-right'), count);
-  syncUseBtn(activePanel.querySelector('.use-btn'), isUsed);
-  activePanel._syncTags?.();
+  syncTrashBtn(ui.activePanel.querySelector('.panel-nav'), ui.activeId, count, newIndex, s?.locked);
+  syncAddBtn(ui.activePanel.querySelector('.panel-footer-right'), count);
+  syncUseBtn(ui.activePanel.querySelector('.use-btn'), isUsed);
+  ui.activePanel._syncTags?.();
 
-  const wrap       = activePanel.querySelector('.panel-content-wrap');
+  const wrap       = ui.activePanel.querySelector('.panel-content-wrap');
   const oldContent = wrap.querySelector('.panel-content');
   const newContent = document.createElement('div');
   newContent.className        = 'panel-content';
   newContent.style.transition = 'none';
   newContent.style.transform  = tr('X', slideDir * 100);
-  activePanel._setUpdateOptions?.(setupSubPanel(newContent, s));
+  ui.activePanel._setUpdateOptions?.(setupSubPanel(newContent, s));
   wrap.appendChild(newContent);
 
   requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -2692,69 +2614,97 @@ function navigateTo(newIndex, slideDir) {
     newContent.style.transform  = tr('X', 0);
     oldContent.style.transform  = tr('X', -slideDir * 100);
   }));
-  newContent.addEventListener('transitionend', () => { oldContent.remove(); isAnimating = false; }, { once: true });
+  newContent.addEventListener('transitionend', () => { oldContent.remove(); ui.isAnimating = false; }, { once: true });
 }
 
 function addSubPanel() {
-  if (isAnimating || !activeId) return;
-  const data = getData(activeId);
-  if (data.count >= MAX_PANELS) return;
+  if (ui.isAnimating || !ui.activeId) return;
+  const data = getData(ui.activeId);
+  if (data.count >= CFG.maxPanels) return;
   data.count++;
-  data.panels.push(defaultTag());
+  data.panels.push(defaultPanel());
   saveState();
   navigateTo(data.count - 1, 1);
 }
 
 function deleteSubPanel() {
-  if (isAnimating || !activeId) return;
+  if (ui.isAnimating || !ui.activeId) return;
   if (!confirm('Delete this divinity panel? This cannot be undone.')) return;
-  const data = getData(activeId);
+  const data = getData(ui.activeId);
   const idx  = data.current;
   data.panels.splice(idx, 1);
   data.count--;
-  for (const size of SIZES) {
+  for (const size of CFG.sizes) {
     const u = data.usedBySize[size];
     if (u === idx)    data.usedBySize[size] = null;
     else if (u > idx) data.usedBySize[size]--;
   }
   saveState();
-  syncCircle(activeId);
+  syncCircle(ui.activeId);
   navigateTo(idx === 0 ? 0 : idx - 1, idx === 0 ? 1 : -1);
 }
 
 function navigateNode(dir) {
-  if (isAnimating || !activeId) return;
-  const nextIdx = nodeOrder.indexOf(activeId) + dir;
+  if (ui.isAnimating || !ui.activeId) return;
+  const nextIdx = nodeOrder.indexOf(ui.activeId) + dir;
   if (nextIdx < 0 || nextIdx >= nodeOrder.length) return;
   const nextId = nodeOrder[nextIdx];
-  isNodeNavigating = true;
-  document.getElementById(activeId).checked = false;
-  document.getElementById(nextId).checked   = true;
-  isNodeNavigating = false;
+  ui.isNodeNavigating = true;
+  document.getElementById(ui.activeId).checked = false;
+  document.getElementById(nextId).checked      = true;
+  ui.isNodeNavigating = false;
   const nextData   = getData(nextId);
   nextData.current = getUsed(nextId) ?? 0;
-  activeId = nextId;
+  ui.activeId = nextId;
   swapPanel(buildPanel(nextId), dir);
 }
 
 function closePanel(onDone) {
-  if (isAnimating || !activePanel) return;
-  isAnimating = true;
-  const panel = activePanel;
-  const dir   = activeDir;
+  if (ui.isAnimating || !ui.activePanel) return;
+  ui.isAnimating = true;
+  const panel = ui.activePanel;
+  const dir   = ui.activeDir;
   panel.style.transform = tr(dir.axis, dir.sign * 100);
   grid.style.transform  = tr(dir.axis, 0);
   panel.addEventListener('transitionend', () => {
     panel.remove();
     container.style.height = '';
-    activePanel = null;
-    activeDir   = null;
-    if (activeId) { document.getElementById(activeId).checked = false; activeId = null; }
-    isAnimating = false;
+    ui.activePanel = null;
+    ui.activeDir   = null;
+    if (ui.activeId) { document.getElementById(ui.activeId).checked = false; ui.activeId = null; }
+    ui.isAnimating = false;
     onDone?.();
   }, { once: true });
 }
 
+function computeSummary() {
+  const totals = {};
+  for (const id of nodeOrder) {
+    const usedIdx = getUsed(id);
+    if (usedIdx == null) continue;
+    const s = getData(id).panels[usedIdx];
+    if (!s) continue;
+    const quality = getQuality(s);
+    for (const key of s.divinity) {
+      if (!key) continue;
+      const val = getStatVal(key, quality);
+      if (val !== null) totals[key] = (totals[key] ?? 0) + val;
+    }
+  }
+  return totals;
+}
+
+function renderSummaryModal() {
+  const totals  = computeSummary();
+  const list    = document.getElementById('summaryList');
+  const entries = STAT_OPTIONS.filter(o => totals[o.key] !== undefined);
+  list.innerHTML = entries.length
+    ? entries.map(opt => `<div class="summary-row">
+        <span class="summary-label">${opt.label}</span>
+        <span class="summary-value">${formatRawVal(null, totals[opt.key])}</span>
+      </div>`).join('')
+    : '<span class="summary-empty">No items in use</span>';
+}
 
 const DOM = {
   msg:              document.getElementById('statsMsg'),
@@ -2803,15 +2753,8 @@ function syncTargetLabels(key) {
   DOM.tAttr.innerHTML = `<option>${data.attributeMob ?? '—'}</option>`;
 }
 
-const showStatsMsg = (html, type) => {
-  DOM.msg.innerHTML = html;
-  DOM.msg.className = `stats-msg ${type} show`;
-};
-
-const setFormOpen = open => {
-  DOM.form.classList.toggle('open', open);
-  DOM.manualBtn.classList.toggle('active', open);
-};
+const showStatsMsg = (html, type) => { DOM.msg.innerHTML = html; DOM.msg.className = `stats-msg ${type} show`; };
+const setFormOpen  = open => { DOM.form.classList.toggle('open', open); DOM.manualBtn.classList.toggle('active', open); };
 
 function fillFromSnap(snap) {
   const f = snap.form;
@@ -2841,33 +2784,23 @@ function loadStatsState() {
   try {
     const stats = readStore().stats;
     if (!stats) return;
-
-    if (stats.targetDef) {
-      DOM.tDef.value = stats.targetDef;
-      syncTargetLabels(stats.targetDef);
-      syncDivSize();
-    }
-    if (stats.weapon) DOM.weapon.value = stats.weapon;
-    if (stats.wElem) {
-      DOM.wElem.value = stats.wElem;
-      DOM.elemEnhanceLabel.textContent = withVal('Element Enhance', stats.wElem);
-    }
+    if (stats.targetDef) { DOM.tDef.value = stats.targetDef; syncTargetLabels(stats.targetDef); syncDivSize(); }
+    if (stats.weapon)    DOM.weapon.value = stats.weapon;
+    if (stats.wElem)     { DOM.wElem.value = stats.wElem; DOM.elemEnhanceLabel.textContent = withVal('Element Enhance', stats.wElem); }
 
     const atkType = stats.atkType ?? 'pen';
     DOM.atkType.value    = atkType;
     DOM.penField.hidden  = atkType !== 'pen';
     DOM.critField.hidden = atkType === 'pen';
 
-    for (const f of NUM_FIELDS) {
-      if (stats[f]) DOM[f].value = stats[f];
-    }
+    for (const f of NUM_FIELDS) { if (stats[f]) DOM[f].value = stats[f]; }
   } catch {}
 }
 
 function syncDivSize() {
   const sizeKey = { Small: 'small', Medium: 'medium', Large: 'large' }[DOM.tSize.value] ?? '';
-  if (sizeKey === activeSize) return;
-  activeSize = sizeKey || 'small';
+  if (sizeKey === ui.activeSize) return;
+  ui.activeSize = sizeKey || 'small';
   const divSizeEl = document.getElementById('divSizeSelect');
   if (divSizeEl) divSizeEl.value = sizeKey;
   nodeOrder.forEach(syncCircle);
@@ -2889,35 +2822,25 @@ function getCalcStateFromForm() {
     tRace:   target.raceMob ?? '',
     tAttr:   tAttrVal,
     reaperValue: isNodeFlash('n8')
-      ? ((wElemVal === tAttrVal) || (wElemVal === 'Neutral' && !tAttrVal) ? 84 : 28)
-      : 0,
+      ? ((wElemVal === tAttrVal) || (wElemVal === 'Neutral' && !tAttrVal) ? 84 : 28) : 0,
     spearValue: isNodeFlash('n1') ? 84 : 0,
   };
 }
 
-
 function buildOptimizerHTML() {
-  const cardOptions = typeof cardData !== 'undefined'
-    ? Object.keys(cardData).sort().map(n => `<option value="${coEsc(n)}">${coEsc(n)}</option>`).join('')
-    : '';
-
-  const equippedSlotsHTML = Object.entries(EQUIP_LABELS).map(([equip, label]) => {
+  const equippedSlotsHTML = Object.entries(EQUIP_SLOTS).map(([equip, { label, count }]) => {
     const options = '<option value="">—</option>'
       + (typeof cardData !== 'undefined'
         ? Object.keys(cardData).filter(n => cardData[n].equip === equip).sort()
-            .map(n => `<option value="${coEsc(n)}">${coEsc(n)}</option>`).join('')
-        : '');
-    const slotsHTML = Array.from({ length: SLOT_COUNTS[equip] }, (_, i) =>
+            .map(n => `<option value="${coEsc(n)}">${coEsc(n)}</option>`).join('') : '');
+    const slotsHTML = Array.from({ length: count }, (_, i) =>
       `<div class="co-slot">
         <span class="co-slot-lbl">Slot ${i + 1}</span>
         <select class="co-card-select" data-equip="${equip}" data-slot="${i}">${options}</select>
         <button class="co-lock-btn" type="button" data-equip="${equip}" data-slot="${i}" data-locked="false" title="Lock slot">${lockSVG(false)}</button>
       </div>`
     ).join('');
-    return `<div class="co-equip-group">
-      <div class="co-equip-lbl">${label}</div>
-      <div class="co-slots-row">${slotsHTML}</div>
-    </div>`;
+    return `<div class="co-equip-group"><div class="co-equip-lbl">${label}</div><div class="co-slots-row">${slotsHTML}</div></div>`;
   }).join('');
 
   return `
@@ -2958,43 +2881,36 @@ It is highly recommended to always add the Dancer's/Bard's Eternal Chaos or GS's
     </div>`;
 }
 
-function buildUnusedRowHTML() {
-  const allOptions = typeof cardData !== 'undefined'
-    ? Object.keys(cardData).sort().map(n => `<option value="${coEsc(n)}">${coEsc(n)}</option>`).join('')
-    : '';
-  const qtyOptions = Array.from({ length: 6 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
-  return `<div class="co-unused-row">
-    <select class="co-unused-name"><option value="">— Select Card —</option>${allOptions}</select>
-    <select class="co-unused-qty">${qtyOptions}</select>
-    <button class="co-rm-btn" type="button">×</button>
-  </div>`;
-}
-
-function buildBuffRowHTML() {
-  const options = BUFF_STAT_OPTIONS.map(o => `<option value="${coEsc(o.field)}">${coEsc(o.label)}</option>`).join('');
-  return `<div class="co-buff-row">
-    <select class="co-buff-stat"><option value="">— Stat —</option>${options}</select>
-    <input type="number" class="co-buff-val" placeholder="0" min="0" step="0.1">
-    <button class="co-rm-btn" type="button">×</button>
-  </div>`;
-}
-
-function addRow(section, listId, html, populate) {
+function buildDynamicRow({ listSelector, html, populate, onRemove, section }) {
   const wrap = document.createElement('div');
   wrap.innerHTML = html;
   const row = wrap.firstElementChild;
   populate(row);
-  row.querySelector('.co-rm-btn').addEventListener('click', () => { row.remove(); saveOptimizerState(section); });
+  row.querySelector('.co-rm-btn').addEventListener('click', () => { row.remove(); onRemove?.(); });
   row.addEventListener('change', () => saveOptimizerState(section));
-  section.querySelector(listId).appendChild(row);
+  section.querySelector(listSelector).appendChild(row);
   return row;
 }
 
 function addUnusedRow(section, name = '', qty = '1') {
-  const row = addRow(section, '#co-unused-list', buildUnusedRowHTML(), row => {
-    if (name)        row.querySelector('.co-unused-name').value = name;
-    if (qty !== '1') row.querySelector('.co-unused-qty').value  = qty;
+  const allOptions = typeof cardData !== 'undefined'
+    ? Object.keys(cardData).sort().map(n => `<option value="${coEsc(n)}">${coEsc(n)}</option>`).join('') : '';
+  const qtyOptions = Array.from({ length: 6 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+  const html = `<div class="co-unused-row">
+    <select class="co-unused-name"><option value="">— Select Card —</option>${allOptions}</select>
+    <select class="co-unused-qty">${qtyOptions}</select>
+    <button class="co-rm-btn" type="button">×</button>
+  </div>`;
+
+  const row = buildDynamicRow({
+    listSelector: '#co-unused-list', html, section,
+    populate: row => {
+      if (name)        row.querySelector('.co-unused-name').value = name;
+      if (qty !== '1') row.querySelector('.co-unused-qty').value  = qty;
+    },
+    onRemove: () => saveOptimizerState(section),
   });
+
   const nameSel = row.querySelector('.co-unused-name');
   nameSel.addEventListener('change', () => syncCardSelectQuality(nameSel));
   if (name) syncCardSelectQuality(nameSel);
@@ -3002,9 +2918,20 @@ function addUnusedRow(section, name = '', qty = '1') {
 }
 
 function addBuffRow(section, stat = '', val = '') {
-  return addRow(section, '#co-buff-list', buildBuffRowHTML(), row => {
-    if (stat) row.querySelector('.co-buff-stat').value = stat;
-    if (val)  row.querySelector('.co-buff-val').value  = val;
+  const options = BUFF_STAT_OPTIONS.map(o => `<option value="${coEsc(o.field)}">${coEsc(o.label)}</option>`).join('');
+  const html = `<div class="co-buff-row">
+    <select class="co-buff-stat"><option value="">— Stat —</option>${options}</select>
+    <input type="number" class="co-buff-val" placeholder="0" min="0" step="0.1">
+    <button class="co-rm-btn" type="button">×</button>
+  </div>`;
+
+  return buildDynamicRow({
+    listSelector: '#co-buff-list', html, section,
+    populate: row => {
+      if (stat) row.querySelector('.co-buff-stat').value = stat;
+      if (val)  row.querySelector('.co-buff-val').value  = val;
+    },
+    onRemove: () => saveOptimizerState(section),
   });
 }
 
@@ -3016,16 +2943,11 @@ function toggleCoPanel(hd) {
 
   if (!expanding) {
     body.style.height = body.scrollHeight + 'px';
-    requestAnimationFrame(() => {
-      body.classList.add('collapsed');
-      body.style.height = '0px';
-    });
+    requestAnimationFrame(() => { body.classList.add('collapsed'); body.style.height = '0px'; });
   } else {
     body.classList.remove('collapsed');
     body.style.height = '0px';
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      body.style.height = inner.scrollHeight + 'px';
-    }));
+    requestAnimationFrame(() => requestAnimationFrame(() => { body.style.height = inner.scrollHeight + 'px'; }));
   }
   body.addEventListener('transitionend', () => { body.style.height = ''; }, { once: true });
 }
@@ -3033,9 +2955,7 @@ function toggleCoPanel(hd) {
 function bindOptimizerEvents(section) {
   const hd = section.querySelector('.co-hd');
   hd.addEventListener('click', () => toggleCoPanel(hd));
-  hd.addEventListener('keydown', e => {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCoPanel(hd); }
-  });
+  hd.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleCoPanel(hd); } });
 
   section.querySelector('#co-equipped-slots').addEventListener('change', e => {
     saveOptimizerState(section);
@@ -3066,94 +2986,70 @@ function bindOptimizerEvents(section) {
   });
 }
 
+const _readEquipped = section => Object.fromEntries(
+  [...section.querySelectorAll('.co-card-select')].map(sel => [`${sel.dataset.equip}_${sel.dataset.slot}`, sel.value])
+);
+const _readLocked   = section => Object.fromEntries(
+  [...section.querySelectorAll('.co-lock-btn')].map(btn => [`${btn.dataset.equip}_${btn.dataset.slot}`, btn.dataset.locked === 'true'])
+);
+const _readUnused   = section => [...section.querySelectorAll('.co-unused-row')].map(row => ({
+  name: row.querySelector('.co-unused-name').value,
+  qty:  row.querySelector('.co-unused-qty').value,
+}));
+const _readBuffs    = section => [...section.querySelectorAll('.co-buff-row')].map(row => ({
+  stat: row.querySelector('.co-buff-stat').value,
+  val:  row.querySelector('.co-buff-val').value,
+}));
+
 function saveOptimizerState(section) {
   try {
-    const prev = readStore().cards || {};
-
+    const prev           = readStore().cards || {};
     const equippedBySize = prev.equippedBySize ?? { small: {}, medium: {}, large: {} };
     const lockedBySize   = prev.lockedBySize   ?? { small: {}, medium: {}, large: {} };
     const unusedBySize   = prev.unusedBySize   ?? { small: [], medium: [], large: [] };
 
-    const equipped = {};
-    for (const sel of section.querySelectorAll('.co-card-select'))
-      equipped[`${sel.dataset.equip}_${sel.dataset.slot}`] = sel.value;
+    equippedBySize[ui.activeSize] = _readEquipped(section);
+    lockedBySize[ui.activeSize]   = _readLocked(section);
+    unusedBySize[ui.activeSize]   = _readUnused(section);
 
-    const locked = {};
-    for (const btn of section.querySelectorAll('.co-lock-btn'))
-      locked[`${btn.dataset.equip}_${btn.dataset.slot}`] = btn.dataset.locked === 'true';
-
-    const unused = [...section.querySelectorAll('.co-unused-row')].map(row => ({
-      name: row.querySelector('.co-unused-name').value,
-      qty:  row.querySelector('.co-unused-qty').value,
-    }));
-
-    const buffs = [...section.querySelectorAll('.co-buff-row')].map(row => ({
-      stat: row.querySelector('.co-buff-stat').value,
-      val:  row.querySelector('.co-buff-val').value,
-    }));
-
-    equippedBySize[activeSize] = equipped;
-    lockedBySize[activeSize]   = locked;
-    unusedBySize[activeSize]   = unused;
-
-    writeStore('cards', { equippedBySize, lockedBySize, unusedBySize, buffs });
+    writeStore('cards', { equippedBySize, lockedBySize, unusedBySize, buffs: _readBuffs(section) });
   } catch {}
+}
+
+function _applyStoredSizeToSection(section, stored, size) {
+  const equipped = (stored.equippedBySize || {})[size] || {};
+  const locked   = (stored.lockedBySize   || {})[size] || {};
+  const unused   = (stored.unusedBySize   || {})[size] || [];
+
+  for (const sel of section.querySelectorAll('.co-card-select')) {
+    sel.value = equipped[`${sel.dataset.equip}_${sel.dataset.slot}`] ?? '';
+    syncCardSelectQuality(sel);
+  }
+  for (const btn of section.querySelectorAll('.co-lock-btn'))
+    setLockState(btn, !!(locked[`${btn.dataset.equip}_${btn.dataset.slot}`]));
+
+  section.querySelector('#co-unused-list').innerHTML = '';
+  for (const { name, qty } of unused) addUnusedRow(section, name, qty);
 }
 
 function restoreOptimizerState(section) {
   try {
     const stored = readStore().cards || {};
-
-    const equippedBySize = stored.equippedBySize
-      ?? { small: stored.equipped ?? {}, medium: stored.equipped ?? {}, large: stored.equipped ?? {} };
-    const lockedBySize = stored.lockedBySize
-      ?? { small: stored.locked ?? {}, medium: stored.locked ?? {}, large: stored.locked ?? {} };
-    const unusedBySize = stored.unusedBySize
-      ?? { small: stored.unused ?? [], medium: stored.unused ?? [], large: stored.unused ?? [] };
-
-    const equipped = equippedBySize[activeSize] || {};
-    const locked   = lockedBySize[activeSize]   || {};
-    const unused   = unusedBySize[activeSize]   || [];
-
-    for (const sel of section.querySelectorAll('.co-card-select')) {
-      const key = `${sel.dataset.equip}_${sel.dataset.slot}`;
-      if (equipped[key] !== undefined) { sel.value = equipped[key]; syncCardSelectQuality(sel); }
-    }
-    for (const btn of section.querySelectorAll('.co-lock-btn')) {
-      const key = `${btn.dataset.equip}_${btn.dataset.slot}`;
-      if (locked[key]) setLockState(btn, true);
-    }
+    const normalised = {
+      equippedBySize: stored.equippedBySize ?? { small: stored.equipped ?? {}, medium: stored.equipped ?? {}, large: stored.equipped ?? {} },
+      lockedBySize:   stored.lockedBySize   ?? { small: stored.locked   ?? {}, medium: stored.locked   ?? {}, large: stored.locked   ?? {} },
+      unusedBySize:   stored.unusedBySize   ?? { small: stored.unused   ?? [], medium: stored.unused   ?? [], large: stored.unused   ?? [] },
+    };
+    _applyStoredSizeToSection(section, normalised, ui.activeSize);
     for (const { stat, val } of (stored.buffs || [])) addBuffRow(section, stat, val);
-    for (const { name, qty } of unused) addUnusedRow(section, name, qty);
   } catch {}
 }
 
 function switchOptimizerSize(section) {
-  try {
-    const stored = readStore().cards || {};
-    const equippedBySize = stored.equippedBySize || {};
-    const lockedBySize   = stored.lockedBySize   || {};
-    const unusedBySize   = stored.unusedBySize   || {};
-
-    const equipped = equippedBySize[activeSize] || {};
-    const locked   = lockedBySize[activeSize]   || {};
-    const unused   = unusedBySize[activeSize]   || [];
-
-    for (const sel of section.querySelectorAll('.co-card-select')) {
-  sel.value = equipped[`${sel.dataset.equip}_${sel.dataset.slot}`] ?? '';
-  syncCardSelectQuality(sel);
-}
-    for (const btn of section.querySelectorAll('.co-lock-btn'))
-      setLockState(btn, !!(locked[`${btn.dataset.equip}_${btn.dataset.slot}`]));
-
-    section.querySelector('#co-unused-list').innerHTML = '';
-    for (const { name, qty } of unused) addUnusedRow(section, name, qty);
-  } catch {}
+  try { _applyStoredSizeToSection(section, readStore().cards || {}, ui.activeSize); } catch {}
 }
 
-
-const lookupCard = name =>
-  typeof cardData !== 'undefined' ? (cardData[name] ?? null) : null;
+const lookupCard = name => typeof cardData !== 'undefined' ? (cardData[name] ?? null) : null;
 
 function syncCardSelectQuality(sel) {
   sel.classList.remove('card-q-white', 'card-q-blue', 'card-q-gold');
@@ -3161,16 +3057,15 @@ function syncCardSelectQuality(sel) {
   if (quality) sel.classList.add(`card-q-${quality}`);
 }
 
-const coParseStatValue = raw =>
+const parseStatPct = raw =>
   typeof raw === 'string' && raw.includes('%')
-    ? parseFloat(raw.replace('%', '').replace(/,/g, ''))
-    : null;
+    ? parseFloat(raw.replace('%', '').replace(/,/g, '')) : null;
 
 function getCardStatDelta(name, ctx) {
   const card = lookupCard(name);
   if (!card) return null;
 
-  const delta     = { pen: 0, crit: 0, dmg: 0, elemEnh: 0, sizeEnh: 0, race: 0, attr: 0, dmgStack: 0 };
+  const delta     = Object.fromEntries(NUM_FIELDS.map(f => [f, 0]));
   const skipStats = new Set();
   for (const group of STAT_DEDUP_GROUPS) {
     const present = group.filter(s => s in card.stats);
@@ -3183,9 +3078,8 @@ function getCardStatDelta(name, ctx) {
     if (!resolver) continue;
     const field = resolver(ctx);
     if (!field) continue;
-    const value = coParseStatValue(rawVal);
-    if (value === null) continue;
-    delta[field] += value;
+    const value = parseStatPct(rawVal);
+    if (value !== null) delta[field] += value;
   }
   return { delta, equip: card.equip };
 }
@@ -3194,11 +3088,10 @@ function applyCardDeltas(state, names, ctx, sign = 1) {
   const result = { ...state };
   for (const name of names) {
     if (!name || name === '—') continue;
-    const cardResult = getCardStatDelta(name, ctx);
-    if (!cardResult) continue;
-    for (const [key, val] of Object.entries(cardResult.delta)) {
+    const r = getCardStatDelta(name, ctx);
+    if (!r) continue;
+    for (const [key, val] of Object.entries(r.delta))
       if (key in result) result[key] += sign * val;
-    }
   }
   return result;
 }
@@ -3206,7 +3099,50 @@ function applyCardDeltas(state, names, ctx, sign = 1) {
 const calcBaseStats = (state, names, ctx) => applyCardDeltas(state, names, ctx, -1);
 const applyCards    = (state, names, ctx) => applyCardDeltas(state, names, ctx);
 const evalMult      = state => calculateMultiplier(state).mult;
-const runWithStrategy = (total, exactFn, greedyFn) => total <= MAX_EVAL_LIMIT ? exactFn() : greedyFn();
+const runWithStrategy = (total, exactFn, greedyFn) => total <= CFG.maxEvalLimit ? exactFn() : greedyFn();
+
+function applyDivinityStats(state, panel, ctx, sign) {
+  const quality = getQuality(panel);
+  const result  = { ...state };
+  for (const key of panel.divinity) {
+    if (!key) continue;
+    const meta = DIVINITY_KEY_MAP[key];
+    if (!meta) continue;
+    if (meta.cond && !meta.cond(ctx)) continue;
+    const val = getStatVal(key, quality);
+    if (val === null) continue;
+    result[meta.field] = (result[meta.field] || 0) + sign * val * 100;
+  }
+  return result;
+}
+
+function applyDivinityPanel(state, panel, nodeId, ctx) {
+  let result = applyDivinityStats(state, panel, ctx, 1);
+  const special = SPECIAL_NODES[nodeId];
+  if (special) result = { ...result, [special.field]: special.calcValue(ctx, panel) };
+  return result;
+}
+
+function applyAllDivinityPanels(state, selection, ctx) {
+  return selection.reduce((s, { id, panelIndex }) => {
+    const panel = getData(id).panels[panelIndex];
+    return panel ? applyDivinityPanel(s, panel, id, ctx) : s;
+  }, { ...state });
+}
+
+function stripCurrentDivinity(state, ctx) {
+  let result = { ...state };
+  for (const id of nodeOrder) {
+    const usedIdx = getUsed(id);
+    if (usedIdx == null || !nodeData[id]) continue;
+    const panel = nodeData[id].panels[usedIdx];
+    if (!panel) continue;
+    result = applyDivinityStats(result, panel, ctx, -1);
+    const special = SPECIAL_NODES[id];
+    if (special) result = { ...result, [special.field]: 0 };
+  }
+  return result;
+}
 
 function generateEquipCombinations(pool, slots) {
   if (slots <= 0 || pool.length === 0) return [[]];
@@ -3238,10 +3174,11 @@ function runOptimizer(baseState, cardPool, slotCounts, ctx, currentMult) {
     const pool = (cardPool[equip] || []).filter(c => c.qty > 0);
     combosPerEquip[equip] = generateEquipCombinations(pool, slotCounts[equip] || 0);
     totalCombos *= combosPerEquip[equip].length;
-    if (totalCombos > MAX_EVAL_LIMIT) { overflowed = true; break; }
+    if (totalCombos > CFG.maxEvalLimit) { overflowed = true; break; }
   }
 
-  return runWithStrategy(overflowed ? MAX_EVAL_LIMIT + 1 : totalCombos,
+  return runWithStrategy(
+    overflowed ? CFG.maxEvalLimit + 1 : totalCombos,
     () => runExactOptimizer(baseState, combosPerEquip, equipTypes, ctx, currentMult),
     () => runGreedyOptimizer(baseState, cardPool, slotCounts, equipTypes, ctx, combosPerEquip)
   );
@@ -3251,7 +3188,7 @@ function runExactOptimizer(baseState, combosPerEquip, equipTypes, ctx, currentMu
   let bestMult  = currentMult;
   let bestCards = null;
 
-  function recurse(equipIdx, cardsSoFar, currentState) {
+  (function recurse(equipIdx, cardsSoFar, currentState) {
     if (equipIdx === equipTypes.length) {
       const m = evalMult(currentState);
       if (m > bestMult) { bestMult = m; bestCards = [...cardsSoFar]; }
@@ -3262,9 +3199,8 @@ function runExactOptimizer(baseState, combosPerEquip, equipTypes, ctx, currentMu
       if (equipIdx === equipTypes.length - 1 && evalMult(nextState) <= bestMult) continue;
       recurse(equipIdx + 1, cardsSoFar.concat(combo), nextState);
     }
-  }
+  })(0, [], baseState);
 
-  recurse(0, [], baseState);
   if (!bestCards) return { topResults: [] };
   return { topResults: [{ cards: bestCards, mult: bestMult }] };
 }
@@ -3287,157 +3223,8 @@ function runGreedyOptimizer(baseState, cardPool, slotCounts, equipTypes, ctx, co
     runningState = applyCards(runningState, bestCombo, ctx);
   }
 
-  const allBestCards = Object.values(bestPerEquip).flat();
-  return { topResults: [{ cards: allBestCards, mult: evalMult(applyCards(baseState, allBestCards, ctx)) }] };
-}
-
-function runAndRender(section, calcState, ctx) {
-  const resultEl     = document.getElementById('resultCard');
-  resultEl.hidden    = false;
-  resultEl.innerHTML = '<div class="co-loading"><span class="co-spinner"></span>Still finding<span class="co-dots"><span>.</span><span>.</span><span>.</span></span></div>';
-  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-  const equippedNames  = [...section.querySelectorAll('.co-card-select')].map(sel => sel.value || '');
-  const slotCounts     = { ...SLOT_COUNTS };
-  const lockedCards    = {};
-  const lockedSlotKeys = new Set();
-
-  for (const btn of section.querySelectorAll('.co-lock-btn')) {
-    if (btn.dataset.locked !== 'true') continue;
-    const { equip, slot } = btn.dataset;
-    lockedSlotKeys.add(`${equip}_${slot}`);
-    const cardName = section.querySelector(`.co-card-select[data-equip="${equip}"][data-slot="${slot}"]`)?.value || '';
-    if (cardName) (lockedCards[equip] ??= []).push(cardName);
-  }
-
-  const allLockedNames = Object.values(lockedCards).flat();
-  for (const [equip, cards] of Object.entries(lockedCards))
-    slotCounts[equip] = Math.max(0, (slotCounts[equip] || 0) - cards.length);
-
-  const unusedMap = {};
-  for (const row of section.querySelectorAll('.co-unused-row')) {
-    const name = row.querySelector('.co-unused-name').value;
-    const qty  = parseInt(row.querySelector('.co-unused-qty').value) || 1;
-    if (name) unusedMap[name] = (unusedMap[name] || 0) + qty;
-  }
-
-  const poolMap = {};
-  const addToPool = (name, count) => {
-    const card = lookupCard(name);
-    if (!card) return;
-    const ep = (poolMap[card.equip] ??= {});
-    ep[name] = (ep[name] || 0) + count;
-  };
-  for (const name of equippedNames) if (name) addToPool(name, 1);
-  for (const [name, qty] of Object.entries(unusedMap)) addToPool(name, qty);
-
-  const cardPool = {};
-  for (const [equip, map] of Object.entries(poolMap))
-    cardPool[equip] = Object.entries(map).map(([name, qty]) => ({ name, qty }));
-
-  const lockedCopiesUsed = {};
-  for (const name of allLockedNames)
-    lockedCopiesUsed[name] = (lockedCopiesUsed[name] || 0) + 1;
-  for (const equip of Object.keys(cardPool)) {
-    cardPool[equip] = cardPool[equip]
-      .map(({ name, qty }) => ({ name, qty: Math.max(0, qty - (lockedCopiesUsed[name] || 0)) }))
-      .filter(c => c.qty > 0);
-  }
-
-  const buffMap = {};
-  for (const row of section.querySelectorAll('.co-buff-row')) {
-    const field = row.querySelector('.co-buff-stat').value;
-    const val   = parseFloat(row.querySelector('.co-buff-val').value) || 0;
-    if (field && val !== 0) buffMap[field] = (buffMap[field] || 0) + val;
-  }
-
-  const nonLockedEquipped = [...section.querySelectorAll('.co-card-select')]
-    .filter(sel => !lockedSlotKeys.has(`${sel.dataset.equip}_${sel.dataset.slot}`) && sel.value)
-    .map(sel => sel.value);
-
-  setTimeout(() => {
-    try {
-      const baseState = calcBaseStats(calcState, equippedNames, ctx);
-      for (const [field, val] of Object.entries(buffMap))
-        if (field in baseState) baseState[field] += val;
-
-      const pureBase        = stripCurrentDivinity(baseState, ctx);
-      const lockedBaseState = applyCards(pureBase, allLockedNames, ctx);
-
-      const currentDivSel = nodeOrder
-        .filter(id => nodeData[id] && getUsed(id) != null)
-        .map(id => ({ id, panelIndex: getUsed(id) }));
-
-      const currentSetupState = applyCards(lockedBaseState, nonLockedEquipped, ctx);
-      const currentMult       = evalMult(applyAllDivinityPanels(currentSetupState, currentDivSel, ctx));
-      const activeNodes       = nodeOrder.filter(id => nodeData[id] && getUsed(id) != null);
-
-      const { bestCards, bestDivSel, bestMult } = runCoordinateDescent(
-        pureBase, lockedBaseState, cardPool, slotCounts,
-        allLockedNames, nonLockedEquipped, activeNodes, currentDivSel, currentMult, ctx
-      );
-
-      const divinityResult = activeNodes.length ? { bestSelection: bestDivSel, bestMult } : null;
-      renderResults(resultEl, [{ cards: bestCards, mult: bestMult }], pureBase, currentMult, lockedCards, equippedNames, ctx, divinityResult, currentDivSel, buffMap);
-      resultEl.classList.remove('co-result-enter');
-      void resultEl.offsetWidth;
-      resultEl.classList.add('co-result-enter');
-    } catch (err) {
-      resultEl.innerHTML = `<div class="co-error">Error: ${coEsc(err.message)}</div>`;
-    }
-  }, 30);
-}
-
-
-function applyDivinityStats(state, panel, ctx, sign) {
-  const quality = getQuality(panel);
-  const result  = { ...state };
-  for (const key of panel.divinity) {
-    if (!key) continue;
-    const cond = DIV_KEY_COND[key];
-    if (cond && !cond(ctx)) continue;
-    const val = getStatVal(key, quality);
-    if (val === null) continue;
-    const field = DIV_KEY_TO_FIELD[key];
-    if (!field) continue;
-    result[field] = (result[field] || 0) + sign * val * 100;
-  }
-  return result;
-}
-
-function stripCurrentDivinity(state, ctx) {
-  let result = { ...state };
-  for (const id of nodeOrder) {
-    const d       = nodeData[id];
-    const usedIdx = getUsed(id);
-    if (!d || usedIdx == null) continue;
-    const panel = d.panels[usedIdx];
-    if (!panel) continue;
-    result = applyDivinityStats(result, panel, ctx, -1);
-    if (id === 'n1') result.spearValue  = 0;
-    if (id === 'n8') result.reaperValue = 0;
-  }
-  return result;
-}
-
-function applyDivinityPanel(state, panel, nodeId, ctx) {
-  const result = applyDivinityStats(state, panel, ctx, 1);
-  if (nodeId === 'n1')
-    result.spearValue = panel.lightning ? 84 : 0;
-  if (nodeId === 'n8')
-    result.reaperValue = panel.lightning
-      ? ((ctx.wElem === ctx.tAttr) || (ctx.wElem === 'Neutral' && !ctx.tAttr) ? 84 : 28)
-      : 0;
-  return result;
-}
-
-function applyAllDivinityPanels(state, selection, ctx) {
-  let result = { ...state };
-  for (const { id, panelIndex } of selection) {
-    const panel = getData(id).panels[panelIndex];
-    if (panel) result = applyDivinityPanel(result, panel, id, ctx);
-  }
-  return result;
+  const allBest = Object.values(bestPerEquip).flat();
+  return { topResults: [{ cards: allBest, mult: evalMult(applyCards(baseState, allBest, ctx)) }] };
 }
 
 function runDivinityOptimizer(cardState, ctx) {
@@ -3452,7 +3239,7 @@ function runDivinityOptimizer(cardState, ctx) {
     return { id, entries: d.panels.slice(0, d.count).map((panel, i) => ({ panel, idx: i })) };
   });
 
-  const base        = { ...cardState, spearValue: 0, reaperValue: 0 };
+  const base        = { ...cardState, ...Object.fromEntries(Object.values(SPECIAL_NODES).map(s => [s.field, 0])) };
   const totalCombos = pools.reduce((acc, p) => acc * p.entries.length, 1);
   let bestMult      = -Infinity;
   let bestSelection = null;
@@ -3489,7 +3276,10 @@ function runDivinityOptimizer(cardState, ctx) {
     }
   );
 
-  return { bestSelection: bestSelection ?? nodeOrder.filter(id => nodeData[id] && getUsed(id) != null).map(id => ({ id, panelIndex: getUsed(id) })), bestMult };
+  return {
+    bestSelection: bestSelection ?? activeNodes.map(id => ({ id, panelIndex: getUsed(id) })),
+    bestMult,
+  };
 }
 
 function runCoordinateDescent(pureBase, lockedBaseState, cardPool, slotCounts, allLockedNames, nonLockedEquipped, activeNodes, currentDivSel, currentMult, ctx) {
@@ -3520,48 +3310,42 @@ function runCoordinateDescent(pureBase, lockedBaseState, cardPool, slotCounts, a
   return { bestCards, bestDivSel, bestMult };
 }
 
-
 function buildEquipMap(names) {
   const map = {};
   for (const name of names) {
     if (!name || name === '—') continue;
     const card = lookupCard(name);
     if (!card) continue;
-    const ep = (map[card.equip] ??= {});
-    ep[name] = (ep[name] || 0) + 1;
+    (map[card.equip] ??= {})[name] = ((map[card.equip] ??= {})[name] || 0) + 1;
   }
   return map;
 }
 
-const buildBreakdownHTML = (equipMap, lockedMap = {}, beforeEquipMap = null) =>
-  Object.entries(equipMap).map(([equip, cards]) => {
-    const lockedInEquip = lockedMap[equip]   || {};
+function buildBreakdownHTML(equipMap, lockedMap = {}, beforeEquipMap = null) {
+  return Object.entries(equipMap).map(([equip, cards]) => {
+    const lockedInEquip = lockedMap[equip]       || {};
     const beforeInEquip = beforeEquipMap?.[equip] || {};
     const chipsHTML = Object.entries(cards).map(([n, q]) => {
       const numLocked = Math.min(lockedInEquip[n] || 0, q);
       const numFree   = q - numLocked;
-      const parts     = [];
       const qClass    = ` card-q-${lookupCard(n)?.quality || 'white'}`;
+      const parts     = [];
       if (numLocked > 0)
-        parts.push(`<span class="co-chip co-chip--locked${qClass}">${LOCK_CLOSED_PATH ? `<svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10">${LOCK_CLOSED_PATH}</svg>` : ''}${coEsc(n)}${numLocked > 1 ? `<span class="co-chip-qty"> ×${numLocked}</span>` : ''}</span>`);
+        parts.push(`<span class="co-chip co-chip--locked${qClass}"><svg viewBox="0 0 24 24" fill="currentColor" width="10" height="10">${ICONS.lockClosed}</svg>${coEsc(n)}${numLocked > 1 ? `<span class="co-chip-qty"> ×${numLocked}</span>` : ''}</span>`);
       if (numFree > 0) {
         const freeCurrent = Math.max(0, (beforeInEquip[n] || 0) - (lockedInEquip[n] || 0));
-        const swapIcon    = beforeEquipMap != null && numFree > freeCurrent ? HORIZ_SWAP_SVG : '';
+        const swapIcon    = beforeEquipMap != null && numFree > freeCurrent ? ICONS.horizSwap : '';
         parts.push(`<span class="co-chip${qClass}">${swapIcon}${coEsc(n)}${numFree > 1 ? `<span class="co-chip-qty"> ×${numFree}</span>` : ''}</span>`);
       }
       return parts.join('');
     }).join('');
-    return `<div class="co-res-equip">
-      <span class="co-res-equip-lbl">${EQUIP_LABELS[equip] ?? equip}</span>
-      <span class="co-res-cards">${chipsHTML}</span>
-    </div>`;
+    return `<div class="co-res-equip"><span class="co-res-equip-lbl">${EQUIP_LABELS[equip] ?? equip}</span><span class="co-res-cards">${chipsHTML}</span></div>`;
   }).join('') || '<span class="co-empty-state">No cards</span>';
+}
 
 function buildStatsGridHTML(state, compareState, atkType, showUseSyncBtn = false) {
-  const atkField = atkType === 'crit'
-    ? { field: 'crit', label: 'Crit DMG BNS' }
-    : { field: 'pen',  label: 'Final PEN'    };
-  const labels = [
+  const atkField = atkType === 'crit' ? { field: 'crit', label: 'Crit DMG BNS' } : { field: 'pen', label: 'Final PEN' };
+  const labels   = [
     atkField,
     ...BASE_STAT_LABELS.map(item =>
       item.field === 'dmgStack' && (state.reaperValue || 0) > 0 ? { ...item, isSpear: true } : item
@@ -3569,38 +3353,31 @@ function buildStatsGridHTML(state, compareState, atkType, showUseSyncBtn = false
     ...((state.spearValue || 0) > 0 ? [{ field: 'spearValue', label: 'DMG to MVP/MINI, BOSS, and Normal Monsters', isSpear: true }] : []),
   ];
   const titleHTML = showUseSyncBtn
-    ? `<div class="co-res-section-title-row">
-        <div class="co-res-section-title">Final Stats</div>
-        <button class="co-use-sync-btn" id="coUseSyncBtn">${SYNC_SVG}Use &amp; Sync</button>
-      </div>`
+    ? `<div class="co-res-section-title-row"><div class="co-res-section-title">Final Stats</div><button class="co-use-sync-btn" id="coUseSyncBtn">${ICONS.sync}Use &amp; Sync</button></div>`
     : `<div class="co-res-section-title">Final Stats</div>`;
-  return `<div class="co-res-section">
-    ${titleHTML}
-    <div class="co-final-stats-grid">
-      ${labels.map(({ field, label, isSpear }) => {
-        const val  = state[field] ?? 0;
-        const diff = compareState != null ? val - (compareState[field] ?? 0) : 0;
-        const arrow = diff > 0 ? UP_ARROW : diff < 0 ? DOWN_ARROW : '';
-        return `<div class="co-final-stat-row${isSpear ? ' co-final-stat-row--spear' : ''}">
-          <span class="co-final-stat-lbl">${isSpear ? `${FLASH_SVG}<span class="co-stat-lbl-text">${label}</span>` : label}</span>
-          <span class="co-final-stat-val">${coFmt(val)}%${arrow}</span>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
+  return `<div class="co-res-section">${titleHTML}<div class="co-final-stats-grid">${
+    labels.map(({ field, label, isSpear }) => {
+      const val   = state[field] ?? 0;
+      const diff  = compareState != null ? val - (compareState[field] ?? 0) : 0;
+      const arrow = diff > 0 ? ICONS.arrowUp : diff < 0 ? ICONS.arrowDown : '';
+      return `<div class="co-final-stat-row${isSpear ? ' co-final-stat-row--spear' : ''}">
+        <span class="co-final-stat-lbl">${isSpear ? `${ICONS.flash}<span class="co-stat-lbl-text">${label}</span>` : label}</span>
+        <span class="co-final-stat-val">${coFmt(val)}%${arrow}</span>
+      </div>`;
+    }).join('')
+  }</div></div>`;
 }
 
 function applyBestCardsToSlots(bestCards, section) {
-  const cardsByEquip = {};
+  const byEquip = {};
   for (const name of bestCards) {
     if (!name || name === '—') continue;
     const card = lookupCard(name);
-    if (!card) continue;
-    (cardsByEquip[card.equip] ??= []).push(name);
+    if (card) (byEquip[card.equip] ??= []).push(name);
   }
   for (const equip of Object.keys(SLOT_COUNTS)) {
     const selects  = [...section.querySelectorAll(`.co-card-select[data-equip="${equip}"]`)];
-    const recCards = cardsByEquip[equip] || [];
+    const recCards = byEquip[equip] || [];
     let nameIdx    = 0;
     for (const sel of selects) {
       const lockBtn = section.querySelector(`.co-lock-btn[data-equip="${equip}"][data-slot="${sel.dataset.slot}"]`);
@@ -3613,29 +3390,22 @@ function applyBestCardsToSlots(bestCards, section) {
 }
 
 function applyBestDivinity(bestDivSel) {
-  for (const { id, panelIndex } of bestDivSel) {
-    setUsed(id, panelIndex);
-    syncCircle(id);
-  }
+  for (const { id, panelIndex } of bestDivSel) { setUsed(id, panelIndex); syncCircle(id); }
   saveState();
-  if (activePanel && activeId) {
-    const useBtn = activePanel.querySelector('.use-btn');
-    if (useBtn) syncUseBtn(useBtn, getUsed(activeId) === getData(activeId).current);
+  if (ui.activePanel && ui.activeId) {
+    const useBtn = ui.activePanel.querySelector('.use-btn');
+    if (useBtn) syncUseBtn(useBtn, getUsed(ui.activeId) === getData(ui.activeId).current);
   }
 }
 
 function syncFinalStatsToForm(finalState, buffMap) {
   const fmt     = v => (Math.round((Number(v) || 0) * 100) / 100).toString();
-  const net     = field => (finalState[field] ?? 0) - (buffMap[field] || 0);
+  const net     = f => (finalState[f] ?? 0) - (buffMap[f] || 0);
   const atkType = DOM.atkType.value;
   if (atkType === 'pen') DOM.pen.value  = fmt(net('pen'));
   else                   DOM.crit.value = fmt(net('crit'));
-  DOM.dmg.value      = fmt(net('dmg'));
-  DOM.elemEnh.value  = fmt(net('elemEnh'));
-  DOM.sizeEnh.value  = fmt(net('sizeEnh'));
-  DOM.race.value     = fmt(net('race'));
-  DOM.attr.value     = fmt(net('attr'));
-  DOM.dmgStack.value = fmt(net('dmgStack'));
+  for (const f of ['dmg', 'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'])
+    DOM[f].value = fmt(net(f));
   saveStatsState();
   setFormOpen(true);
 }
@@ -3646,104 +3416,73 @@ function renderResults(container, topResults, pureBase, currentMult, lockedCards
     return;
   }
 
-  const best               = topResults[0];
-  const combinedBestMult   = divinityResult ? divinityResult.bestMult : best.mult;
-  const pctRaw             = currentMult > 0 ? ((combinedBestMult - currentMult) / currentMult * 100) : 0;
-  const pct                = pctRaw.toFixed(2);
-  const sign               = pctRaw >= 0 ? '+' : '';
-  const isGain             = combinedBestMult >= currentMult;
+  const best             = topResults[0];
+  const combinedBestMult = divinityResult ? divinityResult.bestMult : best.mult;
+  const pctRaw           = currentMult > 0 ? ((combinedBestMult - currentMult) / currentMult * 100) : 0;
+  const pct              = pctRaw.toFixed(2);
+  const isGain           = combinedBestMult >= currentMult;
 
   const lockedCountByEquip = {};
   for (const [equip, names] of Object.entries(lockedCards)) {
     lockedCountByEquip[equip] = {};
-    for (const name of names)
-      lockedCountByEquip[equip][name] = (lockedCountByEquip[equip][name] || 0) + 1;
+    for (const name of names) lockedCountByEquip[equip][name] = (lockedCountByEquip[equip][name] || 0) + 1;
   }
 
-  const byEquip       = buildEquipMap(best.cards);
-  const beforeByEquip = buildEquipMap(equippedNames);
-
-  const bestCardsState    = applyCards(pureBase, best.cards, ctx);
-  const currentCardsState = applyCards(pureBase, equippedNames.filter(n => n && n !== '—'), ctx);
-
-  const bestDivSel  = divinityResult ? divinityResult.bestSelection : currentDivSel;
-  const finalState  = applyAllDivinityPanels(bestCardsState, bestDivSel, ctx);
-  const beforeState = applyAllDivinityPanels(currentCardsState, currentDivSel, ctx);
+  const byEquip         = buildEquipMap(best.cards);
+  const beforeByEquip   = buildEquipMap(equippedNames);
+  const bestCardsState  = applyCards(pureBase, best.cards, ctx);
+  const curCardsState   = applyCards(pureBase, equippedNames.filter(n => n && n !== '—'), ctx);
+  const bestDivSel      = divinityResult ? divinityResult.bestSelection : currentDivSel;
+  const finalState      = applyAllDivinityPanels(bestCardsState, bestDivSel, ctx);
+  const beforeState     = applyAllDivinityPanels(curCardsState, currentDivSel, ctx);
 
   const displayFinal  = { ...finalState,  dmgStack: finalState.dmgStack  + (finalState.reaperValue  || 0) };
   const displayBefore = { ...beforeState, dmgStack: beforeState.dmgStack + (beforeState.reaperValue || 0) };
   container.classList.toggle('spear-active', (finalState.spearValue || 0) > 0);
 
-  const currentByNode = Object.fromEntries(currentDivSel.map(s => [s.id, s.panelIndex]));
-
-  const bestDivNodesHTML = divinityResult
-    ? `<div class="co-res-section">
-        <div class="co-res-section-title">Recommended Divinities (tap for details)</div>
-        <div class="co-div-nodes">${buildDivNodesHTML(divinityResult.bestSelection, currentByNode)}</div>
-       </div>` : '';
-
+  const currentByNode      = Object.fromEntries(currentDivSel.map(s => [s.id, s.panelIndex]));
+  const bestDivNodesHTML   = divinityResult
+    ? `<div class="co-res-section"><div class="co-res-section-title">Recommended Divinities (tap for details)</div><div class="co-div-nodes">${buildDivNodesHTML(divinityResult.bestSelection, currentByNode)}</div></div>` : '';
   const currentDivNodesHTML = currentDivSel.length
-    ? `<div class="co-res-section">
-        <div class="co-res-section-title">Divinity</div>
-        <div class="co-div-nodes">${buildDivNodesHTML(currentDivSel)}</div>
-       </div>` : '';
+    ? `<div class="co-res-section"><div class="co-res-section-title">Divinity</div><div class="co-div-nodes">${buildDivNodesHTML(currentDivSel)}</div></div>` : '';
 
-  const noteHTML = pctRaw >= 0 && pctRaw <= 5 ?
-  `<div class="co-res-note">This tool only calculates the multiplier based on main offensive stats (pen, critdmg, p/mbo, elem, size, race, attr). Stat%, ATK%, Haste, etc. are not calculated, so in-game results may differ, especially for jobs that need Haste or Max HP.</div>` : `<div class="co-res-note">This tool only calculates the multiplier based on main offensive stats. Stat%, ATK%, Haste, etc. are not calculated, so in-game results may differ, especially for jobs that need Haste or Max HP.</div>`;
+  const noteHTML = `<div class="co-res-note">This tool only calculates the multiplier based on main offensive stats${pctRaw >= 0 && pctRaw <= 5 ? ' (pen, critdmg, p/mbo, elem, size, race, attr)' : ''}. Stat%, ATK%, Haste, etc. are not calculated, so in-game results may differ, especially for jobs that need Haste or Max HP.</div>`;
 
-  const slide1HTML = `
-    <div class="co-res-section">
-      <div class="co-res-section-title">Recommended Cards</div>
-      <div class="co-res-breakdown">${buildBreakdownHTML(byEquip, lockedCountByEquip, beforeByEquip)}</div>
-    </div>
+  const sign     = pctRaw >= 0 ? '+' : '';
+  const slide1   = `
+    <div class="co-res-section"><div class="co-res-section-title">Recommended Cards</div><div class="co-res-breakdown">${buildBreakdownHTML(byEquip, lockedCountByEquip, beforeByEquip)}</div></div>
     ${bestDivNodesHTML}
     <div class="co-res-divider"></div>
     ${buildStatsGridHTML(displayFinal, displayBefore, ctx.atkType, true)}
     <div class="co-res-hero">
-      <div class="co-res-hero-block">
-        <div class="co-res-hero-val">×${coFmt(combinedBestMult)}</div>
-        <div class="co-res-hero-lbl">New Multiplier</div>
-      </div>
-      <div class="co-res-hero-block ${isGain ? 'pos' : 'neg'}">
-        <div class="co-res-hero-val">${sign}${pct}%</div>
-        <div class="co-res-hero-lbl">vs. Before</div>
-      </div>
-    </div>
-    ${noteHTML}`;
+      <div class="co-res-hero-block"><div class="co-res-hero-val">×${coFmt(combinedBestMult)}</div><div class="co-res-hero-lbl">New Multiplier</div></div>
+      <div class="co-res-hero-block ${isGain ? 'pos' : 'neg'}"><div class="co-res-hero-val">${sign}${pct}%</div><div class="co-res-hero-lbl">vs. Before</div></div>
+    </div>${noteHTML}`;
 
-  const slide2HTML = `
-    <div class="co-res-section">
-      <div class="co-res-section-title">Current Cards</div>
-      <div class="co-res-breakdown">${buildBreakdownHTML(beforeByEquip)}</div>
-    </div>
+  const slide2 = `
+    <div class="co-res-section"><div class="co-res-section-title">Current Cards</div><div class="co-res-breakdown">${buildBreakdownHTML(beforeByEquip)}</div></div>
     ${currentDivNodesHTML}
     <div class="co-res-divider"></div>
     ${buildStatsGridHTML(displayBefore, null, ctx.atkType)}
     <div class="co-res-hero">
-      <div class="co-res-hero-block">
-        <div class="co-res-hero-val">×${coFmt(currentMult)}</div>
-        <div class="co-res-hero-lbl">Current Multiplier</div>
-      </div>
-      <div class="co-res-hero-block">
-        <div class="co-res-hero-val">BASE</div>
-        <div class="co-res-hero-lbl">Reference</div>
-      </div>
+      <div class="co-res-hero-block"><div class="co-res-hero-val">×${coFmt(currentMult)}</div><div class="co-res-hero-lbl">Current Multiplier</div></div>
+      <div class="co-res-hero-block"><div class="co-res-hero-val">BASE</div><div class="co-res-hero-lbl">Reference</div></div>
     </div>`;
 
   const slideLabels = [ctx.tDefKey ? `Recommendation vs ${ctx.tDefKey}` : 'Recommendation', 'Before Optimization'];
 
-container.innerHTML = `
-<div class="co-slider">
-  <div class="co-slider-header">
-    <div class="co-slider-label" id="co-slider-label">${slideLabels[0]}</div>
+  container.innerHTML = `
+    <div class="co-slider">
+      <div class="co-slider-header">
+        <div class="co-slider-label" id="co-slider-label">${slideLabels[0]}</div>
         <div class="co-slider-nav">
           <button class="co-slide-btn" data-dir="-1" disabled>‹</button>
           <button class="co-slide-btn" data-dir="1">›</button>
         </div>
       </div>
       <div class="co-slides-wrap">
-        <div class="co-slide co-slide--active">${slide1HTML}</div>
-        <div class="co-slide co-slide--hidden-right">${slide2HTML}</div>
+        <div class="co-slide co-slide--active">${slide1}</div>
+        <div class="co-slide co-slide--hidden-right">${slide2}</div>
       </div>
     </div>`;
 
@@ -3754,31 +3493,26 @@ container.innerHTML = `
         applyBestCardsToSlots(best.cards, coSection);
         applyBestDivinity(bestDivSel);
         syncFinalStatsToForm(finalState, buffMap);
-        useSyncBtn.innerHTML = `${CHECK_SVG} Applied`;
-        useSyncBtn.disabled = true;
-      } catch (e) {
-        useSyncBtn.textContent = 'Error';
-      }
+        useSyncBtn.innerHTML = `${ICONS.check} Applied`;
+        useSyncBtn.disabled  = true;
+      } catch { useSyncBtn.textContent = 'Error'; }
     });
   }
 
   const slides      = container.querySelectorAll('.co-slide');
   const btnPrev     = container.querySelector('[data-dir="-1"]');
   const btnNext     = container.querySelector('[data-dir="1"]');
-  let current       = 0;
-  let transitioning = false;
+  let   current     = 0;
+  let   transitioning = false;
 
-  const syncBtns = () => {
-    btnPrev.disabled = current === 0;
-    btnNext.disabled = current === slides.length - 1;
-  };
+  const syncNavBtns = () => { btnPrev.disabled = current === 0; btnNext.disabled = current === slides.length - 1; };
 
   const goTo = idx => {
     if (transitioning || idx < 0 || idx >= slides.length || idx === current) return;
-    transitioning = true;
-    const dir      = idx > current ? 1 : -1;
-    const outgoing = slides[current];
-    const incoming = slides[idx];
+    transitioning   = true;
+    const dir       = idx > current ? 1 : -1;
+    const outgoing  = slides[current];
+    const incoming  = slides[idx];
     incoming.classList.remove('co-slide--hidden-left', 'co-slide--hidden-right');
     incoming.classList.add(dir > 0 ? 'co-slide--hidden-right' : 'co-slide--hidden-left');
     requestAnimationFrame(() => requestAnimationFrame(() => {
@@ -3789,7 +3523,7 @@ container.innerHTML = `
     incoming.addEventListener('transitionend', () => { transitioning = false; }, { once: true });
     current = idx;
     container.querySelector('#co-slider-label').textContent = slideLabels[current];
-    syncBtns();
+    syncNavBtns();
   };
 
   btnPrev.addEventListener('click', () => goTo(current - 1));
@@ -3797,20 +3531,100 @@ container.innerHTML = `
   bindDivNodes(container);
 }
 
+function runAndRender(section, calcState, ctx) {
+  const resultEl     = document.getElementById('resultCard');
+  resultEl.hidden    = false;
+  resultEl.innerHTML = '<div class="co-loading"><span class="co-spinner"></span>Still finding<span class="co-dots"><span>.</span><span>.</span><span>.</span></span></div>';
+  resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  const equippedNames  = [...section.querySelectorAll('.co-card-select')].map(sel => sel.value || '');
+  const slotCounts     = { ...SLOT_COUNTS };
+  const lockedCards    = {};
+  const lockedSlotKeys = new Set();
+
+  for (const btn of section.querySelectorAll('.co-lock-btn')) {
+    if (btn.dataset.locked !== 'true') continue;
+    const { equip, slot } = btn.dataset;
+    lockedSlotKeys.add(`${equip}_${slot}`);
+    const cardName = section.querySelector(`.co-card-select[data-equip="${equip}"][data-slot="${slot}"]`)?.value || '';
+    if (cardName) (lockedCards[equip] ??= []).push(cardName);
+  }
+
+  const allLockedNames = Object.values(lockedCards).flat();
+  for (const [equip, cards] of Object.entries(lockedCards))
+    slotCounts[equip] = Math.max(0, (slotCounts[equip] || 0) - cards.length);
+
+  const unusedMap = {};
+  for (const row of section.querySelectorAll('.co-unused-row')) {
+    const name = row.querySelector('.co-unused-name').value;
+    const qty  = parseInt(row.querySelector('.co-unused-qty').value) || 1;
+    if (name) unusedMap[name] = (unusedMap[name] || 0) + qty;
+  }
+
+  const poolMap    = {};
+  const addToPool  = (name, count) => {
+    const card = lookupCard(name);
+    if (!card) return;
+    (poolMap[card.equip] ??= {})[name] = ((poolMap[card.equip] ??= {})[name] || 0) + count;
+  };
+  for (const name of equippedNames) if (name) addToPool(name, 1);
+  for (const [name, qty] of Object.entries(unusedMap)) addToPool(name, qty);
+
+  const cardPool         = Object.fromEntries(Object.entries(poolMap).map(([e, m]) => [e, Object.entries(m).map(([name, qty]) => ({ name, qty }))]));
+  const lockedCopiesUsed = {};
+  for (const name of allLockedNames) lockedCopiesUsed[name] = (lockedCopiesUsed[name] || 0) + 1;
+  for (const equip of Object.keys(cardPool))
+    cardPool[equip] = cardPool[equip].map(({ name, qty }) => ({ name, qty: Math.max(0, qty - (lockedCopiesUsed[name] || 0)) })).filter(c => c.qty > 0);
+
+  const buffMap = {};
+  for (const row of section.querySelectorAll('.co-buff-row')) {
+    const field = row.querySelector('.co-buff-stat').value;
+    const val   = parseFloat(row.querySelector('.co-buff-val').value) || 0;
+    if (field && val !== 0) buffMap[field] = (buffMap[field] || 0) + val;
+  }
+
+  const nonLockedEquipped = [...section.querySelectorAll('.co-card-select')]
+    .filter(sel => !lockedSlotKeys.has(`${sel.dataset.equip}_${sel.dataset.slot}`) && sel.value)
+    .map(sel => sel.value);
+
+  setTimeout(() => {
+    try {
+      const baseState = calcBaseStats(calcState, equippedNames, ctx);
+      for (const [field, val] of Object.entries(buffMap)) if (field in baseState) baseState[field] += val;
+
+      const pureBase        = stripCurrentDivinity(baseState, ctx);
+      const lockedBaseState = applyCards(pureBase, allLockedNames, ctx);
+      const currentDivSel   = nodeOrder.filter(id => nodeData[id] && getUsed(id) != null).map(id => ({ id, panelIndex: getUsed(id) }));
+      const currentMult     = evalMult(applyAllDivinityPanels(applyCards(lockedBaseState, nonLockedEquipped, ctx), currentDivSel, ctx));
+      const activeNodes     = nodeOrder.filter(id => nodeData[id] && getUsed(id) != null);
+
+      const { bestCards, bestDivSel, bestMult } = runCoordinateDescent(
+        pureBase, lockedBaseState, cardPool, slotCounts,
+        allLockedNames, nonLockedEquipped, activeNodes, currentDivSel, currentMult, ctx
+      );
+
+      const divinityResult = activeNodes.length ? { bestSelection: bestDivSel, bestMult } : null;
+      renderResults(resultEl, [{ cards: bestCards, mult: bestMult }], pureBase, currentMult, lockedCards, equippedNames, ctx, divinityResult, currentDivSel, buffMap);
+      resultEl.classList.remove('co-result-enter');
+      void resultEl.offsetWidth;
+      resultEl.classList.add('co-result-enter');
+    } catch (err) {
+      resultEl.innerHTML = `<div class="co-error">Error: ${coEsc(err.message)}</div>`;
+    }
+  }, 30);
+}
 
 function buildStatRowsHTML(panel) {
   const quality = getQuality(panel);
-  const rows = panel.divinity
-    .filter(k => k)
-    .map(k => {
-      const opt = STAT_OPTIONS.find(o => o.key === k);
-      const val = getStatVal(k, quality);
-      if (!opt || val === null) return '';
-      return `<div class="co-div-modal-stat-row">
-        <span class="co-div-modal-stat-lbl">${opt.label}</span>
-        <span class="co-div-modal-stat-val">+${formatRawVal(opt, val)}</span>
-      </div>`;
-    }).join('');
+  const rows = panel.divinity.filter(k => k).map(k => {
+    const opt = STAT_OPTIONS.find(o => o.key === k);
+    const val = getStatVal(k, quality);
+    if (!opt || val === null) return '';
+    return `<div class="co-div-modal-stat-row">
+      <span class="co-div-modal-stat-lbl">${opt.label}</span>
+      <span class="co-div-modal-stat-val">+${formatRawVal(null, val)}</span>
+    </div>`;
+  }).join('');
   return rows || '<div class="co-div-modal-empty">No divinity stats configured.</div>';
 }
 
@@ -3819,16 +3633,17 @@ function openDivModal({ nodeId, panelIndex, isChanged }) {
   const panel = data.panels[panelIndex];
   if (!panel) return;
 
-  divModalFlash.hidden     = !(panel.lightning && panel.gold);
+  divModalFlash.hidden = !(panel.lightning && panel.gold);
   divModal.classList.remove('quality-blue', 'quality-purple', 'quality-gold');
   divModal.classList.add(`quality-${getQuality(panel)}`);
-  const curUsedIdx         = getUsed(nodeId);
-  const currentNum         = curUsedIdx != null ? curUsedIdx + 1 : null;
+
+  const curUsedIdx = getUsed(nodeId);
+  const currentNum = curUsedIdx != null ? curUsedIdx + 1 : null;
   divModalName.textContent = isChanged && currentNum != null
     ? `${NODE_NAMES[nodeId]} #${currentNum} \u00bb #${panelIndex + 1}`
     : `${NODE_NAMES[nodeId]} #${panelIndex + 1}`;
 
-  const showComparison = isChanged && curUsedIdx != null && data.panels[curUsedIdx];
+  const showComparison    = isChanged && curUsedIdx != null && data.panels[curUsedIdx];
   divModalStatsCur.hidden = !showComparison;
   divModalArrow.hidden    = !showComparison;
   if (showComparison) divModalStatsCur.innerHTML = buildStatRowsHTML(data.panels[curUsedIdx]);
@@ -3848,11 +3663,10 @@ function buildDivNodesHTML(selection, currentByNode = null) {
     const quality    = getQuality(panel);
     const isChanged  = currentByNode != null && panelIndex !== currentByNode[id];
     const circleClass = `co-div-circle quality-${quality}${panel.lightning ? ' has-lightning' : ''}`;
-    const shortLabel  = NODE_NAMES[id].split(' ')[0];
     return `<div class="co-div-node${isChanged ? ' co-div-changed' : ''}"
       data-nodeid="${id}" data-panelindex="${panelIndex}" data-changed="${isChanged}">
-      <div class="${circleClass}">${DIV_LIGHTNING_SVG}<span class="co-div-num">${panelIndex + 1}</span>${isChanged ? VERT_SWAP_SVG : ''}</div>
-      <span class="co-div-lbl">${shortLabel}</span>
+      <div class="${circleClass}">${ICONS.lightning}<span class="co-div-num">${panelIndex + 1}</span>${isChanged ? ICONS.vertSwap : ''}</div>
+      <span class="co-div-lbl">${NODE_NAMES[id].split(' ')[0]}</span>
     </div>`;
   }).join('');
 }
@@ -3867,13 +3681,12 @@ function bindDivNodes(container) {
   });
 }
 
-
-const container       = document.querySelector('.slider-container');
-const grid            = document.getElementById('grid');
-const summaryModal    = document.getElementById('summaryModal');
-const summaryBtn      = document.getElementById('summaryBtn');
-const helpModal       = document.getElementById('helpModal');
-const coSection       = document.getElementById('card-optimizer');
+const container        = document.querySelector('.slider-container');
+const grid             = document.getElementById('grid');
+const summaryModal     = document.getElementById('summaryModal');
+const summaryBtn       = document.getElementById('summaryBtn');
+const helpModal        = document.getElementById('helpModal');
+const coSection        = document.getElementById('card-optimizer');
 const divModalBackdrop = document.getElementById('divModalBackdrop');
 const divModal         = document.getElementById('divModal');
 const divModalName     = document.getElementById('divModalName');
@@ -3882,35 +3695,31 @@ const divModalStatsCur = document.getElementById('divModalStatsCurrent');
 const divModalArrow    = document.getElementById('divModalArrow');
 const divModalStatsRec = document.getElementById('divModalStatsRec');
 
-
 document.getElementById('divModalClose').addEventListener('click', closeDivModal);
 divModalBackdrop.addEventListener('click', e => { if (e.target === divModalBackdrop) closeDivModal(); });
 
+const closeAllModals = () => { summaryModal.classList.remove('open'); helpModal.classList.remove('open'); };
+document.addEventListener('click', closeAllModals);
+
 summaryBtn.addEventListener('click', e => {
   e.stopPropagation();
-  const isOpen = summaryModal.classList.contains('open');
-  helpModal.classList.remove('open');
-  if (!isOpen) renderSummaryModal();
-  summaryModal.classList.toggle('open', !isOpen);
+  const opening = !summaryModal.classList.contains('open');
+  closeAllModals();
+  if (opening) { renderSummaryModal(); summaryModal.classList.add('open'); }
 });
 document.getElementById('summaryClose').addEventListener('click', () => summaryModal.classList.remove('open'));
 summaryModal.addEventListener('click', e => e.stopPropagation());
 
 document.getElementById('helpBtn').addEventListener('click', e => {
   e.stopPropagation();
-  const isOpen = helpModal.classList.contains('open');
-  summaryModal.classList.remove('open');
-  helpModal.classList.toggle('open', !isOpen);
+  const opening = !helpModal.classList.contains('open');
+  closeAllModals();
+  if (opening) helpModal.classList.add('open');
 });
 document.getElementById('helpClose').addEventListener('click', () => helpModal.classList.remove('open'));
 helpModal.addEventListener('click', e => {
   const sp = e.target.closest('.spoiler');
-  if (sp) sp.classList.toggle('revealed');
-  e.stopPropagation();
-});
-document.addEventListener('click', () => {
-  summaryModal.classList.remove('open');
-  helpModal.classList.remove('open');
+  if (sp) { sp.classList.toggle('revealed'); e.stopPropagation(); }
 });
 
 document.addEventListener('click', e => {
@@ -3922,70 +3731,61 @@ document.getElementById('trashDivBtn').addEventListener('click', e => {
   e.stopPropagation();
   if (!confirm('Clear all divinity? This will remove all added divinities including the one currently in use.')) return;
   for (const id of nodeOrder) {
-    nodeData[id] = { count: 1, current: 0, usedBySize: defaultUsedBySize(), panels: [defaultTag()] };
+    nodeData[id] = { count: 1, current: 0, usedBySize: defaultUsedBySize(), panels: [defaultPanel()] };
     syncCircle(id);
   }
   saveState();
-  if (activePanel) closePanel();
+  if (ui.activePanel) closePanel();
 });
 
 document.getElementById('divSizeSelect').addEventListener('change', e => {
-  activeSize = e.target.value;
+  ui.activeSize = e.target.value;
   nodeOrder.forEach(syncCircle);
   switchOptimizerSize(coSection);
-  if (!activePanel || !activeId) return;
-  const data = getData(activeId);
-  syncUseBtn(activePanel.querySelector('.use-btn'), getUsed(activeId) === data.current);
-  syncTrashBtn(activePanel.querySelector('.panel-nav'), activeId, data.count, data.current, data.panels[data.current]?.locked);
+  if (!ui.activePanel || !ui.activeId) return;
+  const data = getData(ui.activeId);
+  syncUseBtn(ui.activePanel.querySelector('.use-btn'), getUsed(ui.activeId) === data.current);
+  syncTrashBtn(ui.activePanel.querySelector('.panel-nav'), ui.activeId, data.count, data.current, data.panels[data.current]?.locked);
 });
 
 document.querySelectorAll('.node').forEach(cb => {
   cb.addEventListener('change', () => {
-    if (isNodeNavigating) return;
-    if (isAnimating) { cb.checked = false; return; }
+    if (ui.isNodeNavigating) return;
+    if (ui.isAnimating) { cb.checked = false; return; }
     if (!cb.checked) return;
-    activePanel ? closePanel(() => openPanel(cb)) : openPanel(cb);
+    ui.activePanel ? closePanel(() => openPanel(cb)) : openPanel(cb);
   });
 });
 
 DOM.tDef.addEventListener('change', () => { syncTargetLabels(DOM.tDef.value); syncDivSize(); saveStatsState(); });
-DOM.wElem.addEventListener('change', () => { DOM.elemEnhanceLabel.textContent = withVal('Element Enhance', DOM.wElem.value); });
-
+DOM.wElem.addEventListener('change', () => { DOM.elemEnhanceLabel.textContent = withVal('Element Enhance', DOM.wElem.value); saveStatsState(); });
 DOM.atkType.addEventListener('change', () => {
-  const isPen          = DOM.atkType.value === 'pen';
+  const isPen      = DOM.atkType.value === 'pen';
   DOM.penField.hidden  = !isPen;
   DOM.critField.hidden = isPen;
-  DOM.pen.value        = '';
-  DOM.crit.value       = '';
+  DOM.pen.value = DOM.crit.value = '';
   saveStatsState();
 });
-
 DOM.manualBtn.addEventListener('click', () => setFormOpen(!DOM.form.classList.contains('open')));
 DOM.form.addEventListener('input',  saveStatsState);
 DOM.form.addEventListener('change', saveStatsState);
 
 document.getElementById('loadStatsBtn').addEventListener('click', () => {
   try {
-    if (readStore().stats) {
-      setFormOpen(true);
-      showStatsMsg('Stats already saved.', 'ok');
-      return;
-    }
-    const raw = localStorage.getItem('pwa_snap');
+    if (readStore().stats) { setFormOpen(true); showStatsMsg('Stats already saved.', 'ok'); return; }
+    const raw = localStorage.getItem(CFG.snapKey);
     if (!raw) { showStatsMsg(ERR_MSG, 'err'); return; }
     fillFromSnap(JSON.parse(raw));
     setFormOpen(true);
     showStatsMsg('Stats loaded.', 'ok');
-  } catch {
-    showStatsMsg(ERR_MSG, 'err');
-  }
+  } catch { showStatsMsg(ERR_MSG, 'err'); }
 });
 
 document.getElementById('calculateBtn').addEventListener('click', () => {
   const calcState = getCalcStateFromForm();
   runAndRender(coSection, calcState, {
     atkType: calcState.atkType,
-    tDefKey:  calcState.tDefKey,
+    tDefKey: calcState.tDefKey,
     wElem:   calcState.wElem,
     tSize:   calcState.tSize,
     tRace:   calcState.tRace,

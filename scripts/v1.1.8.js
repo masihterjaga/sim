@@ -51,6 +51,7 @@ const DOM_ELEMENTS = {
   attrLabel: document.getElementById('attrLabel'),
   hasil: document.getElementById('hasil'),
   rec: document.getElementById('recommendations'),
+  optimizer: document.getElementById('optimizer'),
   submit: document.getElementById('submitBtn'),
   edit: document.getElementById('editBtn'),
   resetRek: document.getElementById('resetRekomenBtn'),
@@ -274,7 +275,7 @@ const processMainCalculation = (() => {
     bindInputLockGuard();
     renderMultiplierBreakdown(calculationState);
     generateRecommendationTable(calculationState);
-    renderCardOptimizer(calculationState, DOM_ELEMENTS.rec); 
+    renderCardOptimizer(calculationState, DOM_ELEMENTS.optimizer); 
     enableResultButtons();
   };
 
