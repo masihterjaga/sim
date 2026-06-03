@@ -3487,17 +3487,44 @@ function renderResults(container, topResults, pureBase, currentMult, lockedCards
     </div>`;
 
   const useSyncBtn = container.querySelector('#coUseSyncBtn');
-  if (useSyncBtn) {
-    useSyncBtn.addEventListener('click', () => {
-      try {
-        applyBestCardsToSlots(best.cards, coSection);
-        applyBestDivinity(bestDivSel);
-        syncFinalStatsToForm(finalState, buffMap);
-        useSyncBtn.innerHTML = `${ICONS.check} Applied`;
-        useSyncBtn.disabled  = true;
-      } catch { useSyncBtn.textContent = 'Error'; }
-    });
-  }
+if (useSyncBtn) {
+  useSyncBtn.addEventListener('click', () => {
+    if (!confirm('This will update your equipped cards, divinities, and base stats. Continue?')) return;
+    try {
+      const totalPool = {};
+      for (const name of equippedNames) {
+        if (name && name !== '—') totalPool[name] = (totalPool[name] || 0) + 1;
+      }
+      for (const row of coSection.querySelectorAll('.co-unused-row')) {
+        const name = row.querySelector('.co-unused-name').value;
+        const qty = parseInt(row.querySelector('.co-unused-qty').value) || 1;
+        if (name) totalPool[name] = (totalPool[name] || 0) + qty;
+      }
+      
+      const usedCount = {};
+      for (const name of best.cards) {
+        if (name && name !== '—') usedCount[name] = (usedCount[name] || 0) + 1;
+      }
+      
+      const newUnused = {};
+      for (const [name, total] of Object.entries(totalPool)) {
+        const remaining = total - (usedCount[name] || 0);
+        if (remaining > 0) newUnused[name] = remaining;
+      }
+      
+      applyBestCardsToSlots(best.cards, coSection);
+      applyBestDivinity(bestDivSel);
+      syncFinalStatsToForm(finalState, buffMap);
+      
+      coSection.querySelector('#co-unused-list').innerHTML = '';
+      for (const [name, qty] of Object.entries(newUnused)) addUnusedRow(coSection, name, String(qty));
+      saveOptimizerState(coSection);
+      
+      useSyncBtn.innerHTML = `${ICONS.check} Applied`;
+      useSyncBtn.disabled = true;
+    } catch { useSyncBtn.textContent = 'Error'; }
+  });
+}
 
   const slides      = container.querySelectorAll('.co-slide');
   const btnPrev     = container.querySelector('[data-dir="-1"]');
