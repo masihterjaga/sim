@@ -4153,7 +4153,19 @@ const lightboxConfig = {
         { src: 'img/Calc_x_Ingame_1.1.6_1.jpg', caption: '' },
         { src: 'img/Calc_x_Ingame_1.1.6_2.jpg', caption: 'Spear Flash Triggered' }
       ]
-    }
+    },
+{
+  name: 'roxtimizer',
+  images: [
+    { src: 'img/01_RoXtimizer.jpg', caption: 'Recomemdation pre Companion Opt.' },
+    { src: 'img/02_RoXtimizer.jpg', caption: 'Tes Before Opt.' },
+    { src: 'img/03_RoXtimizer.jpg', caption: 'After Opt.' },
+    { src: 'img/04_RoXtimizer.jpg', caption: 'Before Opt. (+Companion)' },
+    { src: 'img/05_RoXtimizer.jpg', caption: 'Opt. Recomendation (+Companion)' },
+    { src: 'img/06_RoXtimizer.jpg', caption: 'Test Before Opt.' },
+    { src: 'img/07_RoXtimizer.jpg', caption: 'Test After Opt.' }
+  ]
+}    
   ]
 };
 const imgLightbox = ((config = {}) => {

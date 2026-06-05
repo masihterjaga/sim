@@ -1,6 +1,20 @@
 {
   "versions": [
     {
+      "version": "1.2.3",
+      "date": "5 Jun, 2026",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "6th card slot for dagger",
+            "companion opt. (<a href='//masihterjaga.github.io/sim/roxtimizer' class='job-sim'>RöXtimizer</a>)",
+            "<a href='#' class='job-sim' data-lightbox-gallery='roxtimizer' data-lightbox-trigger>Album#3</a>"
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.2.2",
       "date": "3 Jun, 2026",
       "changes": [
@@ -8,7 +22,7 @@
           "category": "Update",
           "items": [
             "fix optimizer disappears after table refresh",
-            "adjusted mvp/mini ordering & lvl"
+            "adjust mvp/mini ordering & lvl"
           ]
         }
       ]

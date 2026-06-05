@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.2.188';
+const CACHE_NAME = 'rox-calc-v1.2.1888';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
@@ -27,6 +27,13 @@ const urlsToCache = [
   '/sim/img/Calc_x_Ingame_1.1.6_0.jpg',
   '/sim/img/Calc_x_Ingame_1.1.6_1.jpg',
   '/sim/img/Calc_x_Ingame_1.1.6_2.jpg',
+  '/sim/img/01_RoXtimizer.jpg',
+  '/sim/img/02_RoXtimizer.jpg',
+  '/sim/img/03_RoXtimizer.jpg',
+  '/sim/img/04_RoXtimizer.jpg',
+  '/sim/img/05_RoXtimizer.jpg',
+  '/sim/img/06_RoXtimizer.jpg',
+  '/sim/img/07_RoXtimizer.jpg',
   '/sim/icons/apple-touch-icon.png',
   '/sim/icons/favicon-96x96.png',
   '/sim/icons/favicon.ico',

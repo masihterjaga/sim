@@ -305,7 +305,7 @@ function buildOptimizerHTML() {
       <div class="co-body">
 
         <div class="co-block">
-        <p>Better version here: <a href="https://masihterjaga.github.io/sim/roxtimizer">RöXtimizer</a> (Card+Divinity optimizer)</p>
+        <p>Better version here: <a href="https://masihterjaga.github.io/sim/roxtimizer">RöXtimizer</a> (Card+Divinity+Companion optimizer)</p>
           <div class="co-block-title">Equipped Cards</div>
           <p class="co-block-desc">
             Select the currently equipped cards, then add any cards relevant to the target. Lock slots if specific cards are needed for an exclusive set.<br/><br/>Results may not fully match in-game values, especially for cards with ATK% because this feature is still a work in progress, and some stats may be missing.
