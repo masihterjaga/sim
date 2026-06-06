@@ -111,11 +111,9 @@ const MONSTER_DATA = {
     160: { def: 344.05, dmgred: 436.00 }
   },
   "Shadow Chaser Gertie": { size: "Small", race: "Demi-Human", attr: "Undead",
-    150: { def: 342.44, dmgred: 294.07 },
     160: { def: 397.23, dmgred: 347.00 }
   },
   "Genetic Flamel": { size: "Medium", race: "Demi-Human", attr: "Fire",
-    150: { def: 382.63, dmgred: 326.69 },
     160: { def: 443.85, dmgred: 385.50 }
   },
   "Dragon Fly": { size: "Small", race: "Insect", attr: "Wind",
@@ -229,11 +227,9 @@ const MONSTER_DATA = {
     160: { def: 337.67, dmgred: 376.00 }
   },
   "Sorcerer Celia": { size: "Small", race: "Undead", attr: "Ghost",
-    150: { def: 342.44, dmgred: 294.07 },
     160: { def: 397.23, dmgred: 347.00 }
   },
   "Ranger Cecil": { size: "Small", race: "Demi-Human", attr: "Wind",
-    150: { def: 299.07, dmgred: 261.36 },
     160: { def: 348.95, dmgred: 308.40 }
   },
 };

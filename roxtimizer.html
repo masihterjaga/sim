@@ -1876,6 +1876,7 @@ h1 { color: var(--loud); }
   color: var(--loud);
   font-weight: 600;
 }
+
 </style>
 
 </head>
@@ -1921,6 +1922,24 @@ h1 { color: var(--loud); }
             <label class="stats-label">Attr</label>
             <div class="select-wrap">
               <select class="stats-select" id="targetElementSelect" disabled>
+                <option>—</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="stats-field-row" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="stats-field">
+            <label class="stats-label">DEF</label>
+            <div class="select-wrap">
+              <select class="stats-select" id="targetFinalDefDisplay" disabled>
+                <option>—</option>
+              </select>
+            </div>
+          </div>
+          <div class="stats-field">
+            <label class="stats-label">DMG Red</label>
+            <div class="select-wrap">
+              <select class="stats-select" id="targetDmgRedDisplay" disabled>
                 <option>—</option>
               </select>
             </div>
@@ -1993,9 +2012,11 @@ h1 { color: var(--loud); }
           </div>
           <div class="disclaimer-body">
             <span class="disclaimer-label">NOTE!</span>
-            <p class="disclaimer-text">
-              Make sure the <strong>Divinity, Card & Companion</strong> you're using have the same offensive stats (and available here) as in-game. Don't swap 'em out once you've already input your stats. Unlike in-game, this tool won't reflect stat changes in real-time.
-            </p>
+            <ol class="disclaimer-text" style="margin:0;padding-left:1.3em;">
+              <li>Keep your F. PEN above the target's DEF, and your Final P/M DMG Bns above DMG Red. This tool can't handle negative values.</li>
+              <li>Make sure the <strong>Divinity, Card & Companion</strong> you're using have the same offensive stats (and available here) as in-game.</li>
+              <li>Don't swap 'em out once you've already input your stats. Unlike in-game, this tool won't reflect stat changes in real-time.</li>
+            </ol>
           </div>
         </div>
       </div>
@@ -2360,7 +2381,7 @@ h1 { color: var(--loud); }
 
   <div class="card" id="resultCard" hidden style="scroll-margin-top: 24px;"></div>
 
-  <footer class="credit">AI-Generated, prompted by Silja [Midgard – Nastia] with <a href="https://claude.ai" target="_blank">Claude Sonnet 4.6</a>.</footer>
+  <footer class="credit">AI-Generated, prompted by Silja [Midgard / Nastia] with <a href="https://claude.ai" target="_blank">Claude Sonnet 4.6</a>.</footer>
   <script src="scripts/card-data.js"></script>
   <script src="scripts/mvp-mini.js"></script>
   <script src="scripts/weapon-modifier.js"></script>
@@ -2594,6 +2615,8 @@ const DOM = {
   dmgSizeLabel:     document.getElementById('dmgSizeLabel'),
   dmgRaceLabel:     document.getElementById('dmgRaceLabel'),
   dmgAttrLabel:     document.getElementById('dmgAttrLabel'),
+  tFinalDef:        document.getElementById('targetFinalDefDisplay'),
+  tDmgRed:          document.getElementById('targetDmgRedDisplay'),
   tSize:            document.getElementById('targetSizeSelect'),
   tRace:            document.getElementById('targetRaceSelect'),
   tAttr:            document.getElementById('targetElementSelect'),
@@ -2757,9 +2780,11 @@ function syncTargetLabels(key) {
   DOM.dmgSizeLabel.textContent = withVal('DMG to Size',      data.sizeMob);
   DOM.dmgRaceLabel.textContent = withVal('DMG to Race',      data.raceMob);
   DOM.dmgAttrLabel.textContent = withVal('DMG to Attribute', data.attributeMob);
-  DOM.tSize.innerHTML = `<option>${data.sizeMob      ?? '—'}</option>`;
-  DOM.tRace.innerHTML = `<option>${data.raceMob      ?? '—'}</option>`;
-  DOM.tAttr.innerHTML = `<option>${data.attributeMob ?? '—'}</option>`;
+  DOM.tSize.innerHTML     = `<option>${data.sizeMob      ?? '—'}</option>`;
+  DOM.tRace.innerHTML     = `<option>${data.raceMob      ?? '—'}</option>`;
+  DOM.tAttr.innerHTML     = `<option>${data.attributeMob ?? '—'}</option>`;
+  DOM.tFinalDef.innerHTML = `<option>${data.def    != null ? data.def    : '—'}</option>`;
+  DOM.tDmgRed.innerHTML   = `<option>${data.dmgred != null ? data.dmgred : '—'}</option>`;
 }
 
 function syncCardSelectQuality(sel) {
@@ -3929,7 +3954,7 @@ function runAndRender(section, calcState, ctx) {
   resultEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
   const equippedNames  = [...section.querySelectorAll('.co-card-select')].map(sel => sel.value || '');
-  const slotCounts     = { ...SLOT_COUNTS };
+  const slotCounts = { ...SLOT_COUNTS, weapon: getWeaponSlotCount() };
   const lockedCards    = {};
   const lockedSlotKeys = new Set();
 
