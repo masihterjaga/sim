@@ -1723,16 +1723,16 @@ strong { color: rgb(90,104,128); }
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.05em;
-  color: var(--dim);
-  background: var(--surface2);
-  border: 1.5px solid var(--border);
+  color: var(--accent);
+  background: var(--accent-bg);
+  border: 1.5px solid var(--accent-bd);
   cursor: pointer;
   transition: border-color var(--t-med), color var(--t-med), background var(--t-med);
 }
 .ench-mode-btn.active {
-  border-color: var(--accent-bd);
-  background: var(--accent-bg);
-  color: var(--accent);
+  border-color: var(--border);
+  background: var(--surface2);
+  color: var(--dim);
 }
 
 .ench-settings-panel {

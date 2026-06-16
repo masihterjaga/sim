@@ -11,6 +11,12 @@
           ]
         },
         {
+          "category": "Update",
+          "items": [
+            "element counter"
+          ]
+        },
+        {
           "category": "Improved",
           "items": [
             "cards selection",

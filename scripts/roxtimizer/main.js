@@ -2198,7 +2198,7 @@ function renderEnchantSettingsPanel() {
   const modeBtn = document.createElement('button');
   modeBtn.type        = 'button';
   modeBtn.className   = 'ench-mode-btn' + (isCustom ? ' active' : '');
-  modeBtn.textContent = isCustom ? 'Switch to Chip' : 'Switch to Custom';
+  modeBtn.textContent = isCustom ? 'Back to Chip' : 'Switch to Custom';
   modeBtn.addEventListener('click', () => {
     const panel = DOM.enchSettingsPanel;
     panel.classList.remove('open');
@@ -2216,8 +2216,8 @@ function renderEnchantSettingsPanel() {
   const desc = document.createElement('p');
   desc.className   = 'co-block-desc';
   desc.textContent = isCustom
-    ? 'Try your own combination here before creating new sets or transferring. Physical Suno/Meister can switch the weapon option to GS or One-Handed Staff (Weapon Perfection).'
-    : 'Select up to 3 enchants per slot. The tool will find the best option based on your choices. Switch to custom mode for more flexibility.';
+    ? 'Try your own combination before creating new sets or transferring. Physical Suno/Meister can switch the weapon option to GS or One-Handed Staff (Weapon Perfection).'
+    : 'Select up to 3 enchants per slot. Tool will find the best option based on your choices. Switch to custom mode for more flexibility.';
   inner.appendChild(desc);
 
   if (isCustom) {
