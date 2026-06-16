@@ -2929,7 +2929,10 @@ function renderResults(container, topResults, pureBase, currentMult, lockedCards
   const compCurrentNodes = hasCompanionItems ? buildCompanionNodesHTML(currentCompanionUsedForState, currentCompanionUsedForState) : '';
   const companionNodesHTML   = buildResSectionHTML('Companion (tap for details)', compBestNodes && `<div class="co-companion-nodes">${compBestNodes}</div>`, EMPTY_STATE_HTML);
   const currentCompanionHTML = buildResSectionHTML('Companion', compCurrentNodes && `<div class="co-companion-nodes">${compCurrentNodes}</div>`, EMPTY_STATE_HTML);
-  const enchantResultHTML  = buildEnchantSectionHTML(bestEnchantAssign ?? currentEnchantAssign, enchantSlotState, bestEnchantAssign ? currentEnchantAssign : null);
+  const resolvedEnchantSlotState = enchantState.prefs.mode === 'custom'
+    ? enchantSlotState.map((slot, i) => ({ ...slot, level: parseInt(enchantState.prefs.custom?.slots?.[i]?.level) || slot.level }))
+    : enchantSlotState;
+  const enchantResultHTML  = buildEnchantSectionHTML(bestEnchantAssign ?? currentEnchantAssign, resolvedEnchantSlotState, bestEnchantAssign ? currentEnchantAssign : null);
   const currentEnchantHTML = buildEnchantSectionHTML(currentEnchantAssign, enchantSlotState);
   const noteHTML = `<div class="co-res-note">
   Crosscheck the result on the <u>next slide</u> with the input at the top of the page and make sure it matches your current detailed stats (in-game).<br/><br/>
