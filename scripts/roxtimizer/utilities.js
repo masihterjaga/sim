@@ -41,6 +41,15 @@ const lightboxConfig = {
         { src: 'img/Roxtimizer_Shadow_Enchant.jpg', caption: 'DPS SHADOW Enchant ±180% Increase,\n\n Lower from tool (±200%) because cant calculate STR enchant contribution.' }
       ]
     },
+    {
+      name: 'roxtimizer_3',
+      images: [
+        { src: 'img/Current_Stats_Vs_Retri.jpg', caption: 'Another test (Retribution) with All Shadow Enchant' },
+        { src: 'img/Recommend_Vs_Retri.jpg', caption: 'Use custom mode enchant optimizer, change to 3 Angel in Main-Hand. Tool expect ±46% increace' },
+        { src: 'img/Retri_6Shadow.jpg', caption: 'All Shadow Enchant' },
+        { src: 'img/Retri_3Angel_3Shadow.jpg', caption: 'DPS Mix angel & shadow enchant, actual-ingame increase ±60%. As i said before, can be higher or even lower ' }
+      ]
+    },
     
   ]
 };
