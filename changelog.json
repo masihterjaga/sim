@@ -1,6 +1,25 @@
 {
   "versions": [
     {
+      "version": "1.2.4",
+      "date": "16 Jun, 2026",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "enchant optimizer"
+          ]
+        },
+        {
+          "category": "Improved",
+          "items": [
+            "cards selection",
+            "optimizer logic"
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.2.3",
       "date": "5 Jun, 2026",
       "changes": [
@@ -8,8 +27,8 @@
           "category": "Added",
           "items": [
             "6th card slot for dagger",
-            "companion opt. (<a href='//masihterjaga.github.io/sim/roxtimizer' class='job-sim'>RöXtimizer</a>)",
-            "<a href='#' class='job-sim' data-lightbox-gallery='roxtimizer' data-lightbox-trigger>Album#3</a>"
+            "companion optimizer",
+            "Album#3"
           ]
         }
       ]
@@ -46,7 +65,8 @@
         {
           "category": "Update",
           "items": [
-            "auto-save stats post-calc, browser only"
+            "auto-save stats post-calc, browser only",
+            "divinity optimizer"
           ]
         }
       ]
@@ -103,7 +123,7 @@
           "category": "Added",
           "items": [
             "attack, raw & % dmg bonus fields",
-            "<a href='#' class='job-sim' data-lightbox-gallery='new-version' data-lightbox-trigger>Album#2</a>"
+            "Album#2"
           ]
         },
         {
@@ -172,7 +192,7 @@
         {
           "category": "Added",
           "items": [
-            "lightbox image gallery (<a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>Album#1</a>)"
+            "lightbox image gallery"
           ]
         },
         {

@@ -8,7 +8,7 @@ const ELEMENT_COUNTER_TABLE = {
     Poison: 1,
     Holy: 1,
     Shadow: 1,
-    Ghost: 0.70,
+    Ghost: 0.50,
     Undead: 1
   },
   Fire: {
@@ -17,11 +17,11 @@ const ELEMENT_COUNTER_TABLE = {
     Water: 0.90,
     Earth: 1.25,
     Wind: 1,
-    Poison: 1,
-    Holy: 0.75,
+    Poison: 1.125,
+    Holy: 0.9,
     Shadow: 1,
     Ghost: 1,
-    Undead: 1.125
+    Undead: 1
   },
   Water: {
     Neutral: 1,
@@ -30,10 +30,10 @@ const ELEMENT_COUNTER_TABLE = {
     Earth: 1,
     Wind: 0.90,
     Poison: 1,
-    Holy: 0.75,
+    Holy: 0.9,
     Shadow: 1,
     Ghost: 1,
-    Undead: 1
+    Undead: 1.125
   },
   Earth: {
     Neutral: 1,
@@ -43,7 +43,7 @@ const ELEMENT_COUNTER_TABLE = {
     Wind: 1.25,
     Poison: 1,
     Holy: 0.75,
-    Shadow: 1,
+    Shadow: 1.125,
     Ghost: 1,
     Undead: 1
   },
@@ -54,7 +54,7 @@ const ELEMENT_COUNTER_TABLE = {
     Earth: 0.90,
     Wind: 0.25,
     Poison: 1,
-    Holy: 0.75,
+    Holy: 0.9,
     Shadow: 1,
     Ghost: 1,
     Undead: 1
@@ -65,11 +65,11 @@ const ELEMENT_COUNTER_TABLE = {
     Water: 1,
     Earth: 1.125,
     Wind: 1.125,
-    Poison: 0,
+    Poison: 0.5,
     Holy: 0.75,
-    Shadow: 0.50,
+    Shadow: 0.75,
     Ghost: 1,
-    Undead: -0.25
+    Undead: 0.75
   },
   Holy: {
     Neutral: 1,
@@ -78,10 +78,10 @@ const ELEMENT_COUNTER_TABLE = {
     Earth: 1,
     Wind: 1,
     Poison: 1,
-    Holy: 0,
-    Shadow: 1.375,
-    Ghost: 1,
-    Undead: 1.375
+    Holy: 0.5,
+    Shadow: 1.25,
+    Ghost: 0.5,
+    Undead: 1.25
   },
   Shadow: {
     Neutral: 1.125,
@@ -89,14 +89,14 @@ const ELEMENT_COUNTER_TABLE = {
     Water: 1,
     Earth: 1,
     Wind: 1,
-    Poison: 0.50,
-    Holy: 1.375,
-    Shadow: 0,
+    Poison: 0.75,
+    Holy: 1.25,
+    Shadow: 0.75,
     Ghost: 1,
-    Undead: -0.25
+    Undead: 0.75
   },
   Ghost: {
-    Neutral: 0.90,
+    Neutral: 1,
     Fire: 1,
     Water: 1,
     Earth: 1,
@@ -104,7 +104,7 @@ const ELEMENT_COUNTER_TABLE = {
     Poison: 1,
     Holy: 0.75,
     Shadow: 0.75,
-    Ghost: 1.375,
+    Ghost: 1.25,
     Undead: 1
   },
   Undead: {
@@ -113,10 +113,10 @@ const ELEMENT_COUNTER_TABLE = {
     Water: 1,
     Earth: 1,
     Wind: 1,
-    Poison: 0.50,
-    Holy: 1.375,
-    Shadow: 0,
-    Ghost: 1.25,
-    Undead: 0
+    Poison: 0.75,
+    Holy: 1.25,
+    Shadow: 0.5,
+    Ghost: 1.125,
+    Undead: 0.5
   }
 };

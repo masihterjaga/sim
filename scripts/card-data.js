@@ -72,7 +72,7 @@ const cardData = {
   },
   "Andre Card": {
     equip: "weapon",
-    quality: "white",
+    quality: "blue",
     stats: {
       "P.ATK%": "3%",
       "Final P.PEN": "3%"
@@ -94,7 +94,7 @@ const cardData = {
   },
   "Anubis Card": {
     equip: "weapon",
-    quality: "white",
+    quality: "blue",
     stats: {
       "Final Crit": "8%"
     }
@@ -117,7 +117,7 @@ const cardData = {
   },
   "Archer Skeleton Card": {
     equip: "weapon",
-    quality: "white",
+    quality: "blue",
     stats: {
       "M.ATK%": "3%",
       "Final M.PEN": "3%"
@@ -437,7 +437,7 @@ const cardData = {
   },
   "Garm Baby Card [2023]": {
     equip: "weapon",
-    quality: "blue",
+    quality: "gold",
     stats: {
       "Water Enhance": "38.80%",
       "Neutral Enhance": "38.80%"
@@ -1787,7 +1787,7 @@ const cardData = {
   },
   "Garm Card [2023]": {
     equip: "clothes",
-    quality: "blue",
+    quality: "gold",
     stats: {
       "Water Attribute RES": "46.50%",
       "VIT": "93"
@@ -2598,7 +2598,7 @@ const cardData = {
   },
   "Thara Frog": {
     equip: "cloak",
-    quality: "white",
+    quality: "blue",
     stats: {
       "Max HP%": "14%",
       "Final P.DEF": "7%"
@@ -4380,7 +4380,7 @@ const cardData = {
   },
   "Alien Adacic Card": {
     equip: "headgear",
-    quality: "blue",
+    quality: "gold",
     stats: {
       "Physical Lifesteal": "25%",
       "Magic Lifesteal": "25%"
