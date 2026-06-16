@@ -47,7 +47,7 @@ const lightboxConfig = {
         { src: 'img/Current_Stats_Vs_Retri.jpg', caption: 'Another test (Retribution) with All Shadow Enchant' },
         { src: 'img/Recommend_Vs_Retri.jpg', caption: 'Use custom mode enchant optimizer, change to 3 Angel in Main-Hand. Tool expect ±46% increace' },
         { src: 'img/Retri_6Shadow.jpg', caption: 'All Shadow Enchant' },
-        { src: 'img/Retri_3Angel_3Shadow.jpg', caption: 'DPS Mix angel & shadow enchant, actual-ingame increase ±41%. As i said before, can be higher or even lower ' }
+        { src: 'img/Retri_3Angel_3Shadow.jpg', caption: 'DPS Mix angel & shadow enchant, actual-ingame increase ±41%. As i said before, can be higher or lower ' }
       ]
     },
     
