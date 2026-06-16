@@ -1,4 +1,4 @@
-const CACHE_NAME = 'rox-calc-v1.2.4.8';
+const CACHE_NAME = 'rox-calc-v1.2.4.88';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
