@@ -2,7 +2,6 @@ const CACHE_NAME = 'rox-calc-v1.2.4.88';
 const urlsToCache = [
   '/sim/',
   '/sim/index.html',
-  '/sim/roxtimizer.html',
   '/sim/physical-suno-mammonite-se.html',
   '/sim/style/v1.1.5.css',
   '/sim/style/roxtimizer/main.css',
