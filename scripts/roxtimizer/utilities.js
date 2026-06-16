@@ -35,10 +35,10 @@ const lightboxConfig = {
     {
       name: 'roxtimizer_2',
       images: [
-        { src: '/img/Roxtimizer_STR_Multiplier.jpg', caption: 'Multiplier FULL STR ENCHANT' },
-        { src: '/img/Roxtimizer_Shadow_Multiplier.jpg', caption: 'Multiplier FULL DMG to Shadow ENCHANT' },
-        { src: '/img/Roxtimizer_STR_Enchant.jpg', caption: 'DPS FULL STR' },
-        { src: '/img/Roxtimizer_Shadow_Enchant.jpg', caption: 'DPS SHADOW Enchant ±180% Increase,\n\n Lower from tool (±200%) because cant calculate STR enchant contribution.' }
+        { src: 'img/Roxtimizer_STR_Multiplier.jpg', caption: 'Multiplier FULL STR ENCHANT' },
+        { src: 'img/Roxtimizer_Shadow_Multiplier.jpg', caption: 'Multiplier FULL DMG to Shadow ENCHANT' },
+        { src: 'img/Roxtimizer_STR_Enchant.jpg', caption: 'DPS FULL STR' },
+        { src: 'img/Roxtimizer_Shadow_Enchant.jpg', caption: 'DPS SHADOW Enchant ±180% Increase,\n\n Lower from tool (±200%) because cant calculate STR enchant contribution.' }
       ]
     },
     
