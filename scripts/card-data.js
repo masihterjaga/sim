@@ -762,7 +762,7 @@ const cardData = {
   },
   "Nezuko Kamado Card (Gold)": {
     equip: "weapon",
-    quality: "blue",
+    quality: "gold",
     stats: {
       "Final P.DMG Bonus": "29%",
       "Final M.DMG Bonus": "29%"
@@ -1146,7 +1146,7 @@ const cardData = {
   },
   "Zenitsu Agatsuma Card (Gold)": {
     equip: "weapon",
-    quality: "blue",
+    quality: "gold",
     stats: {
       "Final M.DMG Bonus": "10.50%",
       "Final M.PEN": "10.50%"
@@ -3532,9 +3532,9 @@ const cardData = {
   },
   "Inosuke Hashibira Card (Gold)": {
     equip: "accessory",
-    quality: "blue",
+    quality: "gold",
     stats: {
-      "M.PEN%": "21%",
+      "Final M.PEN": "21%",
       "M.ATK%": "10.50%"
     }
   },

@@ -2256,6 +2256,10 @@ strong { color: rgb(90,104,128); }
 }
 
 /* LIGHTBOX OVERLAY */
+.img-lightbox-image,
+.img-lightbox-overlay {
+  touch-action: none;
+}
 .img-lightbox-overlay {
   position: fixed;
   inset: 0;
@@ -2353,6 +2357,7 @@ strong { color: rgb(90,104,128); }
 }
 
 .img-lightbox-loader {
+  display: none;
   font-size: 9px;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -2360,6 +2365,8 @@ strong { color: rgb(90,104,128); }
   color: var(--accent, #5b8ef0);
   animation: lbPulse 1.0s ease-in-out infinite;
 }
+.img-lightbox-overlay.img-lightbox-loading .img-lightbox-loader { display: block; }
+.img-lightbox-overlay.img-lightbox-loading .img-lightbox-image { display: none; }
 
 .img-lightbox-image {
   display: block;
@@ -2369,9 +2376,15 @@ strong { color: rgb(90,104,128); }
   border-radius: 13px;
   border: 1px solid var(--border, #1c2133);
   box-shadow: 0 8px 40px rgba(0,0,0,0.65), 0 0 0 1px rgba(91,142,240,0.06);
-  transform-origin: center center;
+  cursor: default;
+
+  transform-origin: 0 0;
+  will-change: transform;
+
   animation: lbImageIn 0.21s ease both;
 }
+.img-lightbox-image.img-lightbox-zoomed { cursor: move; }
+.img-lightbox-image.img-lightbox-dragging { cursor: grabbing; }
 
 .img-lightbox-caption {
   position: absolute;
@@ -2393,6 +2406,9 @@ strong { color: rgb(90,104,128); }
   transition: opacity var(--t-med);
 }
 .img-lightbox-caption.active { opacity: 1; }
+
+.img-lightbox-data-holder { display: none; }
+
 
 /* KEYFRAME ANIMATIONS */
 @keyframes statsMsgIn {

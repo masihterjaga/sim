@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Weapon Awakening</title>
+<meta name="description" content="Part of RöXtimizer - Weapon Awakening Calculator" />
+<link rel="icon shortcut" type="image/x-icon" href="/sim/icons/favicon.ico">
+<link rel="icon" type="image/svg+xml" href="/sim/icons/favicon.svg">
+<link rel="icon" type="image/png" sizes="96x96" href="/sim/icons/favicon-96x96.png">
+<link rel="apple-touch-icon" href="/sim/icons/apple-touch-icon.png">
+<meta name="google" content="notranslate">
 <style>
 :root {
   --c-bg:            #07080c;
@@ -78,7 +84,7 @@ h1 {
 
 /* weapon entry wrapper */
 .weapon-entry { display: flex; flex-direction: column; gap: 8px; }
-.weapon-entry + .weapon-entry { margin-top: 0; }
+.weapon-entry + .weapon-entry { margin-top: 13px; }
 
 .panel {
   background: var(--c-surface);
@@ -256,7 +262,6 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   background: rgba(242,96,90,.07);
 }
 
-
 @keyframes resultReveal {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
@@ -339,7 +344,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   <div class="card-header">
     <div class="badge">Weapon Awakening</div>
     <h1>Calculator</h1>
-    <p class="subtitle">If you have a lot of 1H progress, pick 1H+Shield, leave the shield empty, add another weapon, and repeat.</p>
+    <p class="subtitle">If you have a lot of 1H progress, select 1H+Shield, leave the shield empty, add another weapon, and repeat.</p>
   </div>
 
   <div id="weapons-container"></div>
@@ -355,7 +360,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; marg
   <p class="credit">Part of <a href="https://masihterjaga.github.io/sim/roxtimizer"><u>röxtimizer</u></a></p>
 </div>
 <script>
-const weaponAwk = [
+const WEAPON_AWK = [
   { tier: 'T1',  score: 250,   rating: 1100, need: 2, bonus: 12  },
   { tier: 'T2',  score: 500,   rating: 1100, need: 2, bonus: 25  },
   { tier: 'T3',  score: 1200,  rating: 1100, need: 2, bonus: 45  },
@@ -367,65 +372,73 @@ const weaponAwk = [
   { tier: 'T9',  score: 12000, rating: 2900, need: 5, bonus: 210 },
   { tier: 'T10', score: 14000, rating: 3500, need: 6, bonus: 250 },
 ];
-const SUB_RATING = { '2h': 600, '1h': 400, 'shield': 200, 'dagger': 300, 'dagger2': 300 };
+
+const SUB_RATING = { '2h': 600, '1h': 400, shield: 200, dagger: 300, dagger2: 300 };
+const SLOT_GROUP = { shield: 'shield', dagger: 'dagger', dagger2: 'dagger' };
+const SLOT_CAP   = { shield: 1, dagger: 2 };
 
 const TYPE_SUBS = {
-  '2h':     [{ key: '2h',      label: '2H' }],
-  '1h':     [{ key: '1h',      label: '1H' }, { key: 'shield', label: 'Shield' }],
-  'dagger': [{ key: 'dagger',  label: 'Dagger A' }, { key: 'dagger2', label: 'Dagger B' }],
+  '2h':     [{ key: '2h',     label: '2H' }],
+  '1h':     [{ key: '1h',     label: '1H' }, { key: 'shield', label: 'Shield' }],
+  dagger:   [{ key: 'dagger', label: 'Dagger A' }, { key: 'dagger2', label: 'Dagger B' }],
 };
-const SUB_FACTOR = { '2h': 1, '1h': 1, 'shield': 1, 'dagger': 1, 'dagger2': 1 };
 
-const refineScores = {
-  0:0,1:20,2:25,3:30,4:40,5:50,6:60,7:80,8:120,9:180,
-  10:330,11:580,12:1000,13:1700,14:3420,15:7500,
+const REFINE_SCORES = [0,20,25,30,40,50,60,80,120,180,330,580,1000,1700,3420,7500];
+
+const ENCHANT_SCORES = {
+  Prontera:        [0,2,3,4,5,6,7,8,9,10,11,12,15,20,25,34],
+  Morroc:          [0,3,4,5,6,7,8,9,10,11,12,15,20,25,34,50],
+  Einbroch:        [0,3,4,5,6,7,8,9,10,11,12,15,20,25,34,50],
+  'Izlude Island': [0,4,5,6,7,8,9,10,11,12,15,20,25,34,50,80],
+  Alberta:         [0,4,5,6,7,8,9,10,11,12,15,20,25,34,50,80],
+  Payon:           [0,5,6,7,8,9,10,11,12,15,20,25,34,50,80,140],
+  Geffen:          [0,6,7,8,9,10,11,12,15,20,25,34,50,80,140,250],
+  'Glast Heim':    [0,7,8,9,10,11,12,15,20,25,34,50,80,140,250,480],
+  Comodo:          [0,8,9,10,11,12,15,20,25,34,50,80,140,250,480,850],
+  Umbala:          [0,9,10,11,12,15,20,25,34,50,80,140,250,480,850,1400],
+  Juno:            [0,10,11,12,15,20,25,34,50,80,140,250,480,850,1400,2100],
+  Rachel:          [0,11,12,15,20,25,34,50,80,140,250,480,850,1400,2100,3200],
 };
-const enchantScores = {
-  "Prontera":    {0:0,1:2,2:3,3:4,4:5,5:6,6:7,7:8,8:9,9:10,10:11,11:12,12:15,13:20,14:25,15:34},
-  "Morroc":      {0:0,1:3,2:4,3:5,4:6,5:7,6:8,7:9,8:10,9:11,10:12,11:15,12:20,13:25,14:34,15:50},
-  "Einbroch":    {0:0,1:3,2:4,3:5,4:6,5:7,6:8,7:9,8:10,9:11,10:12,11:15,12:20,13:25,14:34,15:50},
-  "Izlude Island":{0:0,1:4,2:5,3:6,4:7,5:8,6:9,7:10,8:11,9:12,10:15,11:20,12:25,13:34,14:50,15:80},
-  "Alberta":     {0:0,1:4,2:5,3:6,4:7,5:8,6:9,7:10,8:11,9:12,10:15,11:20,12:25,13:34,14:50,15:80},
-  "Payon":       {0:0,1:5,2:6,3:7,4:8,5:9,6:10,7:11,8:12,9:15,10:20,11:25,12:34,13:50,14:80,15:140},
-  "Geffen":      {0:0,1:6,2:7,3:8,4:9,5:10,6:11,7:12,8:15,9:20,10:25,11:34,12:50,13:80,14:140,15:250},
-  "Glast Heim":  {0:0,1:7,2:8,3:9,4:10,5:11,6:12,7:15,8:20,9:25,10:34,11:50,12:80,13:140,14:250,15:480},
-  "Comodo":      {0:0,1:8,2:9,3:10,4:11,5:12,6:15,7:20,8:25,9:34,10:50,11:80,12:140,13:250,14:480,15:850},
-  "Umbala":      {0:0,1:9,2:10,3:11,4:12,5:15,6:20,7:25,8:34,9:50,10:80,11:140,12:250,13:480,14:850,15:1400},
-  "Juno":        {0:0,1:10,2:11,3:12,4:15,5:20,6:25,7:34,8:50,9:80,10:140,11:250,12:480,13:850,14:1400,15:2100},
-  "Rachel":      {0:0,1:11,2:12,3:15,4:20,5:25,6:34,7:50,8:80,9:140,10:250,11:480,12:850,13:1400,14:2100,15:3200},
-};
-const upgradeScores = (() => {
-  const m = { 0: 0 };
+
+const MAX_UPGRADE = 280;
+
+const UPGRADE_SCORES = (() => {
   const ranges = [
     [1,20,5],[21,40,10],[41,60,15],[61,100,20],[101,120,30],
     [121,140,35],[141,160,40],[161,180,60],[181,200,120],
     [201,220,200],[221,240,300],[241,260,450],[261,280,600],
   ];
-  for (const [from, to, score] of ranges)
-    for (let i = from; i <= to; i++) m[i] = score;
-  return m;
+  const table = new Uint16Array(MAX_UPGRADE + 1);
+  for (const [from, to, score] of ranges) table.fill(score, from, to + 1);
+  return table;
 })();
 
-const cities   = Object.keys(enchantScores);
-const slotNums = [1, 2, 3];
-const maxUpgrade = 280;
+const CITIES    = Object.keys(ENCHANT_SCORES);
+const SLOT_NUMS = [1, 2, 3];
 
 let weapons = [];
 let nextId  = 0;
 let hasInteracted = false;
-const panelAborts = {};
+let lastTiersHTML = '';
 
-const el  = id => document.getElementById(id);
+const el = id => document.getElementById(id);
 
-function buildLevelOptions() {
-  return '<option value="0">0</option>' +
-    Array.from({length:15}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('');
+const levelOptionsHTML = '<option value="0">0</option>' +
+  Array.from({ length: 15 }, (_, i) => `<option value="${i + 1}">${i + 1}</option>`).join('');
+
+const refineOptionsHTML = Array.from({ length: 16 }, (_, i) => `<option value="${i}">${i}</option>`).join('');
+
+const cityOptionsHTML = '<option value="">— none —</option>' +
+  CITIES.map(c => `<option value="${c}">${c}</option>`).join('');
+
+function createSubState() {
+  return { upg: 0, ref: 0, ench: SLOT_NUMS.map(() => ({ city: '', lvl: 0 })) };
 }
 
 function buildSubPanel(wid, subKey, subLabel) {
   const prefix = `w${wid}-${subKey}`;
   return `
-    <div class="sub-panel" data-sub="${subKey}">
+    <div class="sub-panel" data-sub="${subKey}" data-wid="${wid}" data-subkey="${subKey}">
       <div class="sub-panel-header">
         <div class="sub-panel-label">${subLabel}</div>
         <div class="sub-panel-stats">
@@ -436,47 +449,37 @@ function buildSubPanel(wid, subKey, subLabel) {
       <div class="field-row">
         <div class="field">
           <label>Upgrade Level</label>
-          <input type="number" id="upg-${prefix}" min="0" max="280" placeholder="0–280">
+          <input type="number" min="0" max="${MAX_UPGRADE}" placeholder="0–${MAX_UPGRADE}" data-field="upg">
         </div>
         <div class="field">
           <label>Refine</label>
-          <select id="ref-${prefix}"></select>
+          <select data-field="ref">${refineOptionsHTML}</select>
         </div>
       </div>
       <hr class="divider" style="margin-top:4px">
       <div style="margin-top:12px">
         <div class="slot-header">Enchantment</div>
-        <div class="enchant-slots" id="ench-${prefix}"></div>
+        <div class="enchant-slots">
+          ${SLOT_NUMS.map(s => buildEnchantSlot(s)).join('')}
+        </div>
       </div>
     </div>`;
 }
 
-function initSubPanel(wid, subKey) {
-  const prefix = `w${wid}-${subKey}`;
-  el(`ref-${prefix}`).innerHTML =
-    Array.from({length:16}, (_, i) => `<option value="${i}">${i}</option>`).join('');
-  el(`ench-${prefix}`).innerHTML = slotNums.map(s => `
+function buildEnchantSlot(slotNum) {
+  const idx = slotNum - 1;
+  return `
     <div class="slot">
-      <div class="slot-label">Line ${s}</div>
+      <div class="slot-label">Line ${slotNum}</div>
       <div class="row">
         <div class="field"><label>City</label>
-          <select id="ench-city-${prefix}-${s}">
-            <option value="">— none —</option>
-            ${cities.map(v => `<option value="${v}">${v}</option>`).join('')}
-          </select>
+          <select data-field="ench-city" data-idx="${idx}">${cityOptionsHTML}</select>
         </div>
         <div class="field"><label>Level</label>
-          <select id="ench-lvl-${prefix}-${s}" disabled>${buildLevelOptions()}</select>
+          <select data-field="ench-lvl" data-idx="${idx}" disabled>${levelOptionsHTML}</select>
         </div>
       </div>
-    </div>`).join('');
-  slotNums.forEach(s => {
-    el(`ench-city-${prefix}-${s}`).addEventListener('change', ({ target }) => {
-      const lvlEl = el(`ench-lvl-${prefix}-${s}`);
-      lvlEl.innerHTML = buildLevelOptions();
-      lvlEl.disabled = !target.value;
-    });
-  });
+    </div>`;
 }
 
 function buildWeaponEntry(wid, isFirst) {
@@ -492,13 +495,13 @@ function buildWeaponEntry(wid, isFirst) {
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <div class="field" style="width:130px">
-            <select id="type-${wid}">
+            <select data-field="type">
               <option value="2h">2H</option>
               <option value="1h">1H + Shield</option>
               <option value="dagger">Dagger + Dagger</option>
             </select>
           </div>
-          ${!isFirst ? `<button class="btn-remove-weapon" data-wid="${wid}">Remove</button>` : ''}
+          ${isFirst ? '' : `<button class="btn-remove-weapon" data-wid="${wid}">Remove</button>`}
         </div>
       </div>
       <div class="panel-body" id="panel-body-${wid}">
@@ -508,42 +511,91 @@ function buildWeaponEntry(wid, isFirst) {
   return div;
 }
 
-function renderSubPanels(wid) {
-  const type = el(`type-${wid}`).value;
-  const subs = TYPE_SUBS[type];
-  const body = el(`panel-body-${wid}`);
-  body.innerHTML = subs.map(s => buildSubPanel(wid, s.key, s.label)).join(
-    subs.length > 1 ? '<hr class="divider" style="margin:4px 0">' : ''
-  );
-  subs.forEach(s => initSubPanel(wid, s.key));
+function renderSubPanels(weapon) {
+  const subs = TYPE_SUBS[weapon.type];
+  const body = el(`panel-body-${weapon.id}`);
+  body.innerHTML = subs
+    .map(s => buildSubPanel(weapon.id, s.key, s.label))
+    .join(subs.length > 1 ? '<hr class="divider" style="margin:4px 0">' : '');
+
+  subs.forEach(s => {
+    weapon.subs[s.key] ??= createSubState();
+    syncSubPanelInputs(weapon, s.key);
+  });
+}
+
+function syncSubPanelInputs(weapon, subKey) {
+  const panel = document.querySelector(`[data-wid="${weapon.id}"][data-subkey="${subKey}"]`);
+  const state = weapon.subs[subKey];
+
+  panel.querySelector('[data-field="upg"]').value = state.upg || '';
+  panel.querySelector('[data-field="ref"]').value = state.ref;
+
+  const citySelects = panel.querySelectorAll('[data-field="ench-city"]');
+  const lvlSelects  = panel.querySelectorAll('[data-field="ench-lvl"]');
+
+  citySelects.forEach((sel, idx) => {
+    sel.value = state.ench[idx].city;
+    lvlSelects[idx].disabled = !state.ench[idx].city;
+    lvlSelects[idx].value = state.ench[idx].lvl;
+  });
 }
 
 function addWeapon() {
-  const wid    = nextId++;
+  const wid = nextId++;
   const isFirst = weapons.length === 0;
-  weapons.push({ id: wid, type: '2h' });
+  const weapon = { id: wid, type: '2h', subs: { '2h': createSubState() } };
+  weapons.push(weapon);
+
   const entry = buildWeaponEntry(wid, isFirst);
   el('weapons-container').appendChild(entry);
-  initSubPanel(wid, '2h');
 
-  el(`type-${wid}`).addEventListener('change', () => {
-    weapons.find(w => w.id === wid).type = el(`type-${wid}`).value;
-    renderSubPanels(wid);
-    setTimeout(() => attachPanelListeners(wid), 0);
-    if (hasInteracted) calculate();
-  });
-
+  entry.addEventListener('input', e => handleFieldChange(weapon, e.target));
+  entry.addEventListener('change', e => handleFieldChange(weapon, e.target));
   entry.addEventListener('click', e => {
     const btn = e.target.closest('.btn-remove-weapon');
-    if (!btn) return;
-    const id = +btn.dataset.wid;
-    removeWeapon(id);
+    if (btn) removeWeapon(+btn.dataset.wid);
   });
+
+  return wid;
+}
+
+function handleFieldChange(weapon, target) {
+  const field = target.dataset.field;
+  if (!field) return;
+
+  if (field === 'type') {
+    weapon.type = target.value;
+    renderSubPanels(weapon);
+    if (hasInteracted) calculate();
+    return;
+  }
+
+  const subPanel = target.closest('[data-subkey]');
+  const subKey = subPanel.dataset.subkey;
+  const state = weapon.subs[subKey];
+
+  if (field === 'upg') {
+    const v = parseInt(target.value, 10);
+    state.upg = (v >= 0 && v <= MAX_UPGRADE) ? v : 0;
+  } else if (field === 'ref') {
+    state.ref = +target.value;
+  } else if (field === 'ench-city') {
+    const idx = +target.dataset.idx;
+    state.ench[idx].city = target.value;
+    state.ench[idx].lvl = 0;
+    const lvlSel = subPanel.querySelector(`[data-field="ench-lvl"][data-idx="${idx}"]`);
+    lvlSel.disabled = !target.value;
+    lvlSel.value = '0';
+  } else if (field === 'ench-lvl') {
+    const idx = +target.dataset.idx;
+    state.ench[idx].lvl = +target.value;
+  }
+
+  onAnyChange();
 }
 
 function removeWeapon(wid) {
-  panelAborts[wid]?.abort();
-  delete panelAborts[wid];
   weapons = weapons.filter(w => w.id !== wid);
   el(`weapon-entry-${wid}`)?.remove();
   renumberWeapons();
@@ -557,59 +609,88 @@ function renumberWeapons() {
   });
 }
 
-function getSubScore(wid, subKey) {
-  const prefix = `w${wid}-${subKey}`;
-  const upgV   = parseInt(el(`upg-${prefix}`)?.value, 10);
-  const upgLvl = (!isNaN(upgV) && upgV >= 0 && upgV <= maxUpgrade) ? upgV : 0;
-  const upgScore = upgradeScores[upgLvl] ?? 0;
-  const refScore = refineScores[+(el(`ref-${prefix}`)?.value ?? 0)] ?? 0;
-  const enchScore = slotNums.reduce((sum, s) => {
-    const city = el(`ench-city-${prefix}-${s}`)?.value;
-    const lvl  = +(el(`ench-lvl-${prefix}-${s}`)?.value ?? 0);
-    return sum + (city && lvl ? (enchantScores[city]?.[lvl] ?? 0) : 0);
+function computeSubScore(state) {
+  const upgScore = UPGRADE_SCORES[state.upg] ?? 0;
+  const refScore = REFINE_SCORES[state.ref] ?? 0;
+  const enchScore = state.ench.reduce((sum, { city, lvl }) => {
+    if (!city) return sum;
+    return sum + (ENCHANT_SCORES[city]?.[lvl] ?? 0);
   }, 0);
-  return (upgScore + refScore + enchScore) * SUB_FACTOR[subKey];
+  return upgScore + refScore + enchScore;
 }
 
-const SLOT_GROUP = { shield: 'shield', dagger: 'dagger', dagger2: 'dagger' };
-const SLOT_CAP   = { shield: 1, dagger: 2 };
+function applySlotCaps(subWeapons) {
+  const byGroup = {};
+  const ungrouped = [];
+
+  for (const sw of subWeapons) {
+    if (sw.group) (byGroup[sw.group] ??= []).push(sw);
+    else ungrouped.push(sw);
+  }
+
+  for (const group in byGroup) {
+    const cap = SLOT_CAP[group];
+    byGroup[group].sort((a, b) => b.score - a.score);
+    if (byGroup[group].length > cap) byGroup[group].length = cap;
+  }
+
+  return ungrouped.concat(...Object.values(byGroup));
+}
+
+function setTextIfChanged(node, text) {
+  if (node.textContent !== text) node.textContent = text;
+}
 
 function calculate() {
-  const baselineTier = weaponAwk[0];
+  const baselineScore = WEAPON_AWK[0].score;
   const subWeapons = [];
 
-  weapons.forEach(w => {
-    const type = el(`type-${w.id}`).value;
-    TYPE_SUBS[type].forEach(s => {
+  for (const w of weapons) {
+    for (const s of TYPE_SUBS[w.type]) {
       const prefix = `w${w.id}-${s.key}`;
-      const score  = getSubScore(w.id, s.key);
+      const score  = computeSubScore(w.subs[s.key]);
       const rating = SUB_RATING[s.key];
+      const qualifies = score >= baselineScore;
 
-      const scoreEl = el(`score-${prefix}`);
-      scoreEl.textContent = Math.round(score).toLocaleString('en-US') + ' pts';
+      const scoreEl  = el(`score-${prefix}`);
+      const ratingEl = el(`rating-${prefix}`);
+
+      setTextIfChanged(scoreEl, Math.round(score).toLocaleString('en-US') + ' pts');
       scoreEl.classList.remove('hidden');
 
-      const qualifies = score >= baselineTier.score;
-      const ratingEl  = el(`rating-${prefix}`);
-      ratingEl.textContent = `${qualifies ? rating : 0}/${rating} rating`;
+      setTextIfChanged(ratingEl, `${qualifies ? rating : 0}/${rating} rating`);
       ratingEl.classList.remove('hidden');
 
       subWeapons.push({ score, rating, group: SLOT_GROUP[s.key] ?? null });
-    });
-  });
+    }
+  }
 
-  const cappedSubWeapons = Object.entries(SLOT_CAP).reduce((acc, [group, cap]) => {
-    const inGroup    = acc.filter(sw => sw.group === group);
-    const outOfGroup = acc.filter(sw => sw.group !== group);
-    const kept       = inGroup.sort((a, b) => b.score - a.score).slice(0, cap);
-    return [...outOfGroup, ...kept];
-  }, subWeapons);
+  const capped = applySlotCaps(subWeapons).sort((a, b) => b.score - a.score);
 
-  const container = el('awk-tiers');
-  container.innerHTML = weaponAwk.map(t => {
-    const totalRating = cappedSubWeapons.reduce((sum, sw) => sum + (sw.score >= t.score ? sw.rating : 0), 0);
-    const qualifyCount = cappedSubWeapons.filter(sw => sw.score >= t.score).length;
-    const active = totalRating >= t.rating && qualifyCount >= t.need;
+  let tierIdx = WEAPON_AWK.length - 1;
+  let runningRating = 0;
+  let runningCount = 0;
+  const ratingAtThreshold = new Array(WEAPON_AWK.length);
+  const countAtThreshold = new Array(WEAPON_AWK.length);
+
+  for (const sw of capped) {
+    while (tierIdx >= 0 && sw.score < WEAPON_AWK[tierIdx].score) {
+      ratingAtThreshold[tierIdx] = runningRating;
+      countAtThreshold[tierIdx] = runningCount;
+      tierIdx--;
+    }
+    runningRating += sw.rating;
+    runningCount++;
+  }
+  while (tierIdx >= 0) {
+    ratingAtThreshold[tierIdx] = runningRating;
+    countAtThreshold[tierIdx] = runningCount;
+    tierIdx--;
+  }
+
+  const tiersHTML = WEAPON_AWK.map((t, i) => {
+    const totalRating = ratingAtThreshold[i];
+    const active = totalRating >= t.rating && countAtThreshold[i] >= t.need;
     return `<div class="awk-tier-row${active ? ' active' : ''}">
       <span class="awk-tier-badge">${t.tier}</span>
       <span class="awk-tier-score">${t.score.toLocaleString('en-US')}pts (need ${t.need} weapon)</span>
@@ -618,19 +699,12 @@ function calculate() {
     </div>`;
   }).join('');
 
-  el('result-panel').classList.add('visible');
-}
+  if (lastTiersHTML !== tiersHTML) {
+    el('awk-tiers').innerHTML = tiersHTML;
+    lastTiersHTML = tiersHTML;
+  }
 
-function attachPanelListeners(wid) {
-  const entry = el(`weapon-entry-${wid}`);
-  if (!entry) return;
-  panelAborts[wid]?.abort();
-  panelAborts[wid] = new AbortController();
-  const { signal } = panelAborts[wid];
-  entry.querySelectorAll('input[type="number"], select:not([id^="type-"])').forEach(input => {
-    input.addEventListener('input', onAnyChange, { signal });
-    input.addEventListener('change', onAnyChange, { signal });
-  });
+  el('result-panel').classList.add('visible');
 }
 
 function onAnyChange() {
@@ -642,12 +716,9 @@ function onAnyChange() {
 }
 
 addWeapon();
-attachPanelListeners(0);
 
 el('btn-add-weapon').addEventListener('click', () => {
   addWeapon();
-  const wid = nextId - 1;
-  attachPanelListeners(wid);
   if (hasInteracted) calculate();
 });
 </script>

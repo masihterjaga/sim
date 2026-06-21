@@ -14,10 +14,10 @@ const lightboxConfig = {
     {
       name: 'new-version',
       images: [
-        { src: 'img/Test_New-V_ArcAngel.jpg',    caption: '' },
-        { src: 'img/Calc_x_Ingame_1.1.6_0.jpg',  caption: '' },
-        { src: 'img/Calc_x_Ingame_1.1.6_1.jpg',  caption: '' },
-        { src: 'img/Calc_x_Ingame_1.1.6_2.jpg',  caption: 'Spear Flash Triggered' }
+        { src: 'img/Test_New-V_ArcAngel.jpg', caption: '' },
+        { src: 'img/Calc_x_Ingame_1.1.6_0.jpg', caption: '' },
+        { src: 'img/Calc_x_Ingame_1.1.6_1.jpg', caption: '' },
+        { src: 'img/Calc_x_Ingame_1.1.6_2.jpg', caption: 'Spear Flash Triggered' }
       ]
     },
     {
@@ -25,11 +25,11 @@ const lightboxConfig = {
       images: [
         { src: 'img/01_RoXtimizer.jpg', caption: 'Recommendation pre Companion Opt.' },
         { src: 'img/02_RoXtimizer.jpg', caption: 'Test Before Opt.' },
-        { src: 'img/03_RoXtimizer.jpg', caption: 'After Opt.' },
+        { src: 'img/03_RoXtimizer.jpg', caption: 'After Opt. (in-game ±26%, tool expect ±23%)' },
         { src: 'img/04_RoXtimizer.jpg', caption: 'Before Opt. (+Companion)' },
         { src: 'img/05_RoXtimizer.jpg', caption: 'Opt. Recommendation (+Companion)' },
         { src: 'img/06_RoXtimizer.jpg', caption: 'Test Before Opt.' },
-        { src: 'img/07_RoXtimizer.jpg', caption: 'Test After Opt.' }
+        { src: 'img/07_RoXtimizer.jpg', caption: 'Test After Opt.(in-game ±22%, tool expect ±24%)' }
       ]
     },
     {
@@ -47,209 +47,213 @@ const lightboxConfig = {
         { src: 'img/Current_Stats_Vs_Retri.jpg', caption: 'Another test (Retribution) with All Shadow Enchant' },
         { src: 'img/Recommend_Vs_Retri.jpg', caption: 'Use custom mode enchant optimizer, change to 3 Angel in Main-Hand. Tool expect ±46% increace' },
         { src: 'img/Retri_6Shadow.jpg', caption: 'All Shadow Enchant' },
-        { src: 'img/Retri_3Angel_3Shadow.jpg', caption: 'DPS Mix angel & shadow enchant, actual-ingame increase ±41%. As i said before, can be higher or lower ' }
+        { src: 'img/Retri_3Angel_3Shadow.jpg', caption: 'DPS Mix angel & shadow enchant, actual-ingame increase ±41% (tool expect ±46%). As i said before, can be higher or lower ' }
       ]
-    },
-    
+    }
   ]
 };
 const imgLightbox = ((config = {}) => {
+  const overlay = document.getElementById('img-lightbox-overlay');
+  if (overlay?._lbInited) return { destroy: () => {}, openGallery: () => {} };
 
-  let _overlay = document.getElementById('img-lightbox-overlay');
-  if (!_overlay) {
-    _overlay = document.createElement('div');
-    _overlay.id        = 'img-lightbox-overlay';
-    _overlay.className = 'img-lightbox-overlay';
-    _overlay.innerHTML =
-      '<span class="img-lightbox-close">&times;</span>'                      +
-      '<div class="img-lightbox-counter">1 / 1</div>'                        +
-      '<button class="img-lightbox-nav img-lightbox-prev">&#8249;</button>'  +
-      '<button class="img-lightbox-nav img-lightbox-next">&#8250;</button>'  +
-      '<div class="img-lightbox-inner">'                                      +
-        '<div class="img-lightbox-loader">Loading...</div>'                  +
-        '<img class="img-lightbox-image" src="" alt="">'                     +
-      '</div>'                                                                +
+  const URL_RE = /^https?:\/\//i;
+  const PASSIVE = { passive: false };
+  const MIN_SCALE = 1;
+  const MAX_SCALE = 8;
+  const ZOOM_STEP = 0.8;
+  const DBLCLICK_SCALE = 3;
+  const BASE_DIR = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+  const ORIGIN = window.location.origin;
+
+  const configByName = new Map((config.galleries || []).map(g => [g.name, g]));
+
+  const root = overlay || (() => {
+    const el = document.createElement('div');
+    el.id = 'img-lightbox-overlay';
+    el.className = 'img-lightbox-overlay';
+    el.innerHTML =
+      '<span class="img-lightbox-close">&times;</span>' +
+      '<div class="img-lightbox-counter">1 / 1</div>' +
+      '<button class="img-lightbox-nav img-lightbox-prev">&#8249;</button>' +
+      '<button class="img-lightbox-nav img-lightbox-next">&#8250;</button>' +
+      '<div class="img-lightbox-inner">' +
+        '<div class="img-lightbox-loader">Loading...</div>' +
+        '<img class="img-lightbox-image" src="" alt="">' +
+      '</div>' +
       '<div class="img-lightbox-caption"></div>';
-    document.body.appendChild(_overlay);
-  }
+    document.body.appendChild(el);
+    return el;
+  })();
+  root._lbInited = true;
 
-  // ── double-init guard ──────────────────────────────────────
-  if (_overlay._lbInited) return { destroy: () => {}, openGallery: () => {} };
-  _overlay._lbInited = true;
-
-  // ── element refs ───────────────────────────────────────────
   const els = {
-    overlay:  _overlay,
-    image:    document.querySelector('.img-lightbox-image'),
-    loader:   document.querySelector('.img-lightbox-loader'),
-    closeBtn: document.querySelector('.img-lightbox-close'),
-    inner:    document.querySelector('.img-lightbox-inner'),
-    caption:  document.querySelector('.img-lightbox-caption'),
-    counter:  document.querySelector('.img-lightbox-counter'),
-    prevBtn:  document.querySelector('.img-lightbox-prev'),
-    nextBtn:  document.querySelector('.img-lightbox-next')
+    overlay: root,
+    image: root.querySelector('.img-lightbox-image'),
+    closeBtn: root.querySelector('.img-lightbox-close'),
+    caption: root.querySelector('.img-lightbox-caption'),
+    counter: root.querySelector('.img-lightbox-counter'),
+    prevBtn: root.querySelector('.img-lightbox-prev'),
+    nextBtn: root.querySelector('.img-lightbox-next')
   };
 
-  // ── state ──────────────────────────────────────────────────
   const state = {
-    scale: 1, translateX: 0, translateY: 0,
+    scale: MIN_SCALE, translateX: 0, translateY: 0,
     isDragging: false, dragStartX: 0, dragStartY: 0,
-    pinchStart: 0, scaleStart: 1,
-    imageLoadId: null,
-    galleries: {}, currentGallery: null, currentIndex: 0
+    pinchStart: 0, scaleStart: MIN_SCALE,
+    imageLoadId: null, isOpen: false, rafId: null, baseRect: null,
+    galleries: {}, currentGallery: null, currentIndex: 0, items: []
   };
 
-  const cfg = { MIN: 1, MAX: 5, STEP: 0.3 };
+  const isZoomed = () => state.scale > MIN_SCALE;
+  const clamp = (v, lo, hi) => v < lo ? lo : v > hi ? hi : v;
+  const dist = (a, b) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+  const midpt = (a, b) => ({ x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 });
 
-  // ── event registries (for cleanup) ────────────────────────
-  // main UI events
-  const _uiEvents = [];
-  const on = (el, type, fn, opts) => {
-    if (!el) return;
-    el.addEventListener(type, fn, opts);
-    _uiEvents.push({ el, type, fn, opts });
+  const createTracker = () => {
+    const bound = [];
+    const on = (el, type, fn, opts) => {
+      if (!el) return;
+      el.addEventListener(type, fn, opts);
+      bound.push({ el, type, fn, opts });
+    };
+    const offAll = () => {
+      bound.forEach(({ el, type, fn, opts }) => el.removeEventListener(type, fn, opts));
+      bound.length = 0;
+    };
+    return { on, offAll };
   };
+  const uiTracker = createTracker();
 
-  // gallery trigger events (separate so they survive destroy if needed)
-  const _galleryEvents = [];
-  const onGallery = (el, type, fn) => {
-    el.addEventListener(type, fn);
-    _galleryEvents.push({ el, type, fn });
-  };
-  const offAllGallery = () => {
-    _galleryEvents.forEach(({ el, type, fn }) => el.removeEventListener(type, fn));
-    _galleryEvents.length = 0;
-  };
+  const invalidateBaseRect = () => { state.baseRect = null; };
 
-  // ── helpers ────────────────────────────────────────────────
-  const clamp  = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
-  const dist   = (a, b) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
-  const midpt  = (a, b) => ({ x: (a.clientX + b.clientX) / 2, y: (a.clientY + b.clientY) / 2 });
+  const captureBaseRect = () => {
+    const prevTransform = els.image.style.transform;
+    els.image.style.transform = 'none';
+    state.baseRect = els.image.getBoundingClientRect();
+    els.image.style.transform = prevTransform;
+  };
 
   const applyTransform = () => {
-    els.image.style.transform =
-      `translate(${state.translateX}px,${state.translateY}px) scale(${state.scale})`;
+    if (state.rafId !== null) return;
+    state.rafId = requestAnimationFrame(() => {
+      els.image.style.transform = `translate(${state.translateX}px,${state.translateY}px) scale(${state.scale})`;
+      state.rafId = null;
+    });
+  };
+
+  const setScale = (scale, translateX = 0, translateY = 0) => {
+    state.scale = scale;
+    state.translateX = translateX;
+    state.translateY = translateY;
+    applyTransform();
+    els.image.classList.toggle('img-lightbox-zoomed', isZoomed());
   };
 
   const resetTransform = () => {
-    Object.assign(state, { scale: 1, translateX: 0, translateY: 0, isDragging: false });
-    applyTransform();
-    els.image.style.cursor = 'default';
+    state.isDragging = false;
+    setScale(MIN_SCALE);
+  };
+
+  const updateTransform = (newScale, clientX, clientY) => {
+    const prev = state.scale;
+    newScale = clamp(newScale, MIN_SCALE, MAX_SCALE);
+    if (newScale === prev) return;
+    if (newScale === MIN_SCALE) return resetTransform();
+
+    if (!state.baseRect) captureBaseRect();
+    const ratio = newScale / prev;
+    setScale(
+      newScale,
+      state.translateX + (clientX - (state.baseRect.left + state.translateX)) * (1 - ratio),
+      state.translateY + (clientY - (state.baseRect.top + state.translateY)) * (1 - ratio)
+    );
   };
 
   const cleanupLoaders = () => {
-    if (els.image) { els.image.onload = null; els.image.onerror = null; }
+    els.image.onload = null;
+    els.image.onerror = null;
     state.imageLoadId = null;
   };
 
-  const getCurrentItems = () =>
-    state.currentGallery ? (state.galleries[state.currentGallery] ?? []) : [];
-
-  // ── URL resolver ───────────────────────────────────────────
   const resolveURL = (path) => {
-    if (/^https?:\/\//i.test(path)) return path;
-    if (path.startsWith('/')) return window.location.origin + path;
-    const dir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-    return window.location.origin + dir + '/' + path;
+    if (URL_RE.test(path)) return path;
+    if (path.startsWith('/')) return ORIGIN + path;
+    return `${ORIGIN}${BASE_DIR}/${path}`;
   };
 
-  // ── UI update ──────────────────────────────────────────────
   const updateUI = () => {
-    const items = getCurrentItems();
-    const item  = items[state.currentIndex];
-
-    els.prevBtn.classList.toggle('disabled', state.currentIndex === 0);
-    els.nextBtn.classList.toggle('disabled', state.currentIndex === items.length - 1);
-    els.counter.textContent = `${state.currentIndex + 1} / ${items.length}`;
-
-    if (item?.caption) {
-      els.caption.textContent = item.caption;
-      els.caption.classList.add('active');
-    } else {
-      els.caption.textContent = '';
-      els.caption.classList.remove('active');
-    }
+    const { items, currentIndex } = state;
+    const caption = items[currentIndex]?.caption;
+    els.prevBtn.classList.toggle('disabled', currentIndex === 0);
+    els.nextBtn.classList.toggle('disabled', currentIndex === items.length - 1);
+    els.counter.textContent = `${currentIndex + 1} / ${items.length}`;
+    els.caption.textContent = caption || '';
+    els.caption.classList.toggle('active', Boolean(caption));
   };
 
-  // ── open / close ───────────────────────────────────────────
   const setActive = (active) => {
+    state.isOpen = active;
     els.overlay.classList.toggle('img-lightbox-active', active);
-    document.body.style.overflow = active ? 'hidden' : '';
-    if (!active) {
-      cleanupLoaders();
-      resetTransform();
-      state.currentGallery = null;
-    }
+    document.body.classList.toggle('img-lightbox-open', active);
+    if (active) return;
+    cleanupLoaders();
+    resetTransform();
+    state.currentGallery = null;
+    state.items = [];
   };
 
   const close = () => setActive(false);
 
-  // ── image loading ──────────────────────────────────────────
   const loadImage = (index) => {
-    const items = getCurrentItems();
+    const { items } = state;
     if (index < 0 || index >= items.length) return;
-
     state.currentIndex = index;
     cleanupLoaders();
-
-    els.loader.style.display = 'block';
-    els.image.style.display  = 'none';
+    els.overlay.classList.add('img-lightbox-loading');
     resetTransform();
-
-    const id   = Symbol();
+    const id = Symbol();
     state.imageLoadId = id;
-
     const done = (ok) => {
       if (state.imageLoadId !== id) return;
-      els.loader.style.display = 'none';
-      if (ok) els.image.style.display = 'block';
-      else console.error('[lightbox] failed to load image');
-      cleanupLoaders();
+      els.overlay.classList.remove('img-lightbox-loading');
+      if (!ok) console.error('[lightbox] failed to load image');
+      state.imageLoadId = null;
+      invalidateBaseRect();
     };
-
-    els.image.onload  = () => done(true);
+    els.image.onload = () => done(true);
     els.image.onerror = () => done(false);
-    els.image.src     = resolveURL(items[index].src);
-
+    els.image.src = resolveURL(items[index].src);
     updateUI();
   };
 
-  const navigate = (dir) => {
-    const items = getCurrentItems();
-    const next  = state.currentIndex + dir;
-    if (next >= 0 && next < items.length) loadImage(next);
-  };
+  const navigate = (dir) => loadImage(state.currentIndex + dir);
 
-  // ── zoom / pan ─────────────────────────────────────────────
-  const updateTransform = (newScale, cx, cy) => {
-    const prev = state.scale;
-    state.scale = clamp(newScale, cfg.MIN, cfg.MAX);
-    if (state.scale === prev) return;
-
-    if (state.scale === cfg.MIN) {
-      state.translateX = state.translateY = 0;
-    } else {
-      const r = state.scale / prev;
-      state.translateX = cx - (cx - state.translateX) * r;
-      state.translateY = cy - (cy - state.translateY) * r;
-    }
-    applyTransform();
-    els.image.style.cursor = state.scale > cfg.MIN ? 'move' : 'default';
-  };
-
-  // ── mouse events ───────────────────────────────────────────
   const onWheel = (e) => {
-    if (!els.overlay.classList.contains('img-lightbox-active')) return;
+    if (!state.isOpen) return;
     e.preventDefault();
-    updateTransform(state.scale + (e.deltaY < 0 ? cfg.STEP : -cfg.STEP), e.clientX, e.clientY);
+    updateTransform(state.scale + (e.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP), e.clientX, e.clientY);
+  };
+
+  const endDrag = () => {
+    state.isDragging = false;
+    els.image.classList.remove('img-lightbox-dragging');
+  };
+
+  const startDrag = (cx, cy) => {
+    state.isDragging = true;
+    state.dragStartX = cx - state.translateX;
+    state.dragStartY = cy - state.translateY;
+    return true;
+  };
+
+  const startDragIfZoomed = (cx, cy) => {
+    if (!isZoomed()) return false;
+    return startDrag(cx, cy);
   };
 
   const onMouseDown = (e) => {
-    if (state.scale <= cfg.MIN) return;
-    state.isDragging = true;
-    state.dragStartX = e.clientX - state.translateX;
-    state.dragStartY = e.clientY - state.translateY;
-    els.image.style.cursor = 'grabbing';
+    if (!startDragIfZoomed(e.clientX, e.clientY)) return;
+    els.image.classList.add('img-lightbox-dragging');
     e.preventDefault();
   };
 
@@ -262,204 +266,189 @@ const imgLightbox = ((config = {}) => {
 
   const onMouseUp = () => {
     if (!state.isDragging) return;
-    state.isDragging = false;
-    els.image.style.cursor = state.scale > cfg.MIN ? 'move' : 'default';
+    endDrag();
   };
 
   const onDblClick = (e) => {
     e.preventDefault();
-    if (state.scale > cfg.MIN) {
-      resetTransform();
-    } else {
-      const rect = els.image.getBoundingClientRect();
-      state.scale      = 2;
-      state.translateX = e.clientX - (e.clientX - rect.left) * 2;
-      state.translateY = e.clientY - (e.clientY - rect.top)  * 2;
-      applyTransform();
-      els.image.style.cursor = 'move';
-    }
-  };
-
-  // ── touch events ───────────────────────────────────────────
-  const startDrag = (cx, cy) => {
-    state.isDragging = true;
-    state.dragStartX = cx - state.translateX;
-    state.dragStartY = cy - state.translateY;
+    if (isZoomed()) return resetTransform();
+    updateTransform(DBLCLICK_SCALE, e.clientX, e.clientY);
   };
 
   const onTouchStart = (e) => {
     const t = e.touches;
-    if (t.length === 1 && state.scale > cfg.MIN) {
-      startDrag(t[0].clientX, t[0].clientY);
-    } else if (t.length === 2) {
+    if (t.length === 2) {
       e.preventDefault();
-      state.isDragging  = false;
-      state.pinchStart  = dist(t[0], t[1]);
-      state.scaleStart  = state.scale;
+      state.isDragging = false;
+      state.pinchStart = dist(t[0], t[1]);
+      state.scaleStart = state.scale;
+      return;
     }
+    if (t.length === 1) startDragIfZoomed(t[0].clientX, t[0].clientY);
   };
 
   const onTouchMove = (e) => {
     const t = e.touches;
-    if (t.length === 1 && state.isDragging) {
+    if (t.length === 2 && state.pinchStart) {
       e.preventDefault();
-      state.translateX = t[0].clientX - state.dragStartX;
-      state.translateY = t[0].clientY - state.dragStartY;
-      applyTransform();
-    } else if (t.length === 2 && state.pinchStart) {
-      e.preventDefault();
-      const c        = midpt(t[0], t[1]);
-      const ratio    = dist(t[0], t[1]) / state.pinchStart;
-      const newScale = clamp(state.scaleStart * ratio, cfg.MIN, cfg.MAX);
-      const sr       = newScale / state.scale;
-      state.scale      = newScale;
-      state.translateX = c.x - (c.x - state.translateX) * sr;
-      state.translateY = c.y - (c.y - state.translateY) * sr;
-      if (state.scale === cfg.MIN) { state.translateX = state.translateY = 0; }
-      applyTransform();
+      const c = midpt(t[0], t[1]);
+      updateTransform(state.scaleStart * (dist(t[0], t[1]) / state.pinchStart), c.x, c.y);
+      return;
     }
+    if (t.length !== 1 || !state.isDragging) return;
+    e.preventDefault();
+    state.translateX = t[0].clientX - state.dragStartX;
+    state.translateY = t[0].clientY - state.dragStartY;
+    applyTransform();
   };
 
   const onTouchEnd = (e) => {
-    if (e.touches.length === 0) {
-      state.isDragging = false;
-      state.pinchStart = 0;
-      if (state.scale === cfg.MIN) { state.translateX = state.translateY = 0; applyTransform(); }
-    } else if (e.touches.length === 1 && state.scale > cfg.MIN) {
-      startDrag(e.touches[0].clientX, e.touches[0].clientY);
-      state.pinchStart = 0;
-    }
+    const remaining = e.touches.length;
+    state.pinchStart = 0;
+    if (remaining === 1) return startDragIfZoomed(e.touches[0].clientX, e.touches[0].clientY);
+    if (remaining !== 0) return;
+    state.isDragging = false;
   };
 
-  // ── keyboard ───────────────────────────────────────────────
+  const KEY_HANDLERS = {
+    Escape: close,
+    '0': resetTransform,
+    ArrowLeft: () => navigate(-1),
+    ArrowRight: () => navigate(1)
+  };
   const onKey = (e) => {
-    if (!els.overlay.classList.contains('img-lightbox-active')) return;
-    ({ Escape: close, '0': resetTransform, ArrowLeft: () => navigate(-1), ArrowRight: () => navigate(1) })[e.key]?.();
+    if (!state.isOpen) return;
+    KEY_HANDLERS[e.key]?.();
   };
-
   const onVisibility = () => {
-    if (document.hidden && state.isDragging) {
-      state.isDragging = false;
-      els.image.style.cursor = state.scale > cfg.MIN ? 'move' : 'default';
-    }
+    if (!document.hidden || !state.isDragging) return;
+    endDrag();
   };
 
-  // ── gallery init ───────────────────────────────────────────
-  const lazyInitGallery = (galleryName) => {
-    if (state.galleries[galleryName]) return;
-
-    const galleryConfig = config.galleries?.find(g => g.name === galleryName);
-    if (!galleryConfig) return;
-
-    const container = document.getElementById('lightbox-galleries') ?? (() => {
+  const galleriesContainer = () =>
+    document.getElementById('lightbox-galleries') ?? (() => {
       const d = document.createElement('div');
       d.id = 'lightbox-galleries';
-      d.style.display = 'none';
+      d.className = 'img-lightbox-data-holder';
       document.body.appendChild(d);
       return d;
     })();
 
+  const lazyInitGallery = (galleryName) => {
+    if (state.galleries[galleryName]) return;
+    const galleryConfig = configByName.get(galleryName);
+    if (!galleryConfig) return;
+    const container = galleriesContainer();
     galleryConfig.images.forEach(img => {
       const div = document.createElement('div');
-      div.setAttribute('data-lightbox-item',  galleryName);
+      div.setAttribute('data-lightbox-item', galleryName);
       div.setAttribute('data-lightbox-image', img.src);
       if (img.caption) div.setAttribute('data-caption', img.caption);
       container.appendChild(div);
     });
-
     initGalleries(container);
   };
 
   const openGallery = (galleryName, startIndex = 0) => {
     lazyInitGallery(galleryName);
-    if (!state.galleries[galleryName]) return;
+    const items = state.galleries[galleryName];
+    if (!items) return;
     state.currentGallery = galleryName;
+    state.items = items;
     setActive(true);
     loadImage(startIndex);
   };
 
-  const initGalleries = (root = document) => {
-    // register gallery items
-    root.querySelectorAll('[data-lightbox-item]:not([data-lb-init])').forEach(item => {
-      item.setAttribute('data-lb-init', '');
-      const name    = item.getAttribute('data-lightbox-item');
-      const src     = item.getAttribute('data-lightbox-image');
-      const caption = item.getAttribute('data-caption') || '';
-      if (!state.galleries[name]) state.galleries[name] = [];
-      state.galleries[name].push({ src, caption });
-    });
-
-    // gallery trigger buttons
-    root.querySelectorAll('[data-lightbox-trigger]:not([data-lb-trigger-init])').forEach(trigger => {
-      trigger.setAttribute('data-lb-trigger-init', '');
-      const name = trigger.getAttribute('data-lightbox-gallery');
-      const handler = (e) => { e.preventDefault(); if (name) openGallery(name, 0); };
-      onGallery(trigger, 'click', handler);
-    });
-
-    // single-image links
-    root.querySelectorAll('[data-lightbox-image]:not([data-lightbox-trigger]):not([data-lb-single-init])').forEach(link => {
-      link.setAttribute('data-lb-single-init', '');
-      const src     = link.getAttribute('data-lightbox-image');
-      const caption = link.getAttribute('data-caption') || '';
-      const uid     = `single-${Math.random().toString(36).slice(2, 11)}`;
-      state.galleries[uid] = [{ src, caption }];
-      const handler = (e) => { e.preventDefault(); openGallery(uid, 0); };
-      onGallery(link, 'click', handler);
+  const bindOpenTrigger = (el, resolveName) => {
+    uiTracker.on(el, 'click', (e) => {
+      e.preventDefault();
+      const name = resolveName();
+      if (name) openGallery(name, 0);
     });
   };
+
+  const claimUninit = (scope, selector, markAttr) => {
+    const found = scope.querySelectorAll(`${selector}:not([${markAttr}])`);
+    found.forEach(el => el.setAttribute(markAttr, ''));
+    return found;
+  };
+
+  const INIT_RULES = [
+    {
+      selector: '[data-lightbox-item]',
+      mark: 'data-lb-init',
+      handle: (item) => {
+        const name = item.getAttribute('data-lightbox-item');
+        (state.galleries[name] ??= []).push({
+          src: item.getAttribute('data-lightbox-image'),
+          caption: item.getAttribute('data-caption') || ''
+        });
+      }
+    },
+    {
+      selector: '[data-lightbox-trigger]',
+      mark: 'data-lb-trigger-init',
+      handle: (trigger) => bindOpenTrigger(trigger, () => trigger.getAttribute('data-lightbox-gallery'))
+    },
+    {
+      selector: '[data-lightbox-image]:not([data-lightbox-trigger])',
+      mark: 'data-lb-single-init',
+      handle: (link) => {
+        const uid = `single-${Math.random().toString(36).slice(2, 11)}`;
+        state.galleries[uid] = [{
+          src: link.getAttribute('data-lightbox-image'),
+          caption: link.getAttribute('data-caption') || ''
+        }];
+        bindOpenTrigger(link, () => uid);
+      }
+    }
+  ];
+
+  function initGalleries(scope = document) {
+    INIT_RULES.forEach(({ selector, mark, handle }) => {
+      claimUninit(scope, selector, mark).forEach(handle);
+    });
+  }
 
   initGalleries();
 
-  // ── mutation observer (dynamic DOM) ───────────────────────
   const observer = new MutationObserver((mutations) => {
+    const targets = new Set();
     for (const m of mutations) {
-      for (const node of m.addedNodes) {
-        if (node.nodeType !== 1) continue;
-        if (node.hasAttribute?.('data-lightbox-item') || node.hasAttribute?.('data-lightbox-trigger')) {
-          initGalleries(node.parentElement);
-        }
-        if (node.querySelectorAll) initGalleries(node);
-      }
+      if (m.addedNodes.length) targets.add(m.target);
     }
+    targets.forEach(initGalleries);
   });
   observer.observe(document.body, { childList: true, subtree: true });
 
-  // ── register all UI events ─────────────────────────────────
-  const passive = { passive: false };
+  uiTracker.on(els.closeBtn, 'click', close);
+  uiTracker.on(els.prevBtn, 'click', () => navigate(-1));
+  uiTracker.on(els.nextBtn, 'click', () => navigate(1));
+  uiTracker.on(document, 'keydown', onKey);
+  uiTracker.on(document, 'visibilitychange', onVisibility);
+  uiTracker.on(window, 'resize', invalidateBaseRect);
+  uiTracker.on(els.image, 'wheel', onWheel, PASSIVE);
+  uiTracker.on(els.image, 'mousedown', onMouseDown);
+  uiTracker.on(document, 'mousemove', onMouseMove);
+  uiTracker.on(document, 'mouseup', onMouseUp);
+  uiTracker.on(els.image, 'dblclick', onDblClick);
+  uiTracker.on(els.image, 'touchstart', onTouchStart, PASSIVE);
+  uiTracker.on(els.image, 'touchmove', onTouchMove, PASSIVE);
+  uiTracker.on(els.image, 'touchend', onTouchEnd);
+  uiTracker.on(els.image, 'touchcancel', onTouchEnd);
 
-  on(els.closeBtn, 'click',            close);
-  on(els.prevBtn,  'click',            () => navigate(-1));
-  on(els.nextBtn,  'click',            () => navigate(1));
-  on(els.overlay,  'click',            (e) => { if (e.target === els.overlay) close(); });
-  on(els.inner,    'click',            (e) => e.stopPropagation());
-  on(document,     'keydown',          onKey);
-  on(document,     'visibilitychange', onVisibility);
-  on(els.image,    'wheel',            onWheel,      passive);
-  on(els.image,    'mousedown',        onMouseDown);
-  on(document,     'mousemove',        onMouseMove);
-  on(document,     'mouseup',          onMouseUp);
-  on(els.image,    'dblclick',         onDblClick);
-  on(els.image,    'touchstart',       onTouchStart, passive);
-  on(els.image,    'touchmove',        onTouchMove,  passive);
-  on(els.image,    'touchend',         onTouchEnd);
-  on(els.image,    'touchcancel',      onTouchEnd);
-
-  // ── destroy ────────────────────────────────────────────────
   const destroy = () => {
     cleanupLoaders();
+    if (state.rafId !== null) { cancelAnimationFrame(state.rafId); state.rafId = null; }
     observer.disconnect();
-    _uiEvents.forEach(({ el, type, fn, opts }) => el.removeEventListener(type, fn, opts));
-    _uiEvents.length = 0;
-    offAllGallery();
+    uiTracker.offAll();
     els.overlay._lbInited = false;
   };
-
-  on(window, 'beforeunload', destroy);
+  uiTracker.on(window, 'beforeunload', destroy);
 
   return { destroy, openGallery };
-
 })(lightboxConfig);
+
 
 /* changelog */
 (function () {
