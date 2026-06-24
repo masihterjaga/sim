@@ -106,26 +106,47 @@ const Config = (() => {
   },
   companionStarMult: 1.17,
 
-  enchantOptions: [
-    { value: 'morroc_crit',  label: 'Morroc \u2013 Crit DMG Bns',       type: 'crit' },
-    { value: 'payon_crit',   label: 'Payon \u2013 Crit DMG Bns',        type: 'crit' },
-    { value: 'geffen_crit',  label: 'Geffen \u2013 Crit DMG Bns',       type: 'crit' },
-    { value: 'izlude_race',  label: 'Izlude \u2013 DMG to Race',       type: 'race' },
-    { value: 'alberta_attr', label: 'Alberta \u2013 DMG to Attribute', type: 'attr' },
-    { value: 'alberta_dmg',  label: 'Alberta \u2013 Final P/M DMG Bns', type: 'dmg' },
-    { value: 'geffen_dmg',   label: 'Geffen \u2013 Final P/M DMG Bns',  type: 'dmg' },
-    { value: 'geffen_pen',   label: 'Geffen \u2013 Final PEN',          type: 'pen' },
+enchantOptions: [
+    { value: 'morroc_crit', label: 'Morroc – Crit DMG Bns', type: 'crit' },
+    { value: 'payon_crit', label: 'Payon – Crit DMG Bns', type: 'crit' },
+    { value: 'geffen_crit', label: 'Geffen – Crit DMG Bns', type: 'crit' },
+    { value: 'comodo_crit', label: 'Comodo – Crit DMG Bns', type: 'crit' },
+    { value: 'umbala_crit', label: 'Umbala – Crit DMG Bns', type: 'crit' },
+    { value: 'rachel_crit', label: 'Rachel – Crit DMG Bns', type: 'crit' },
+    { value: 'izlude_race', label: 'Izlude – DMG to Race', type: 'race' },
+    { value: 'alberta_attr', label: 'Alberta – DMG to Attribute', type: 'attr' },
+    { value: 'alberta_dmg', label: 'Alberta – Final P/M DMG Bns', type: 'dmg' },
+    { value: 'geffen_dmg', label: 'Geffen – Final P/M DMG Bns', type: 'dmg' },
+    { value: 'comodo_dmg', label: 'Comodo – Final P/M DMG Bns', type: 'dmg' },
+    { value: 'umbala_dmg', label: 'Umbala – Final P/M DMG Bns', type: 'dmg' },
+    { value: 'rachel_dmg', label: 'Rachel – Final P/M DMG Bns', type: 'dmg' },
+    { value: 'geffen_pen', label: 'Geffen – Final PEN', type: 'pen' },
+    { value: 'comodo_pen', label: 'Comodo – Final PEN', type: 'pen' },
+    { value: 'umbala_pen', label: 'Umbala – Final PEN', type: 'pen' },
+    { value: 'rachel_pen', label: 'Rachel – Final PEN', type: 'pen' },
   ],
-
+  
   enchantValues: {
-    morroc_crit:  { '1H': 2.40, '2H': 3.60, Dagger: 1.80, Shield: 1.20, ACC: null },
-    izlude_race:  { '1H': 2.00, '2H': 3.00, Dagger: 1.50, Shield: 1.00, ACC: null },
+    morroc_crit: { '1H': 2.40, '2H': 3.60, Dagger: 1.80, Shield: 1.20, ACC: null },
+    payon_crit: { '1H': 3.60, '2H': 5.40, Dagger: 2.70, Shield: 1.80, ACC: null },
+    geffen_crit: { '1H': 4.80, '2H': 7.20, Dagger: 3.60, Shield: 2.40, ACC: 2.40 },
+    comodo_crit: { '1H': 6.40, '2H': 9.60, Dagger: 4.80, Shield: 3.20, ACC: null },
+    umbala_crit: { '1H': 7.20, '2H': 10.80, Dagger: 5.40, Shield: 3.60, ACC: null },
+    rachel_crit: { '1H': 8.80, '2H': 13.20, Dagger: 6.60, Shield: 4.40, ACC: null },
+    
+    izlude_race: { '1H': 2.00, '2H': 3.00, Dagger: 1.50, Shield: 1.00, ACC: null },
     alberta_attr: { '1H': 2.00, '2H': 3.00, Dagger: 1.50, Shield: 1.00, ACC: null },
-    alberta_dmg:  { '1H': 1.60, '2H': 2.40, Dagger: 1.20, Shield: 0.80, ACC: null },
-    payon_crit:   { '1H': 3.60, '2H': 5.40, Dagger: 2.70, Shield: 1.80, ACC: null },
-    geffen_crit:  { '1H': 4.80, '2H': 7.20, Dagger: 3.60, Shield: 2.40, ACC: 2.40 },
-    geffen_pen:   { '1H': 2.40, '2H': 3.60, Dagger: 1.80, Shield: 1.20, ACC: 1.20 },
-    geffen_dmg:   { '1H': 2.40, '2H': 3.60, Dagger: 1.80, Shield: 1.20, ACC: null },
+    
+    alberta_dmg: { '1H': 1.60, '2H': 2.40, Dagger: 1.20, Shield: 0.80, ACC: null },
+    geffen_dmg: { '1H': 2.40, '2H': 3.60, Dagger: 1.80, Shield: 1.20, ACC: null },
+    comodo_dmg: { '1H': 3.20, '2H': 4.80, Dagger: 2.40, Shield: 1.60, ACC: null },
+    umbala_dmg: { '1H': 3.60, '2H': 5.40, Dagger: 2.70, Shield: 1.80, ACC: null },
+    rachel_dmg: { '1H': 4.40, '2H': 6.60, Dagger: 3.30, Shield: 2.20, ACC: null },
+    
+    geffen_pen: { '1H': 2.40, '2H': 3.60, Dagger: 1.80, Shield: 1.20, ACC: 1.20 },
+    comodo_pen: { '1H': 3.20, '2H': 4.80, Dagger: 2.40, Shield: 1.60, ACC: null },
+    umbala_pen: { '1H': 3.60, '2H': 5.40, Dagger: 2.70, Shield: 1.80, ACC: null },
+    rachel_pen: { '1H': 4.40, '2H': 6.60, Dagger: 3.30, Shield: 2.20, ACC: null },
   },
   enchantSixSlot: new Set(['One-Handed Sword', 'One-Handed Axe', 'One-Handed Staff', 'Mace', 'GS', 'Dagger']),
   enchantLevelHtml:
@@ -1114,7 +1135,7 @@ const Divinity = (() => {
         <span class="co-div-modal-stat-lbl">${opt.label}</span>
         <span class="co-div-modal-stat-val">+${fmtRawPct(val)}</span>
       </div>`;
-    }).join('') || '<div class="co-div-modal-empty">No divinity stats configured.</div>';
+    }).join('') || '<div class="co-div-modal-empty">No divinity stats configured, flash with trash stats?</div>';
   }
 
   function buildDivNodesHTML(selection, currentDivByNode = null) {
@@ -1583,7 +1604,7 @@ const Cards = (() => {
           </div>
           <div class="co-block">
             <div class="co-block-title">Extra Buff</div>
-            <p class="co-block-desc">If there are exclusive effects (element enhance, damage bonus, etc.) from cards/equips, add them here. Make sure these haven't been included in the base inputs yet.<br /><br />Note that some effects are already included in your detailed stats (Nano Flying Blade, Acc Obs and Skeg 3*Set, One Punch Man Headgear, etc).<br /><br />It is highly recommended to add <span class="buff">Eternal Chaos (Bard/Dancer) or Glorious Command (GS)</span> bonus here.</p>
+            <p class="co-block-desc">It is highly recommended to add <span class="buff">Eternal Chaos (Bard/Dancer) or Glorious Command (GS)</span> bonus here.<br /><br />If there are exclusive effects (element enhance, damage bonus, etc.) from cards/equips, add them here. Make sure these haven't been included in the base inputs yet.<br /><br />Note that some effects are already included in your detailed stats (Nano Flying Blade, Acc Obs and Skeg 3*Set, One Punch Man Headgear, etc).</p>
             <div id="co-buff-list" class="co-buff-list"></div>
             <div class="co-btn-group">
               <button class="co-action-btn blue"  id="co-add-buff"        type="button">+ Add Buff</button>
@@ -2593,7 +2614,9 @@ const Enchant = (() => {
       const label        = getEnchantRowLabel(entry);
       const changedClass = isChanged ? ' co-ench-changed' : '';
       const num          = (slotIdx % 3) + 1;
-      return `<div class="co-ench-row${changedClass}"><span class="co-ench-num">${num}</span><span class="co-ench-val">${label}</span><span class="co-ench-lvl">Lv.${slot.level}</span></div>`;
+      const rawVal       = entry ? getEnchantVal(entry.key, slot.level, slot.col, 1) : null;
+      const valStr       = rawVal != null ? `${Utils.fmtPct(rawVal)}%` : '';
+      return `<div class="co-ench-row${changedClass}"><span class="co-ench-num">${num}</span><span class="co-ench-val">Lv.${slot.level}${label}</span><span class="co-ench-lvl">${valStr ? `+${valStr}` : ''}</span></div>`;
     };
 
     let bodyHTML;

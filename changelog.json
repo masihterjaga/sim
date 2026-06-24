@@ -1,6 +1,25 @@
 {
   "versions": [
     {
+      "version": "1.2.6",
+      "date": "24 Jun, 2026",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "comodo, umbala, rachel enchantment"
+          ]
+        },
+        {
+          "category": "Update",
+          "items": [
+            "enchantment result ui"
+          ]
+        }
+      ]
+    },
+    
+    {
       "version": "1.2.5",
       "date": "21 Jun, 2026",
       "changes": [
