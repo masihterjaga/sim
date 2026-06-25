@@ -368,7 +368,12 @@
   <div class="co-companion-modal-backdrop" id="coCompanionModalBackdrop">
     <div class="co-companion-modal" id="coCompanionModal">
       <div class="co-companion-modal-header">
-        <span class="co-companion-modal-name" id="coCompanionModalSlotName">Slot 1</span>
+        <div class="co-companion-modal-title">
+          <span class="co-companion-modal-star" id="coCompanionModalStar" hidden>
+            <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13"><path d="M8 1.5l1.64 3.32 3.66.53-2.65 2.58.63 3.65L8 9.77l-3.28 1.81.63-3.65L2.7 5.35l3.66-.53L8 1.5z"/></svg>
+          </span>
+          <span class="co-companion-modal-name" id="coCompanionModalSlotName">Slot 1</span>
+        </div>
         <button class="co-companion-modal-close" id="coCompanionModalClose">
           <svg viewBox="0 0 12 12" fill="none">
             <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
@@ -377,13 +382,19 @@
       </div>
       <div class="co-companion-modal-divider"></div>
       <div class="co-companion-modal-subtitle" id="coCompanionModalSubtitle">Recommended Item</div>
-      <div class="co-companion-modal-item-row" id="coCompanionModalContent"></div>
+      <div class="co-companion-modal-stats co-companion-modal-stats--dim" id="coCompanionModalStatsCur"></div>
+      <div class="co-companion-modal-arrow" id="coCompanionModalArrow" hidden>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5v14M5 13l7 7 7-7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </div>
+      <div class="co-companion-modal-stats" id="coCompanionModalStatsRec"></div>
     </div>
   </div>
   <div class="card co-card" id="card-companion">
     <div class="co-hd" role="button" tabindex="0" aria-expanded="false">
       <div class="co-hd-left"><span class="co-hd-title">Companion</span></div>
-      <span class="co-chevron">▾</span>
+      <span class="co-chevron"></span>
     </div>
     <div class="co-body collapsed">
       <div class="co-body-inner">
@@ -414,8 +425,8 @@
                     <div class="summary-list" id="companionSummaryList"></div>
                   </div>
                 </div>
-                <button class="co-slide-btn" id="companion-prev" disabled>‹</button>
-                <button class="co-slide-btn" id="companion-next">›</button>
+                <button class="co-slide-btn" id="companion-prev" disabled><svg class="co-slide-btn-icon" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button class="co-slide-btn" id="companion-next"><svg class="co-slide-btn-icon" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
               </div>
             </div>
             <div class="co-slides-wrap">
@@ -568,7 +579,7 @@
         <span class="co-hd-title">Enchantment</span>
         <span class="ench-badge">Adv. [BETA]</span>
       </div>
-      <span class="co-chevron">▾</span>
+      <span class="co-chevron"></span>
     </div>
     <div class="co-body collapsed">
       <div class="co-body-inner">

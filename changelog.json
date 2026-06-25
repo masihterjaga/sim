@@ -1,6 +1,25 @@
 {
   "versions": [
     {
+      "version": "1.2.7",
+      "date": "25 Jun, 2026",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "other tools link"
+          ]
+        },
+        {
+          "category": "Update",
+          "items": [
+            "fix extra buff reset on main-form option change",
+            "UI adjustments: companion, enchantment, result panels"
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.2.6",
       "date": "24 Jun, 2026",
       "changes": [
@@ -18,7 +37,6 @@
         }
       ]
     },
-    
     {
       "version": "1.2.5",
       "date": "21 Jun, 2026",
