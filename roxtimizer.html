@@ -38,11 +38,57 @@
     </div>
   </div>
   <h1>RöXtimizer</h1>
+  <div class="card co-card" id="card-about">
+    <div class="co-hd" role="button" tabindex="0" aria-expanded="false">
+      <div class="co-hd-left"><span class="co-hd-title">About</span></div>
+      <span class="co-chevron"></span>
+    </div>
+    <div class="co-body collapsed">
+      <div class="co-body-inner">
+        <div class="co-block">
+          <p class="co-block-desc">A free web-based tool built for <a href="https://www.ragnarokx.com/" target="_blank">Ragnarok X: Next Generation</a> players who want to calculate base multipliers and optimize their stat distribution for maximum DPS.</p>
+        </div>
+        <div class="co-block">
+          <span class="co-block-title">Why was this created?</span>
+          <p class="co-block-desc">The <a href="https://docs.google.com/spreadsheets/d/1ePXRvfGJbsLJQgY8HnroCUnxUeVIvk51WhZveuKpz9c/" target="_blank">community spreadsheet</a> was solid for quick checks, but only covered 3 stats. I added the remaining in-game stats for more accurate.</p>
+        </div>
+        <div class="co-block">
+          <span class="co-block-title">What are the features?</span>
+          <ul class="co-block-list">
+            <li>Base Multiplier Calculator</li>
+            <li>Specific MVP/Mini per level</li>
+            <li>
+              Build Optimizer
+              <ul>
+                <li>Divinity</li>
+                <li>Card</li>
+                <li>Companion</li>
+                <li>Enchant</li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div class="co-block">
+          <span class="co-block-title">Is it safe?</span>
+          <p class="co-block-desc">This tool runs locally in your browser for instant results and complete privacy. No data ever leaves your device, no registration, no servers, no tracking.</p>
+          <p class="co-block-desc">The code is also open source, so feel free to check it out on the <a href="https://github.com/masihterjaga/sim" target="_blank">GitHub repository</a> for full transparency.</p>
+        </div>
+        <div class="co-block">
+          <span class="co-block-title">Credits</span>
+          <p class="co-block-desc">This tool is entirely AI-generated using <a href="https://claude.ai/" target="_blank">Claude Sonnet 4.6</a>, including the code and all the text you see in the interface.</p>
+          <p class="co-block-desc">Special thanks to <u>Nila</u> for the damage formulas and defense stat data, <u>Isle</u> for MVP/Mini Lv.160 data, <u>SHURAFern</u> for crit build testing, and <u>Bine</u> for dual-dagger build testing.</p>
+          <p class="co-block-desc">Also to everyone who has visited and used this tool, and to all members of the <a href="https://discord.gg/9j2WnTAnMu" target="_blank">RöX University</a> Discord server.</p>
+          <p class="co-block-desc">This is a community-made tool and isn't affiliated with <a href="https://www.nvsgames.com/" target="_blank">Nuverse</a> or Ragnarok X: Next Generation. Released under the MIT License.</p>
+          <p class="co-block-desc">- Silja [Midgard - Nastia]</p>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="card stats-card">
-    <div class="stats-actions" style="display:grid;grid-template-columns:2fr 2fr 1fr;gap:8px;align-items:stretch;">
+    <div class="stats-actions">
       <button class="stats-btn load-btn" id="loadStatsBtn">Load my stats</button>
       <button class="stats-btn manual-btn" id="inputManualBtn">Input manual</button>
-      <button class="stats-btn" id="statsHelpBtn" aria-label="Stats help" style="color:var(--accent);background:var(--accent-bg);border:1.5px solid var(--accent-bd);display:flex;align-items:center;justify-content:center;" onclick="renderStatsModal();openStatsModal();">
+      <button class="stats-btn stats-btn--help" id="statsHelpBtn" aria-label="Stats help" onclick="renderStatsModal();openStatsModal();">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
           <circle cx="8" cy="8" r="6.25" />
           <path d="M6.5 6.2c0-1 .67-1.7 1.5-1.7s1.5.7 1.5 1.7c0 .8-.5 1.3-1 1.7C8 8.3 8 8.6 8 9" />
@@ -88,7 +134,7 @@
             </div>
           </div>
         </div>
-        <div class="stats-field-row" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="stats-field-row stats-field-row--2col">
           <div class="stats-field">
             <label class="stats-label">DEF</label>
             <div class="select-wrap">
@@ -131,10 +177,16 @@
             </select>
           </div>
         </div>
-        <div class="stats-field" id="penField">
-          <label class="stats-label">F. PEN</label>
-          <input class="stats-input" type="number" id="pen" />
-        </div>
+        <div class="stats-field-row stats-field-row-pen" id="penField">
+          <div class="stats-field">
+            <label class="stats-label">F. PEN</label>
+            <input class="stats-input" type="number" id="pen" />
+           </div>
+           <div class="stats-field">
+             <label class="stats-label">RAW PEN</label>
+             <input class="stats-input" type="number" id="rawPen" />
+            </div>
+          </div>
         <div class="stats-field" id="critField" hidden>
           <label class="stats-label">Crit DMG BNS</label>
           <input class="stats-input" type="number" id="crit" />
@@ -173,7 +225,7 @@
           </div>
           <div class="disclaimer-body">
             <span class="disclaimer-label">NOTE!</span>
-            <ol class="disclaimer-text" style="margin:0;padding-left:1.3em;">
+            <ol class="disclaimer-text">
               <li>Keep your F. PEN above the target's DEF and your Final P/M DMG Bns above DMG Red, as this tool can't handle negative values.</li>
               <li>Make sure the <strong>Divinity, Card, Companion & Enchantment</strong> you're using match the offensive stats you have in-game, and that they're available here.</li>
               <li>Don't swap these out after entering your stats, as this tool won't update stat changes in real time like the game does.</li>
@@ -216,7 +268,7 @@
               <div class="help-item"><span class="help-num">4.</span><span class="help-text">You can add up to 8 divinities per slot with + Add Div. Hit Use to mark which one's currently in use.</span></div>
               <div class="help-item"><span class="help-num">5.</span><span class="help-text">All divs added here will be used by the optimizer to find the most effective slot combination.</span></div>
               <div class="help-item"><span class="help-num">6.</span><span class="help-text">Lock a div to protect it from being deleted or replaced by the optimizer.</span></div>
-              <div class="help-item"><span class="help-num">7.</span><span class="help-text">This tool only supports some main-offensive stats. Stat%, HP%, ATK%, and Haste aren't included! So yeah, it might not be accurate <span class="spoiler">for ED ED ED / SB SB SB enjoyers! <img alt=":pepekekcry:" src="https://masihterjaga.github.io/sim/img/pepekekcry.png" width="12" height="12"></span></span></div>
+              <div class="help-item"><span class="help-num">7.</span><span class="help-text">This tool only supports some main-offensive stats. Stat%, HP%, ATK%, and Haste aren't included! So yeah, it might not be accurate <span class="spoiler">for ED ED ED / SB SB SB enjoyers! <img alt=":pepekekcry:" src="https://masihterjaga.github.io/sim/img/pepekekcry.png" width="10" height="10"></span></span></div>
             </div>
           </div>
           <div class="summary-modal" id="summaryModal">
@@ -398,7 +450,7 @@
     </div>
     <div class="co-body collapsed">
       <div class="co-body-inner">
-        <div class="co-block" style="position:relative;">
+        <div class="co-block co-block--rel">
           <div class="co-slider">
             <div class="co-slider-header">
               <div class="co-slider-label" id="companion-slide-label">Slot 1</div>
@@ -410,7 +462,7 @@
                     <circle cx="8" cy="10.6" r="0.7" fill="currentColor" />
                   </svg>
                 </button>
-                <div style="position:relative;">
+                <div class="co-block--rel">
                   <button class="summary-btn" id="companionSummaryBtn">Summary</button>
                   <div class="summary-modal align-right" id="companionSummaryModal">
                     <div class="summary-modal-header">
@@ -488,7 +540,7 @@
               </div>
             </div>
           </div>
-          <div class="help-modal" id="companionHelpModal" style="top:44px; right:20px; left:auto;">
+          <div class="help-modal" id="companionHelpModal">
             <div class="help-modal-header">
               <span class="help-modal-title">How to Use</span>
               <button class="help-modal-close" id="companionHelpClose">
@@ -503,19 +555,32 @@
               <div class="help-item"><span class="help-num">2.</span><span class="help-text">Input the formation upgrade progress for each offensive stat per slot. Stat types appear once a companion is added.</span></div>
               <div class="help-item"><span class="help-num">3.</span><span class="help-text">You can add and remove companions freely from the Items section.</span></div>
               <div class="help-item"><span class="help-num">4.</span><span class="help-text">Set the quality of each companion using the color buttons. Enable the star icon if your companion is 4 Stars or above.</span></div>
-              <div class="help-item"><span class="help-num">5.</span><span class="help-text">Use the pencil icon to rename a companion, match it to the in-game name or whatever you like.</span></div>
-              <div class="help-item"><span class="help-num">6.</span><span class="help-text">Navigate to a slot and hit Use to assign which companion is active for that slot.</span></div>
-              <div class="help-item"><span class="help-num">7.</span><span class="help-text">Summary shows the total stats from all active companions across every slot.</span></div>
+              <div class="help-item"><span class="help-num">5.</span><span class="help-text">Lock icon appears when you open a item with a matching slot. Like Divinity, locked slots are skipped by the optimizer.</span></div>
+              <div class="help-item"><span class="help-num">6.</span><span class="help-text">Use the pencil icon to rename a companion, match it to the in-game name or whatever you like.</span></div>
+              <div class="help-item"><span class="help-num">7.</span><span class="help-text">Navigate to a slot and hit Use to assign which companion is active for that slot.</span></div>
+              <div class="help-item"><span class="help-num">8.</span><span class="help-text">Summary shows the total stats from all active companions across every slot.</span></div>
             </div>
           </div>
         </div>
         <div class="co-block-note">
-          <div class="co-block-note-text">The input form above is for slot upgrade progress (0–100), not final stats.</div>
+          <div class="co-block-note-inner">
+            <div class="co-block-note-text">
+              <span>The input form above is for slot upgrade progress (0–100), not final stats.</span>
+              <button class="companion-reset-input-btn" id="companionResetInputBtn" title="Reset slot upgrade inputs">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 4v6h-6"/>
+                  <path d="M1 20v-6h6"/>
+                  <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+                </svg>
+              </button>
+            </div>
+          </div>
         </div>
         <div class="co-block">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+          <div class="co-block-header">
             <div class="co-block-title">Items</div>
-            <div id="companion-quality-btns" style="display:flex;align-items:center;gap:6px;visibility:hidden;">
+            <div id="companion-quality-btns" class="companion-quality-btns">
+              <button class="tag-btn tag-lock" id="companion-q-lock" title="Lock slot"></button>
               <button class="tag-btn tag-purple" id="companion-q-purple" title="Purple quality"></button>
               <button class="tag-btn tag-gold" id="companion-q-gold" title="Gold quality"></button>
               <button class="tag-btn tag-star" id="companion-q-star" title="Star (×1.17)">
@@ -555,10 +620,10 @@
                   </button>
                 </div>
                 <div class="companion-sheet-stats" id="companion-sheet-stats"></div>
-                <div style="display:flex;align-items:center;justify-content:flex-end;">
-                  <button style="margin-right:5px" class="co-action-btn muted" id="companion-remove-btn">Remove</button>
+                <div class="companion-sheet-actions">
+                  <button class="co-action-btn co-action-btn--mr muted" id="companion-remove-btn">Remove</button>
                   <button class="use-btn" id="companion-use-btn">
-                    <svg style="display:none" viewBox="0 0 12 12" fill="none">
+                    <svg viewBox="0 0 12 12" fill="none">
                       <circle cx="6" cy="3.5" r="2" stroke="currentColor" stroke-width="1.3" />
                       <line x1="6" y1="5.5" x2="6" y2="10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
                       <line x1="3.5" y1="5.5" x2="8.5" y2="5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" />
@@ -577,51 +642,70 @@
     <div class="co-hd" role="button" tabindex="0" aria-expanded="false">
       <div class="co-hd-left">
         <span class="co-hd-title">Enchantment</span>
-        <span class="ench-badge">Adv. [BETA]</span>
+        <span class="ench-badge">Adv.</span><span class="ench-badge experimental-badge">EXPERI[PEN]CHANT</span>
       </div>
       <span class="co-chevron"></span>
     </div>
     <div class="co-body collapsed">
       <div class="co-body-inner">
         <div class="co-block">
-          <div class="co-block-title">Weapon Only</div>
-          <p class="co-block-desc">Enchant stats shown here are limited to specific cities. If yours isn't listed, leave it empty but still select the enchant level.</p><p class="co-block-desc">Results will be overestimated if your current enchants are STAT or Raw PEN, the tool treats them as empty, but they still apply in-game.</p>
-          <div class="ench-lines" id="enchLines"></div>
-          <div class="stats-field">
-            <label class="stats-label">Awakening</label>
-            <div class="ench-awakening-row">
-              <div class="select-wrap">
-                <select class="stats-select" id="enchAwakeningSelect">
-                  <option value="" disabled selected>Select</option>
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                  <option value="7">7</option>
-                  <option value="8">8</option>
-                  <option value="9">9</option>
-                  <option value="10">10</option>
-                </select>
+          <p class="co-block-desc">Enchant stats shown here are limited to specific cities. If yours isn't listed, leave it empty but still select the enchant level.</p><p class="co-block-desc">Results will be overestimated or lower(?) if your current enchants are STAT, the tool treats them as empty, but they still apply in-game.</p><p class="co-block-desc">Raw & PEN% still experimental too, dont expect too much.</p>
+          <div class="co-slider">
+            <div class="co-slider-header">
+              <div class="co-slider-label" id="enchSlideLabel">Weapon</div>
+              <div class="co-slider-nav">
+                <button class="co-slide-btn" id="enchSlidePrev" disabled><svg class="co-slide-btn-icon" viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                <button class="co-slide-btn" id="enchSlideNext"><svg class="co-slide-btn-icon" viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
               </div>
-              <button class="ench-settings-btn" id="enchSettingsBtn" title="Enchantment preferences">
-                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="2" y1="4" x2="14" y2="4" />
-                  <circle cx="5" cy="4" r="1.5" fill="currentColor" stroke="none" />
-                  <line x1="2" y1="8" x2="14" y2="8" />
-                  <circle cx="11" cy="8" r="1.5" fill="currentColor" stroke="none" />
-                  <line x1="2" y1="12" x2="14" y2="12" />
-                  <circle cx="6" cy="12" r="1.5" fill="currentColor" stroke="none" />
-                </svg>
-              </button>
             </div>
+            <div class="co-slides-wrap">
+              <div class="co-slide co-slide--active">
+                <div class="ench-lines" id="enchLines"></div>
+              </div>
+              <div class="co-slide co-slide--hidden-right">
+                <div class="ench-lines" id="enchLinesAcc"></div>
+              </div>
+            </div>
+          </div>
+          <label class="ench-section-title" for="enchAwakeningSelect">Awakening</label>
+
+          <div class="ench-footer-row">
+            <div class="select-wrap">
+              <select class="stats-select" id="enchAwakeningSelect">
+                <option value="" selected>Awakening</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+              </select>
+            </div>
+            <button class="ench-settings-btn" id="enchSettingsBtn" title="Enchantment preferences">
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="2" y1="4" x2="14" y2="4" />
+                <circle cx="5" cy="4" r="1.5" fill="currentColor" stroke="none" />
+                <line x1="2" y1="8" x2="14" y2="8" />
+                <circle cx="11" cy="8" r="1.5" fill="currentColor" stroke="none" />
+                <line x1="2" y1="12" x2="14" y2="12" />
+                <circle cx="6" cy="12" r="1.5" fill="currentColor" stroke="none" />
+              </svg>
+            </button>
+            <button class="ench-reset-btn" id="enchResetBtn" title="Reset enchantment preferences">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 4v6h-6"/>
+                <path d="M1 20v-6h6"/>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+              </svg>
+            </button>
           </div>
           <div class="ench-settings-panel" id="enchSettingsPanel">
             <div class="ench-settings-inner" id="enchSettingsInner"></div>
           </div>
-          <div class="ench-sub-divider" id="enchTotalDivider" hidden></div>
-          <div class="co-final-stats-grid" id="enchTotal"></div>
         </div>
       </div>
     </div>
@@ -655,14 +739,12 @@
     </div>
   </div>
   <button class="calc-btn" id="calculateBtn">Calctimize</button>
-  <div class="card" id="resultCard" hidden style="scroll-margin-top: 24px;"></div>
+  <div class="card" id="resultCard" hidden></div>
   <footer class="credit">Mobile-First Design AI-Generated Tool.<br/>Prompted by Silja [Midgard - Nastia] with <a href="https://claude.ai" target="_blank">Sonnet 4.6</a>.</footer>
   <script src="scripts/card-data.js"></script>
   <script src="scripts/mvp-mini.js"></script>
   <script src="scripts/weapon-modifier.js"></script>
   <script src="scripts/element-counter.js"></script>
-  <script src="scripts/calculation-helpers.js"></script>
-  <script src="scripts/calculation-core.js"></script>
   <script src="scripts/roxtimizer/main.js"></script>
   <script src="scripts/roxtimizer/hows.js"></script>
   <script src="scripts/roxtimizer/utilities.js"></script>

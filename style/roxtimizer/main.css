@@ -74,7 +74,7 @@ select { color: rgb(90,104,128); }
 #card-enchantment select,
 #card-companion input,
 #card-companion select,
-.co-buff-list input { color: rgb(90,104,128) !important; }
+.co-buff-list input { color: rgb(90,104,128); }
 
 input::placeholder,
 select::placeholder { color: var(--muted); }
@@ -192,7 +192,7 @@ strong { color: rgb(90,104,128); }
   gap: 8px;
 }
 .stats-field-row--2col { grid-template-columns: repeat(2, 1fr); }
-
+.stats-field-row-pen { grid-template-columns: 6fr 4fr; }
 .stats-msg {
   display: none;
   font-size: 10px;
@@ -454,7 +454,8 @@ strong { color: rgb(90,104,128); }
   cursor: pointer;
   transition: border-color var(--t-med), color var(--t-med), background var(--t-med);
 }
-.use-btn svg    { width: 8px; height: 8px; flex-shrink: 0; }
+.use-btn svg    { width: 8px; height: 8px; flex-shrink: 0; display: none; }
+.use-btn.active svg { display: block; }
 .use-btn.active { border-color: rgba(91,142,240,0.5); background: var(--accent-bg); color: var(--accent); }
 
 .companion-quality-btns { display: flex; align-items: center; gap: 6px; visibility: hidden; }
@@ -496,7 +497,7 @@ strong { color: rgb(90,104,128); }
   color: var(--accent);
 }
 
-.co-action-btn {
+#card-optimizer .co-slide-nav-btn,.co-action-btn {
   padding: 5px 13px;
   border-radius: 20px;
   font-size: 10px;
@@ -702,6 +703,7 @@ strong { color: rgb(90,104,128); }
 .panel-footer-right { display: flex; align-items: center; gap: 6px; }
 .panel-node-nav     { display: flex; gap: 4px; }
 .panel-nav          { display: flex; gap: 4px; align-items: center; }
+.panel-nav--hidden  { visibility: hidden; }
 
 .panel-nav-count {
   font-size: 8px;
@@ -959,20 +961,53 @@ strong { color: rgb(90,104,128); }
   white-space: pre-wrap;
 }
 
-.co-block-note { padding: 8px 21px; border-bottom: 1px solid var(--border); }
+.co-block-desc a       { color: var(--dim); text-decoration: underline; text-underline-offset: 2px; transition: color var(--t-med); }
+.co-block-desc a:hover { color: var(--loud); }
+.co-block-desc u       { color: var(--loud); text-decoration-color: var(--border2); }
+#card-about u     { color: var(--dim); }
 
-.co-block-note-text {
+.co-block-list {
   font-size: 10px;
   color: var(--muted);
   line-height: 1.6;
   letter-spacing: 0.02em;
-  padding: 8px 8px;
-  border: 1px solid var(--border2);
-  border-radius: 8px;
+  padding-left: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.co-block-list ul {
+  padding-left: 16px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
+.co-block-note { padding: 8px 21px; border-bottom: 1px solid var(--border); }
+
+.co-block-note-inner {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+
+.co-block-note-text {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  padding: 8px;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  flex: 1;
+}
+.co-block-note-text > span { flex: 1; }
+
 /* OPTIMIZER — equipped section */
-.co-equipped-wrap { display: flex; flex-direction: column; gap: 13px; }
 .co-equip-group   { display: flex; flex-direction: column; gap: 5px; }
 
 .co-equip-lbl {
@@ -1013,6 +1048,7 @@ strong { color: rgb(90,104,128); }
 .co-buff-row    { display: flex; align-items: center; gap: 6px; }
 
 .co-btn-group   { display: flex; gap: 6px; flex-wrap: wrap; }
+.co-btn-group--split { justify-content: space-between; align-items: center; }
 
 /* CARD SEARCH (custom dropdown) */
 .co-card-search {
@@ -1066,11 +1102,20 @@ strong { color: rgb(90,104,128); }
   border: 1.5px solid var(--border2);
   border-radius: 8px;
   box-shadow: 0 8px 21px rgba(0,0,0,0.5);
-  max-height: 180px;
+  max-height: 89px;
   overflow-y: auto;
   z-index: 50;
 }
 .co-card-search-panel.open { display: block; }
+
+.co-equip-group[data-equip="weapon"]    .co-slot:nth-child(n+4) .co-card-search-panel,
+.co-equip-group[data-equip="accessory"] .co-slot:nth-child(n+4) .co-card-search-panel,
+.co-equip-group[data-equip="headgear"]  .co-slot:nth-child(n+4) .co-card-search-panel,
+.co-equip-group[data-equip="cloak"]     .co-card-search-panel,
+.co-equip-group[data-equip="shoes"]     .co-card-search-panel {
+  top: auto;
+  bottom: calc(100% + 5px);
+}
 
 .co-card-search-item {
   padding: 8px 8px;
@@ -1737,19 +1782,33 @@ strong { color: rgb(90,104,128); }
   text-overflow: ellipsis;
 }
 
+.companion-reset-input-btn {
+  flex-shrink: 0;
+  margin-right: 8px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--t-med);
+}
+.companion-reset-input-btn svg { width: 13px; height: 13px; }
+
 /* ENCHANTMENT CARD */
-.ench-awakening-row {
+#enchSlideNext {
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+.ench-footer-row {
   display: grid;
-  grid-template-columns: 8fr 2fr;
+  grid-template-columns: 6fr 2fr 2fr;
   gap: 6px;
   align-items: center;
 }
-.ench-settings-inner .ench-awakening-row {
-  grid-template-columns: 10fr 0fr;
-  gap: 0px
-
-}
-.ench-settings-btn {
+.ench-settings-btn,
+.ench-reset-btn {
   width: 100%;
   height: 34px;
   border-radius: 8px;
@@ -1764,7 +1823,28 @@ strong { color: rgb(90,104,128); }
   transition: border-color var(--t-med), color var(--t-med), background var(--t-med);
 }
 .ench-settings-btn.active { border-color: var(--accent-bd); background: var(--accent-bg); color: var(--accent); }
-.ench-settings-btn svg    { width: 13px; height: 13px; }
+.ench-settings-btn svg,
+.ench-reset-btn svg      { width: 13px; height: 13px; }
+
+.ench-mode-row {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+}
+.ench-prefs-reset-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border-radius: 20px;
+  color: var(--dim);
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color var(--t-med), color var(--t-med), background var(--t-med);
+}
+.ench-prefs-reset-btn svg { width: 12px; height: 12px; }
 
 .ench-mode-btn {
   align-self: flex-start;
@@ -1802,7 +1882,9 @@ strong { color: rgb(90,104,128); }
   flex-direction: column;
   gap: 8px;
 }
-
+.custom-awk {
+  margin-bottom: 8px;
+}
 .ench-tab-bar {
   display: flex;
   gap: 3px;
@@ -1883,6 +1965,17 @@ strong { color: rgb(90,104,128); }
   background: var(--gold-bg);
   border: 1.5px solid var(--gold-bd);
   flex-shrink: 0;
+}
+.experimental-badge {
+  color: var(--violet);
+  background: var(--violet-bg);
+  border: 1.5px solid var(--violet-bd);
+}
+
+.ench-acc-tab-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .ench-section-title {
@@ -1982,7 +2075,7 @@ strong { color: rgb(90,104,128); }
 .summary-modal             { left: 0; min-width: 200px; }
 .summary-modal.align-right { left: auto; right: 0; }
 .help-modal                { right: 0; width: 240px; max-height: 260px; overflow-y: auto; }
-#companionHelpModal        { top: 44px; right: 0; left: auto; margin-top: 5px; }
+#companionHelpModal        { top: 44px; right: 20px; left: auto; margin-top: 5px; }
 
 .summary-modal.open,
 .help-modal.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
@@ -2535,7 +2628,7 @@ strong { color: rgb(90,104,128); }
   .close-btn:hover,
   .nav-btn:hover:not(:disabled)               { border-color: var(--violet-hbd); background: var(--violet-bg); color: var(--violet); }
   .del-btn:hover:not(:disabled)               { border-color: rgba(220,80,80,0.45); background: rgba(220,60,60,0.1); color: rgba(240,100,100,0.9); }
-  .trash-div-btn:hover                         { border-color: rgba(220,80,80,0.45) !important; background: rgba(220,60,60,0.1) !important; color: rgba(240,100,100,0.9) !important; }
+  .help-btn.trash-div-btn:hover                { border-color: rgba(220,80,80,0.45); background: rgba(220,60,60,0.1); color: rgba(240,100,100,0.9); }
   .divinity-del-btn:hover,
   .co-rm-btn:hover                             { border-color: rgba(220,80,80,0.4); background: rgba(220,60,60,0.08); color: rgba(240,100,100,0.85); }
   .divinity-add-toggle:hover                   { background: var(--accent-hv); border-color: var(--accent-hbd); }
@@ -2553,8 +2646,11 @@ strong { color: rgb(90,104,128); }
   .co-companion-modal-close:hover              { border-color: var(--violet-hbd); background: var(--violet-bg); color: var(--violet); }
   .div-size-select:hover                       { background-color: var(--accent-hv); border-color: var(--accent-hbd); }
   .spoiler:hover                               { filter: blur(0); }
-  .ench-settings-btn:hover                     { border-color: var(--accent-hbd); color: var(--accent); }
+  .ench-settings-btn:hover,
+  .ench-reset-btn:hover                         { border-color: var(--accent-hbd); color: var(--accent); }
+  .companion-reset-input-btn:hover              { color: var(--accent); }
   .ench-mode-btn:hover                          { border-color: var(--accent-hbd); color: var(--accent); }
+  .ench-prefs-reset-btn:hover                   { border-color: var(--accent-hbd); background: var(--accent-hv); }
   .co-tool-card:hover                          { border-color: var(--border2); color: var(--body); }
   .co-tool-card:hover .co-tool-card-name       { color: var(--body); }
   .co-slider-footer-link:hover                 { color: var(--accent); }

@@ -14,7 +14,7 @@ const Config = (() => {
 
     game: {
       equipSlots: {
-        weapon:    { label: 'Weapon',    count: 5 },
+        weapon:    { label: 'Weapon',    count: { default: 5, dagger: 6 } },
         clothes:   { label: 'Clothes',   count: 2 },
         cloak:     { label: 'Cloak',     count: 2 },
         shoes:     { label: 'Shoes',     count: 2 },
@@ -32,22 +32,24 @@ const Config = (() => {
         crit:     'Crit DMG Bns',
         dmg:      'Final P/M DMG Bns',
         dmgStack: 'Final DMG Stack',
+        rawPen:   'Raw PEN',
+        pctPen:   'PEN%',
       },
       numFields:   ['pen', 'crit', 'dmg', 'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'],
       snapFields:  {
         pen: 'pen', crit: 'crit', dmg: 'dmg',
         elemEnh: 'elemEnhance', sizeEnh: 'sizeEnhance',
         race: 'race', attr: 'attr', dmgStack: 'dmgStack',
+        rawPen: 'rawPen',
       },
       dedupGroups: [
         ['Final P.DMG Bonus', 'Final M.DMG Bonus'],
         ['Final P.PEN',       'Final M.PEN'],
       ],
-      exclKeys: { crit: new Set(['crit']), pen: new Set(['pen']) },
+      exclKeys: { crit: new Set(['pen', 'rawPen', 'pctPen']), pen: new Set(['crit']) },
     },
 
     optimizer: {
-      maxEvalLimit:       1_234_567,
       convergenceEpsilon: 1e-9,
     },
 
@@ -100,28 +102,37 @@ const Config = (() => {
     },
 
     enchant: {
-      maxPrefs:          3,
+      maxPrefs:          2,
       awakeningPerLevel: 0.1,
       sixSlot:           new Set(['One-Handed Sword', 'One-Handed Axe', 'One-Handed Staff', 'Mace', 'GS', 'Dagger']),
       levelHtml:         '<option value="" selected>Level</option>' + numericOptionsHTML(15),
       options: [
         { value: 'morroc_crit',   label: 'Morroc – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 2.40, '2H': 3.60,  Dagger: 1.80, Shield: 1.20 } } },
-        { value: 'payon_crit',    label: 'Payon – Crit DMG Bns',       type: 'crit', eq: { weapon: { '1H': 3.60, '2H': 5.40,  Dagger: 2.70, Shield: 1.80 } } },
-        { value: 'geffen_crit',   label: 'Geffen – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 4.80, '2H': 7.20,  Dagger: 3.60, Shield: 2.40 }, acc: { value: 2.40 } } },
-        { value: 'comodo_crit',   label: 'Comodo – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 6.40, '2H': 9.60,  Dagger: 4.80, Shield: 3.20 } } },
-        { value: 'umbala_crit',   label: 'Umbala – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 7.20, '2H': 10.80, Dagger: 5.40, Shield: 3.60 } } },
-        { value: 'rachel_crit',   label: 'Rachel – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 8.80, '2H': 13.20, Dagger: 6.60, Shield: 4.40 } } },
+        { value: 'morroc_rawpen', label: 'Morroc – Raw PEN',            type: 'rawPen', eq: { weapon: { '1H': 36,   '2H': 54,    Dagger: 27,   Shield: 18   } } },
+        { value: 'izlude_element',  label: 'Izlude – Element Enhance',  type: 'elemEnh', eq: { acc: { value: 1.00 } } },
+        { value: 'izlude_size',     label: 'Izlude – DMG to Size',      type: 'sizeEnh', eq: { acc: { value: 1.00 } } },
         { value: 'izlude_race',   label: 'Izlude – DMG to Race',       type: 'race', eq: { weapon: { '1H': 2.00, '2H': 3.00,  Dagger: 1.50, Shield: 1.00 } } },
-        { value: 'alberta_attr',  label: 'Alberta – DMG to Attribute', type: 'attr', eq: { weapon: { '1H': 2.00, '2H': 3.00,  Dagger: 1.50, Shield: 1.00 } } },
+        { value: 'alberta_pctpen', label: 'Alberta – PEN%',            type: 'pctPen', eq: { acc: { value: 1.60 } } },
         { value: 'alberta_dmg',   label: 'Alberta – Final P/M DMG Bns',type: 'dmg',  eq: { weapon: { '1H': 1.60, '2H': 2.40,  Dagger: 1.20, Shield: 0.80 } } },
-        { value: 'geffen_dmg',    label: 'Geffen – Final P/M DMG Bns', type: 'dmg',  eq: { weapon: { '1H': 2.40, '2H': 3.60,  Dagger: 1.80, Shield: 1.20 } } },
-        { value: 'comodo_dmg',    label: 'Comodo – Final P/M DMG Bns', type: 'dmg',  eq: { weapon: { '1H': 3.20, '2H': 4.80,  Dagger: 2.40, Shield: 1.60 } } },
-        { value: 'umbala_dmg',    label: 'Umbala – Final P/M DMG Bns', type: 'dmg',  eq: { weapon: { '1H': 3.60, '2H': 5.40,  Dagger: 2.70, Shield: 1.80 } } },
-        { value: 'rachel_dmg',    label: 'Rachel – Final P/M DMG Bns', type: 'dmg',  eq: { weapon: { '1H': 4.40, '2H': 6.60,  Dagger: 3.30, Shield: 2.20 } } },
+        { value: 'alberta_attr',  label: 'Alberta – DMG to Attribute', type: 'attr', eq: { weapon: { '1H': 2.00, '2H': 3.00,  Dagger: 1.50, Shield: 1.00 } } },
+        { value: 'payon_crit',    label: 'Payon – Crit DMG Bns',       type: 'crit', eq: { weapon: { '1H': 3.60, '2H': 5.40,  Dagger: 2.70, Shield: 1.80 } } },
+        { value: 'payon_rawpen',  label: 'Payon – Raw PEN',             type: 'rawPen', eq: { weapon: { '1H': 60,   '2H': 90,    Dagger: 45,   Shield: 30   } } },
+        { value: 'geffen_crit',   label: 'Geffen – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 4.80, '2H': 7.20,  Dagger: 3.60, Shield: 2.40 }, acc: { value: 2.40 } } },
         { value: 'geffen_pen',    label: 'Geffen – Final PEN',         type: 'pen',  eq: { weapon: { '1H': 2.40, '2H': 3.60,  Dagger: 1.80, Shield: 1.20 }, acc: { value: 1.20 } } },
+        { value: 'geffen_dmg',    label: 'Geffen – Final P/M DMG Bns', type: 'dmg',  eq: { weapon: { '1H': 2.40, '2H': 3.60,  Dagger: 1.80, Shield: 1.20 } } },
+        { value: 'comodo_crit',   label: 'Comodo – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 6.40, '2H': 9.60,  Dagger: 4.80, Shield: 3.20 } } },
         { value: 'comodo_pen',    label: 'Comodo – Final PEN',         type: 'pen',  eq: { weapon: { '1H': 3.20, '2H': 4.80,  Dagger: 2.40, Shield: 1.60 } } },
-        { value: 'umbala_pen',    label: 'Umbala – Final PEN',         type: 'pen',  eq: { weapon: { '1H': 3.60, '2H': 5.40,  Dagger: 2.70, Shield: 1.80 } } },
+        { value: 'comodo_dmg',    label: 'Comodo – Final P/M DMG Bns', type: 'dmg',  eq: { weapon: { '1H': 3.20, '2H': 4.80,  Dagger: 2.40, Shield: 1.60 } } },
+        { value: 'comodo_element',  label: 'Comodo – Element Enhance',  type: 'elemEnh', eq: { acc: { value: 2.00 } } },
+        { value: 'umbala_crit',   label: 'Umbala – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 7.20, '2H': 10.80, Dagger: 5.40, Shield: 3.60 }, acc: { value: 3.60 } } },
+        { value: 'umbala_pen',    label: 'Umbala – Final PEN',         type: 'pen',  eq: { weapon: { '1H': 3.60, '2H': 5.40,  Dagger: 2.70, Shield: 1.80 }, acc: { value: 1.80 } } },
+        { value: 'umbala_dmg',    label: 'Umbala – Final P/M DMG Bns', type: 'dmg',  eq: { weapon: { '1H': 3.60, '2H': 5.40,  Dagger: 2.70, Shield: 1.80 } } },
+        { value: 'umbala_size',    label: 'Umbala – DMG to Size',      type: 'sizeEnh', eq: { acc: { value: 2.25 } } },
+        { value: 'umbala_race',    label: 'Umbala – DMG to Race',      type: 'race', eq: { acc: { value: 2.25 } } },
+        { value: 'rachel_crit',   label: 'Rachel – Crit DMG Bns',      type: 'crit', eq: { weapon: { '1H': 8.80, '2H': 13.20, Dagger: 6.60, Shield: 4.40 } } },
         { value: 'rachel_pen',    label: 'Rachel – Final PEN',         type: 'pen',  eq: { weapon: { '1H': 4.40, '2H': 6.60,  Dagger: 3.30, Shield: 2.20 } } },
+        { value: 'rachel_dmg',    label: 'Rachel – Final P/M DMG Bns', type: 'dmg',  eq: { weapon: { '1H': 4.40, '2H': 6.60,  Dagger: 3.30, Shield: 2.20 }, acc: { value: 2.20 } } },
+        { value: 'rachel_element',  label: 'Rachel – Element Enhance',  type: 'elemEnh', eq: { acc: { value: 2.75 } } },
       ],
     },
 
@@ -145,15 +156,15 @@ const Config = (() => {
         arrowUp:    `<svg class="co-stat-arrow co-stat-arrow--up" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 18l8-12 8 12z"/></svg>`,
         arrowDown:  `<svg class="co-stat-arrow co-stat-arrow--down" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6l8 12 8-12z"/></svg>`,
         flash:      `<svg class="co-stat-flash" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2L3 14h8l-1 8 11-12h-8l1-8z"/></svg>`,
-        sync:       `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
-        check:      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="9" height="9"><polyline points="20 6 9 17 4 12"/></svg>`,
         trash:      `<svg viewBox="0 0 12 12" fill="none"><path d="M1.5 3.5h9M4.5 3.5v-1.5h3v1.5M3 3.5l.6 6.5h4.8l.6-6.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         close:      `<svg viewBox="0 0 12 12" fill="none"><path d="M1 1l10 10M11 1L1 11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>`,
+        check:      `<svg viewBox="0 0 12 12" fill="none"><path d="M2 6.5l3 3 5-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         chevLeft:   `<svg viewBox="0 0 12 12" fill="none"><path d="M8 2L4 6l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         chevRight:  `<svg viewBox="0 0 12 12" fill="none"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
         person:         `<svg viewBox="0 0 12 12" fill="none"><circle cx="6" cy="3.5" r="2" stroke="currentColor" stroke-width="1.3"/><line x1="6" y1="5.5" x2="6" y2="10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><line x1="3.5" y1="5.5" x2="8.5" y2="5.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>`,
         star:           `<svg viewBox="0 0 16 16" fill="currentColor" width="9" height="9" class="icon-star-svg"><path d="M8 1.5l1.64 3.32 3.66.53-2.65 2.58.63 3.65L8 9.77l-3.28 1.81.63-3.65L2.7 5.35l3.66-.53L8 1.5z"/></svg>`,
         companionSwap:  `<svg class="co-companion-swap" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 16V4m0 0L3 8m4-4l4 4M17 8v12m0 0l4-4m-4 4l-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+        sync:           `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>`,
       },
     },
   };
@@ -162,7 +173,7 @@ const Config = (() => {
   const NODE_NAMES = Object.fromEntries(base.divinity.nodes.map(n => [n.id, n.name]));
   const DIR_MAP    = Object.fromEntries(base.divinity.nodes.map(n => [n.id, n.dir]));
 
-  const slotCounts  = pluck(base.game.equipSlots, 'count');
+  const slotCounts  = { ...pluck(base.game.equipSlots, 'count'), weapon: base.game.equipSlots.weapon.count.default };
   const equipLabels = pluck(base.game.equipSlots, 'label');
 
   const ENCHANT_OPTIONS_MAP = new Map(base.enchant.options.map(o => [o.value, o]));
@@ -194,6 +205,36 @@ const Utils = (() => {
   const fmtPct    = v => (Math.round((Number(v) || 0) * 100) / 100).toFixed(2);
   const fmtRawPct = val => (val * 100).toFixed(0) + '%';
 
+  const statsConverter = raw => {
+    const rd = (n, d = 0) => Math.floor(n * 10 ** d) / 10 ** d;
+
+    if (raw < 5750) {
+      const n = rd((-1 + Math.sqrt(8 * raw / 25 + 1)) / 2);
+      const base = n * (n + 1) / 2 * 25;
+      return Math.round((n * 0.05 + (raw - base) * 0.002 / (n + 1)) * 10000) / 100;
+    }
+
+    if (raw < 35300) {
+      const step = Math.min(rd((raw - 5750) / 500), 58);
+      const rate = (105 + 5 * step) / 100;
+      return Math.round((rate + (raw - (5750 + 500 * step)) / (rate + 0.05) / 10000) * 10000) / 100;
+    }
+
+    const brackets = [
+      [35300, 400, 575, 100, 50, 25, 575],
+      [42500, 445, 1050, 200, 100, 50, 1050],
+      [58000, 495, 2150, 600, 300, 150, 2150],
+      [94500, 545, 5250, 1000, 500, 250, 5250],
+    ];
+
+    const [A, R, B, C, D, c1, c2] = brackets.findLast(([A]) => raw >= A);
+    const step = rd((-B + Math.sqrt(B ** 2 + C * (raw - A))) / D);
+    const rate = (R + 5 * step) / 100;
+    const base = A + c1 * step ** 2 + c2 * step;
+
+    return Math.round((rate + (raw - base) / (rate + 0.05) / 10000) * 10000) / 100;
+  };
+
   const labelWithVal = (base, val) => (val ? `${base} (${val})` : base);
   const cssTranslate  = (axis, pct) => `translate${axis}(${pct}%)`;
   const buildLockSvg  = closed => `<svg viewBox="0 0 24 24" fill="currentColor">${closed ? Config.ui.icons.lockClosed : Config.ui.icons.lockOpen}</svg>`;
@@ -210,9 +251,6 @@ const Utils = (() => {
     for (const n of names) obj[n] = (obj[n] || 0) + 1;
     return obj;
   };
-
-  const runWithStrategy = (total, exactFn, greedyFn) =>
-    (total <= Config.optimizer.maxEvalLimit ? exactFn() : greedyFn());
 
   const rAF2 = fn => requestAnimationFrame(() => requestAnimationFrame(fn));
 
@@ -329,7 +367,7 @@ const Utils = (() => {
       rAF2(() => { body.style.height = inner.scrollHeight + 'px'; });
     } else {
       body.style.height = body.scrollHeight + 'px';
-      requestAnimationFrame(() => { body.classList.add('collapsed'); body.style.height = '0px'; });
+      rAF2(() => { body.classList.add('collapsed'); body.style.height = '0px'; });
     }
     body.addEventListener('transitionend', () => { body.style.height = ''; }, { once: true });
   };
@@ -353,8 +391,7 @@ const Utils = (() => {
 
   const updateUseBtn = (btn, isUsed) => {
     btn.classList.toggle('active', isUsed);
-    btn.querySelector('span').textContent  = isUsed ? 'In Use' : 'Use';
-    btn.querySelector('svg').style.display = isUsed ? '' : 'none';
+    btn.querySelector('span').textContent = isUsed ? 'In Use' : 'Use';
   };
 
   const setInteractionLocked = (locked, exemptEl) => {
@@ -363,8 +400,8 @@ const Utils = (() => {
   };
 
   return {
-    escHtml, fmtNum, fmtPct, fmtRawPct, labelWithVal, cssTranslate, buildLockSvg,
-    pluck, createStatResolver, parseStatPct, countBy, runWithStrategy, rAF2,
+    escHtml, fmtNum, statsConverter, fmtPct, fmtRawPct, labelWithVal, cssTranslate, buildLockSvg,
+    pluck, createStatResolver, parseStatPct, countBy, rAF2,
     numericOptionsHTML,
     buildLoadingHTML, setLoadingText, buildResSectionHTML, EMPTY_STATE_HTML,
     renderSummaryList, toggleConditionalBtn, updateSelectsDisabled,
@@ -373,6 +410,54 @@ const Utils = (() => {
     setInteractionLocked,
   };
 })();
+
+const calculateMultiplier = (state) => {
+  const {
+    atkType = '', weapon = '', wElem = '', tDefKey = '', tSize = '', tRace = '', tAttr = '',
+      pen = 0, crit = 0, dmg = 0,
+      elemEnh = 0, sizeEnh = 0, race = 0, attr = 0, dmgStack = 0,
+      reaperValue = 0, spearValue = 0,
+      rawPen = 0,
+  } = state;
+
+  const toPercent = val => val / 100;
+
+  const effectivePen = pen + (rawPen && atkType === 'pen' ? Utils.statsConverter(rawPen) : 0);
+  
+  const defData = tDefKey ?
+    (DEFENSE_TABLE[tDefKey] || DEFENSE_TABLE['DUMMY Lvl.0 (0 DEF)']) :
+    DEFENSE_TABLE;
+  const { def, dmgred } = defData;
+  
+  const sizeMod = weapon && weapon !== 'all' ?
+    (WEAPON_SIZE_MODIFIER_TABLE[weapon]?.[tSize] ?? 1.0) :
+    1.0;
+  
+  const elemCtr = wElem && wElem !== 'all' ?
+    (ELEMENT_COUNTER_TABLE[wElem]?.[tAttr || 'Neutral'] ?? 1.0) :
+    1.0;
+  
+  let atkF = 0;
+  if (atkType === 'crit') {
+    atkF = toPercent(crit);
+  } else if (atkType === 'pen') {
+    const r = effectivePen - def;
+    atkF = r > 0 ? 1 + toPercent(r >= 150 ? r * 2 - 150 : r) : 0;
+  }
+  
+  const e1 = 1 + toPercent(dmgStack) + toPercent(reaperValue);
+  const e2 = 1 + toPercent(spearValue);
+  
+  const mult = atkF *
+    (1 + toPercent(dmg - dmgred)) *
+    (elemCtr + toPercent(elemEnh)) *
+    (1 + (tAttr ? toPercent(attr) : 0)) *
+    (1 + (tRace ? toPercent(race) : 0)) *
+    e1 * e2 *
+    (sizeMod + toPercent(sizeEnh));
+  
+  return { mult };
+};
 
 const Dom = (() => {
   const g  = id  => document.getElementById(id);
@@ -388,6 +473,7 @@ const Dom = (() => {
     penField:         g('penField'),
     critField:        g('critField'),
     pen:              g('pen'),
+    rawPen:           g('rawPen'),
     crit:             g('crit'),
     dmg:              g('dmg'),
     elemEnh:          g('elemEnhance'),
@@ -406,10 +492,13 @@ const Dom = (() => {
     tAttr:            g('targetElementSelect'),
     resultCard:       g('resultCard'),
     divSizeSelect:    g('divSizeSelect'),
-    enchLines:        g('enchLines'),
+    enchWeaponLines:     g('enchLines'),
+    enchAccLines:        g('enchLinesAcc'),
+    enchSlideLabel:      g('enchSlideLabel'),
     enchAwakeningSelect: g('enchAwakeningSelect'),
     enchSettingsPanel:   g('enchSettingsPanel'),
     enchSettingsBtn:     g('enchSettingsBtn'),
+    enchResetBtn:        g('enchResetBtn'),
     enchSettingsInner:   g('enchSettingsInner'),
     coCompanionBackdrop:    g('coCompanionModalBackdrop'),
     coCompanionModal:       g('coCompanionModal'),
@@ -436,6 +525,7 @@ const Dom = (() => {
     companionSheetTitle: g('companion-sheet-title'),
     companionStatsWrap: g('companion-sheet-stats'),
     companionSheetClose: g('companion-sheet-close'),
+    companionQLock: g('companion-q-lock'),
     companionQPurple: g('companion-q-purple'),
     companionQGold: g('companion-q-gold'),
     companionQStar: g('companion-q-star'),
@@ -451,15 +541,13 @@ const Dom = (() => {
     coCompanionModalStatsCur: g('coCompanionModalStatsCur'),
     coCompanionModalArrow:    g('coCompanionModalArrow'),
     coCompanionModalStatsRec: g('coCompanionModalStatsRec'),
-    companionSummaryBtn:   g('companionSummaryBtn'),
     companionSummaryModal: g('companionSummaryModal'),
     companionSummaryList:  g('companionSummaryList'),
-    companionHelpBtn:      g('companionHelpBtn'),
     companionHelpModal:    g('companionHelpModal'),
-    companionHelpClose:    g('companionHelpClose'),
     trashDivBtn:           g('trashDivBtn'),
     loadStatsBtn:          g('loadStatsBtn'),
     calculateBtn:          g('calculateBtn'),
+    companionResetInputBtn: g('companionResetInputBtn'),
   };
 })();
 
@@ -474,8 +562,7 @@ const Labels = (() => {
   const getTargetAttrLabel = () => getDynamicLabel('tAttr', v => `DMG to ${v}`, 'DMG to Attribute');
   const getTargetSizeLabel = () => getDynamicLabel('tSize', v => `DMG to ${v}`, 'DMG to Size');
 
-  const getEnchantExcludedType = () => (Dom.atkType.value === 'pen' ? 'crit' : 'pen');
-  const isAtkExcluded = key => Config.stats.exclKeys[getEnchantExcludedType()]?.has(key) ?? false;
+  const isAtkExcluded = key => Config.stats.exclKeys[Dom.atkType.value]?.has(key) ?? false;
 
   const STAT_OPTIONS = [
     { key: 'pen',         label: Config.stats.labels.pen  },
@@ -502,19 +589,6 @@ const Labels = (() => {
     ...elemList.reduce((a, x) => ({ ...a, [`Bonus DMG to ${x} Attribute Monster`]: createStatResolver('tAttr', x, 'attr')   }), {}),
   };
 
-  const COMPANION_STAT_OPTIONS = [
-    { key: 'elemEnh', get label() { return getElemEnhLabel(); } },
-    { key: 'pen',     label: Config.stats.labels.pen  },
-    { key: 'crit',    label: Config.stats.labels.crit },
-    { key: 'dmg',     label: Config.stats.labels.dmg  },
-  ];
-  const COMPANION_FIELD_LABELS = {
-    get elemEnh() { return getElemEnhLabel(); },
-    pen:  Config.stats.labels.pen,
-    crit: Config.stats.labels.crit,
-    dmg:  Config.stats.labels.dmg,
-  };
-
   const ALL_STAT_FIELDS = [
     { field: 'dmg',      label: Config.stats.labels.dmg      },
     { field: 'pen',      label: Config.stats.labels.pen      },
@@ -525,6 +599,21 @@ const Labels = (() => {
     { field: 'attr',     get label() { return getTargetAttrLabel(); } },
     { field: 'dmgStack', label: Config.stats.labels.dmgStack },
   ];
+
+  const COMPANION_STAT_OPTIONS = (() => {
+    const keys = Config.companion.statKeys;
+    const set  = new Set(keys);
+    return ALL_STAT_FIELDS
+      .filter(f => set.has(f.field))
+      .sort((a, b) => keys.indexOf(a.field) - keys.indexOf(b.field))
+      .map(f => ({ key: f.field, get label() { return f.label; } }));
+  })();
+  const COMPANION_FIELD_LABELS = Object.fromEntries(
+    COMPANION_STAT_OPTIONS.map(o => [o.key, null])
+  );
+  for (const o of COMPANION_STAT_OPTIONS) {
+    Object.defineProperty(COMPANION_FIELD_LABELS, o.key, { get() { return o.label; }, enumerable: true });
+  }
 
   const getAtkFieldOption = atkType =>
     ALL_STAT_FIELDS.find(({ field }) => field === atkType) ?? { field: atkType, label: atkType };
@@ -537,11 +626,15 @@ const Labels = (() => {
       .map(({ field, label }) => ({ field, label }));
 
   const getEnchantTypeLabel = type => ({
-    crit: Config.stats.labels.crit,
-    race: getTargetRaceLabel(),
-    attr: getTargetAttrLabel(),
-    dmg:  Config.stats.labels.dmg,
-    pen:  Config.stats.labels.pen,
+    crit:    Config.stats.labels.crit,
+    race:    getTargetRaceLabel(),
+    attr:    getTargetAttrLabel(),
+    dmg:     Config.stats.labels.dmg,
+    pen:     Config.stats.labels.pen,
+    rawPen:  Config.stats.labels.rawPen,
+    pctPen:  Config.stats.labels.pctPen,
+    sizeEnh: getTargetSizeLabel(),
+    elemEnh: getElemEnhLabel(),
   })[type] ?? type;
 
   const getEnchantOptLabel = opt => {
@@ -551,17 +644,17 @@ const Labels = (() => {
   };
 
   const buildEnchantOptionsHTML = (currentVal = '', slotKey = 'weapon') => {
-    const excl = getEnchantExcludedType();
-    return '<option value="" selected>Enchantment</option>' +
+    const slotLabel = slotKey === 'acc' ? 'Acc.' : 'Weapon';
+    return `<option value="" selected>${slotLabel} Enchantment</option>` +
       Config.enchant.options.filter(o => o.eq[slotKey]).map(o => {
-        const excluded = o.type === excl && o.value !== currentVal;
+        const excluded = isAtkExcluded(o.type) && o.value !== currentVal;
         return `<option value="${o.value}"${excluded ? ' disabled' : ''}>${getEnchantOptLabel(o)}</option>`;
       }).join('');
   };
 
   return {
     getElemEnhLabel, getTargetRaceLabel, getTargetAttrLabel, getTargetSizeLabel,
-    getEnchantExcludedType, isAtkExcluded,
+    isAtkExcluded,
     STAT_OPTIONS, STAT_OPTIONS_MAP, STAT_RESOLVERS,
     COMPANION_STAT_OPTIONS, COMPANION_FIELD_LABELS,
     getBuffStatOptions, getBaseStatLabels, getAtkFieldOption,
@@ -594,30 +687,7 @@ const Store = (() => {
     }
   };
 
-  const persisted = (key, obj) => {
-    const wrap = target => {
-      if (!target || typeof target !== 'object') return target;
-      for (const k of Object.keys(target)) target[k] = wrap(target[k]);
-      return new Proxy(target, {
-        set(t, prop, value) { t[prop] = wrap(value); write(key, { ...section(key), ...obj }); return true; },
-        deleteProperty(t, prop) { delete t[prop]; write(key, { ...section(key), ...obj }); return true; },
-      });
-    };
-    return wrap(obj);
-  };
-
-  return { read, section, write, persisted };
-})();
-
-const Domains = (() => {
-  const registry = [];
-
-  const register = descriptor => { registry.push(descriptor); };
-  const getAll   = () => registry;
-  const getAux   = () => registry.filter(d => d.isAux);
-  const get      = key => registry.find(d => d.key === key);
-
-  return { register, getAll, getAux, get };
+  return { section, write };
 })();
 
 const Modals = (() => {
@@ -655,7 +725,19 @@ const Modals = (() => {
     }
   };
 
-  return { register, closeAll, bind, bindModalNodes };
+  const openComparison = ({ backdropEl, qualityEl, titleEl, flashEl, curEl, arrowEl, recEl, quality, title, flashVisible, curHTML, recHTML, showComparison }) => {
+    Utils.setQualityClass(qualityEl, quality);
+    if (titleEl)  titleEl.textContent  = title;
+    if (flashEl)  flashEl.hidden       = !flashVisible;
+    if (curEl)    curEl.hidden         = !showComparison;
+    if (arrowEl)  arrowEl.hidden       = !showComparison;
+    if (showComparison && curEl) curEl.innerHTML = curHTML;
+    recEl.innerHTML = recHTML;
+    recEl.hidden    = false;
+    backdropEl.classList.add('open');
+  };
+
+  return { closeAll, bind, bindModalNodes, openComparison };
 })();
 
 const Divinity = (() => {
@@ -666,7 +748,8 @@ const Divinity = (() => {
           animateSlideTransition, animateSlide,
           updateUseBtn, renderSummaryList, fromHTML, setQualityClass } = Utils;
 
-  const nodeData = Store.persisted('divinity', {});
+  const nodeData = {};
+  const saveDivinityState = () => Store.write('divinity', nodeData);
 
   const panelState = {
     activeId:         null,
@@ -689,26 +772,31 @@ const Divinity = (() => {
   };
   const fmtStatPct = (key, quality) => { const v = getStatVal(key, quality); return v === null ? '' : fmtRawPct(v); };
 
-  const defaultPanel      = () => ({ blue: true, purple: false, gold: false, lightning: false, locked: false, divinity: [null] });
+  const defaultItem      = () => ({ blue: true, purple: false, gold: false, lightning: false, locked: false, stats: [null] });
   const defaultSizeMap    = (val = () => ({})) => Object.fromEntries(divSizes.map(s => [s, typeof val === 'function' ? val() : val]));
-  const defaultUsedBySize = () => defaultSizeMap(() => null);
+  const defaultInUse = () => defaultSizeMap(() => null);
 
-  const getUsed         = id => getData(id).usedBySize[panelState.activeSize] ?? null;
-  const setUsed         = (id, idx) => { getData(id).usedBySize[panelState.activeSize] = idx; };
-  const isUsedInAnySize = (id, idx) => Object.values(getData(id).usedBySize).some(v => v === idx);
+  const getUsed         = id => getData(id).inUse[panelState.activeSize] ?? null;
+  const setUsed         = (id, idx) => { getData(id).inUse[panelState.activeSize] = idx; saveDivinityState(); };
+  const isUsedInAnySize = (id, idx) => Object.values(getData(id).inUse).some(v => v === idx);
   const canShowTrash    = (id, count, idx, locked = false) => !locked && count > 1 && !isUsedInAnySize(id, idx);
 
-  const load = () => {
+  function writeBestSelection(selection) {
+    for (const { id, panelIndex } of selection) setUsed(id, panelIndex);
+    Config.nodeOrder.forEach(updateDivCircle);
+  }
+
+  const loadDivinityState = () => {
     try { Object.assign(nodeData, Store.section('divinity')); normalize(); }
-    catch (err) { console.warn('Divinity.load: failed to restore divinity state', err); }
+    catch (err) { console.warn('Divinity.loadDivinityState: failed to restore divinity state', err); }
   };
 
   function normalize() {
     for (const id of Object.keys(nodeData)) {
       const d = nodeData[id];
-      while (d.panels.length < d.count) d.panels.push(defaultPanel());
-      for (const p of d.panels) {
-        if (!Array.isArray(p.divinity)) p.divinity = [null];
+      while (d.items.length < d.count) d.items.push(defaultItem());
+      for (const p of d.items) {
+        if (!Array.isArray(p.stats)) p.stats = [null];
         p.locked ??= false;
         if (!p.blue && !p.purple && !p.gold) p.blue = true;
       }
@@ -717,7 +805,8 @@ const Divinity = (() => {
 
   function getData(id) {
     if (!nodeData[id])
-      nodeData[id] = { count: 1, current: 0, usedBySize: defaultUsedBySize(), panels: [defaultPanel()] };
+      nodeData[id] = { count: 1, inUse: defaultInUse(), items: [defaultItem()] };
+    nodeData[id].current ??= 0;
     return nodeData[id];
   }
 
@@ -731,7 +820,7 @@ const Divinity = (() => {
     circle.classList.remove('quality-blue', 'quality-purple', 'quality-gold', 'has-lightning');
     let lockEl = circle.querySelector('.circle-lock');
     if (!hasUsed) { lockEl?.remove(); return; }
-    const s = nodeData[id]?.panels[usedIdx];
+    const s = nodeData[id]?.items[usedIdx];
     if (!s) return;
     setQualityClass(circle, getQuality(s));
     circle.classList.toggle('has-lightning', s.lightning);
@@ -751,6 +840,12 @@ const Divinity = (() => {
     btn.dataset.locked = String(locked);
     btn.innerHTML      = buildLockSvg(locked);
     btn.title          = locked ? 'Unlock slot' : 'Lock slot';
+  }
+
+  function applyDivLockBtn(btn, locked) {
+    btn.classList.toggle('active', locked);
+    btn.innerHTML = buildLockSvg(locked);
+    btn.title     = locked ? 'Unlock this divinity' : 'Lock this divinity';
   }
 
   function toggleAddBtn(footerRight, count) {
@@ -781,8 +876,8 @@ const Divinity = (() => {
     addToggle.textContent = '+ Add Stat';
 
     const getDivOptionText        = (opt, quality) => `${opt.label} · ${fmtStatPct(opt.key, quality)}`;
-    const updateDivAddToggle      = () => { addToggle.style.display = s.divinity.length >= divinity.maxStats[getQuality(s)] ? 'none' : ''; };
-    const updateDivOptionDisabled = () => updateSelectsDisabled(list, '.divinity-select', () => s.divinity, Labels.isAtkExcluded);
+    const updateDivAddToggle      = () => { addToggle.style.display = s.stats.length >= divinity.maxStats[getQuality(s)] ? 'none' : ''; };
+    const updateDivOptionDisabled = () => updateSelectsDisabled(list, '.divinity-select', () => s.stats, Labels.isAtkExcluded);
 
     function makeDivRow(selectedKey, index) {
       const quality    = getQuality(s);
@@ -796,14 +891,14 @@ const Divinity = (() => {
       </div>`);
       const sel    = row.querySelector('.divinity-select');
       const delBtn = row.querySelector('.divinity-del-btn');
-      sel.addEventListener('change', () => { s.divinity[index] = sel.value; updateDivOptionDisabled(); });
-      delBtn.addEventListener('click', () => { s.divinity.splice(index, 1); renderDivRows(); });
+      sel.addEventListener('change', () => { s.stats[index] = sel.value; updateDivOptionDisabled(); saveDivinityState(); });
+      delBtn.addEventListener('click', () => { s.stats.splice(index, 1); renderDivRows(); saveDivinityState(); });
       return row;
     }
 
     function renderDivRows() {
       list.innerHTML = '';
-      s.divinity.forEach((key, i) => list.appendChild(makeDivRow(key, i)));
+      s.stats.forEach((key, i) => list.appendChild(makeDivRow(key, i)));
       updateDivAddToggle();
       updateDivOptionDisabled();
     }
@@ -811,7 +906,7 @@ const Divinity = (() => {
     function updateDivOptions() {
       const quality = getQuality(s);
       const max     = divinity.maxStats[quality];
-      if (s.divinity.length > max) { s.divinity.splice(max); renderDivRows(); return; }
+      if (s.stats.length > max) { s.stats.splice(max); renderDivRows(); return; }
       list.querySelectorAll('.divinity-select').forEach(sel => {
         sel.querySelectorAll('option[value]:not([value=""])').forEach(opt => {
           const meta = Labels.STAT_OPTIONS_MAP.get(opt.value);
@@ -822,13 +917,14 @@ const Divinity = (() => {
     }
 
     addToggle.addEventListener('click', () => {
-      if (s.divinity.length >= divinity.maxStats[getQuality(s)]) return;
-      s.divinity.push(null);
+      if (s.stats.length >= divinity.maxStats[getQuality(s)]) return;
+      s.stats.push(null);
       renderDivRows();
+      saveDivinityState();
     });
 
     const max = divinity.maxStats[getQuality(s)];
-    if (s.divinity.length > max) { s.divinity.splice(max); }
+    if (s.stats.length > max) { s.stats.splice(max); }
     renderDivRows();
     contentEl.appendChild(list);
     contentEl.appendChild(addToggle);
@@ -845,35 +941,35 @@ const Divinity = (() => {
     };
 
     function updateDivTags() {
-      const s = data.panels[data.current];
+      const s = data.items[data.current];
       t.blue.classList.toggle('active', s.blue);
       t.purple.classList.toggle('active', s.purple);
       t.gold.classList.toggle('active', s.gold);
       t.lightning.classList.toggle('active', s.lightning);
       t.lightning.classList.toggle('tag-disabled', !s.gold);
-      t.lock.classList.toggle('active', s.locked);
-      t.lock.innerHTML = buildLockSvg(s.locked);
-      t.lock.title     = s.locked ? 'Unlock this divinity' : 'Lock this divinity';
+      applyDivLockBtn(t.lock, s.locked);
       onQualityChange?.();
     }
 
     const setDivQuality = qual => {
-      const s = data.panels[data.current];
+      const s = data.items[data.current];
       if (s[qual]) return;
       s.blue = s.purple = s.gold = false;
       s[qual] = true;
       if (qual !== 'gold') s.lightning = false;
       updateDivTags();
+      saveDivinityState();
     };
 
     t.blue.addEventListener('click',      () => setDivQuality('blue'));
     t.purple.addEventListener('click',    () => setDivQuality('purple'));
     t.gold.addEventListener('click',      () => setDivQuality('gold'));
     t.lightning.addEventListener('click', () => {
-      const s = data.panels[data.current];
+      const s = data.items[data.current];
       if (!s.gold) return;
       s.lightning = !s.lightning;
       updateDivTags();
+      saveDivinityState();
     });
     return updateDivTags;
   }
@@ -883,7 +979,8 @@ const Divinity = (() => {
     const data = getData(panelState.activeId);
     if (data.count >= divinity.maxPanels) return;
     data.count++;
-    data.panels.push(defaultPanel());
+    data.items.push(defaultItem());
+    saveDivinityState();
     navigateTo(data.count - 1, 1);
   }
 
@@ -891,8 +988,9 @@ const Divinity = (() => {
     if (panelState.isAnimating || !panelState.activePanel || !panelState.activeId) return;
     const data = getData(panelState.activeId);
     data.current = newIndex;
+    saveDivinityState();
     panelState.isAnimating = true;
-    const s      = data.panels[newIndex];
+    const s      = data.items[newIndex];
     const count  = data.count;
     const isUsed = getUsed(panelState.activeId) === newIndex;
     const p      = panelState.activePanel;
@@ -901,6 +999,7 @@ const Divinity = (() => {
     p._prevBtn.disabled     = newIndex === 0;
     p._nextBtn.disabled     = newIndex === count - 1;
     panelNav.style.visibility = count > 1 ? '' : 'hidden';
+    panelNav.classList.toggle('panel-nav--hidden', count <= 1);
     toggleTrashBtn(panelNav, panelState.activeId, count, newIndex, s?.locked);
     toggleAddBtn(p._footerRight, count);
     updateUseBtn(p._useBtn, isUsed);
@@ -921,13 +1020,14 @@ const Divinity = (() => {
     if (!confirm('Delete this divinity panel? This cannot be undone.')) return;
     const data = getData(panelState.activeId);
     const idx  = data.current;
-    data.panels.splice(idx, 1);
+    data.items.splice(idx, 1);
     data.count--;
     for (const size of divSizes) {
-      const u = data.usedBySize[size];
-      if (u === idx)    data.usedBySize[size] = null;
-      else if (u > idx) data.usedBySize[size]--;
+      const u = data.inUse[size];
+      if (u === idx)    data.inUse[size] = null;
+      else if (u > idx) data.inUse[size]--;
     }
+    saveDivinityState();
     updateDivCircle(panelState.activeId);
     navigateTo(idx === 0 ? 0 : idx - 1, idx === 0 ? 1 : -1);
   }
@@ -971,6 +1071,7 @@ const Divinity = (() => {
     panelState.isNodeNavigating = false;
     const nextData   = getData(nextId);
     nextData.current = getUsed(nextId) ?? 0;
+    saveDivinityState();
     panelState.activeId = nextId;
     swapPanel(makePanelEl(nextId), dir);
   }
@@ -979,7 +1080,7 @@ const Divinity = (() => {
     const data    = getData(id);
     const idx     = data.current;
     const count   = data.count;
-    const s       = data.panels[idx];
+    const s       = data.items[idx];
     const nodeIdx = nodeOrder.indexOf(id);
     const isUsed  = getUsed(id) === idx;
     const panel   = document.createElement('div');
@@ -1007,13 +1108,13 @@ const Divinity = (() => {
       <div class="panel-divider"></div>
       <div class="panel-content-wrap"><div class="panel-content"></div></div>
       <div class="panel-footer">
-        <div class="panel-nav"${count > 1 ? '' : ' style="visibility:hidden"'}>
+        <div class="panel-nav${count > 1 ? '' : ' panel-nav--hidden'}">
           <button class="nav-btn prev-btn" ${idx === 0 ? 'disabled' : ''}>${icons.chevLeft}</button>
           <span class="panel-nav-count">${idx + 1}/${count}</span>
           <button class="nav-btn next-btn" ${idx === count - 1 ? 'disabled' : ''}>${icons.chevRight}</button>
         </div>
         <div class="panel-footer-right">
-          <button class="use-btn${isUsed ? ' active' : ''}"><svg style="${isUsed ? '' : 'display:none'}" viewBox="0 0 12 12" fill="none">${icons.person}</svg><span>${isUsed ? 'In Use' : 'Use'}</span></button>
+          <button class="use-btn${isUsed ? ' active' : ''}"><svg viewBox="0 0 12 12" fill="none">${icons.person}</svg><span>${isUsed ? 'In Use' : 'Use'}</span></button>
           ${count < divinity.maxPanels ? '<button class="add-btn">+ Add Div</button>' : ''}
         </div>
       </div>`;
@@ -1037,12 +1138,11 @@ const Divinity = (() => {
 
     panel.querySelector('.close-btn').addEventListener('click', () => closePanel());
     lockBtn.addEventListener('click', () => {
-      const cur  = data.panels[data.current];
+      const cur  = data.items[data.current];
       cur.locked = !cur.locked;
-      lockBtn.classList.toggle('active', cur.locked);
-      lockBtn.title     = cur.locked ? 'Unlock this divinity' : 'Lock this divinity';
-      lockBtn.innerHTML = buildLockSvg(cur.locked);
+      applyDivLockBtn(lockBtn, cur.locked);
       toggleTrashBtn(panelNav, panelState.activeId, data.count, data.current, cur.locked);
+      saveDivinityState();
     });
 
     if (nodeIdx > 0)                    panel.querySelector('.node-prev-btn').addEventListener('click', () => navigateNode(-1));
@@ -1057,7 +1157,7 @@ const Divinity = (() => {
       setUsed(id, getUsed(id) === cur ? null : cur);
       updateDivCircle(id);
       updateUseBtn(useBtn, getUsed(id) === cur);
-      toggleTrashBtn(panelNav, id, data.count, cur, data.panels[cur]?.locked);
+      toggleTrashBtn(panelNav, id, data.count, cur, data.items[cur]?.locked);
     });
 
     let currentUpdateOptions = initDivSubPanel(contentWrap.querySelector('.panel-content'), s);
@@ -1074,6 +1174,7 @@ const Divinity = (() => {
     const dir    = DIR_MAP[cb.id];
     const data   = getData(cb.id);
     data.current = getUsed(cb.id) ?? 0;
+    saveDivinityState();
     panelState.activeId  = cb.id;
     panelState.activeDir = dir;
     Dom.sliderContainer.style.height = Dom.grid.offsetHeight + 'px';
@@ -1101,7 +1202,7 @@ const Divinity = (() => {
   function applyDivinityStats(state, panel, ctx, sign) {
     const quality = getQuality(panel);
     let result    = { ...state };
-    for (const key of panel.divinity) {
+    for (const key of panel.stats) {
       if (!key) continue;
       const meta = divinityDefs[key];
       if (!meta) continue;
@@ -1125,7 +1226,7 @@ const Divinity = (() => {
 
   function applyDivinity(state, selection, ctx, sign = 1) {
     return selection.reduce((s, { id, panelIndex }) => {
-      const panel = getData(id).panels[panelIndex];
+      const panel = getData(id).items[panelIndex];
       return panel ? applyDivinityPanel(s, panel, id, ctx, sign) : s;
     }, { ...state });
   }
@@ -1138,21 +1239,22 @@ const Divinity = (() => {
   };
 
   const isPanelActive = (id, p) =>
-    p.divinity.some(Boolean) ||
-    (!!specialNodes[id] && p.gold && p.lightning && p.divinity.length <= 1);
+    p.stats.some(Boolean) ||
+    (!!specialNodes[id] && p.gold && p.lightning && p.stats.length <= 1);
 
   const hasNode     = id => !!nodeData[id];
   const resetAll    = () => {
     for (const id of nodeOrder) {
-      nodeData[id] = { count: 1, current: 0, usedBySize: defaultUsedBySize(), panels: [defaultPanel()] };
-      updateDivCircle(id);
+      nodeData[id] = { count: 1, inUse: defaultInUse(), items: [defaultItem()] };
     }
+    saveDivinityState();
+    for (const id of nodeOrder) updateDivCircle(id);
     if (getActivePanel()) closePanel();
   };
 
   const isNodeActive = id => {
     const d = getData(id);
-    return d.panels.slice(0, d.count).some(p => isPanelActive(id, p)) ||
+    return d.items.slice(0, d.count).some(p => isPanelActive(id, p)) ||
       (!!specialNodes[id] && getUsed(id) != null);
   };
 
@@ -1161,10 +1263,10 @@ const Divinity = (() => {
     for (const id of nodeOrder) {
       const usedIdx = getUsed(id);
       if (usedIdx == null) continue;
-      const s = getData(id).panels[usedIdx];
+      const s = getData(id).items[usedIdx];
       if (!s) continue;
       const quality = getQuality(s);
-      for (const key of s.divinity) {
+      for (const key of s.stats) {
         if (!key) continue;
         const val = getStatVal(key, quality);
         if (val !== null) totals[key] = (totals[key] ?? 0) + val;
@@ -1183,7 +1285,7 @@ const Divinity = (() => {
 
   function buildDivStatRowsHTML(panel) {
     const quality = getQuality(panel);
-    return panel.divinity.filter(k => k).map(k => {
+    return panel.stats.filter(k => k).map(k => {
       const opt = Labels.STAT_OPTIONS_MAP.get(k);
       const val = getStatVal(k, quality);
       if (!opt || val === null) return '';
@@ -1197,7 +1299,7 @@ const Divinity = (() => {
   function buildDivNodesHTML(selection, currentDivByNode = null) {
     if (!selection?.length) return '';
     return selection.map(({ id, panelIndex }) => {
-      const panel = getData(id).panels[panelIndex];
+      const panel = getData(id).items[panelIndex];
       if (!panel) return '';
       const quality     = getQuality(panel);
       const isChanged   = currentDivByNode != null && panelIndex !== currentDivByNode[id];
@@ -1213,22 +1315,28 @@ const Divinity = (() => {
 
   function openDivModal({ nodeId, panelIndex, isChanged }) {
     const data  = getData(nodeId);
-    const panel = data.panels[panelIndex];
+    const panel = data.items[panelIndex];
     if (!panel) return;
-    Dom.divModalFlash.hidden = !(panel.lightning && panel.gold);
-    setQualityClass(Dom.divModal, getQuality(panel));
     const curUsedIdx     = getUsed(nodeId);
     const currentNum     = curUsedIdx != null ? curUsedIdx + 1 : null;
-    const showComparison = isChanged && curUsedIdx != null && data.panels[curUsedIdx];
-    Dom.divModalName.textContent = (isChanged && currentNum != null)
-      ? `${NODE_NAMES[nodeId]} #${currentNum} \u00bb #${panelIndex + 1}`
-      : `${NODE_NAMES[nodeId]} #${panelIndex + 1}`;
-    Dom.divModalStatsCur.hidden = !showComparison;
-    Dom.divModalArrow.hidden    = !showComparison;
-    if (showComparison) Dom.divModalStatsCur.innerHTML = buildDivStatRowsHTML(data.panels[curUsedIdx]);
-    Dom.divModalStatsRec.innerHTML = buildDivStatRowsHTML(panel);
-    Dom.divModalStatsRec.hidden    = false;
-    Dom.divModalBackdrop.classList.add('open');
+    const showComparison = isChanged && curUsedIdx != null && !!data.items[curUsedIdx];
+    Modals.openComparison({
+      backdropEl:     Dom.divModalBackdrop,
+      qualityEl:      Dom.divModal,
+      titleEl:        Dom.divModalName,
+      flashEl:        Dom.divModalFlash,
+      curEl:          Dom.divModalStatsCur,
+      arrowEl:        Dom.divModalArrow,
+      recEl:          Dom.divModalStatsRec,
+      quality:        getQuality(panel),
+      title:          (isChanged && currentNum != null)
+                        ? `${NODE_NAMES[nodeId]} #${currentNum} \u00bb #${panelIndex + 1}`
+                        : `${NODE_NAMES[nodeId]} #${panelIndex + 1}`,
+      flashVisible:   panel.lightning && panel.gold,
+      curHTML:        showComparison ? buildDivStatRowsHTML(data.items[curUsedIdx]) : '',
+      recHTML:        buildDivStatRowsHTML(panel),
+      showComparison,
+    });
   }
 
   const closeDivModal = () => Dom.divModalBackdrop.classList.remove('open');
@@ -1240,28 +1348,18 @@ const Divinity = (() => {
       isChanged:  el.dataset.changed === 'true',
     }), openDivModal);
 
-  function writeBestDivinity(bestDivSelection) {
-    for (const { id, panelIndex } of bestDivSelection) {
-      setUsed(id, panelIndex);
-      updateDivCircle(id);
-    }
-    if (!panelState.activePanel || !panelState.activeId) return;
-    const useBtn = panelState.activePanel._useBtn;
-    if (useBtn) updateUseBtn(useBtn, getUsed(panelState.activeId) === getData(panelState.activeId).current);
-  }
-
   return {
-    getQuality, getStatVal, fmtStatPct,
-    defaultPanel, defaultSizeMap, defaultUsedBySize,
-    getUsed, setUsed, isUsedInAnySize, canShowTrash,
-    getData, load,
+    defaultSizeMap,
+    getUsed,
+    getData, loadDivinityState,
     hasNode, resetAll,
     updateDivCircle, setLockState, toggleTrashBtn, navigateTo,
-    applyDeltas, applyDivinityStats, applyDivinityPanel, applyDivinity,
-    stripCurrentDivinity, isPanelActive, isNodeActive,
-    getDivSummary, renderSummaryModal,
-    buildDivStatRowsHTML, buildDivNodesHTML,
-    openDivModal, closeDivModal, bindDivModalNodes, writeBestDivinity,
+    applyDeltas, applyDivinityPanel, applyDivinity,
+    stripCurrentDivinity, isNodeActive,
+    writeBestSelection,
+    renderSummaryModal,
+    buildDivNodesHTML,
+    closeDivModal, bindDivModalNodes,
     openPanel, closePanel,
     getActiveId, getActiveSize, getActivePanel, setActiveSize,
     get isAnimating()      { return panelState.isAnimating; },
@@ -1270,23 +1368,40 @@ const Divinity = (() => {
 })();
 
 const Cards = (() => {
-  const { escHtml, parseStatPct, countBy, updateSelectsDisabled, buildLockSvg, bindCoPanelToggle, fromHTML, setQualityClass } = Utils;
+  const { escHtml, parseStatPct, countBy, buildLockSvg, bindCoPanelToggle, fromHTML, setQualityClass, initSlider } = Utils;
   const { isAtkExcluded, getBuffStatOptions } = Labels;
-  const { stats: { numFields, dedupGroups: statDedupGroups }, game: { equipSlots }, slotCounts: SLOT_COUNTS, equipLabels: EQUIP_LABELS } = Config;
+  const { stats: { numFields, dedupGroups: statDedupGroups }, game: { equipSlots }, slotCounts: SLOT_COUNTS, equipLabels: EQUIP_LABELS, ui: { icons } } = Config;
 
-  const QTY_OPTIONS_HTML = Utils.numericOptionsHTML(6);
+  const MAX_UNUSED_QTY   = 6;
+  const QTY_OPTIONS_HTML = Utils.numericOptionsHTML(MAX_UNUSED_QTY);
 
-  const cardDeltaCache = new Map();
+  const cardDeltaCache     = new Map();
+  const cardSkipStatsCache = new Map();
+
+  let allCardNamesSorted = null;
+  const getAllCardNamesSorted = () => {
+    if (allCardNamesSorted) return allCardNamesSorted;
+    allCardNamesSorted = typeof cardData !== 'undefined' ? Object.keys(cardData).sort() : [];
+    return allCardNamesSorted;
+  };
+
+  const cardNamesByEquipCache = new Map();
+  const getCardNamesByEquip = equip => {
+    if (cardNamesByEquipCache.has(equip)) return cardNamesByEquipCache.get(equip);
+    const names = getAllCardNamesSorted().filter(n => cardData[n].equip === equip);
+    cardNamesByEquipCache.set(equip, names);
+    return names;
+  };
 
   const getCard     = name => (typeof cardData !== 'undefined' ? (cardData[name] ?? null) : null);
   const isValidCard = name => !!name && name !== '—';
   const filterValid = names => names.filter(isValidCard);
 
-  const getWeaponSlotCount = () => (Dom.weapon.value === 'Dagger' ? 6 : equipSlots.weapon.count);
+  const getWeaponSlotCount = () => (Dom.weapon.value === 'Dagger' ? equipSlots.weapon.count.dagger : equipSlots.weapon.count.default);
   const getSlotKey          = el => `${el.dataset.equip}_${el.dataset.slot}`;
 
-  function buildPoolFromSection(section, adjustForLocked = null) {
-    const equippedNames = [...section.querySelectorAll('.co-card-select')].map(input => input.dataset.value || '');
+  function buildPoolFromSection(section, adjustForLocked = null, cardSelects = null) {
+    const equippedNames = (cardSelects ?? [...section.querySelectorAll('.co-card-select')]).map(input => input.dataset.value || '');
 
     const unusedMap = {};
     for (const row of section.querySelectorAll('.co-unused-row')) {
@@ -1399,14 +1514,12 @@ const Cards = (() => {
 
   function bindEquipSlotSearch(input, section) {
     const equip      = input.dataset.equip;
-    const allOptions = typeof cardData !== 'undefined'
-      ? Object.keys(cardData).filter(n => cardData[n].equip === equip).sort()
-      : [];
+    const allOptions = getCardNamesByEquip(equip);
     createCardSearch({
       input,
       panel: input.nextElementSibling,
       getOptions: () => allOptions,
-      onSelect: () => { updateCardSelectQuality(input); saveStateDebounced(section); },
+      onSelect: () => { updateCardSelectQuality(input); saveStateDebounced(section); updateActionBtnVisibility(section); },
     });
   }
 
@@ -1442,13 +1555,13 @@ const Cards = (() => {
   function saveState(section) {
     try {
       const prev           = Store.section('cards');
-      const equippedBySize = prev.equippedBySize ?? Divinity.defaultSizeMap();
-      const lockedBySize   = prev.lockedBySize   ?? Divinity.defaultSizeMap();
-      const unusedBySize   = prev.unusedBySize   ?? Divinity.defaultSizeMap(() => []);
-      equippedBySize[Divinity.getActiveSize()] = readEquipped(section);
-      lockedBySize[Divinity.getActiveSize()]   = readLocked(section);
-      unusedBySize[Divinity.getActiveSize()]   = readUnused(section);
-      Store.write('cards', { equippedBySize, lockedBySize, unusedBySize, buffs: readBuffs(section) });
+      const inUse = prev.inUse ?? Divinity.defaultSizeMap();
+      const locked   = prev.locked   ?? Divinity.defaultSizeMap();
+      const unused   = prev.unused   ?? Divinity.defaultSizeMap(() => []);
+      inUse[Divinity.getActiveSize()] = readEquipped(section);
+      locked[Divinity.getActiveSize()]   = readLocked(section);
+      unused[Divinity.getActiveSize()]   = readUnused(section);
+      Store.write('cards', { inUse, locked, unused, buffs: readBuffs(section) });
     } catch (err) {
       console.warn('Cards.saveState: failed to persist card state', err);
     }
@@ -1461,9 +1574,9 @@ const Cards = (() => {
   };
 
   function loadSizeToDOM(section, stored, size) {
-    const equipped = (stored.equippedBySize || {})[size] || {};
-    const locked   = (stored.lockedBySize   || {})[size] || {};
-    const unused   = (stored.unusedBySize   || {})[size] || [];
+    const equipped = (stored.inUse || {})[size] || {};
+    const locked   = (stored.locked   || {})[size] || {};
+    const unused   = (stored.unused   || {})[size] || [];
     for (const input of section.querySelectorAll('.co-card-select')) {
       const val = equipped[getSlotKey(input)] ?? '';
       input.value = input.dataset.value = val;
@@ -1473,6 +1586,7 @@ const Cards = (() => {
       Divinity.setLockState(btn, !!(locked[getSlotKey(btn)]));
     section.querySelector('#co-unused-list').innerHTML = '';
     for (const { name, qty } of unused) addUnusedRow(section, name, qty);
+    updateActionBtnVisibility(section);
   }
 
   const loadState = section => {
@@ -1480,6 +1594,7 @@ const Cards = (() => {
       const stored = Store.section('cards');
       loadSizeToDOM(section, stored, Divinity.getActiveSize());
       for (const { stat, val } of (stored.buffs || [])) addBuffRow(section, stat, val);
+      updateActionBtnVisibility(section);
     } catch (err) {
       console.warn('Cards.loadState: failed to restore card state', err);
     }
@@ -1529,7 +1644,7 @@ const Cards = (() => {
   }
 
   function addUnusedRow(section, name = '', qty = '1') {
-    const allOptions = typeof cardData !== 'undefined' ? Object.keys(cardData).sort() : [];
+    const allOptions = getAllCardNamesSorted();
     const html = `<div class="co-unused-row">
       <div class="co-card-search">
         <input class="co-unused-name co-card-search-input" type="text" placeholder="— Select Card —" autocomplete="off" data-value="">
@@ -1560,19 +1675,29 @@ const Cards = (() => {
     return row;
   }
 
-  function getCardStatDelta(name, ctx) {
-    const card = getCard(name);
-    if (!card) return null;
-    const cacheKey = `${name}|${ctx.atkType}|${ctx.wElem}|${ctx.tSize}|${ctx.tRace}|${ctx.tAttr}`;
-    const cached = cardDeltaCache.get(cacheKey);
-    if (cached) return cached;
-    const delta = Object.fromEntries(numFields.map(f => [f, 0]));
-    const skipStats = new Set(
+  function getSkipStats(card) {
+    let skipStats = cardSkipStatsCache.get(card);
+    if (skipStats) return skipStats;
+    skipStats = new Set(
       statDedupGroups.flatMap(group => {
         const present = group.filter(s => s in card.stats);
         return present.length > 1 ? present.slice(1) : [];
       })
     );
+    cardSkipStatsCache.set(card, skipStats);
+    return skipStats;
+  }
+
+  function getCardStatDelta(name, ctx) {
+    const card = getCard(name);
+    if (!card || !card.stats) return null;
+    const ctxKey  = `${ctx.atkType}|${ctx.wElem}|${ctx.tSize}|${ctx.tRace}|${ctx.tAttr}`;
+    let byCtx = cardDeltaCache.get(name);
+    if (!byCtx) { byCtx = new Map(); cardDeltaCache.set(name, byCtx); }
+    const cached = byCtx.get(ctxKey);
+    if (cached) return cached;
+    const delta = Object.fromEntries(numFields.map(f => [f, 0]));
+    const skipStats = getSkipStats(card);
     for (const [statName, rawVal] of Object.entries(card.stats)) {
       if (skipStats.has(statName)) continue;
       const field = Labels.STAT_RESOLVERS[statName]?.(ctx);
@@ -1581,18 +1706,18 @@ const Cards = (() => {
       if (value !== null) delta[field] += value;
     }
     const result = { delta, equip: card.equip };
-    cardDeltaCache.set(cacheKey, result);
+    byCtx.set(ctxKey, result);
     return result;
   }
 
   function applyCardStats(state, names, ctx, sign) {
     let result = { ...state };
     for (const name of names) {
-      if (!name || name === '—') continue;
+      if (!isValidCard(name)) continue;
       const r = getCardStatDelta(name, ctx);
       if (!r) continue;
-      for (const [field, val] of Object.entries(r.delta))
-        if (field in result) result[field] = (result[field] || 0) + sign * val;
+      for (const field of numFields)
+        if (field in result) result[field] = (result[field] || 0) + sign * r.delta[field];
     }
     return result;
   }
@@ -1612,36 +1737,37 @@ const Cards = (() => {
     return map;
   };
 
-  function writeToSlots(bestCards, section) {
-    const byEquip = {};
-    for (const name of bestCards) {
-      if (!name || name === '—') continue;
-      const card = getCard(name);
-      if (card) (byEquip[card.equip] ??= []).push(name);
-    }
-    const allInputs  = [...section.querySelectorAll('.co-card-select')];
-    const allLockBtns = [...section.querySelectorAll('.co-lock-btn')];
-    const lockMap = {};
-    for (const btn of allLockBtns) lockMap[getSlotKey(btn)] = btn;
-    for (const equip of Object.keys(SLOT_COUNTS)) {
-      const inputs   = allInputs.filter(inp => inp.dataset.equip === equip);
-      const recCards = byEquip[equip] || [];
-      let nameIdx    = 0;
-      for (const input of inputs) {
-        const lockBtn = lockMap[getSlotKey(input)];
-        if (lockBtn?.dataset.locked === 'true') continue;
-        const val = recCards[nameIdx++] || '';
-        input.value = input.dataset.value = val;
-        updateCardSelectQuality(input);
-      }
+  function writeToSlots(names, section) {
+    const byEquip = getCardsEquipMap(names);
+    const queues  = {};
+    for (const [equip, counts] of Object.entries(byEquip))
+      queues[equip] = Object.entries(counts).flatMap(([name, qty]) => Array(qty).fill(name));
+    for (const input of section.querySelectorAll('.co-card-select')) {
+      const queue = queues[input.dataset.equip];
+      const val   = queue?.length ? queue.shift() : '';
+      input.value = input.dataset.value = val;
+      updateCardSelectQuality(input);
     }
     saveState(section);
   }
 
+  const EQUIP_SLIDE_GROUPS = [
+    ['weapon'],
+    ['clothes', 'cloak', 'shoes'],
+    ['accessory'],
+    ['headgear'],
+  ];
+
+  function buildEquipSlidesHTML() {
+    return EQUIP_SLIDE_GROUPS.map((equips, i) => {
+      const groupsHTML = equips
+        .map(equip => buildEquipGroupHTML(equip, equipSlots[equip].label, equip === 'weapon' ? getWeaponSlotCount() : equipSlots[equip].count))
+        .join('');
+      return `<div class="co-slide${i === 0 ? ' co-slide--active' : ' co-slide--hidden-right'}">${groupsHTML}</div>`;
+    }).join('');
+  }
+
   function buildCardsHTML() {
-    const equippedSlotsHTML = Object.entries(equipSlots)
-      .map(([equip, { label, count }]) => buildEquipGroupHTML(equip, label, count))
-      .join('');
     return `
       <div class="co-hd" role="button" tabindex="0" aria-expanded="false">
         <div class="co-hd-left"><span class="co-hd-title">Card & Buff</span></div>
@@ -1651,17 +1777,23 @@ const Cards = (() => {
         <div class="co-body-inner">
           <div class="co-block">
             <div class="co-block-title">Equipped Card</div>
-            <p class="co-block-desc">Select currently equipped cards. Lock slots if specific cards are needed for an exclusive set. <span class="spoiler">Pls ignore the color if differ vs in-game <img alt=":pepelaugh:" src="https://masihterjaga.github.io/sim/img/pepelaugh.png" width="12" height="12"></span></p>
-            <div id="co-equipped-slots" class="co-equipped-wrap">${equippedSlotsHTML}</div>
-            <div class="co-btn-group">
+            <p class="co-block-desc">Select currently equipped cards. Lock slots if specific cards are needed for an exclusive set. <span class="spoiler">Pls ignore the color if differ vs in-game <img alt=":pepelaugh:" src="https://masihterjaga.github.io/sim/img/pepelaugh.png" width="10" height="10"></span></p>
+            <div class="co-slider">
+              <div class="co-slides-wrap" id="co-equipped-slots">${buildEquipSlidesHTML()}</div>
+            </div>
+            <div class="co-btn-group co-btn-group--split">
+              <div class="co-slider-footer-nav">
+                <button class="co-slide-nav-btn co-slide-nav-btn--prev" id="co-equip-slide-prev" data-dir="-1" disabled>${icons.chevLeft}Prev</button>
+                <button class="co-slide-nav-btn co-slide-nav-btn--next" id="co-equip-slide-next" data-dir="1">Next${icons.chevRight}</button>
+              </div>
               <button class="co-action-btn muted" id="co-unequip-all" type="button">Unequip All</button>
             </div>
           </div>
           <div class="co-block">
             <div class="co-block-title">Card Pool</div>
-            <p class="co-block-desc">Add unused cards relevant to your target to the pool. <span class="spoiler">Or any cards you're dreaming of and definitely can't afford, here you GO! <img alt=":dogekek:" src="https://masihterjaga.github.io/sim/img/dogekek.png" width="12" height="12"></span></p>
+            <p class="co-block-desc">Add unused cards relevant to your target to the pool. <span class="spoiler">Or any cards you're dreaming of and definitely can't afford, here you GO! <img alt=":dogekek:" src="https://masihterjaga.github.io/sim/img/dogekek.png" width="10" height="10"></span></p>
             <div id="co-unused-list" class="co-unused-list"></div>
-            <div class="co-btn-group">
+            <div class="co-btn-group co-btn-group--split">
               <button class="co-action-btn blue"  id="co-add-unused"    type="button">+ Add Card</button>
               <button class="co-action-btn muted" id="co-dismantle-all" type="button">Dismantle All</button>
             </div>
@@ -1670,7 +1802,7 @@ const Cards = (() => {
             <div class="co-block-title">Extra Buff</div>
             <p class="co-block-desc">It is highly recommended to add <span class="buff">Eternal Chaos (Bard/Dancer) or Glorious Command (GS)</span> bonus here.<br /><br />If there are exclusive effects (element enhance, damage bonus, etc.) from cards/equips, add them here. Make sure these haven't been included in the base inputs yet.<br /><br />Note that some effects are already included in your detailed stats (Nano Flying Blade, Acc Obs and Skeg 3*Set, One Punch Man Headgear, etc).</p>
             <div id="co-buff-list" class="co-buff-list"></div>
-            <div class="co-btn-group">
+            <div class="co-btn-group co-btn-group--split">
               <button class="co-action-btn blue"  id="co-add-buff"        type="button">+ Add Buff</button>
               <button class="co-action-btn muted" id="co-clear-all-buffs" type="button">Clear All</button>
             </div>
@@ -1681,11 +1813,12 @@ const Cards = (() => {
 
   function rebuildWeaponSlots(section) {
     const wrap     = section.querySelector('#co-equipped-slots');
-    const oldGroup = wrap.querySelector('[data-equip="weapon"]')?.closest('.co-equip-group') ?? wrap.firstElementChild;
+    const oldGroup = wrap.querySelector('[data-equip="weapon"]')?.closest('.co-equip-group');
+    if (!oldGroup) return;
     const count    = getWeaponSlotCount();
     const stored   = Store.section('cards');
-    const equipped = (stored.equippedBySize || {})[Divinity.getActiveSize()] || {};
-    const locked   = (stored.lockedBySize   || {})[Divinity.getActiveSize()] || {};
+    const equipped = (stored.inUse || {})[Divinity.getActiveSize()] || {};
+    const locked   = (stored.locked   || {})[Divinity.getActiveSize()] || {};
     const newGroup = fromHTML(buildEquipGroupHTML('weapon', equipSlots.weapon.label, count));
     newGroup.querySelectorAll('.co-card-select').forEach(input => {
       const val = equipped[`weapon_${input.dataset.slot}`] ?? '';
@@ -1696,7 +1829,17 @@ const Cards = (() => {
     newGroup.querySelectorAll('.co-lock-btn').forEach(btn => {
       Divinity.setLockState(btn, !!(locked[`weapon_${btn.dataset.slot}`]));
     });
-    wrap.replaceChild(newGroup, oldGroup);
+    oldGroup.parentNode.replaceChild(newGroup, oldGroup);
+    updateActionBtnVisibility(section);
+  }
+
+  function updateActionBtnVisibility(section) {
+    const hasEquipped = [...section.querySelectorAll('.co-card-select')].some(input => input.dataset.value);
+    const hasUnused   = section.querySelector('#co-unused-list').children.length > 0;
+    const hasBuffs    = section.querySelector('#co-buff-list').children.length > 0;
+    section.querySelector('#co-unequip-all').hidden    = !hasEquipped;
+    section.querySelector('#co-dismantle-all').hidden  = !hasUnused;
+    section.querySelector('#co-clear-all-buffs').hidden = !hasBuffs;
   }
 
   function bindCardsEvents(section) {
@@ -1704,7 +1847,14 @@ const Cards = (() => {
     const equippedSlots = section.querySelector('#co-equipped-slots');
     const unusedList    = section.querySelector('#co-unused-list');
     const buffList      = section.querySelector('#co-buff-list');
-    const save          = () => saveStateDebounced(section);
+    const refreshBtns   = () => updateActionBtnVisibility(section);
+    const save          = () => { saveStateDebounced(section); refreshBtns(); };
+
+    initSlider(
+      section, [...equippedSlots.querySelectorAll('.co-slide')],
+      null, null,
+      null, '#co-equip-slide-prev', '#co-equip-slide-next'
+    );
 
     equippedSlots.addEventListener('click', e => {
       const btn = e.target.closest('.co-lock-btn');
@@ -1733,9 +1883,9 @@ const Cards = (() => {
         const existing = [...unusedList.querySelectorAll('.co-unused-name')].find(el => el.dataset.value === name);
         if (existing) {
           const qtySel = existing.closest('.co-unused-row').querySelector('.co-unused-qty');
-          qtySel.value = Math.min(6, (parseInt(qtySel.value) || 0) + count);
+          qtySel.value = Math.min(MAX_UNUSED_QTY, (parseInt(qtySel.value) || 0) + count);
         } else {
-          addUnusedRow(section, name, String(Math.min(6, count)));
+          addUnusedRow(section, name, String(Math.min(MAX_UNUSED_QTY, count)));
         }
       }
       save();
@@ -1749,6 +1899,9 @@ const Cards = (() => {
       if (!confirm('Remove all buffs?')) return;
       buffList.innerHTML = ''; save();
     });
+
+    section.addEventListener('click', e => { if (e.target.closest('.co-rm-btn')) refreshBtns(); });
+    refreshBtns();
   }
 
   function buildCardsBreakdownHTML(equipMap, lockedMap = {}, beforeEquipMap = null) {
@@ -1776,33 +1929,45 @@ const Cards = (() => {
   return {
     getCard, isValidCard, filterValid, cardDeltaCache,
     getWeaponSlotCount, getSlotKey, buildPoolFromSection,
-    updateCardSearchQuality, updateCardSelectQuality,
-    applyCards, stripCards, applyCardStats, getCardStatDelta,
+    applyCards, stripCards,
     getCardsEquipMap, writeToSlots,
-    buildEquipGroupHTML, buildCardsHTML, buildCardsBreakdownHTML,
+    buildCardsHTML, buildCardsBreakdownHTML,
     addBuffRow, rebuildBuffList, addUnusedRow,
-    saveState, saveStateDebounced, loadState, switchSize, loadSizeToDOM,
-    bindEquipSlotSearch, bindCardsEvents, rebuildWeaponSlots,
-    readBuffs, readEquipped, readLocked, readUnused,
+    saveState, loadState, switchSize,
+    bindCardsEvents, rebuildWeaponSlots,
     clearCtxCache: () => cardDeltaCache.clear(),
     SLOT_COUNTS,
   };
 })();
 
 const Companion = (() => {
-  const { fmtPct, escHtml, updateUseBtn, initSlider, updateSelectsDisabled, bindCoPanelToggle, fromHTML, setQualityClass } = Utils;
+  const { fmtPct, escHtml, updateUseBtn, initSlider, updateSelectsDisabled, bindCoPanelToggle, fromHTML, setQualityClass, buildLockSvg } = Utils;
   const { companion, ui: { icons } } = Config;
   const { slots: companionSlots, maxItems: maxCompanion, maxStats: maxCompanionStats, rates: companionRates, starMult: companionStarMult } = companion;
 
-  const companionState = Store.persisted('companion', { items: [], usedBySlot: {} });
+  const companionState = { items: [], formation: {} };
   const items      = companionState.items;
-  const usedBySlot = companionState.usedBySlot;
+  const formation = companionState.formation;
   let activeIdx   = null;
   let currentSlot = 0;
+
+  const getFormationItem = slotIdx => formation[slotIdx]?.item ?? null;
+  const getFormationLock = slotIdx => formation[slotIdx]?.lock ?? false;
+  const getLockedSlots    = () => new Set(
+    Object.entries(formation).filter(([, entry]) => entry?.lock).map(([slot]) => Number(slot))
+  );
+  const getFlatFormation = () => {
+    const flat = {};
+    for (const [slot, entry] of Object.entries(formation)) flat[slot] = entry?.item ?? null;
+    return flat;
+  };
+  const isCompanionSlotLocked = slotIdx => getFormationLock(slotIdx);
+
 
   const slides      = [...Dom.companionSection.querySelectorAll('.co-slide')];
   const addBtnLabel = Dom.companionAddBtn.closest('.companion-item-add-node').querySelector('.companion-item-dot-lbl');
   Dom.companionClearBtn.innerHTML = icons.trash;
+  Dom.companionQLock.innerHTML   = buildLockSvg(false);
 
   const defaultCompanionItem = () => ({
     stats:   Array(maxCompanionStats).fill(null),
@@ -1822,10 +1987,11 @@ const Companion = (() => {
       const quality   = item.quality ?? '';
       const curIdx    = currentUsed[s] ?? null;
       const isChanged = recIdx !== curIdx;
+      const isLocked  = isCompanionSlotLocked(s);
       const recName   = item.name?.trim() || `Item ${recIdx + 1}`;
       parts.push(`<div class="co-companion-node${isChanged ? ' co-companion-changed' : ''}"
         data-slot="${s}" data-recidx="${recIdx}" data-curidx="${curIdx ?? ''}" data-changed="${isChanged}">
-        <div class="co-companion-dot${quality ? ' quality-' + quality : ''}"><span>${s + 1}</span>${isChanged ? icons.companionSwap : ''}</div>
+        <div class="co-companion-dot${quality ? ' quality-' + quality : ''}"><span>${s + 1}</span>${isChanged ? icons.companionSwap : ''}${isLocked ? icons.divLock : ''}</div>
         <span class="co-companion-lbl">${escHtml(recName)}</span>
       </div>`);
     }
@@ -1845,19 +2011,27 @@ const Companion = (() => {
   }
 
   function openCompanionModal({ slotIdx, recIdx, curIdx, isChanged }) {
-    const recItem = recIdx != null ? items[recIdx] : null;
-    const curItem = curIdx != null ? items[curIdx] : null;
+    const recItem        = recIdx != null ? items[recIdx] : null;
+    const curItem        = curIdx != null ? items[curIdx] : null;
     const showComparison = isChanged && curItem != null;
-    Dom.coCompanionModal.classList.remove('quality-purple', 'quality-gold');
-    if (recItem?.quality) setQualityClass(Dom.coCompanionModal, recItem.quality);
-    Dom.coCompanionModalStar.hidden    = !recItem?.star;
+    Dom.coCompanionModalStar.hidden          = !recItem?.star;
     Dom.coCompanionModalSlotName.textContent = `Formation Slot ${slotIdx + 1}`;
     Dom.coCompanionModalSubtitle.textContent = showComparison ? 'Item Change' : 'Recommended Item';
-    Dom.coCompanionModalStatsCur.hidden = !showComparison;
-    Dom.coCompanionModalArrow.hidden    = !showComparison;
-    if (showComparison) Dom.coCompanionModalStatsCur.innerHTML = buildCompanionStatRowsHTML(curItem, curIdx);
-    Dom.coCompanionModalStatsRec.innerHTML = buildCompanionStatRowsHTML(recItem, recIdx);
-    Dom.coCompanionBackdrop.classList.add('open');
+    Modals.openComparison({
+      backdropEl:     Dom.coCompanionBackdrop,
+      qualityEl:      Dom.coCompanionModal,
+      titleEl:        null,
+      flashEl:        null,
+      curEl:          Dom.coCompanionModalStatsCur,
+      arrowEl:        Dom.coCompanionModalArrow,
+      recEl:          Dom.coCompanionModalStatsRec,
+      quality:        recItem?.quality ?? null,
+      title:          '',
+      flashVisible:   false,
+      curHTML:        showComparison ? buildCompanionStatRowsHTML(curItem, curIdx) : '',
+      recHTML:        buildCompanionStatRowsHTML(recItem, recIdx),
+      showComparison,
+    });
   }
 
   const bindCompanionModalNodes = container =>
@@ -1874,7 +2048,16 @@ const Companion = (() => {
   }
 
   const readSlideInputs    = () => slides.map(slide => [...slide.querySelectorAll('.stats-input')].map(inp => inp.value));
-  const saveCompanionState = () => Store.write('companion', { ...Store.section('companion'), slideInputs: readSlideInputs() });
+  const serializeFormation = () => Object.fromEntries(
+    Object.entries(formation).map(([slot, entry]) => [slot, entry.lock ? { item: entry.item, lock: true } : { item: entry.item }])
+  );
+  const saveCompanionState = () => Store.write('companion', { ...companionState, formation: serializeFormation(), upgradeProgress: readSlideInputs() });
+
+  let _saveCompanionTimer = null;
+  const saveCompanionStateDebounced = () => {
+    clearTimeout(_saveCompanionTimer);
+    _saveCompanionTimer = setTimeout(saveCompanionState, 300);
+  };
 
   function loadCompanionState() {
     try {
@@ -1888,13 +2071,13 @@ const Companion = (() => {
         items.length = 0;
         items.push(...mapped);
       }
-      const usedEntries = Object.entries(stored.usedBySlot ?? {})
-        .map(([k, v]) => [Number(k), Number(v)])
-        .filter(([slot, idx]) => Number.isFinite(slot) && Number.isFinite(idx) && idx < items.length);
-      for (const k of Object.keys(usedBySlot)) delete usedBySlot[k];
-      for (const [k, v] of usedEntries) usedBySlot[k] = v;
-      if (Array.isArray(stored.slideInputs)) {
-        stored.slideInputs.forEach((vals, si) => {
+      const usedEntries = Object.entries(stored.formation ?? {})
+        .map(([k, v]) => [Number(k), typeof v === 'object' && v !== null ? { item: Number(v.item), lock: !!v.lock } : { item: Number(v), lock: false }])
+        .filter(([slot, entry]) => Number.isFinite(slot) && Number.isFinite(entry.item) && entry.item < items.length);
+      for (const k of Object.keys(formation)) delete formation[k];
+      for (const [k, entry] of usedEntries) formation[k] = { item: entry.item, lock: entry.lock };
+      if (Array.isArray(stored.upgradeProgress)) {
+        stored.upgradeProgress.forEach((vals, si) => {
           if (!slides[si]) return;
           const inputs = slides[si].querySelectorAll('.stats-input');
           vals.forEach((v, vi) => { if (inputs[vi]) inputs[vi].value = v; });
@@ -1937,10 +2120,10 @@ const Companion = (() => {
     return result;
   }
 
-  const calcCompanionSlotValues = slotIdx => resolveCompanionSlot(slotIdx, usedBySlot[slotIdx] ?? null) ?? {};
+  const calcCompanionSlotValues = slotIdx => resolveCompanionSlot(slotIdx, getFormationItem(slotIdx)) ?? {};
   const getCompanionItemSlot    = itemIdx => {
-    for (const [slot, itm] of Object.entries(usedBySlot)) {
-      if (itm === itemIdx) return Number(slot);
+    for (const [slot, entry] of Object.entries(formation)) {
+      if (entry?.item === itemIdx) return Number(slot);
     }
     return null;
   };
@@ -1955,26 +2138,40 @@ const Companion = (() => {
     return totals;
   };
   const getCompanionItems = () => items;
-  const getCompanionUsed  = () => usedBySlot;
+  const getCompanionUsed  = () => getFlatFormation();
+
+  function writeAssignment(assign) {
+    const lockedSlots = getLockedSlots();
+    for (const k of Object.keys(formation)) delete formation[k];
+    for (const [slot, idx] of Object.entries(assign ?? {}))
+      if (idx != null) formation[slot] = { item: idx, lock: lockedSlots.has(Number(slot)) };
+    saveCompanionState();
+    renderCompanionCircles();
+    updateCompanionAddBtn();
+    updateCompanionClearBtn();
+    updateAllCompanionSlides();
+  }
+
   const applyCompanion    = (state, slotMap) => applyCompanionStats(state, slotMap,  1);
   const stripCompanion    = (state, slotMap) => applyCompanionStats(state, slotMap, -1);
 
-  function writeCompanionAssign(assignment) {
-    for (let s = 0; s < companionSlots; s++) usedBySlot[s] = null;
-    for (const [s, idx] of Object.entries(assignment))
-      if (idx != null) usedBySlot[Number(s)] = idx;
-    items.forEach((_, i) => updateCompanionCircle(i));
-    for (let s = 0; s < companionSlots; s++) updateCompanionSlideValues(s);
-  }
-
   function runCompanionOptimizer(baseState) {
     if (!items.length) return null;
+    const lockedSlots = getLockedSlots();
+    const lockedMap   = new Map([...lockedSlots].map(s => [s, getFormationItem(s)]));
     let bestMult   = -Infinity;
     let bestAssign = {};
     function backtrack(slotIdx, assign, usedItems, state) {
       if (slotIdx === companionSlots) {
         const m = calculateMultiplier(state).mult;
         if (m > bestMult) { bestMult = m; bestAssign = { ...assign }; }
+        return;
+      }
+      if (lockedMap.has(slotIdx)) {
+        const lockedItem = lockedMap.get(slotIdx);
+        assign[slotIdx] = lockedItem;
+        backtrack(slotIdx + 1, assign, usedItems, applyCompanion(state, { [slotIdx]: lockedItem }));
+        assign[slotIdx] = null;
         return;
       }
       assign[slotIdx] = null;
@@ -1988,17 +2185,25 @@ const Companion = (() => {
         assign[slotIdx] = null;
       }
     }
-    backtrack(0, {}, new Set(), baseState);
-    const currentUsed = { ...usedBySlot };
+    backtrack(0, {}, new Set(lockedMap.values()), baseState);
+    const currentUsed = getFlatFormation();
     const improved    = Object.keys(bestAssign).some(s => (bestAssign[s] ?? null) !== (currentUsed[s] ?? null));
     return { assignment: bestAssign, improved };
+  }
+
+
+  function updateCompanionSlideLabel(slotIdx) {
+    const itemIdx = getFormationItem(slotIdx);
+    const suffix  = itemIdx != null ? ` (${getCompanionItemName(itemIdx)})` : '';
+    Dom.companionSlideLabel.textContent = `SLOT ${slotIdx + 1}${suffix}`;
   }
 
   function updateCompanionSlideValues(slotIdx) {
     if (!slides[slotIdx]) return;
     let display  = slides[slotIdx].querySelector('.companion-slot-values');
-    const itemIdx = usedBySlot[slotIdx] ?? null;
+    const itemIdx = getFormationItem(slotIdx);
     const item    = itemIdx != null ? items[itemIdx] : null;
+    if (slotIdx === currentSlot) updateCompanionSlideLabel(slotIdx);
     if (!item) { display?.remove(); return; }
     if (!display) {
       display = document.createElement('div');
@@ -2024,8 +2229,10 @@ const Companion = (() => {
 
   function companionOnSlotChange(slotIdx) {
     currentSlot = slotIdx;
-    if (activeIdx != null) { updateCompanionUseBtn(); updateCompanionCircle(activeIdx); }
+    updateCompanionSlideLabel(slotIdx);
+    if (activeIdx != null) { updateCompanionUseBtn(); updateCompanionCircle(activeIdx); updateCompanionLockBtn(); }
   }
+
 
   const getCompanionDotClasses = (item, idx, usedSlot) => {
     const cls = ['companion-item-dot'];
@@ -2036,15 +2243,12 @@ const Companion = (() => {
   };
 
   function makeCircleEl(idx) {
-    const item     = items[idx];
-    const usedSlot = getCompanionItemSlot(idx);
     const node     = document.createElement('div');
-    node.className   = `companion-item-node${item.stats.some(Boolean) ? ' has-stats' : ''}`;
+    node.className   = 'companion-item-node';
     node.dataset.idx = idx;
-    node.innerHTML   = `
-      <div class="${getCompanionDotClasses(item, idx, usedSlot)}">${usedSlot != null ? String(usedSlot + 1) : ''}</div>
-      <span class="companion-item-dot-lbl">${getCompanionItemName(idx)}</span>`;
+    node.innerHTML   = `<div class="companion-item-dot"></div><span class="companion-item-dot-lbl"></span>`;
     node.addEventListener('click', () => toggleCompanionSheet(idx));
+    updateCompanionCircle(idx, node);
     return node;
   }
 
@@ -2054,9 +2258,9 @@ const Companion = (() => {
     items.forEach((_, idx) => Dom.companionItemRow.insertBefore(makeCircleEl(idx), addNode));
   }
 
-  function updateCompanionCircle(idx) {
+  function updateCompanionCircle(idx, el) {
     if (idx == null || idx < 0 || idx >= items.length) return;
-    const el = Dom.companionItemRow.querySelector(`.companion-item-node[data-idx="${idx}"]`);
+    el = el ?? Dom.companionItemRow.querySelector(`.companion-item-node[data-idx="${idx}"]`);
     if (!el) return;
     const item     = items[idx];
     const usedSlot = getCompanionItemSlot(idx);
@@ -2075,6 +2279,15 @@ const Companion = (() => {
     Dom.companionQStar.classList.toggle('active',   !!(item?.star));
   }
 
+  function updateCompanionLockBtn() {
+    const canShowLock = activeIdx != null && getFormationItem(currentSlot) === activeIdx;
+    Dom.companionQLock.style.display = canShowLock ? '' : 'none';
+    if (!canShowLock) return;
+    const locked = getFormationLock(currentSlot);
+    Dom.companionQLock.classList.toggle('active', locked);
+    Dom.companionQLock.innerHTML = buildLockSvg(locked);
+  }
+
   function setCompanionQuality(q) {
     if (activeIdx == null) return;
     const item   = items[activeIdx];
@@ -2083,6 +2296,7 @@ const Companion = (() => {
     updateCompanionCircle(activeIdx);
     const slot = getCompanionItemSlot(activeIdx);
     if (slot != null) updateCompanionSlideValues(slot);
+    saveCompanionState();
   }
 
   function setCompanionStar() {
@@ -2091,15 +2305,24 @@ const Companion = (() => {
     updateCompanionQualityBtns();
     const slot = getCompanionItemSlot(activeIdx);
     if (slot != null) updateCompanionSlideValues(slot);
+    saveCompanionState();
+  }
+
+  function setCompanionLock() {
+    if (activeIdx == null || getFormationItem(currentSlot) !== activeIdx) return;
+    formation[currentSlot].lock = !getFormationLock(currentSlot);
+    updateCompanionLockBtn();
+    saveCompanionState();
   }
 
   const updateCompanionUseBtn = () =>
-    updateUseBtn(Dom.companionUseBtn, activeIdx != null && usedBySlot[currentSlot] === activeIdx);
+    updateUseBtn(Dom.companionUseBtn, activeIdx != null && getFormationItem(currentSlot) === activeIdx);
 
   function openCompanionSheet(idx) {
     activeIdx = idx;
     Dom.companionSheetTitle.textContent = getCompanionItemName(idx);
     updateCompanionQualityBtns();
+    updateCompanionLockBtn();
     updateCompanionUseBtn();
     renderCompanionSheetStats();
     Dom.companionItemPanel.classList.add('open');
@@ -2145,6 +2368,7 @@ const Companion = (() => {
       const slot = getCompanionItemSlot(activeIdx);
       if (slot != null) updateCompanionSlideValues(slot);
       updateCompanionCircle(activeIdx);
+      saveCompanionState();
     });
     return rowEl;
   }
@@ -2166,41 +2390,45 @@ const Companion = (() => {
   function initCompanionItems() {
     slides.forEach((slide, si) => {
       slide.querySelectorAll('.stats-input').forEach(inp => {
-        inp.addEventListener('input', () => { updateCompanionSlideValues(si); saveCompanionState(); });
+        inp.addEventListener('input', () => { updateCompanionSlideValues(si); saveCompanionStateDebounced(); });
       });
     });
 
+    Dom.companionQLock.addEventListener('click',   () => setCompanionLock());
     Dom.companionQPurple.addEventListener('click', () => setCompanionQuality('purple'));
     Dom.companionQGold.addEventListener('click',   () => setCompanionQuality('gold'));
     Dom.companionQStar.addEventListener('click',   () => setCompanionStar());
 
     Dom.companionUseBtn.addEventListener('click', () => {
       if (activeIdx == null) return;
-      if (usedBySlot[currentSlot] === activeIdx) {
-        delete usedBySlot[currentSlot];
+      if (getFormationItem(currentSlot) === activeIdx) {
+        delete formation[currentSlot];
         updateCompanionSlideValues(currentSlot);
       } else {
         const prevSlot = getCompanionItemSlot(activeIdx);
-        if (prevSlot != null) { delete usedBySlot[prevSlot]; updateCompanionSlideValues(prevSlot); }
-        const prevItem = usedBySlot[currentSlot];
-        if (prevItem != null) { delete usedBySlot[currentSlot]; updateCompanionCircle(prevItem); }
-        usedBySlot[currentSlot] = activeIdx;
+        if (prevSlot != null) { delete formation[prevSlot]; updateCompanionSlideValues(prevSlot); }
+        const prevItem = getFormationItem(currentSlot);
+        if (prevItem != null) { delete formation[currentSlot]; updateCompanionCircle(prevItem); }
+        formation[currentSlot] = { item: activeIdx, lock: false };
         updateCompanionSlideValues(currentSlot);
       }
+      saveCompanionState();
       updateCompanionCircle(activeIdx);
       updateCompanionUseBtn();
+      updateCompanionLockBtn();
     });
 
     Dom.companionRemoveBtn.addEventListener('click', () => {
       if (activeIdx == null) return;
       if (!confirm(`Remove Item ${activeIdx + 1}?`)) return;
-      for (const [slot, itm] of Object.entries(usedBySlot)) {
-        if (itm === activeIdx) { delete usedBySlot[slot]; updateCompanionSlideValues(Number(slot)); }
+      for (const [slot, entry] of Object.entries(formation)) {
+        if (entry?.item === activeIdx) { delete formation[slot]; updateCompanionSlideValues(Number(slot)); }
       }
       items.splice(activeIdx, 1);
-      const shifted = Object.entries(usedBySlot).map(([slot, itm]) => [slot, itm > activeIdx ? itm - 1 : itm]);
-      for (const k of Object.keys(usedBySlot)) delete usedBySlot[k];
-      for (const [slot, itm] of shifted) usedBySlot[slot] = itm;
+      const shifted = Object.entries(formation).map(([slot, entry]) => [slot, { item: entry.item > activeIdx ? entry.item - 1 : entry.item, lock: entry.lock }]);
+      for (const k of Object.keys(formation)) delete formation[k];
+      for (const [slot, entry] of shifted) formation[slot] = entry;
+      saveCompanionState();
       closeCompanionSheet();
       renderCompanionCircles();
       updateCompanionAddBtn();
@@ -2227,6 +2455,7 @@ const Companion = (() => {
         Dom.companionSheetTitle.style.display   = Dom.companionEditBtn.style.display = '';
         inp.remove();
         updateCompanionCircle(activeIdx);
+        saveCompanionState();
       }
       inp.addEventListener('blur', commit);
       inp.addEventListener('keydown', e => {
@@ -2236,16 +2465,19 @@ const Companion = (() => {
     });
 
     Dom.companionClearBtn.addEventListener('click', () => {
-      if (!confirm('Clear all companion items?')) return;
+      if (!confirm('Remove all added companions?')) return;
       items.length = 0;
-      for (const k of Object.keys(usedBySlot)) delete usedBySlot[k];
+      for (const k of Object.keys(formation)) delete formation[k];
+      saveCompanionState();
       closeCompanionSheet();
       renderCompanionCircles();
       updateCompanionAddBtn();
       updateCompanionClearBtn();
       for (let s = 0; s < companionSlots; s++) updateCompanionSlideValues(s);
+    });
 
-      if (!confirm('Also reset slot upgrade progress (the input fields)?')) return;
+    Dom.companionResetInputBtn.addEventListener('click', () => {
+      if (!confirm('Reset all upgrade progress for Slot 1-4?')) return;
       for (let s = 0; s < companionSlots; s++) {
         if (slides[s]) slides[s].querySelectorAll('.stats-input').forEach(inp => { inp.value = ''; });
         updateCompanionSlideValues(s);
@@ -2256,13 +2488,13 @@ const Companion = (() => {
     Dom.companionAddBtn.addEventListener('click', () => {
       if (items.length >= maxCompanion) return;
       items.push(defaultCompanionItem());
+      saveCompanionState();
       renderCompanionCircles();
       updateCompanionAddBtn();
       updateCompanionClearBtn();
     });
 
     loadCompanionState();
-    if (!items.length) items.push(defaultCompanionItem());
     renderCompanionCircles();
     updateCompanionAddBtn();
     updateCompanionClearBtn();
@@ -2270,52 +2502,92 @@ const Companion = (() => {
   }
 
   return {
-    defaultCompanionItem,
-    buildCompanionNodesHTML, openCompanionModal, bindCompanionModalNodes,
+    buildCompanionNodesHTML, bindCompanionModalNodes,
     initCompanionSlider, initCompanionItems,
-    apply:         applyCompanion,
-    strip:         stripCompanion,
+    applyCompanion, stripCompanion,
     runOptimizer:  runCompanionOptimizer,
-    writeAssign:   writeCompanionAssign,
     getItems:      getCompanionItems,
     getUsed:       getCompanionUsed,
+    writeAssignment,
     getBonuses:    getCompanionBonuses,
     rerenderSheet: rerenderCompanionSheet,
   };
 })();
 
-Domains.register({
-  key:      'companion',
-  isAux:    true,
-  isActive: () => Companion.getItems().length > 0,
-  optimize: state => Companion.runOptimizer(state)?.assignment ?? null,
-  apply:    (state, assign) => (assign ? Companion.apply(state, assign) : state),
-  strip:    (state, assign) => (assign ? Companion.strip(state, assign) : state),
-});
-
 const Enchant = (() => {
   const { enchant, ENCHANT_OPTIONS_MAP: EOMAP } = Config;
   const { sixSlot: enchantSixSlot, options: enchantOptions, levelHtml: enchantLevelHtml, awakeningPerLevel: enchantAwakeningPerLevel, maxPrefs: maxEnchPrefs } = enchant;
-  const { fromHTML } = Utils;
+  const { fromHTML, bindCoPanelToggle, initSlider } = Utils;
 
-  const enchantState = Store.persisted('enchantment', {
+  const ACC_GROUPS = [
+    { label: 'Left Accessory',  range: [0, 3] },
+    { label: 'Right Accessory', range: [3, 6] },
+    { label: 'Talisman',        range: [6, 9] },
+  ];
+
+  let activeSlide = 0;
+
+  const enchantState = {
     awakening: '',
-    slots:     [],
-    prefs:     { mode: 'chip', chip: [], custom: { awakening: '', slots: [] } },
-  });
+    weapon: {
+      slots: [],
+      prefs: {
+        mode:   'chip',
+        chip:   [],
+        custom: [],
+      },
+    },
+    acc: {
+      slots: [],
+      prefs: {
+        mode:   'chip',
+        chip:   [],
+        custom: [],
+      },
+    },
+  };
+  const saveEnchantState = () => Store.write('enchantment', enchantState);
 
-  const defaultEnchPrefs = () => ({ mode: 'chip', chip: [], custom: { awakening: '', slots: [] } });
+  const renderActiveSettingsPanel = () => { activeSlide === 0 ? renderWeaponSettingsPanel() : renderAccSettingsPanel(); };
 
-  const refresh = () => { if (Dom.enchSettingsPanel?.classList.contains('open')) renderSettingsPanel(); };
-
-  const getEnchantLayout = weapon => {
-    const is1H = enchantSixSlot.has(weapon);
-    return is1H
-      ? { slotCount: 6, groups: [{ label: 'Main Hand', range: [0, 3] }, { label: 'Off Hand', range: [3, 6] }] }
-      : { slotCount: 3, groups: [{ label: '2Handed Enchantment', range: [0, 3] }] };
+  const refresh = () => {
+    if (!Dom.enchSettingsPanel?.classList.contains('open')) return;
+    renderActiveSettingsPanel();
   };
 
-  const getEnchantColForSlot = (weapon, slotIndex) => {
+  const resetEnchantPrefs = (group, mode) => {
+    enchantState[group].prefs[mode] = [];
+    saveEnchantState();
+    refresh();
+  };
+
+  const resetEnchantSlots = group => {
+    enchantState[group].slots = [];
+    if (Dom.enchAwakeningSelect) Dom.enchAwakeningSelect.value = '';
+    enchantState.awakening = '';
+    saveEnchantState();
+    if (group === 'weapon') rebuildWeaponEnchantPairs(true);
+    else                    rebuildAccEnchantPairs(true);
+    refresh();
+  };
+
+  const setActiveSlide = idx => { activeSlide = idx; };
+  const getActiveSlide = () => activeSlide;
+
+  const toggleMode = (group, renderFn) => {
+    enchantState[group].prefs.mode = enchantState[group].prefs.mode === 'custom' ? 'chip' : 'custom';
+    saveEnchantState();
+    renderFn();
+  };
+
+  const getWeaponEnchantLayout = weapon => {
+    const groups = enchantSixSlot.has(weapon)
+      ? [{ label: 'Main Hand', range: [0, 3] }, { label: 'Off Hand', range: [3, 6] }]
+      : [{ label: '2Handed Enchantment', range: [0, 3] }];
+    return { slotCount: groups[groups.length - 1].range[1], groups };
+  };
+
+  const getWeaponEnchantColForSlot = (weapon, slotIndex) => {
     if (weapon === 'Dagger') return 'Dagger';
     return enchantSixSlot.has(weapon) ? (slotIndex < 3 ? '1H' : 'Shield') : '2H';
   };
@@ -2323,11 +2595,18 @@ const Enchant = (() => {
   const getAwkMult    = () => { const v = parseInt(Dom.enchAwakeningSelect?.value) || 0; return v > 0 ? (1 + v * enchantAwakeningPerLevel) : 1; };
   const getEnchantVal    = (key, level, col, awkMult) => {
     const eq     = EOMAP.get(key)?.eq;
-    const perLvl = eq?.weapon?.[col] ?? eq?.acc?.value;
+    const perLvl = col === 'acc' ? eq?.acc?.value : eq?.weapon?.[col];
     if (perLvl == null) return null;
     return +(perLvl * level * awkMult).toFixed(2);
   };
   const getEnchantsByEq  = eq => enchantOptions.filter(o => o.eq[eq]);
+
+  const getPairSelects = pair => [pair.children[0]?.firstElementChild, pair.children[1]?.firstElementChild];
+  const readPair = pair => {
+    const [enchantSel, lvlSel] = getPairSelects(pair);
+    return { enchant: enchantSel?.value || '', level: lvlSel?.value || '' };
+  };
+  const readPairsFrom = lines => [...(lines?.querySelectorAll('.ench-pair') ?? [])].map(readPair);
 
   function makeEnchantLabel(id, text) {
     const el = document.createElement('div');
@@ -2337,68 +2616,81 @@ const Enchant = (() => {
     return el;
   }
 
-  function makeEnchantPairEl(savedEnchant, savedLevel) {
+  function makeEnchantPairEl(savedEnchant, savedLevel, slotKey = 'weapon') {
     const pair = fromHTML(`<div class="ench-pair">
-      <div class="select-wrap"><select class="stats-select">${Labels.buildEnchantOptionsHTML(savedEnchant || '')}</select></div>
+      <div class="select-wrap"><select class="stats-select">${Labels.buildEnchantOptionsHTML(savedEnchant || '', slotKey)}</select></div>
       <div class="select-wrap"><select class="stats-select">${enchantLevelHtml}</select></div>
     </div>`);
-    const [enchantSel, lvlSel] = pair.querySelectorAll('select');
-    if (savedEnchant)  enchantSel.value = savedEnchant;
-    if (savedLevel) lvlSel.value  = savedLevel;
+    const [enchantSel, lvlSel] = getPairSelects(pair);
+    if (savedEnchant) enchantSel.value = savedEnchant;
+    if (savedLevel)   lvlSel.value     = savedLevel;
     return pair;
   }
 
-  function rebuildEnchantPairs(force = false) {
-    const lines  = Dom.enchLines;
+  function rebuildEnchantPairs({ lines, groups, slotCount, slotKey, saved }, force) {
     if (!lines) return;
-    const weapon = Dom.weapon.value;
-    const { slotCount, groups } = getEnchantLayout(weapon);
-    const pairs  = lines.querySelectorAll('.ench-pair');
+    const pairs = lines.querySelectorAll('.ench-pair');
     if (!force && pairs.length === slotCount) {
       pairs.forEach(pair => {
-        const enchantSel = pair.querySelector('select');
+        const [enchantSel] = getPairSelects(pair);
         if (!enchantSel) return;
         const cur = enchantSel.value;
-        enchantSel.innerHTML = Labels.buildEnchantOptionsHTML(cur);
+        enchantSel.innerHTML = Labels.buildEnchantOptionsHTML(cur, slotKey);
         enchantSel.value = cur;
       });
-      updateEnchantTotal();
       return;
     }
-    const saved = enchantState.slots;
     lines.innerHTML = '';
     for (const { label, range: [start, end] } of groups) {
-      lines.appendChild(makeEnchantLabel(`enchLbl_${start}`, label));
+      lines.appendChild(makeEnchantLabel(`${slotKey === 'acc' ? 'enchLblAcc' : 'enchLbl'}_${start}`, label));
       for (let i = start; i < end; i++)
-        lines.appendChild(makeEnchantPairEl(saved[i]?.enchant, saved[i]?.level));
+        lines.appendChild(makeEnchantPairEl(saved[i]?.enchant, saved[i]?.level, slotKey));
     }
-    updateEnchantTotal();
+  }
+
+  function rebuildWeaponEnchantPairs(force = false) {
+    const weapon = Dom.weapon.value;
+    const { slotCount, groups } = getWeaponEnchantLayout(weapon);
+    rebuildEnchantPairs({ lines: Dom.enchWeaponLines, groups, slotCount, slotKey: 'weapon', saved: enchantState.weapon.slots }, force);
+  }
+
+  function rebuildAccEnchantPairs(force = false) {
+    const slotCount = ACC_GROUPS[ACC_GROUPS.length - 1].range[1];
+    rebuildEnchantPairs({ lines: Dom.enchAccLines, groups: ACC_GROUPS, slotCount, slotKey: 'acc', saved: enchantState.acc.slots }, force);
   }
 
   function readEnchantStateFromDOM() {
-    enchantState.awakening = Dom.enchAwakeningSelect?.value || '';
-    enchantState.slots     = [...Dom.enchLines.querySelectorAll('.ench-pair')].map(pair => ({
-      enchant: pair.children[0]?.firstElementChild?.value || '',
-      level:   pair.children[1]?.firstElementChild?.value || '',
-    }));
+    enchantState.awakening       = Dom.enchAwakeningSelect?.value || '';
+    enchantState.weapon.slots    = readPairsFrom(Dom.enchWeaponLines);
+    enchantState.acc.slots       = readPairsFrom(Dom.enchAccLines);
+    saveEnchantState();
   }
 
   function loadEnchantState() {
     try {
-      const stored           = Store.section('enchantment');
+      const stored = Store.section('enchantment');
       enchantState.awakening = stored.awakening || '';
-      enchantState.slots     = stored.slots     || [];
-      const rawPrefs = stored.prefs;
-      if (Array.isArray(rawPrefs)) {
-        enchantState.prefs = defaultEnchPrefs();
-        enchantState.prefs.chip = rawPrefs;
-      } else if (rawPrefs && typeof rawPrefs === 'object') {
-        enchantState.prefs = { mode: rawPrefs.mode || 'chip', chip: rawPrefs.chip || [], custom: rawPrefs.custom || { awakening: '', slots: [] } };
-      } else {
-        enchantState.prefs = defaultEnchPrefs();
-      }
+      const rw = stored.weapon || {};
+      const ra = stored.acc    || {};
+      enchantState.weapon = {
+        slots: rw.slots || [],
+        prefs: {
+          mode:   rw.prefs?.mode   || 'chip',
+          chip:   rw.prefs?.chip   || [],
+          custom: rw.prefs?.custom || [],
+        },
+      };
+      enchantState.acc = {
+        slots: ra.slots || [],
+        prefs: {
+          mode:   ra.prefs?.mode   || 'chip',
+          chip:   ra.prefs?.chip   || [],
+          custom: ra.prefs?.custom || [],
+        },
+      };
       if (Dom.enchAwakeningSelect && enchantState.awakening) Dom.enchAwakeningSelect.value = enchantState.awakening;
-      rebuildEnchantPairs();
+      rebuildWeaponEnchantPairs();
+      rebuildAccEnchantPairs();
     } catch (err) {
       console.warn('Enchant.loadEnchantState: failed to restore enchantment state', err);
     }
@@ -2407,12 +2699,13 @@ const Enchant = (() => {
   function getEnchantSlotState() {
     const weapon  = Dom.weapon.value;
     const awkMult = getAwkMult();
-    return [...Dom.enchLines.querySelectorAll('.ench-pair')].map((pair, i) => {
-      const key   = pair.children[0]?.firstElementChild?.value || '';
-      const level = parseInt(pair.children[1]?.firstElementChild?.value) || 0;
-      const col   = getEnchantColForSlot(weapon, i);
-      return { key, level, col, slotIdx: i, awkMult };
-    });
+    const weaponSlots = readPairsFrom(Dom.enchWeaponLines).map(({ enchant, level }, i) =>
+      ({ key: enchant, level: parseInt(level) || 0, col: getWeaponEnchantColForSlot(weapon, i), slotIdx: i, group: 'weapon', awkMult })
+    );
+    const accSlots = readPairsFrom(Dom.enchAccLines).map(({ enchant, level }, i) =>
+      ({ key: enchant, level: parseInt(level) || 0, col: 'acc', slotIdx: i, group: 'acc', awkMult })
+    );
+    return [...weaponSlots, ...accSlots];
   }
 
   const makeEnchantEntry = (key, level, col, awkMult) => {
@@ -2423,22 +2716,33 @@ const Enchant = (() => {
     return { key, field: opt.type, val, label: opt.label, type: opt.type };
   };
 
+  const getAccGroupForSlot = slotIdx => {
+    const groupIdx = ACC_GROUPS.findIndex(({ range: [start, end] }) => slotIdx >= start && slotIdx < end);
+    return groupIdx === -1 ? null : { groupIdx, localIdx: slotIdx - ACC_GROUPS[groupIdx].range[0] };
+  };
+
   function getEnchantCandidates(slotState) {
-    const prefs = enchantState.prefs;
-    if (prefs.mode === 'custom') {
-      const customSlots = prefs.custom?.slots || [];
-      const v = parseInt(prefs.custom?.awakening) || 0;
-      const customAwk = v > 0 ? (1 + v * enchantAwakeningPerLevel) : 1;
-      return slotState.map(({ col, slotIdx }) => {
-        const cs = customSlots[slotIdx];
+    return slotState.map(({ key, level, col, slotIdx, group, awkMult }) => {
+      const grpState = group === 'acc' ? enchantState.acc : enchantState.weapon;
+      const prefs    = grpState.prefs;
+      const isCustom = prefs.mode === 'custom';
+
+      if (isCustom) {
+        const cs = prefs.custom?.[slotIdx];
         if (!cs?.enchant || !cs?.level) return [];
-        const entry = makeEnchantEntry(cs.enchant, parseInt(cs.level), col, customAwk);
+        const entry = makeEnchantEntry(cs.enchant, parseInt(cs.level), col, awkMult);
         return entry ? [entry] : [];
-      });
-    }
-    return slotState.map(({ key, level, col, slotIdx, awkMult }) => {
+      }
+
       if (!level) return [];
-      const poolKeys = new Set(prefs.chip[slotIdx] || []);
+      let chipPool;
+      if (group === 'acc') {
+        const loc = getAccGroupForSlot(slotIdx);
+        chipPool = loc ? (prefs.chip[loc.groupIdx]?.[loc.localIdx] || []) : [];
+      } else {
+        chipPool = prefs.chip[slotIdx] || [];
+      }
+      const poolKeys = new Set(chipPool);
       if (key) poolKeys.add(key);
       return [...poolKeys].map(k => makeEnchantEntry(k, level, col, awkMult)).filter(Boolean);
     });
@@ -2449,61 +2753,124 @@ const Enchant = (() => {
       (key && level) ? makeEnchantEntry(key, level, col, awkMult) : null
     );
 
-  function updateEnchantTotal() {
-    const lines = Dom.enchLines;
-    if (!lines) return;
-    const weapon  = Dom.weapon.value;
-    const awkMult = getAwkMult();
-    lines.querySelectorAll('.ench-pair').forEach((pair, i) => {
-      const key    = pair.children[0]?.firstElementChild?.value;
-      const level  = parseInt(pair.children[1]?.firstElementChild?.value);
-      const valSel = pair.children[2]?.firstElementChild;
-      if (!key || !level) { if (valSel) valSel.options[0].text = '—'; return; }
-      const col = getEnchantColForSlot(weapon, i);
-      const val = getEnchantVal(key, level, col, awkMult);
-      if (val == null) { if (valSel) valSel.options[0].text = '—'; return; }
-      if (valSel) valSel.options[0].text = `${val}`;
+  function writeAssignment(assignment) {
+    if (!assignment?.length) return;
+    const weaponPairs = [...Dom.enchWeaponLines.querySelectorAll('.ench-pair')];
+    const accPairs    = [...Dom.enchAccLines.querySelectorAll('.ench-pair')];
+    const allPairs    = [...weaponPairs, ...accPairs];
+    allPairs.forEach((pair, i) => {
+      const entry = assignment[i];
+      if (!entry?.key) return;
+      const [enchantSel] = getPairSelects(pair);
+      if (enchantSel) enchantSel.value = entry.key;
     });
+    readEnchantStateFromDOM();
   }
 
-  function applyEnchantStats(state, assignment, sign) {
+  function stripRawPenEnchant(rawPenVal, enchRaw, enchPct) {
+    const withoutPct = enchPct ? rawPenVal / (1 + enchPct / 100) : rawPenVal;
+    return withoutPct - enchRaw;
+  }
+
+  function applyRawPenEnchant(gearRaw, enchRaw, enchPct) {
+    return (gearRaw + enchRaw) * (1 + enchPct / 100);
+  }
+
+  function applyEnchant(state, assignment) {
     if (!assignment?.length) return state;
-    const deltas = assignment.filter(s => s?.field).map(s => ({ field: s.field, val: s.val }));
-    return Divinity.applyDeltas(state, deltas, sign);
+    let result = { ...state };
+    let enchRaw = 0;
+    let enchPct = 0;
+    for (const s of assignment) {
+      if (!s?.field) continue;
+      if (s.field === 'rawPen') { enchRaw += s.val; continue; }
+      if (s.field === 'pctPen') { enchPct += s.val; continue; }
+      result[s.field] = (result[s.field] || 0) + s.val;
+    }
+    if (enchRaw || enchPct)
+      result.rawPen = applyRawPenEnchant(result.rawPen || 0, enchRaw, enchPct);
+    return result;
   }
 
-  const applyEnchant = (state, assign) => applyEnchantStats(state, assign,  1);
-  const stripEnchant = (state, assign) => applyEnchantStats(state, assign, -1);
+  function stripEnchant(state, assignment) {
+    if (!assignment?.length) return state;
+    let result = { ...state };
+    let enchRaw = 0;
+    let enchPct = 0;
+    for (const s of assignment) {
+      if (!s?.field) continue;
+      if (s.field === 'rawPen') { enchRaw += s.val; continue; }
+      if (s.field === 'pctPen') { enchPct += s.val; continue; }
+      result[s.field] = (result[s.field] || 0) - s.val;
+    }
+    if (enchRaw || enchPct)
+      result.rawPen = stripRawPenEnchant(result.rawPen || 0, enchRaw, enchPct);
+    return result;
+  }
 
   function runEnchantOptimizer(baseState, candidates, initialAssignment) {
     if (!candidates?.length || candidates.every(c => !c.length)) return null;
-    let assignment = initialAssignment.map((cur, i) => {
-      if (!candidates[i]?.length) return null;
-      return candidates[i].find(c => c.key === cur?.key) ?? candidates[i][0] ?? null;
-    });
-    let changed = true;
-    while (changed) {
-      changed = false;
-      for (let i = 0; i < candidates.length; i++) {
-        if (!candidates[i]?.length) continue;
-        const baseWithOthers = { ...baseState };
-        for (let j = 0; j < assignment.length; j++) {
-          if (j === i) continue;
-          const a = assignment[j];
-          if (a?.field) baseWithOthers[a.field] = (baseWithOthers[a.field] || 0) + a.val;
+
+    const slots = candidates.length;
+    const candList = candidates.map((c, i) => c.length ? c : [initialAssignment[i] ?? null]);
+    const isPenType = entry => entry?.field === 'rawPen' || entry?.field === 'pctPen';
+
+    const coupledIdx     = [];
+    const independentIdx = [];
+    for (let i = 0; i < slots; i++) (candList[i].some(isPenType) ? coupledIdx : independentIdx).push(i);
+
+    const independentPick    = new Array(slots).fill(null);
+    let stateAfterIndependent = { ...baseState };
+    for (const i of independentIdx) {
+      let bestCand = candList[i][0] ?? null;
+      let bestM    = -Infinity;
+      for (const cand of candList[i]) {
+        const trial = { ...stateAfterIndependent };
+        if (cand?.field) trial[cand.field] = (trial[cand.field] || 0) + cand.val;
+        const m = calculateMultiplier(trial).mult;
+        if (m > bestM) { bestM = m; bestCand = cand; }
+      }
+      independentPick[i] = bestCand;
+      if (bestCand?.field) stateAfterIndependent[bestCand.field] = (stateAfterIndependent[bestCand.field] || 0) + bestCand.val;
+    }
+
+    let bestCoupled = coupledIdx.map(i => candList[i][0] ?? null);
+    if (coupledIdx.length) {
+      const indices = new Array(coupledIdx.length).fill(0);
+      let bestMult = -Infinity;
+      while (true) {
+        let enchRaw = 0;
+        let enchPct = 0;
+        const state = { ...stateAfterIndependent };
+        for (let j = 0; j < coupledIdx.length; j++) {
+          const cand = candList[coupledIdx[j]][indices[j]];
+          if (!cand?.field) continue;
+          if (cand.field === 'rawPen') { enchRaw += cand.val; continue; }
+          if (cand.field === 'pctPen') { enchPct += cand.val; continue; }
+          state[cand.field] = (state[cand.field] || 0) + cand.val;
         }
-        let bestMult = -Infinity;
-        let bestCand = assignment[i];
-        for (const cand of candidates[i]) {
-          const testState = { ...baseWithOthers };
-          if (cand?.field) testState[cand.field] = (testState[cand.field] || 0) + cand.val;
-          const mult = calculateMultiplier(testState).mult;
-          if (mult > bestMult) { bestMult = mult; bestCand = cand; }
+        state.rawPen = applyRawPenEnchant(stateAfterIndependent.rawPen || 0, enchRaw, enchPct);
+        const mult = calculateMultiplier(state).mult;
+        if (mult > bestMult) {
+          bestMult    = mult;
+          bestCoupled = indices.map((idx, j) => candList[coupledIdx[j]][idx] ?? null);
         }
-        if (bestCand?.key !== assignment[i]?.key) { assignment[i] = bestCand; changed = true; }
+
+        let carry = coupledIdx.length - 1;
+        while (carry >= 0) {
+          indices[carry]++;
+          if (indices[carry] < candList[coupledIdx[carry]].length) break;
+          indices[carry] = 0;
+          carry--;
+        }
+        if (carry < 0) break;
       }
     }
-    return assignment;
+
+    const bestAssignment = new Array(slots).fill(null);
+    independentIdx.forEach(i => { bestAssignment[i] = independentPick[i]; });
+    coupledIdx.forEach((i, k) => { bestAssignment[i] = bestCoupled[k]; });
+    return bestAssignment;
   }
 
   const hasActiveEnchantCandidates = () => getEnchantCandidates(getEnchantSlotState()).some(c => c.length);
@@ -2514,29 +2881,7 @@ const Enchant = (() => {
     return runEnchantOptimizer(baseState, candidates, currentAssignment ?? getEnchantCurrentAssign(slotState));
   }
 
-  function writeEnchantToDOM(bestEnchantAssign) {
-    if (!bestEnchantAssign?.length) return;
-    [...Dom.enchLines.querySelectorAll('.ench-pair')].forEach((pair, i) => {
-      const slot = bestEnchantAssign[i];
-      if (!slot) return;
-      const enchantSel = pair.children[0]?.firstElementChild;
-      if (enchantSel && slot.key) enchantSel.value = slot.key;
-    });
-    enchantState.prefs.chip = [];
-    readEnchantStateFromDOM();
-    updateEnchantTotal();
-  }
-
-  function renderSettingsPanel() {
-    const inner  = Dom.enchSettingsInner;
-    if (!inner) return;
-    const weapon = Dom.weapon.value;
-    const { slotCount, groups } = getEnchantLayout(weapon);
-    const prefs    = enchantState.prefs;
-    const isCustom = prefs.mode === 'custom';
-
-    inner.innerHTML = '';
-
+  function buildModeToggleButton(isCustom, onToggle) {
     const modeBtn = document.createElement('button');
     modeBtn.type        = 'button';
     modeBtn.className   = 'ench-mode-btn' + (isCustom ? ' active' : '');
@@ -2545,192 +2890,300 @@ const Enchant = (() => {
       const panel = Dom.enchSettingsPanel;
       panel.classList.remove('open');
       panel.addEventListener('transitionend', () => {
-        enchantState.prefs.mode = enchantState.prefs.mode === 'custom' ? 'chip' : 'custom';
-        setTimeout(() => { renderSettingsPanel(); panel.classList.add('open'); }, 120);
+        onToggle();
+        setTimeout(() => panel.classList.add('open'), 120);
       }, { once: true });
     });
-    inner.appendChild(modeBtn);
+    return modeBtn;
+  }
+
+  function buildPrefsResetButton(group, isCustom) {
+    const mode = isCustom ? 'custom' : 'chip';
+    const groupLabel = group === 'acc' ? 'Accessory' : 'Weapon';
+    const modeLabel  = isCustom ? 'Custom' : 'Chip';
+    const btn = document.createElement('button');
+    btn.type      = 'button';
+    btn.className = 'ench-prefs-reset-btn';
+    btn.title     = `Reset ${groupLabel} ${modeLabel} preferences`;
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>';
+    btn.addEventListener('click', () => {
+      if (!confirm(`Reset ${groupLabel} ${modeLabel} preferences? This cannot be undone.`)) return;
+      resetEnchantPrefs(group, mode);
+    });
+    return btn;
+  }
+
+  function buildModeToggleRow(group, isCustom, onToggle) {
+    const row = document.createElement('div');
+    row.className = 'ench-mode-row';
+    row.appendChild(buildModeToggleButton(isCustom, onToggle));
+    row.appendChild(buildPrefsResetButton(group, isCustom));
+    return row;
+  }
+
+  function buildCustomPairsPanel(groups, savedSlots, slotKey, onSave) {
+    const pairsWrap = document.createElement('div');
+    pairsWrap.className = 'ench-lines';
+    for (const { label, range: [start, end] } of groups) {
+      pairsWrap.appendChild(makeEnchantLabel(`${slotKey === 'acc' ? 'customEnchLblAcc' : 'customEnchLbl'}_${start}`, label));
+      for (let i = start; i < end; i++) {
+        const cs = savedSlots[i] || { enchant: '', level: '' };
+        pairsWrap.appendChild(makeEnchantPairEl(cs.enchant, cs.level, slotKey));
+      }
+    }
+    pairsWrap.addEventListener('change', () => onSave(readPairsFrom(pairsWrap)));
+    return pairsWrap;
+  }
+
+  function buildTabSwitcher(slotCount, tabLabels, initialTab = 0) {
+    const tabBar = document.createElement('div');
+    tabBar.className = 'ench-tab-bar';
+    const panelsWrap = document.createElement('div');
+    panelsWrap.className = 'ench-tab-panels-wrap';
+    let activeTab = initialTab >= slotCount ? 0 : initialTab;
+
+    for (let i = 0; i < slotCount; i++) {
+      const btn = fromHTML(`<button class="ench-tab-btn${i === activeTab ? ' active' : ''}" type="button" data-tab="${i}">${tabLabels[i]}</button>`);
+      btn.addEventListener('click', () => {
+        const next = parseInt(btn.dataset.tab);
+        if (next === activeTab) return;
+        panelsWrap.querySelectorAll('.ench-tab-panel').forEach(p => {
+          const idx = parseInt(p.dataset.tab);
+          p.classList.remove('ench-tab-panel--active', 'ench-tab-panel--hidden-left', 'ench-tab-panel--hidden-right');
+          if (idx === activeTab) p.classList.add(next > activeTab ? 'ench-tab-panel--hidden-left' : 'ench-tab-panel--hidden-right');
+          else if (idx === next)  p.classList.add('ench-tab-panel--active');
+          else                    p.classList.add(idx < next ? 'ench-tab-panel--hidden-left' : 'ench-tab-panel--hidden-right');
+        });
+        tabBar.querySelectorAll('.ench-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTab = next;
+      });
+      tabBar.appendChild(btn);
+    }
+    return { tabBar, panelsWrap, activeTab };
+  }
+
+  const isChipDisabled = (atMax, isExcl, isChecked) => (atMax && !isChecked) || (isExcl && !isChecked);
+
+  function buildChipPanel({ panelsWrap, slotCount, activeTab, eqType, curEnchantFor, chipsFor, extraAttrsFor }) {
+    for (let i = 0; i < slotCount; i++) {
+      const curEnchant = curEnchantFor(i);
+      const checked    = new Set(chipsFor(i).slice(0, maxEnchPrefs).filter(v => v !== curEnchant));
+      const atMax      = checked.size >= maxEnchPrefs;
+      const panel = document.createElement('div');
+      panel.className   = 'ench-tab-panel ' + (i === activeTab ? 'ench-tab-panel--active' : 'ench-tab-panel--hidden-right');
+      panel.dataset.tab = i;
+      getEnchantsByEq(eqType).forEach(opt => {
+        if (opt.value === curEnchant) return;
+        const isExcl    = Labels.isAtkExcluded(opt.type);
+        const isChecked = checked.has(opt.value);
+        const disable   = isChipDisabled(atMax, isExcl, isChecked);
+        panel.appendChild(fromHTML(`<label class="ench-check-row${disable ? ' ench-check-disabled' : ''}"><input type="checkbox" value="${opt.value}"${isChecked ? ' checked' : ''}${disable ? ' disabled' : ''}${extraAttrsFor(i)}><span class="ench-check-label">${Labels.getEnchantOptLabel(opt)}</span></label>`));
+      });
+      panelsWrap.appendChild(panel);
+    }
+  }
+
+  function bindChipChangeHandler({ target, scope, slotCount, onSave }) {
+    target.addEventListener('change', e => {
+      const cb = e.target;
+      if (cb.type !== 'checkbox' || !scope.contains(cb)) return;
+      const slotIdx = parseInt(cb.dataset.slot);
+      const allCbs  = [...scope.querySelectorAll(`input[type="checkbox"][data-slot="${slotIdx}"]`)];
+      if (allCbs.filter(c => c.checked).length > maxEnchPrefs) cb.checked = false;
+      const atMax    = allCbs.filter(c => c.checked).length >= maxEnchPrefs;
+      allCbs.forEach(c => {
+        const isExcl  = Labels.isAtkExcluded(EOMAP.get(c.value)?.type);
+        const disable = isChipDisabled(atMax, isExcl, c.checked);
+        c.disabled = disable;
+        c.closest('.ench-check-row').classList.toggle('ench-check-disabled', disable);
+      });
+      onSave(Array.from({ length: slotCount }, (_, s) =>
+        [...scope.querySelectorAll(`input[type="checkbox"][data-slot="${s}"]`)]
+          .filter(c => c.checked).map(c => c.value)
+      ));
+    });
+  }
+
+  function renderWeaponSettingsPanel() {
+    const inner  = Dom.enchSettingsInner;
+    if (!inner) return;
+    const weapon = Dom.weapon.value;
+    const { slotCount, groups } = getWeaponEnchantLayout(weapon);
+    const prefs    = enchantState.weapon.prefs;
+    const isCustom = prefs.mode === 'custom';
+
+    inner.innerHTML = '';
+
+    inner.appendChild(buildModeToggleRow('weapon', isCustom, () => toggleMode('weapon', renderWeaponSettingsPanel)));
 
     const desc = document.createElement('p');
     desc.className   = 'co-block-desc';
     desc.textContent = isCustom
       ? 'Try your own combination before creating new sets or transferring. Physical Suno/Meister can switch the weapon option to GS or One-Handed Staff (Weapon Perfection).'
-      : 'Select up to 3 enchants per slot. Tool will find the best option based on your choices. Switch to custom mode for more flexibility.';
+      : 'Select up to 2 enchants per slot. Tool will find the best option based on your choices. Switch to custom mode for more flexibility.';
     inner.appendChild(desc);
 
     if (isCustom) {
-      const customPrefs = prefs.custom;
-      const customAwk   = customPrefs.awakening || '';
-      const customSlots = customPrefs.slots || [];
-      const pairsWrap   = document.createElement('div');
-      pairsWrap.className = 'ench-lines';
-      let awkSel;
-
-      for (const { label, range: [start, end] } of groups) {
-        pairsWrap.appendChild(makeEnchantLabel(`customEnchLbl_${start}`, label));
-        for (let i = start; i < end; i++) {
-          const cs = customSlots[i] || { enchant: '', level: '' };
-          pairsWrap.appendChild(makeEnchantPairEl(cs.enchant, cs.level));
-        }
-      }
-      inner.appendChild(pairsWrap);
-
-      const awkWrap = document.createElement('div');
-      awkWrap.innerHTML = `<div class="stats-field"><label class="stats-label">Awakening</label><div class="ench-awakening-row"><div class="select-wrap"><select class="stats-select"><option value="" disabled selected>Select</option>${Utils.numericOptionsHTML(10)}</select></div></div></div>`;
-      awkSel = awkWrap.querySelector('select');
-      if (customAwk) awkSel.value = customAwk;
-      inner.appendChild(awkWrap.firstElementChild);
-
-      const saveCustom = () => {
-        const slots = [];
-        pairsWrap.querySelectorAll('.ench-pair').forEach((pair, i) => {
-          slots[i] = { enchant: pair.children[0]?.firstElementChild?.value || '', level: pair.children[1]?.firstElementChild?.value || '' };
-        });
-        enchantState.prefs.custom = { awakening: awkSel.value, slots };
-      };
-      awkSel.addEventListener('change', saveCustom);
-      pairsWrap.addEventListener('change', saveCustom);
+      inner.appendChild(buildCustomPairsPanel(groups, prefs.custom || [], 'weapon', slots => {
+        enchantState.weapon.prefs.custom = slots;
+        saveEnchantState();
+      }));
     } else {
       const prevActiveTab = inner.querySelector('.ench-tab-btn.active');
-      let activeTab       = prevActiveTab ? parseInt(prevActiveTab.dataset.tab) : 0;
-      if (activeTab >= slotCount) activeTab = 0;
+      const initialTab    = prevActiveTab ? parseInt(prevActiveTab.dataset.tab) : 0;
 
       const tabLabels = groups.flatMap(({ label, range: [start, end] }) => {
         const prefix = label.includes('Main') ? 'MH' : label.includes('Off') ? 'OH' : 'Slot';
         return Array.from({ length: end - start }, (_, i) => `${prefix} ${i + 1}`);
       });
 
-      const tabBar = document.createElement('div');
-      tabBar.className = 'ench-tab-bar';
-      for (let i = 0; i < slotCount; i++) {
-        const btn = fromHTML(`<button class="ench-tab-btn${i === activeTab ? ' active' : ''}" type="button" data-tab="${i}">${tabLabels[i]}</button>`);
-        btn.addEventListener('click', () => {
-          const next = parseInt(btn.dataset.tab);
-          if (next === activeTab) return;
-          panelsWrap.querySelectorAll('.ench-tab-panel').forEach(p => {
-            const idx = parseInt(p.dataset.tab);
-            p.classList.remove('ench-tab-panel--active', 'ench-tab-panel--hidden-left', 'ench-tab-panel--hidden-right');
-            if (idx === activeTab) p.classList.add(next > activeTab ? 'ench-tab-panel--hidden-left' : 'ench-tab-panel--hidden-right');
-            else if (idx === next)  p.classList.add('ench-tab-panel--active');
-            else                    p.classList.add(idx < next ? 'ench-tab-panel--hidden-left' : 'ench-tab-panel--hidden-right');
-          });
-          tabBar.querySelectorAll('.ench-tab-btn').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          activeTab = next;
-        });
-        tabBar.appendChild(btn);
-      }
+      const { tabBar, panelsWrap, activeTab } = buildTabSwitcher(slotCount, tabLabels, initialTab);
       inner.appendChild(tabBar);
-
-      const panelsWrap = document.createElement('div');
-      panelsWrap.className = 'ench-tab-panels-wrap';
       inner.appendChild(panelsWrap);
 
-      const allPairs     = [...Dom.enchLines.querySelectorAll('.ench-pair')];
-      const enchExclType = Labels.getEnchantExcludedType();
-      for (let i = 0; i < slotCount; i++) {
-        const raw        = prefs.chip[i] || [];
-        const curEnchant = allPairs[i]?.children[0]?.firstElementChild?.value || '';
-        const checked    = new Set(raw.slice(0, maxEnchPrefs).filter(v => v !== curEnchant));
-        const atMax      = checked.size >= maxEnchPrefs;
-        const panel = document.createElement('div');
-        panel.className   = 'ench-tab-panel ' + (i === activeTab ? 'ench-tab-panel--active' : 'ench-tab-panel--hidden-right');
-        panel.dataset.tab = i;
-        getEnchantsByEq('weapon').forEach(opt => {
-          if (opt.value === curEnchant) return;
-          const isExcl    = opt.type === enchExclType;
-          const isChecked = checked.has(opt.value);
-          const disable   = (atMax && !isChecked) || (isExcl && !isChecked);
-          panel.appendChild(fromHTML(`<label class="ench-check-row${disable ? ' ench-check-disabled' : ''}"><input type="checkbox" value="${opt.value}"${isChecked ? ' checked' : ''}${disable ? ' disabled' : ''} data-slot="${i}"><span class="ench-check-label">${Labels.getEnchantOptLabel(opt)}</span></label>`));
-        });
-        panelsWrap.appendChild(panel);
-      }
+      const allPairs = readPairsFrom(Dom.enchWeaponLines);
+      buildChipPanel({
+        panelsWrap, slotCount, activeTab, eqType: 'weapon',
+        curEnchantFor:  i => allPairs[i]?.enchant || '',
+        chipsFor:       i => prefs.chip[i] || [],
+        extraAttrsFor:  i => ` data-slot="${i}"`,
+      });
 
-      inner.addEventListener('change', e => {
-        const cb = e.target;
-        if (cb.type !== 'checkbox') return;
-        const slotIdx = parseInt(cb.dataset.slot);
-        const allCbs  = [...inner.querySelectorAll(`input[type="checkbox"][data-slot="${slotIdx}"]`)];
-        if (allCbs.filter(c => c.checked).length > maxEnchPrefs) cb.checked = false;
-        const atMax    = allCbs.filter(c => c.checked).length >= maxEnchPrefs;
-        const exclType = Labels.getEnchantExcludedType();
-        allCbs.forEach(c => {
-          const isExcl  = EOMAP.get(c.value)?.type === exclType;
-          const disable = (atMax && !c.checked) || (isExcl && !c.checked);
-          c.disabled = disable;
-          c.closest('.ench-check-row').classList.toggle('ench-check-disabled', disable);
-        });
-        enchantState.prefs.chip = Array.from({ length: slotCount }, (_, s) =>
-          [...inner.querySelectorAll(`input[type="checkbox"][data-slot="${s}"]`)]
-            .filter(c => c.checked).map(c => c.value)
-        );
+      bindChipChangeHandler({
+        target: inner, scope: panelsWrap, slotCount,
+        onSave: chips => { enchantState.weapon.prefs.chip = chips; saveEnchantState(); },
       });
     }
   }
 
+  function buildAccTabGroup(group, groupIdx) {
+    const { label, range: [start, end] } = group;
+    const slotCount = end - start;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'ench-acc-tab-group';
+    wrap.appendChild(makeEnchantLabel(`accSettingsLbl_${start}`, label));
+
+    const tabLabels = Array.from({ length: slotCount }, (_, i) => `Slot ${i + 1}`);
+    const { tabBar, panelsWrap, activeTab } = buildTabSwitcher(slotCount, tabLabels);
+    wrap.appendChild(tabBar);
+    wrap.appendChild(panelsWrap);
+
+    const groupChip   = enchantState.acc.prefs.chip[groupIdx] || [];
+    const allAccPairs = readPairsFrom(Dom.enchAccLines);
+    buildChipPanel({
+      panelsWrap, slotCount, activeTab, eqType: 'acc',
+      curEnchantFor:  i => allAccPairs[start + i]?.enchant || '',
+      chipsFor:       i => groupChip[i] || [],
+      extraAttrsFor:  i => ` data-group="${groupIdx}" data-slot="${i}"`,
+    });
+
+    bindChipChangeHandler({
+      target: wrap, scope: panelsWrap, slotCount,
+      onSave: chips => { enchantState.acc.prefs.chip[groupIdx] = chips; saveEnchantState(); },
+    });
+
+    return wrap;
+  }
+
+  function renderAccSettingsPanel() {
+    const inner    = Dom.enchSettingsInner;
+    if (!inner) return;
+    const prefs    = enchantState.acc.prefs;
+    const isCustom = prefs.mode === 'custom';
+    inner.innerHTML = '';
+
+    inner.appendChild(buildModeToggleRow('acc', isCustom, () => toggleMode('acc', renderAccSettingsPanel)));
+
+    const desc = document.createElement('p');
+    desc.className   = 'co-block-desc';
+    desc.textContent = isCustom
+      ? 'Try your own combination before creating new sets or transferring.'
+      : 'Select up to 2 enchants per slot. Tool will find the best option based on your choices.';
+    inner.appendChild(desc);
+
+    if (isCustom) {
+      inner.appendChild(buildCustomPairsPanel(ACC_GROUPS, prefs.custom || [], 'acc', slots => {
+        enchantState.acc.prefs.custom = slots;
+        saveEnchantState();
+      }));
+    } else {
+      ACC_GROUPS.forEach((group, groupIdx) => inner.appendChild(buildAccTabGroup(group, groupIdx)));
+    }
+  }
+
   function buildEnchantSectionHTML(assign, slotState, compareAssign = null) {
-    const weapon     = Dom.weapon.value;
-    const { groups } = getEnchantLayout(weapon);
-    let hasChanged   = false;
+    const weapon            = Dom.weapon.value;
+    const { groups }        = getWeaponEnchantLayout(weapon);
+    let hasChanged           = false;
 
     const getEnchantRowLabel = entry => {
       const opt = entry ? EOMAP.get(entry.key) : null;
       return opt ? Labels.getEnchantOptLabel(opt) : (entry?.key ?? '-');
     };
 
-    const buildEnchantRow = (entry, slotIdx, slot) => {
-      const isChanged    = compareAssign != null && (entry?.key ?? null) !== (compareAssign[slotIdx]?.key ?? null);
+    const buildEnchantRow = (entry, globalIdx, slot, localIdx) => {
+      const isChanged    = compareAssign != null && (entry?.key ?? null) !== (compareAssign[globalIdx]?.key ?? null);
       if (isChanged) hasChanged = true;
+      const num          = localIdx + 1;
+      if (!slot.level) return `<div class="co-ench-row"><span class="co-ench-num">${num}</span><span class="co-ench-val">-</span><span class="co-ench-lvl"></span></div>`;
       const label        = getEnchantRowLabel(entry);
       const changedClass = isChanged ? ' co-ench-changed' : '';
-      const num          = (slotIdx % 3) + 1;
       const rawVal       = entry ? getEnchantVal(entry.key, slot.level, slot.col, 1) : null;
-      const valStr       = rawVal != null ? `${Utils.fmtPct(rawVal)}%` : '';
+      const valStr       = rawVal != null ? (entry.type === 'rawPen' ? Utils.fmtNum(rawVal) : `${Utils.fmtPct(rawVal)}%`) : '';
       return `<div class="co-ench-row${changedClass}"><span class="co-ench-num">${num}</span><span class="co-ench-val">Lv.${slot.level}${label}</span><span class="co-ench-lvl">${valStr ? `+${valStr}` : ''}</span></div>`;
     };
 
-    let bodyHTML;
-    if (groups.length > 1) {
-      const parts = groups.map(({ label, range: [start, end] }) => {
-        const rows = slotState.slice(start, end)
-          .map((slot, j) => slot.level ? buildEnchantRow(assign[start + j], start + j, slot) : null)
-          .filter(Boolean);
-        return rows.length ? `<div class="co-ench-group-hdr">${label}</div>${rows.join('')}` : '';
-      }).filter(Boolean);
-      bodyHTML = parts.length ? parts.join('') : null;
-    } else {
-      const rows = slotState.map((slot, i) => slot.level ? buildEnchantRow(assign[i], i, slot) : null).filter(Boolean);
-      bodyHTML = rows.length ? rows.join('') : null;
-    }
+    const buildGroupRows = (groupDefs, groupSlots, groupAssign, indexOffset, anyLevel) => {
+      if (!anyLevel) return '';
+      return groupDefs.map(({ label, range: [start, end] }) => {
+        const rows = groupSlots.slice(start, end)
+          .map((slot, j) => buildEnchantRow(groupAssign[start + j], indexOffset + start + j, slot, j))
+          .join('');
+        return `<div class="co-ench-group-hdr">${label}</div>${rows}`;
+      }).join('');
+    };
 
+    const weaponSlotState = slotState.filter(s => s.group !== 'acc');
+    const accSlotState    = slotState.filter(s => s.group === 'acc');
+    const weaponAssign    = assign.slice(0, weaponSlotState.length);
+    const accAssign       = assign.slice(weaponSlotState.length);
+
+    const weaponHasLevel = weaponSlotState.some(s => s.level);
+    const accHasLevel    = accSlotState.some(s => s.level);
+
+    const weaponHTML = buildGroupRows(groups, weaponSlotState, weaponAssign, 0, weaponHasLevel);
+    const accHTML    = accSlotState.length ? buildGroupRows(ACC_GROUPS, accSlotState, accAssign, weaponSlotState.length, accHasLevel) : '';
+
+    const bodyHTML = (weaponHTML || accHTML) ? (weaponHTML + accHTML) : null;
     const title = compareAssign != null && !hasChanged ? 'Enchantment (No Change)' : 'Enchantment';
     return Utils.buildResSectionHTML(title, bodyHTML && `<div class="co-ench-result-list">${bodyHTML}</div>`, Utils.EMPTY_STATE_HTML);
   }
 
+  const initEnchantSlider = () => {
+    bindCoPanelToggle(Dom.enchantSection.querySelector('.co-hd'));
+    initSlider(Dom.enchantSection, [...Dom.enchantSection.querySelectorAll('.co-slide')], Dom.enchSlideLabel, ['Weapon', 'Accessories'], idx => {
+      setActiveSlide(idx);
+      if (Dom.enchSettingsPanel.classList.contains('open')) renderActiveSettingsPanel();
+    }, '#enchSlidePrev', '#enchSlideNext');
+  };
+
   return {
-    enchantState, defaultEnchPrefs,
+    enchantState,
     refresh,
-    getEnchantLayout, getEnchantColForSlot, getAwkMult, getEnchantVal, getEnchantsByEq,
-    makeEnchantLabel, makeEnchantPairEl,
-    rebuildEnchantPairs, readEnchantStateFromDOM, loadEnchantState,
-    getEnchantSlotState, makeEnchantEntry, getEnchantCandidates, getEnchantCurrentAssign,
-    updateEnchantTotal, applyEnchantStats, applyEnchant, stripEnchant, runEnchantOptimizer,
+    rebuildWeaponEnchantPairs, rebuildAccEnchantPairs, readEnchantStateFromDOM, loadEnchantState,
+    getEnchantSlotState, getEnchantCandidates, getEnchantCurrentAssign,
+    applyEnchant, stripEnchant, writeAssignment,
     runOptimizer, hasActiveEnchantCandidates,
-    writeEnchantToDOM, renderSettingsPanel, buildEnchantSectionHTML,
+    renderActiveSettingsPanel, buildEnchantSectionHTML,
+    setActiveSlide, getActiveSlide, resetEnchantPrefs, resetEnchantSlots,
+    initEnchantSlider,
   };
 })();
 
-Domains.register({
-  key:      'enchant',
-  isAux:    true,
-  isActive: Enchant.hasActiveEnchantCandidates,
-  optimize: (state, current) => Enchant.runOptimizer(state, current),
-  apply:    (state, assign) => Enchant.applyEnchant(state, assign),
-  strip:    (state, assign) => Enchant.stripEnchant(state, assign),
-});
-
 const Stats = (() => {
-  const { fmtPct, labelWithVal } = Utils;
+  const { labelWithVal, fmtPct, fmtNum } = Utils;
   const { getElemEnhLabel } = Labels;
   const { stats: { numFields, snapFields } } = Config;
 
@@ -2744,8 +3197,15 @@ const Stats = (() => {
       wElem:     Dom.wElem.value,
       atkType:   Dom.atkType.value,
       ...Object.fromEntries(numFields.map(f => [f, Dom[f].value])),
+      rawPen: Dom.rawPen.value,
     });
   }
+
+  let _saveStatsTimer = null;
+  const saveStatsStateDebounced = () => {
+    clearTimeout(_saveStatsTimer);
+    _saveStatsTimer = setTimeout(saveStatsState, 300);
+  };
 
   function initSelect(sel, keys) {
     const frag = document.createDocumentFragment();
@@ -2791,6 +3251,7 @@ const Stats = (() => {
       Dom.penField.hidden  = atkType !== 'pen';
       Dom.critField.hidden = atkType === 'pen';
       for (const f of numFields) { if (stats[f]) Dom[f].value = stats[f]; }
+      if (stats.rawPen) Dom.rawPen.value = stats.rawPen;
     } catch (err) {
       console.warn('Stats.loadStatsState: failed to restore stats form state', err);
     }
@@ -2819,13 +3280,15 @@ const Stats = (() => {
     const specialVals = Object.fromEntries(
       Object.entries(Config.divinity.specialNodes).map(([id, spec]) => {
         const usedIdx = Divinity.getUsed(id);
-        const panel   = usedIdx != null ? Divinity.getData(id).panels[usedIdx] : null;
+        const panel   = usedIdx != null ? Divinity.getData(id).items[usedIdx] : null;
         return [spec.field, panel ? spec.calcValue(partialCtx, panel) : 0];
       })
     );
+    const atkType = Dom.atkType.value;
     return {
       ...Object.fromEntries(numFields.map(k => [k, parseFloat(Dom[k].value) || 0])),
-      atkType: Dom.atkType.value,
+      ...(atkType === 'pen' && { pen: parseFloat(Dom.pen.value) || 0, rawPen: parseFloat(Dom.rawPen.value) || 0 }),
+      atkType,
       weapon:  Dom.weapon.value || '',
       wElem:   wElemVal,
       tDefKey,
@@ -2836,43 +3299,83 @@ const Stats = (() => {
     };
   }
 
-  function writeStatsToForm(finalState, buffMap) {
+  function writeStatsToForm(finalState) {
     const fmt = v => fmtPct(v).replace(/\.?0+$/, '');
-    const net = f => (finalState[f] ?? 0) - (buffMap[f] || 0);
-    if (Dom.atkType.value === 'pen') Dom.pen.value  = fmt(net('pen'));
-    else                             Dom.crit.value = fmt(net('crit'));
-    for (const f of ['dmg', 'elemEnh', 'sizeEnh', 'race', 'attr', 'dmgStack'])
-      Dom[f].value = fmt(net(f));
+    if (Dom.atkType.value === 'pen') {
+      Dom.pen.value    = fmt(finalState.pen || 0);
+      Dom.rawPen.value = Math.round(finalState.rawPen || 0);
+    } else {
+      Dom.crit.value = fmt(finalState.crit || 0);
+    }
+    for (const f of numFields) {
+      if (f === 'pen' || f === 'crit') continue;
+      Dom[f].value = fmt(finalState[f] || 0);
+    }
     saveStatsState();
     setFormOpen(true);
   }
 
   return {
-    showMsg, setFormOpen, saveStatsState, initSelect,
+    showMsg, setFormOpen, saveStatsState, saveStatsStateDebounced, initSelect,
     updateTargetLabels, updateActiveSize,
     loadStatsState, loadStatsFromSnap, buildStatsState, writeStatsToForm,
   };
 })();
 
+const Domains = (() => {
+  const registry = [];
+
+  const register = descriptor => { registry.push(descriptor); };
+  const getAux   = () => registry.filter(d => d.isAux);
+
+  return { register, getAux };
+})();
+
+Domains.register({
+  key:      'companion',
+  isAux:    true,
+  isActive: () => Companion.getItems().length > 0,
+  optimize: state => Companion.runOptimizer(state)?.assignment ?? null,
+  apply:    (state, assign) => (assign ? Companion.applyCompanion(state, assign) : state),
+  strip:    (state, assign) => (assign ? Companion.stripCompanion(state, assign) : state),
+});
+
+Domains.register({
+  key:      'enchant',
+  isAux:    true,
+  isActive: Enchant.hasActiveEnchantCandidates,
+  optimize: (state, current) => Enchant.runOptimizer(state, current),
+  apply:    (state, assign) => Enchant.applyEnchant(state, assign),
+  strip:    (state, assign) => Enchant.stripEnchant(state, assign),
+});
+
 const Optimizer = (() => {
-  const { runWithStrategy, countBy, buildLoadingHTML, escHtml, setInteractionLocked } = Utils;
+  const { buildLoadingHTML, escHtml, setInteractionLocked } = Utils;
   const { SLOT_COUNTS } = Cards;
   const { nodeOrder, divinity: { specialNodes }, optimizer, ui: { loaderTiming } } = Config;
+  const specialNodeZeroFields = Object.fromEntries(Object.values(specialNodes).map(s => [s.field, 0]));
 
   const calcMult = state => calculateMultiplier(state).mult;
 
   const countDivCombos = () =>
     nodeOrder.filter(id => Divinity.hasNode(id) && Divinity.isNodeActive(id)).reduce((acc, id) => {
       const d = Divinity.getData(id), usedIdx = Divinity.getUsed(id);
-      return acc * (usedIdx != null && d.panels[usedIdx]?.locked ? 1 : d.count);
-    }, 1);
+      return acc + (usedIdx != null && d.items[usedIdx]?.locked ? 1 : d.count);
+    }, 0);
 
-  const countCompanionCombos = companionItemCount =>
-    Array.from({ length: Config.companion.slots }, (_, i) => Math.max(1, companionItemCount - i + 1))
-      .reduce((a, b) => a * b, 1);
+  const countCompanionCombos = companionItemCount => companionItemCount;
 
-  const countEnchantCombos = enchantCandidates =>
-    enchantCandidates.reduce((acc, c) => acc * (c.length + 1), 1);
+  const countEnchantCombos = enchantCandidates => {
+    const isPenType = entry => entry?.field === 'rawPen' || entry?.field === 'pctPen';
+    let independentSum  = 0;
+    let coupledProduct  = 1;
+    for (const c of enchantCandidates) {
+      const size = c.length + 1;
+      if (c.some(isPenType)) coupledProduct *= size;
+      else independentSum += size;
+    }
+    return independentSum + coupledProduct;
+  };
 
   function genEquipCombinations(pool, slots) {
     if (slots <= 0 || pool.length === 0) return [[]];
@@ -2897,116 +3400,59 @@ const Optimizer = (() => {
   function genCardCombos(cardPool, slotCounts) {
     const equipTypes     = Object.keys(SLOT_COUNTS).filter(e => (slotCounts[e] ?? 0) > 0);
     const combosPerEquip = {};
-    let totalCombos      = 1;
-    let overflowed       = false;
+    let totalCombos      = 0;
     for (const equip of equipTypes) {
       const pool = (cardPool[equip] || []).filter(c => c.qty > 0);
       combosPerEquip[equip] = genEquipCombinations(pool, slotCounts[equip] || 0);
-      if (!overflowed) {
-        totalCombos *= combosPerEquip[equip].length;
-        if (totalCombos > optimizer.maxEvalLimit) overflowed = true;
-      }
+      totalCombos += combosPerEquip[equip].length;
     }
-    return { equipTypes, combosPerEquip, totalCombos, overflowed };
+    return { equipTypes, combosPerEquip, totalCombos };
   }
 
   function runCardsExact(baseState, combosPerEquip, equipTypes, ctx, currentMult) {
-    let bestMult  = currentMult;
-    let bestCards = null;
-    const cardsSoFar = [];
-    (function recurse(equipIdx, currentState) {
-      if (equipIdx === equipTypes.length) {
-        const m = calcMult(currentState);
-        if (m > bestMult) { bestMult = m; bestCards = [...cardsSoFar]; }
-        return;
-      }
-      for (const combo of combosPerEquip[equipTypes[equipIdx]]) {
-        const nextState = Cards.applyCards(currentState, combo, ctx);
-        if (equipIdx === equipTypes.length - 1 && calcMult(nextState) <= bestMult) continue;
-        for (const c of combo) cardsSoFar.push(c);
-        recurse(equipIdx + 1, nextState);
-        cardsSoFar.length -= combo.length;
-      }
-    })(0, baseState);
-    return bestCards ? { topResults: [{ cards: bestCards, mult: bestMult }] } : { topResults: [] };
-  }
-
-  function runCardsGreedy(baseState, equipTypes, ctx, combosPerEquip) {
-    let runningState   = { ...baseState };
-    const bestPerEquip = {};
+    const bestCards = [];
     for (const equip of equipTypes) {
-      const combos = combosPerEquip[equip];
-      let bestMult  = -Infinity;
-      let bestCombo = [];
-      for (const combo of combos) {
-        const m = calcMult(Cards.applyCards(runningState, combo, ctx));
-        if (m > bestMult) { bestMult = m; bestCombo = combo; }
+      let bestCombo = null;
+      let bestM     = -Infinity;
+      for (const combo of combosPerEquip[equip]) {
+        const m = calcMult(Cards.applyCards(baseState, combo, ctx));
+        if (m > bestM) { bestM = m; bestCombo = combo; }
       }
-      bestPerEquip[equip] = bestCombo;
-      runningState = Cards.applyCards(runningState, bestCombo, ctx);
+      if (bestCombo?.length) bestCards.push(...bestCombo);
     }
-    const allBest = Object.values(bestPerEquip).flat();
-    return { topResults: [{ cards: allBest, mult: calcMult(Cards.applyCards(baseState, allBest, ctx)) }] };
+    const finalMult = calcMult(Cards.applyCards(baseState, bestCards, ctx));
+    return finalMult > currentMult ? { cards: bestCards, mult: finalMult } : null;
   }
 
   function runCardsOptimizer(baseState, cardPool, slotCounts, ctx, currentMult, prebuilt) {
-    const { equipTypes, combosPerEquip, totalCombos, overflowed } = prebuilt ?? genCardCombos(cardPool, slotCounts);
-    return runWithStrategy(
-      overflowed ? optimizer.maxEvalLimit + 1 : totalCombos,
-      () => runCardsExact(baseState, combosPerEquip, equipTypes, ctx, currentMult),
-      () => runCardsGreedy(baseState, equipTypes, ctx, combosPerEquip)
-    );
+    const { equipTypes, combosPerEquip } = prebuilt ?? genCardCombos(cardPool, slotCounts);
+    return runCardsExact(baseState, combosPerEquip, equipTypes, ctx, currentMult);
   }
 
-  function runDivinityOptimizer(cardState, ctx) {
-    const activeNodes = nodeOrder.filter(id => Divinity.hasNode(id) && Divinity.isNodeActive(id));
+  function runDivinityOptimizer(cardState, ctx, activeNodes) {
     if (!activeNodes.length) return null;
     const pools = activeNodes.map(id => {
       const d       = Divinity.getData(id);
       const usedIdx = Divinity.getUsed(id);
-      if (usedIdx != null && d.panels[usedIdx]?.locked)
-        return { id, entries: [{ panel: d.panels[usedIdx], idx: usedIdx }] };
-      return { id, entries: d.panels.slice(0, d.count).map((panel, i) => ({ panel, idx: i })) };
+      if (usedIdx != null && d.items[usedIdx]?.locked)
+        return { id, entries: [{ panel: d.items[usedIdx], idx: usedIdx }] };
+      return { id, entries: d.items.slice(0, d.count).map((panel, i) => ({ panel, idx: i })) };
     });
-    const base        = { ...cardState, ...Object.fromEntries(Object.values(specialNodes).map(s => [s.field, 0])) };
-    const totalCombos = pools.reduce((acc, p) => acc * p.entries.length, 1);
-    let bestMult      = -Infinity;
-    let bestSelection = null;
-    runWithStrategy(totalCombos,
-      () => {
-        (function recurse(poolIdx, sel, state) {
-          if (poolIdx === pools.length) {
-            const m = calcMult(state);
-            if (m > bestMult) { bestMult = m; bestSelection = sel.map(s => ({ ...s })); }
-            return;
-          }
-          const { id, entries } = pools[poolIdx];
-          for (const { panel, idx } of entries) {
-            sel.push({ id, panelIndex: idx });
-            recurse(poolIdx + 1, sel, Divinity.applyDivinityPanel(state, panel, id, ctx));
-            sel.pop();
-          }
-        })(0, [], base);
-      },
-      () => {
-        let running = { ...base };
-        bestSelection = [];
-        for (const { id, entries } of pools) {
-          let localBest = -Infinity, localIdx = entries[0].idx, localPanel = entries[0].panel;
-          for (const { panel, idx } of entries) {
-            const m = calcMult(Divinity.applyDivinityPanel(running, panel, id, ctx));
-            if (m > localBest) { localBest = m; localIdx = idx; localPanel = panel; }
-          }
-          bestSelection.push({ id, panelIndex: localIdx });
-          running = Divinity.applyDivinityPanel(running, localPanel, id, ctx);
-        }
-        bestMult = calcMult(Divinity.applyDivinity(base, bestSelection, ctx));
+    const base = { ...cardState, ...specialNodeZeroFields };
+
+    let running          = { ...base };
+    const bestSelection  = [];
+    for (const { id, entries } of pools) {
+      let localBest = -Infinity, localIdx = entries[0].idx, localPanel = entries[0].panel;
+      for (const { panel, idx } of entries) {
+        const m = calcMult(Divinity.applyDivinityPanel(running, panel, id, ctx));
+        if (m > localBest) { localBest = m; localIdx = idx; localPanel = panel; }
       }
-    );
-    return {
-      bestSelection: bestSelection ?? activeNodes.map(id => ({ id, panelIndex: Divinity.getUsed(id) ?? 0 })),
-      bestMult,
-    };
+      bestSelection.push({ id, panelIndex: localIdx });
+      running = Divinity.applyDivinityPanel(running, localPanel, id, ctx);
+    }
+
+    return { bestSelection, bestMult: calcMult(running) };
   }
 
   function runCoordinateDescent(pureBase, lockedBaseState, cardPool, slotCounts, allLockedNames, nonLockedEquipped, activeNodes, currentDivSelection, currentMult, ctx, prebuilt, currentEnchantAssign) {
@@ -3049,13 +3495,13 @@ const Optimizer = (() => {
               mult,
               prebuilt
             );
-            if (cardResult.topResults.length) {
-              const newCards = [...allLockedNames, ...cardResult.topResults[0].cards];
+            if (cardResult) {
+              const newCards = [...allLockedNames, ...cardResult.cards];
               const newMult  = calcMultWithAll(buildCardsAndDivinityState(newCards, divSelection), auxAssign);
               if (newMult > mult) { cards = newCards; mult = newMult; }
             }
           } else if (dim === 'divinity' && activeNodes.length) {
-            const divResult = runDivinityOptimizer(Cards.applyCards(pureBase, Cards.filterValid(cards), ctx), ctx);
+            const divResult = runDivinityOptimizer(Cards.applyCards(pureBase, Cards.filterValid(cards), ctx), ctx, activeNodes);
             if (divResult) {
               const newMult = calcMultWithAll(buildCardsAndDivinityState(cards, divResult.bestSelection), auxAssign);
               if (newMult > mult) { divSelection = divResult.bestSelection; mult = newMult; }
@@ -3082,7 +3528,7 @@ const Optimizer = (() => {
 
     const coldStartCards = (() => {
       const result = runCardsOptimizer(Divinity.applyDivinity(lockedBaseState, currentDivSelection, ctx), cardPool, slotCounts, ctx, -Infinity, prebuilt);
-      return result.topResults.length ? [...allLockedNames, ...result.topResults[0].cards] : [...allLockedNames, ...nonLockedEquipped];
+      return result ? [...allLockedNames, ...result.cards] : [...allLockedNames, ...nonLockedEquipped];
     })();
     const warmCards   = [...allLockedNames, ...nonLockedEquipped];
     const baseDivSel  = () => currentDivSelection.map(s => ({ ...s }));
@@ -3101,16 +3547,14 @@ const Optimizer = (() => {
       if (result.bestMult > best.bestMult) best = result;
     }
     return {
-      bestCards:           best.bestCards,
-      bestDivSelection:    best.bestDivSelection,
-      bestMult:            best.bestMult,
-      bestCompanionAssign: best.bestAuxAssign.companion,
-      bestEnchantAssign:   best.bestAuxAssign.enchant,
+      bestCards:        best.bestCards,
+      bestDivSelection: best.bestDivSelection,
+      bestMult:         best.bestMult,
+      bestAuxAssign:    best.bestAuxAssign,
     };
   }
 
-  function runAndRender(section, calcState, ctx) {
-    const resultEl = Dom.resultCard;
+  function buildCardComputation(section) {
     const slotCounts      = { ...SLOT_COUNTS, weapon: Cards.getWeaponSlotCount() };
     const lockedCards     = {};
     const lockedSlotKeys  = new Set();
@@ -3129,7 +3573,7 @@ const Optimizer = (() => {
     for (const [equip, cards] of Object.entries(lockedCards))
       slotCounts[equip] = Math.max(0, (slotCounts[equip] || 0) - cards.length);
 
-    const { equippedNames, cardPool } = Cards.buildPoolFromSection(section, allLockedNames);
+    const { equippedNames, cardPool } = Cards.buildPoolFromSection(section, allLockedNames, allCardSelects);
 
     const buffMap = {};
     for (const row of section.querySelectorAll('.co-buff-row')) {
@@ -3143,6 +3587,16 @@ const Optimizer = (() => {
       .map(input => input.dataset.value);
 
     const prebuiltCombos = genCardCombos(cardPool, slotCounts);
+
+    return { slotCounts, lockedCards, allLockedNames, equippedNames, cardPool, buffMap, nonLockedEquipped, prebuiltCombos };
+  }
+
+  function runAndRender(section, calcState, ctx, precomputed) {
+    const resultEl = Dom.resultCard;
+    const {
+      slotCounts, lockedCards, allLockedNames, equippedNames,
+      cardPool, buffMap, nonLockedEquipped, prebuiltCombos,
+    } = precomputed ?? buildCardComputation(section);
 
     try {
       const baseState = Cards.stripCards(calcState, Cards.filterValid(equippedNames), ctx);
@@ -3161,15 +3615,17 @@ const Optimizer = (() => {
       const lockedBaseState          = Cards.applyCards(pureBase, allLockedNames, ctx);
       const currentBaseWithCards     = Cards.applyCards(lockedBaseState, nonLockedEquipped, ctx);
       const currentBaseWithDivinity  = Divinity.applyDivinity(currentBaseWithCards, currentDivSelection, ctx);
-      const currentBaseWithCompanion = Companion.apply(currentBaseWithDivinity, currentCompanionUsed);
+      const currentBaseWithCompanion = Companion.applyCompanion(currentBaseWithDivinity, currentCompanionUsed ?? {});
       const currentMult              = calcMult(Enchant.applyEnchant(currentBaseWithCompanion, currentEnchantAssign));
       const activeNodes              = nodeOrder.filter(id => Divinity.hasNode(id) && Divinity.isNodeActive(id));
 
-      const { bestCards, bestDivSelection, bestMult, bestCompanionAssign, bestEnchantAssign } = runCoordinateDescent(
+      const { bestCards, bestDivSelection, bestMult, bestAuxAssign } = runCoordinateDescent(
         pureBase, lockedBaseState, cardPool, slotCounts,
         allLockedNames, nonLockedEquipped, activeNodes, currentDivSelection, currentMult, ctx,
         prebuiltCombos, currentEnchantAssign
       );
+      const bestCompanionAssign = bestAuxAssign.companion;
+      const bestEnchantAssign   = bestAuxAssign.enchant;
 
       const bestStateWithCards    = Cards.applyCards(pureBase, Cards.filterValid(bestCards), ctx);
       const bestStateWithDivinity = Divinity.applyDivinity(bestStateWithCards, bestDivSelection, ctx);
@@ -3178,7 +3634,12 @@ const Optimizer = (() => {
 
       resultEl.innerHTML = buildLoadingHTML('qqq');
       setTimeout(() => {
-        Results.render(resultEl, [{ cards: bestCards, mult: bestMult }], pureBase, lockedCards, equippedNames, ctx, divinityResult, currentDivSelection, buffMap, resolvedCompanionAssign, bestEnchantAssign, currentEnchantAssign, enchantSlotState);
+        Results.render(resultEl, {
+          bestResult: { cards: bestCards, mult: bestMult },
+          pureBase, lockedCards, equippedNames, ctx, divinityResult,
+          currentDivSelection, buffMap, bestCompanionAssign: resolvedCompanionAssign,
+          bestEnchantAssign, currentEnchantAssign, enchantSlotState,
+        });
         resultEl.classList.remove('co-result-enter');
         void resultEl.offsetWidth;
         resultEl.classList.add('co-result-enter');
@@ -3190,13 +3651,49 @@ const Optimizer = (() => {
     }
   }
 
-  return { calcMult, countDivCombos, countCompanionCombos, countEnchantCombos, genCardCombos, runCardsOptimizer, runDivinityOptimizer, runCoordinateDescent, runAndRender };
+  return { calcMult, countDivCombos, countCompanionCombos, countEnchantCombos, genCardCombos, buildCardComputation, runAndRender };
 })();
 
 const Results = (() => {
-  const { fmtNum, buildResSectionHTML, EMPTY_STATE_HTML, initSlider, countBy } = Utils;
+  const { fmtNum, statsConverter, countBy, buildResSectionHTML, EMPTY_STATE_HTML, initSlider } = Utils;
   const { getBaseStatLabels, getBuffStatOptions, getAtkFieldOption } = Labels;
   const { ui: { icons } } = Config;
+
+  const NOTE_HTML = `<div class="co-res-note">
+  Crosscheck the result on the <u>next slide</u> with the input at the top of the page, and make sure it matches your current detailed stats (in-game).<br/><br/>
+
+  This tool only supports some offensive stats, so if your build has a lot of ATK% / Flat & Stat% bonuses (esp. in divinity) and the tool still suggests switching, <u>in-game results may vary</u><span class="spoiler">, could go higher or lower <img alt=":dogekek:" src="https://masihterjaga.github.io/sim/img/dogekek.png" width="10" height="10"></span><br/><br/>
+
+  But since this tool calculates base multipliers, it'll be more accurate as long as your other stats (ATK, Flat STAT/%, Haste, Max HP) don't drop too much after the switch, especially for jobs that rely on those.<br/><br/>
+
+  <sup>[Tool vs In-game#<a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>1</a>],[<a href='#' class='job-sim' data-lightbox-gallery='new-version' data-lightbox-trigger>2</a>],[<a href='#' class='job-sim' data-lightbox-gallery='roxtimizer' data-lightbox-trigger>3</a>],[<a href='#' class='job-sim' data-lightbox-gallery='roxtimizer_2' data-lightbox-trigger>4</a>],[<a href='#' class='job-sim' data-lightbox-gallery='roxtimizer_3' data-lightbox-trigger>5</a>]</sup> Results in TG can differ vs in-field; they might be lower depending on the affix, or higher since certain debuffs from other players are shared across all attackers.
+</div>`;
+
+  const MORE_TOOLS = [
+    { href: 'https://masihterjaga.github.io/sim',                                                     name: 'Old Version' },
+    { href: 'https://masihterjaga.github.io/sim/weapon-awakening.html',                                name: 'Weapon Awakening' },
+    { href: 'https://masihterjaga.github.io/sim/physical-suno-mammonite-se.html',                      name: 'Mammonite I / II?' },
+    { href: 'https://discord.com/channels/784407151342256148/909016309218541568/1498338086449319957', name: 'Specific-Job Simulator' },
+    { href: 'https://masihterjaga.github.io/sim/advanced-transfer.html',                               name: 'Adv. Transfer' },
+  ];
+  const buildMoreToolsHTML = () => `<div class="co-more-tools">
+        <span class="co-more-tools-label">More Tools</span>
+        <div class="co-more-tools-row">
+          ${MORE_TOOLS.map(({ href, name }) => `<a class="co-tool-card" href="${href}" target="_blank" rel="noopener">
+            <span class="co-tool-card-name">${name}</span>
+          </a>`).join('\n          ')}
+        </div>
+      </div>`;
+
+  const buildSectionPair = (label, bestInner, currentInner, nodesClass) => ({
+    best:    buildResSectionHTML(`${label} (tap for details)`, bestInner    && `<div class="${nodesClass}">${bestInner}</div>`,    EMPTY_STATE_HTML),
+    current: buildResSectionHTML(label,                        currentInner && `<div class="${nodesClass}">${currentInner}</div>`, EMPTY_STATE_HTML),
+  });
+
+  const buildHeroHTML = (leftVal, leftLbl, right) => `<div class="co-res-hero">
+        <div class="co-res-hero-block"><div class="co-res-hero-val">${leftVal}</div><div class="co-res-hero-lbl">${leftLbl}</div></div>
+        <div class="co-res-hero-block${right.cls ? ` ${right.cls}` : ''}"><div class="co-res-hero-val">${right.val}</div><div class="co-res-hero-lbl">${right.lbl}</div></div>
+      </div>`;
 
   const buildStatsTitleHTML = showUseSyncBtn =>
     showUseSyncBtn
@@ -3207,10 +3704,27 @@ const Results = (() => {
     const val   = state[field] ?? 0;
     const diff  = compareState != null ? val - (compareState[field] ?? 0) : 0;
     const arrow = diff > 0 ? icons.arrowUp : diff < 0 ? icons.arrowDown : '';
+    const rawPen      = field === 'pen' ? (state.rawPen || 0) : 0;
+    const rawPenDiff  = compareState != null ? rawPen - (compareState.rawPen || 0) : 0;
+    const rawPenArrow = rawPenDiff > 0 ? icons.arrowUp : rawPenDiff < 0 ? icons.arrowDown : '';
+    const totalVal    = val + statsConverter(rawPen);
+    const totalCompare = compareState != null ? (compareState.pen || 0) + statsConverter(compareState.rawPen || 0) : null;
+    const totalDiff   = totalCompare != null ? totalVal - totalCompare : 0;
+    const totalArrow  = totalDiff > 0 ? icons.arrowUp : totalDiff < 0 ? icons.arrowDown : '';
+    const rawPenRows  = rawPen
+      ? `<div class="co-final-stat-row co-final-stat-row--rawpen">
+        <span class="co-final-stat-lbl">Raw PEN</span>
+        <span class="co-final-stat-val">${Math.round(rawPen)}${rawPenArrow}</span>
+      </div>
+      <div class="co-final-stat-row co-final-stat-row--rawpen-total">
+        <span class="co-final-stat-lbl">Final + Raw PEN</span>
+        <span class="co-final-stat-val">${fmtNum(totalVal)}%${totalArrow}</span>
+      </div>`
+      : '';
     return `<div class="co-final-stat-row${isSpear ? ' co-final-stat-row--spear' : ''}">
       <span class="co-final-stat-lbl">${isSpear ? `${icons.flash}<span class="co-stat-lbl-text">${label}</span>` : label}</span>
       <span class="co-final-stat-val">${fmtNum(val)}%${arrow}</span>
-    </div>`;
+    </div>${rawPenRows}`;
   };
 
   const buildBuffFooterHTML = buffMap => {
@@ -3241,75 +3755,79 @@ const Results = (() => {
     return `<div class="co-res-section">${buildStatsTitleHTML(showUseSyncBtn)}${gridHTML}${buildBuffFooterHTML(buffMap)}</div>`;
   }
 
-  function render(container, topResults, pureBase, lockedCards = {}, equippedNames = [], ctx = {}, divinityResult = null, currentDivSelection = [], buffMap = {}, bestCompanionAssign = null, bestEnchantAssign = null, currentEnchantAssign = [], enchantSlotState = []) {
-    if (!topResults?.length) {
+  function render(container, {
+    bestResult, pureBase, lockedCards = {}, equippedNames = [], ctx = {},
+    divinityResult = null, currentDivSelection = [], buffMap = {},
+    bestCompanionAssign = null, bestEnchantAssign = null,
+    currentEnchantAssign = [], enchantSlotState = [],
+  }) {
+    if (!bestResult) {
       container.innerHTML = '<div class="co-empty-state">No valid combinations found. Add cards to the pool.</div>';
       return;
     }
-    const best = topResults[0];
+    const best = bestResult;
     const lockedCountByEquip = {};
     for (const [equip, names] of Object.entries(lockedCards)) {
       lockedCountByEquip[equip] = {};
       for (const name of names) lockedCountByEquip[equip][name] = (lockedCountByEquip[equip][name] || 0) + 1;
     }
-    const byEquip             = Cards.getCardsEquipMap(best.cards);
-    const beforeByEquip       = Cards.getCardsEquipMap(equippedNames);
-    const bestDivSelection    = divinityResult?.bestSelection ?? currentDivSelection;
-    const finalBaseWithCards  = Cards.applyCards(pureBase, best.cards, ctx);
-    const finalStateBase      = Divinity.applyDivinity(finalBaseWithCards, bestDivSelection, ctx);
-    const beforeBaseWithCards = Cards.applyCards(pureBase, Cards.filterValid(equippedNames), ctx);
-    const beforeStateBase     = Divinity.applyDivinity(beforeBaseWithCards, currentDivSelection, ctx);
+    const byEquip          = Cards.getCardsEquipMap(best.cards);
+    const beforeByEquip    = Cards.getCardsEquipMap(equippedNames);
+    const bestDivSelection = divinityResult?.bestSelection ?? currentDivSelection;
 
     const currentCompanionUsedForState = Companion.getUsed();
     const resolvedBestEnchantAssign    = bestEnchantAssign ?? currentEnchantAssign;
 
     const finalAuxAssign  = { companion: bestCompanionAssign, enchant: resolvedBestEnchantAssign };
     const beforeAuxAssign = { companion: currentCompanionUsedForState, enchant: currentEnchantAssign };
-    const applyAuxChain = (state, auxAssign) =>
-      Domains.getAux().reduce((s, aux) => aux.apply(s, auxAssign[aux.key]), state);
+    const computeBuildState = (cardsList, divSelection, auxAssign) => {
+      const withCards = Cards.applyCards(pureBase, cardsList, ctx);
+      const stateBase = Divinity.applyDivinity(withCards, divSelection, ctx);
+      return Domains.getAux().reduce((s, aux) => aux.apply(s, auxAssign[aux.key]), stateBase);
+    };
 
-    const finalState  = applyAuxChain(finalStateBase, finalAuxAssign);
-    const beforeState = applyAuxChain(beforeStateBase, beforeAuxAssign);
+    const finalState  = computeBuildState(best.cards, bestDivSelection, finalAuxAssign);
+    const beforeState = computeBuildState(Cards.filterValid(equippedNames), currentDivSelection, beforeAuxAssign);
 
     const combinedBestMult = Optimizer.calcMult(finalState);
     const currentMultFinal = Optimizer.calcMult(beforeState);
     const pctRaw = currentMultFinal > 0 ? ((combinedBestMult - currentMultFinal) / currentMultFinal * 100) : 0;
     const pct    = pctRaw.toFixed(2);
     const isGain = combinedBestMult >= currentMultFinal;
-    const displayFinal  = { ...finalState,  dmgStack: finalState.dmgStack  + (finalState.reaperValue  || 0) };
-    const displayBefore = { ...beforeState, dmgStack: beforeState.dmgStack + (beforeState.reaperValue || 0) };
+    const resolveDisplayState = s => ({
+      ...s,
+      dmgStack: s.dmgStack + (s.reaperValue || 0),
+    });
+    const displayFinal  = resolveDisplayState(finalState);
+    const displayBefore = resolveDisplayState(beforeState);
 
     container.classList.toggle('spear-active', (finalState.spearValue || 0) > 0);
 
-    const currentDivByNode    = Object.fromEntries(currentDivSelection.map(s => [s.id, s.panelIndex]));
-    const divBestHTML         = Divinity.buildDivNodesHTML(divinityResult?.bestSelection ?? [], currentDivByNode);
-    const divCurrentHTML      = Divinity.buildDivNodesHTML(currentDivSelection);
-    const bestDivNodesHTML    = buildResSectionHTML('Divinity (tap for details)', divBestHTML    && `<div class="co-div-nodes">${divBestHTML}</div>`, EMPTY_STATE_HTML);
-    const currentDivNodesHTML = buildResSectionHTML('Divinity', divCurrentHTML && `<div class="co-div-nodes">${divCurrentHTML}</div>`, EMPTY_STATE_HTML);
+    const currentDivByNode = Object.fromEntries(currentDivSelection.map(s => [s.id, s.panelIndex]));
+    const divBestHTML      = Divinity.buildDivNodesHTML(divinityResult?.bestSelection ?? [], currentDivByNode);
+    const divCurrentHTML   = Divinity.buildDivNodesHTML(currentDivSelection, currentDivByNode);
+    const { best: bestDivNodesHTML, current: currentDivNodesHTML } =
+      buildSectionPair('Divinity', divBestHTML, divCurrentHTML, 'co-div-nodes');
 
     const bestCompanionAssignment = bestCompanionAssign ?? currentCompanionUsedForState;
     const companionItems          = Companion.getItems();
     const hasCompanionItems       = companionItems.length > 0;
     const compBestNodes           = hasCompanionItems ? Companion.buildCompanionNodesHTML(bestCompanionAssignment, currentCompanionUsedForState) : '';
     const compCurrentNodes        = hasCompanionItems ? Companion.buildCompanionNodesHTML(currentCompanionUsedForState, currentCompanionUsedForState) : '';
-    const companionNodesHTML   = buildResSectionHTML('Companion (tap for details)', compBestNodes    && `<div class="co-companion-nodes">${compBestNodes}</div>`, EMPTY_STATE_HTML);
-    const currentCompanionHTML = buildResSectionHTML('Companion', compCurrentNodes && `<div class="co-companion-nodes">${compCurrentNodes}</div>`, EMPTY_STATE_HTML);
+    const { best: companionNodesHTML, current: currentCompanionHTML } =
+      buildSectionPair('Companion', compBestNodes, compCurrentNodes, 'co-companion-nodes');
 
-    const resolvedEnchantSlotState = Enchant.enchantState.prefs.mode === 'custom'
-      ? enchantSlotState.map((slot, i) => ({ ...slot, level: parseInt(Enchant.enchantState.prefs.custom?.slots?.[i]?.level) || slot.level }))
-      : enchantSlotState;
+    const resolvedEnchantSlotState = enchantSlotState.map(slot => {
+      const grpPrefs = slot.group === 'acc' ? Enchant.enchantState.acc.prefs : Enchant.enchantState.weapon.prefs;
+      const isCustom = grpPrefs.mode === 'custom';
+      if (!isCustom) return slot;
+      const customSlots = grpPrefs.custom;
+      return { ...slot, level: parseInt(customSlots?.[slot.slotIdx]?.level) || slot.level };
+    });
     const enchantResultHTML  = Enchant.buildEnchantSectionHTML(resolvedBestEnchantAssign, resolvedEnchantSlotState, bestEnchantAssign ? currentEnchantAssign : null);
     const currentEnchantHTML = Enchant.buildEnchantSectionHTML(currentEnchantAssign, enchantSlotState);
 
-    const noteHTML = `<div class="co-res-note">
-  Crosscheck the result on the <u>next slide</u> with the input at the top of the page and make sure it matches your current detailed stats (in-game).<br/><br/>
-
-  Keep in mind, this tool only supports some offensive stats. If your build has a lot of ATK% / Flat & Stat% bonuses (esp. in divinity) and the tool still suggests switching, <u>in-game results may vary</u><span class="spoiler">, could go higher or lower <img alt=":dogekek:" src="https://masihterjaga.github.io/sim/img/dogekek.png" width="12" height="12"></span><br/><br/>
-
-  But, since this tool calculates base multipliers, it'll be more accurate as long as your other stats (ATK, Flat STAT/%, Haste, Max HP) don't drop too much after the switch, especially for jobs that rely on those. <sup>[Tool vs In-game#<a href='#' class='job-sim' data-lightbox-gallery='my-gallery' data-lightbox-trigger>1</a>],[<a href='#' class='job-sim' data-lightbox-gallery='new-version' data-lightbox-trigger>2</a>],[<a href='#' class='job-sim' data-lightbox-gallery='roxtimizer' data-lightbox-trigger>3</a>],[<a href='#' class='job-sim' data-lightbox-gallery='roxtimizer_2' data-lightbox-trigger>4</a>],[<a href='#' class='job-sim' data-lightbox-gallery='roxtimizer_3' data-lightbox-trigger>5</a>]</sup>.
-</div>`;
-
-    const sign        = pctRaw >= 0 ? '+' : '';
+    const sign        = pctRaw >= 0 ? '≈' : '';
     const slideLabels = [ctx.tDefKey ? `Recommendation vs ${ctx.tDefKey}` : 'Recommendation', 'Before Optimization'];
 
     const slide1 = `
@@ -3318,43 +3836,18 @@ const Results = (() => {
       ${companionNodesHTML}
       ${enchantResultHTML}
       <div class="co-res-divider"></div>
-      ${buildStatsGridHTML(displayFinal, displayBefore, ctx.atkType, true)}
-      <div class="co-res-hero">
-        <div class="co-res-hero-block"><div class="co-res-hero-val">≈${fmtNum(combinedBestMult)}</div><div class="co-res-hero-lbl">New Multiplier</div></div>
-        <div class="co-res-hero-block ${isGain ? 'pos' : 'neg'}"><div class="co-res-hero-val">${sign}${pct}%</div><div class="co-res-hero-lbl">vs. Before</div></div>
-      </div>${noteHTML}
-      <div class="co-more-tools">
-        <span class="co-more-tools-label">More Tools</span>
-        <div class="co-more-tools-row">
-          <a class="co-tool-card" href="https://masihterjaga.github.io/sim" target="_blank" rel="noopener">
-            <span class="co-tool-card-name">Old Version</span>
-          </a>
-          <a class="co-tool-card" href="https://masihterjaga.github.io/sim/weapon-awakening.html" target="_blank" rel="noopener">
-            <span class="co-tool-card-name">Weapon Awakening</span>
-          </a>
-          <a class="co-tool-card" href="https://masihterjaga.github.io/sim/physical-suno-mammonite-se.html" target="_blank" rel="noopener">
-            <span class="co-tool-card-name">Mammonite I / II?</span>
-          </a>
-          <a class="co-tool-card" href="https://discord.com/channels/784407151342256148/909016309218541568/1498338086449319957" target="_blank" rel="noopener">
-            <span class="co-tool-card-name">Specific-Job Simulator</span>
-          </a>
-          <a class="co-tool-card" href="https://masihterjaga.github.io/sim/advanced-transfer.html" target="_blank" rel="noopener">
-            <span class="co-tool-card-name">Adv. Transfer</span>
-          </a>
-        </div>
-      </div>`;
+      ${buildStatsGridHTML(displayFinal, displayBefore, ctx.atkType, pctRaw > 8)}
+      ${buildHeroHTML(`≈${fmtNum(combinedBestMult)}`, 'New Multiplier', { val: `${sign}${pct}%`, lbl: 'vs. Before', cls: isGain ? 'pos' : 'neg' })}${NOTE_HTML}
+      ${buildMoreToolsHTML()}`;
 
     const slide2 = `
-      ${buildResSectionHTML('Cards', `<div class="co-res-breakdown">${Cards.buildCardsBreakdownHTML(beforeByEquip)}</div>`)}
+      ${buildResSectionHTML('Cards', `<div class="co-res-breakdown">${Cards.buildCardsBreakdownHTML(beforeByEquip, lockedCountByEquip)}</div>`)}
       ${currentDivNodesHTML}
       ${currentCompanionHTML}
       ${currentEnchantHTML}
       <div class="co-res-divider"></div>
       ${buildStatsGridHTML(displayBefore, null, ctx.atkType, false, buffMap)}
-      <div class="co-res-hero">
-        <div class="co-res-hero-block"><div class="co-res-hero-val">≈${fmtNum(currentMultFinal)}</div><div class="co-res-hero-lbl">Current Multiplier</div></div>
-        <div class="co-res-hero-block"><div class="co-res-hero-val">BASE</div><div class="co-res-hero-lbl">Reference</div></div>
-      </div>`;
+      ${buildHeroHTML(`≈${fmtNum(currentMultFinal)}`, 'Current Multiplier', { val: 'BASE', lbl: 'Reference' })}`;
 
     container.innerHTML = `
       <div class="co-slider">
@@ -3370,34 +3863,37 @@ const Results = (() => {
             <a class="co-slider-footer-link" href="https://discord.gg/9j2WnTAnMu" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>RöX University</a>
           </div>
           <div class="co-slider-footer-nav">
-            <button class="co-slide-nav-btn co-slide-nav-btn--prev" data-dir="-1" disabled>${icons.chevLeft}Prev</button>
-            <button class="co-slide-nav-btn co-slide-nav-btn--next" data-dir="1">Next${icons.chevRight}</button>
+            <button class="co-slide-nav-btn co-slide-nav-btn--prev" id="co-result-slide-prev" data-dir="-1" disabled>${icons.chevLeft}Prev</button>
+            <button class="co-slide-nav-btn co-slide-nav-btn--next" id="co-result-slide-next" data-dir="1">Next${icons.chevRight}</button>
           </div>
         </div>
       </div>`;
+
+    initSlider(container, [...container.querySelectorAll('.co-slide')], container.querySelector('#co-slider-label'), slideLabels, null, '#co-result-slide-prev', '#co-result-slide-next');
+    Divinity.bindDivModalNodes(container);
+    Companion.bindCompanionModalNodes(container);
 
     const useSyncBtn = container.querySelector('#coUseSyncBtn');
     if (useSyncBtn) {
       useSyncBtn.addEventListener('click', () => {
         if (!confirm('This will update your equipped cards, divinities, companion, enchantment, and base stats. Ill keep reminding you, in-game results can be differ!')) return;
         try {
-          const totalPool = countBy(Cards.filterValid(equippedNames));
-          for (const row of Dom.coSection.querySelectorAll('.co-unused-row')) {
-            const name = row.querySelector('.co-unused-name').dataset.value ?? '';
-            const qty  = parseInt(row.querySelector('.co-unused-qty').value) || 1;
-            if (name) totalPool[name] = (totalPool[name] || 0) + qty;
-          }
-          const usedCount = countBy(Cards.filterValid(best.cards));
+          const { unusedMap } = Cards.buildPoolFromSection(Dom.coSection);
+          const usedCount     = countBy(Cards.filterValid(best.cards));
+          const totalPool     = { ...unusedMap };
+          for (const name of Cards.filterValid(equippedNames)) totalPool[name] = (totalPool[name] || 0) + 1;
           const newUnused = {};
           for (const [name, total] of Object.entries(totalPool)) {
             const remaining = total - (usedCount[name] || 0);
             if (remaining > 0) newUnused[name] = remaining;
           }
           Cards.writeToSlots(best.cards, Dom.coSection);
-          Divinity.writeBestDivinity(bestDivSelection);
-          if (bestEnchantAssign) Enchant.writeEnchantToDOM(bestEnchantAssign);
-          if (bestCompanionAssign) Companion.writeAssign(bestCompanionAssign);
-          Stats.writeStatsToForm(finalState, buffMap);
+          Divinity.writeBestSelection(bestDivSelection);
+          if (resolvedBestEnchantAssign) Enchant.writeAssignment(resolvedBestEnchantAssign);
+          if (bestCompanionAssign) Companion.writeAssignment(bestCompanionAssign);
+          const finalStateNoBuff = { ...finalState };
+          for (const [field, val] of Object.entries(buffMap)) if (field in finalStateNoBuff) finalStateNoBuff[field] -= val;
+          Stats.writeStatsToForm(finalStateNoBuff);
           Dom.coSection.querySelector('#co-unused-list').innerHTML = '';
           for (const [name, qty] of Object.entries(newUnused)) Cards.addUnusedRow(Dom.coSection, name, String(qty));
           Cards.saveState(Dom.coSection);
@@ -3406,93 +3902,40 @@ const Results = (() => {
         } catch { useSyncBtn.textContent = 'Error'; }
       });
     }
-
-    initSlider(container, [...container.querySelectorAll('.co-slide')], container.querySelector('#co-slider-label'), slideLabels);
-    Divinity.bindDivModalNodes(container);
-    Companion.bindCompanionModalNodes(container);
   }
 
-  return { render, buildStatsGridHTML };
+  return { render };
 })();
 
 (() => {
-  const { fmtPct, buildLoadingHTML, setLoadingText, countBy, bindCoPanelToggle, updateUseBtn, setInteractionLocked, escHtml } = Utils;
+  const { fmtPct, buildLoadingHTML, setLoadingText, updateUseBtn, setInteractionLocked, escHtml } = Utils;
   let calcTimeouts = [];
   const { getElemEnhLabel, COMPANION_FIELD_LABELS } = Labels;
-  const { nodeOrder, optimizer, ui: { loaderTiming } } = Config;
+  const { nodeOrder, ui: { loaderTiming } } = Config;
+  const refreshEnchantBoth = () => {
+    Enchant.rebuildWeaponEnchantPairs(true);
+    Enchant.rebuildAccEnchantPairs(true);
+    Enchant.refresh();
+  };
 
   document.addEventListener('click', Modals.closeAll);
-
-  Dom.divModalClose.addEventListener('click', Divinity.closeDivModal);
-  Dom.divModalBackdrop.addEventListener('click', e => { if (e.target === Dom.divModalBackdrop) Divinity.closeDivModal(); });
-
-  (() => {
-    const closeModal = () => Dom.coCompanionBackdrop.classList.remove('open');
-    Dom.coCompanionModalClose.addEventListener('click', closeModal);
-    Dom.coCompanionBackdrop.addEventListener('click', e => { if (e.target === Dom.coCompanionBackdrop) closeModal(); });
-  })();
-
-  Modals.bind('summaryBtn', Dom.summaryModal, {
-    closeId: 'summaryClose',
-    onOpen:  Divinity.renderSummaryModal,
-  });
-  Modals.bind('companionSummaryBtn', Dom.companionSummaryModal, {
-    closeId: 'companionSummaryClose',
-    onOpen: () => {
-      const totals = Companion.getBonuses();
-      Utils.renderSummaryList(
-        Dom.companionSummaryList,
-        Object.entries(COMPANION_FIELD_LABELS)
-          .filter(([field]) => (totals[field] || 0) > 0)
-          .map(([field, lbl]) => ({ lbl, val: `${fmtPct(totals[field])}%` }))
-      );
-    },
-  });
-  Modals.bind('companionHelpBtn', Dom.companionHelpModal, { closeId: 'companionHelpClose' });
-  Modals.bind('helpBtn', Dom.helpModal, { closeId: 'helpClose', spoilerToggle: true });
-
   document.addEventListener('click', e => {
     const sp = e.target.closest('.spoiler');
     if (sp) { e.stopPropagation(); sp.classList.toggle('revealed'); }
   });
+  Modals.bind('helpBtn', Dom.helpModal, { closeId: 'helpClose', spoilerToggle: true });
 
-  Dom.trashDivBtn.addEventListener('click', e => {
-    e.stopPropagation();
-    if (!confirm('Clear all divinity? This will `force` remove all added divinities including locked and currently in use.')) return;
-    Divinity.resetAll();
-  });
-
-  Dom.divSizeSelect.addEventListener('change', e => {
-    Divinity.setActiveSize(e.target.value);
-    nodeOrder.forEach(Divinity.updateDivCircle);
-    Cards.switchSize(Dom.coSection);
-    if (!Divinity.getActivePanel() || !Divinity.getActiveId()) return;
-    const data = Divinity.getData(Divinity.getActiveId());
-    updateUseBtn(Divinity.getActivePanel()._useBtn, Divinity.getUsed(Divinity.getActiveId()) === data.current);
-    Divinity.toggleTrashBtn(
-      Divinity.getActivePanel()._panelNav,
-      Divinity.getActiveId(), data.count, data.current, data.panels[data.current]?.locked
-    );
-  });
-
-  document.querySelectorAll('.node').forEach(cb => {
-    cb.addEventListener('change', () => {
-      if (Divinity.isNodeNavigating || !cb.checked) return;
-      if (Divinity.isAnimating) { cb.checked = false; return; }
-      Divinity.getActivePanel() ? Divinity.closePanel(() => Divinity.openPanel(cb)) : Divinity.openPanel(cb);
-    });
-  });
-
+  Stats.initSelect(Dom.tDef,   Object.keys(DEFENSE_TABLE).filter(k => !k.includes('Lvl.')));
+  Stats.initSelect(Dom.weapon, Object.keys(WEAPON_SIZE_MODIFIER_TABLE));
+  Stats.initSelect(Dom.wElem,  Object.keys(ELEMENT_COUNTER_TABLE));
   Dom.tDef.addEventListener('change', () => {
     Stats.updateTargetLabels(Dom.tDef.value);
     Stats.updateActiveSize();
     Stats.saveStatsState();
     Cards.clearCtxCache();
     Cards.rebuildBuffList();
-    Enchant.rebuildEnchantPairs(true);
-    Enchant.refresh();
+    refreshEnchantBoth();
   });
-
   Dom.wElem.addEventListener('change', () => {
     Dom.elemEnhanceLabel.textContent = getElemEnhLabel();
     Stats.saveStatsState();
@@ -3501,22 +3944,19 @@ const Results = (() => {
     Cards.rebuildBuffList();
     Companion.rerenderSheet();
   });
-
   Dom.weapon.addEventListener('change', () => {
     if (Dom.coSection.querySelector('.co-card-select')) Cards.rebuildWeaponSlots(Dom.coSection);
     Stats.saveStatsState();
-    Enchant.rebuildEnchantPairs();
+    Enchant.rebuildWeaponEnchantPairs();
     Enchant.refresh();
   });
-
   Dom.atkType.addEventListener('change', () => {
     const isPen = Dom.atkType.value === 'pen';
     Dom.penField.hidden  = !isPen;
     Dom.critField.hidden = isPen;
     Dom.pen.value = Dom.crit.value = '';
     Stats.saveStatsState();
-    Enchant.rebuildEnchantPairs(true);
-    Enchant.refresh();
+    refreshEnchantBoth();
     if (Divinity.getActivePanel() && Divinity.getActiveId()) {
       const d = Divinity.getData(Divinity.getActiveId());
       Divinity.navigateTo(d.current, 0);
@@ -3525,11 +3965,9 @@ const Results = (() => {
     Cards.rebuildBuffList();
     Companion.rerenderSheet();
   });
-
   Dom.manualBtn.addEventListener('click', () => Stats.setFormOpen(!Dom.form.classList.contains('open')));
-  Dom.form.addEventListener('input',  Stats.saveStatsState);
+  Dom.form.addEventListener('input',  Stats.saveStatsStateDebounced);
   Dom.form.addEventListener('change', Stats.saveStatsState);
-
   Dom.loadStatsBtn.addEventListener('click', () => {
     try {
       if (Object.keys(Store.section('stats')).length) {
@@ -3545,6 +3983,88 @@ const Results = (() => {
     } catch {
       Stats.showMsg(Config.ui.errMsg, 'err');
     }
+  });
+  Stats.loadStatsState();
+
+  Divinity.loadDivinityState();
+  nodeOrder.forEach(Divinity.updateDivCircle);
+  Dom.divModalClose.addEventListener('click', Divinity.closeDivModal);
+  Dom.divModalBackdrop.addEventListener('click', e => { if (e.target === Dom.divModalBackdrop) Divinity.closeDivModal(); });
+  Modals.bind('summaryBtn', Dom.summaryModal, {
+    closeId: 'summaryClose',
+    onOpen:  Divinity.renderSummaryModal,
+  });
+  Dom.trashDivBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    if (!confirm('Clear all divinity? This will `force` remove all added divinities including locked and currently in use.')) return;
+    Divinity.resetAll();
+  });
+  Dom.divSizeSelect.addEventListener('change', e => {
+    Divinity.setActiveSize(e.target.value);
+    nodeOrder.forEach(Divinity.updateDivCircle);
+    Cards.switchSize(Dom.coSection);
+    if (!Divinity.getActivePanel() || !Divinity.getActiveId()) return;
+    const data = Divinity.getData(Divinity.getActiveId());
+    updateUseBtn(Divinity.getActivePanel()._useBtn, Divinity.getUsed(Divinity.getActiveId()) === data.current);
+    Divinity.toggleTrashBtn(
+      Divinity.getActivePanel()._panelNav,
+      Divinity.getActiveId(), data.count, data.current, data.items[data.current]?.locked
+    );
+  });
+  document.querySelectorAll('.node').forEach(cb => {
+    cb.addEventListener('change', () => {
+      if (Divinity.isNodeNavigating || !cb.checked) return;
+      if (Divinity.isAnimating) { cb.checked = false; return; }
+      Divinity.getActivePanel() ? Divinity.closePanel(() => Divinity.openPanel(cb)) : Divinity.openPanel(cb);
+    });
+  });
+
+  Dom.coSection.innerHTML = Cards.buildCardsHTML();
+  Cards.loadState(Dom.coSection);
+  if (Cards.getWeaponSlotCount() !== Config.game.equipSlots.weapon.count.default) Cards.rebuildWeaponSlots(Dom.coSection);
+  Cards.bindCardsEvents(Dom.coSection);
+
+  Utils.bindCoPanelToggle(document.querySelector('#card-about .co-hd'));
+  Companion.initCompanionSlider();
+  Companion.initCompanionItems();
+  const closeCompanionModal = () => Dom.coCompanionBackdrop.classList.remove('open');
+  Dom.coCompanionModalClose.addEventListener('click', closeCompanionModal);
+  Dom.coCompanionBackdrop.addEventListener('click', e => { if (e.target === Dom.coCompanionBackdrop) closeCompanionModal(); });
+  Modals.bind('companionSummaryBtn', Dom.companionSummaryModal, {
+    closeId: 'companionSummaryClose',
+    onOpen: () => {
+      const totals = Companion.getBonuses();
+      Utils.renderSummaryList(
+        Dom.companionSummaryList,
+        Object.entries(COMPANION_FIELD_LABELS)
+          .filter(([field]) => (totals[field] || 0) > 0)
+          .map(([field, lbl]) => ({ lbl, val: `${fmtPct(totals[field])}%` }))
+      );
+    },
+  });
+  Modals.bind('companionHelpBtn', Dom.companionHelpModal, { closeId: 'companionHelpClose' });
+
+  Enchant.loadEnchantState();
+  Enchant.initEnchantSlider();
+  Dom.enchAwakeningSelect.addEventListener('change', () => {
+    Enchant.readEnchantStateFromDOM();
+    Enchant.refresh();
+  });
+  Dom.enchantSection.addEventListener('change', e => {
+    if (!e.target.closest('#enchLines .ench-pair') && !e.target.closest('#enchLinesAcc .ench-pair')) return;
+    Enchant.readEnchantStateFromDOM();
+    Enchant.refresh();
+  });
+  Dom.enchSettingsBtn.addEventListener('click', () => {
+    const open = Dom.enchSettingsPanel.classList.toggle('open');
+    Dom.enchSettingsBtn.classList.toggle('active', open);
+    if (open) Enchant.renderActiveSettingsPanel();
+  });
+  Dom.enchResetBtn.addEventListener('click', () => {
+    const group = Enchant.getActiveSlide() === 1 ? 'acc' : 'weapon';
+    const groupLabel = group === 'acc' ? 'Accessory' : 'Weapon';
+    if (!confirm(`Reset ${groupLabel} enchantment selections? This cannot be undone.`)) return;
+    Enchant.resetEnchantSlots(group);
   });
 
   Dom.calculateBtn.addEventListener('click', () => {
@@ -3570,25 +4090,11 @@ const Results = (() => {
 
     const divCombos = Optimizer.countDivCombos();
 
-    const slotCounts = { ...Cards.SLOT_COUNTS, weapon: Cards.getWeaponSlotCount() };
-    const sectionCardSelects = [...Dom.coSection.querySelectorAll('.co-card-select')];
-    const sectionCardByKey   = {};
-    for (const inp of sectionCardSelects) sectionCardByKey[Cards.getSlotKey(inp)] = inp;
-    const lockedCopiesUsed = countBy(
-      [...Dom.coSection.querySelectorAll('.co-lock-btn')]
-        .filter(b => b.dataset.locked === 'true')
-        .map(b => sectionCardByKey[Cards.getSlotKey(b)]?.dataset.value || '')
-        .filter(Boolean)
-    );
-    for (const [equip, cards] of Object.entries(lockedCopiesUsed))
-      slotCounts[equip] = Math.max(0, (slotCounts[equip] || 0) - cards);
-
-    const { cardPool } = Cards.buildPoolFromSection(Dom.coSection);
-    const prebuilt    = Optimizer.genCardCombos(cardPool, slotCounts);
-    const cardCombos  = prebuilt.overflowed ? optimizer.maxEvalLimit + 1 : prebuilt.totalCombos;
-    const totalCombos = cardCombos * divCombos * companionCombos * enchantCombos;
-    const targetLabel = (ctx.tDefKey || 'target').replace(/\s*Lv\.?\s*\d{3}/i, '');
-    const comboLabel  = totalCombos.toLocaleString();
+    const cardComputation = Optimizer.buildCardComputation(Dom.coSection);
+    const cardCombos      = cardComputation.prebuiltCombos.totalCombos;
+    const totalCombos     = cardCombos + divCombos + companionCombos + enchantCombos;
+    const targetLabel     = (ctx.tDefKey || 'target').replace(/\s*Lv\.?\s*\d{3}/i, '');
+    const comboLabel      = totalCombos.toLocaleString();
 
     calcTimeouts.push(setTimeout(() => {
       setLoadingText(resultEl, `Scanned! ${targetLabel} appear in ${comboLabel} seconds`);
@@ -3601,42 +4107,11 @@ const Results = (() => {
     }, loaderTiming.convexMirror + loaderTiming.okScanned + loaderTiming.timeTravel));
     calcTimeouts.push(setTimeout(() => {
       try {
-        Optimizer.runAndRender(Dom.coSection, calcState, ctx);
+        Optimizer.runAndRender(Dom.coSection, calcState, ctx, cardComputation);
       } catch (err) {
         resultEl.innerHTML = `<div class="co-error">Error: ${escHtml(err.message)}</div>`;
         setInteractionLocked(false, Dom.calculateBtn);
       }
     }, loaderTiming.convexMirror + loaderTiming.okScanned + loaderTiming.timeTravel + loaderTiming.flywingScam));
   });
-
-  Dom.enchAwakeningSelect.addEventListener('change', () => {
-    Enchant.readEnchantStateFromDOM();
-    Enchant.updateEnchantTotal();
-  });
-  Dom.enchantSection.addEventListener('change', e => {
-    if (!e.target.closest('.ench-pair')) return;
-    Enchant.readEnchantStateFromDOM();
-    Enchant.updateEnchantTotal();
-    Enchant.refresh();
-  });
-  Dom.enchSettingsBtn.addEventListener('click', () => {
-    const open = Dom.enchSettingsPanel.classList.toggle('open');
-    Dom.enchSettingsBtn.classList.toggle('active', open);
-    if (open) Enchant.renderSettingsPanel();
-  });
-  bindCoPanelToggle(Dom.enchantSection.querySelector('.co-hd'));
-
-  Stats.initSelect(Dom.tDef,   Object.keys(DEFENSE_TABLE).filter(k => !k.includes('Lvl.')));
-  Stats.initSelect(Dom.weapon, Object.keys(WEAPON_SIZE_MODIFIER_TABLE));
-  Stats.initSelect(Dom.wElem,  Object.keys(ELEMENT_COUNTER_TABLE));
-  Divinity.load();
-  nodeOrder.forEach(Divinity.updateDivCircle);
-  Stats.loadStatsState();
-  Dom.coSection.innerHTML = Cards.buildCardsHTML();
-  Cards.loadState(Dom.coSection);
-  if (Cards.getWeaponSlotCount() !== Config.game.equipSlots.weapon.count) Cards.rebuildWeaponSlots(Dom.coSection);
-  Cards.bindCardsEvents(Dom.coSection);
-  Companion.initCompanionSlider();
-  Companion.initCompanionItems();
-  Enchant.loadEnchantState();
 })();

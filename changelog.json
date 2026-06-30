@@ -1,6 +1,27 @@
 {
   "versions": [
     {
+      "version": "1.2.8",
+      "date": "30 Jun, 2026",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "about section",
+            "Y1S1 & Astroboy collab cards",
+            "enchantment: acc, raw & pen%",
+            "reset buttons: enchant options & prefs, companion upgrade"
+          ]
+        },
+        {
+          "category": "Update",
+          "items": [
+            "bug fixes and performance improvements"
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.2.7",
       "date": "25 Jun, 2026",
       "changes": [

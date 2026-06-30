@@ -5506,4 +5506,255 @@ const cardData = {
       "Final M.DMG RED": "24%"
     }
   },
+  //
+  "Splendor in the Eternal Night Card [Accessory]": {
+    equip: "accessory",
+    quality: "blue",
+    stats: {
+      "PVP Debuff Duration RED": "12",
+      "Holy Attribute RES": "45%"
+    }
+  },
+  "When Echoes Fade Card [Accessory]": {
+    equip: "accessory",
+    quality: "blue",
+    stats: {
+      "PVP Debuff Duration RED": "12",
+      "Poison Attribute RES": "45%"
+    }
+  },
+  "Melody of Abundance [Night]": {
+    equip: "accessory",
+    quality: "gold",
+    stats: {
+      "PVP Final M.DMG Bonus": "23.50%",
+      "Final M.PEN": "15%"
+    }
+  },
+  "When Echoes Fade [Night]": {
+    equip: "accessory",
+    quality: "gold",
+    stats: {
+      "PVP Final M.DMG Bonus": "23.50%",
+      "Final Crit": "15%"
+    }
+  },
+  "Splendor in the Eternal Night [Night]": {
+    equip: "accessory",
+    quality: "gold",
+    stats: {
+      "PVP Final P.DMG Bonus": "23.50%",
+      "Final P.PEN": "15%"
+    }
+  },
+  "Splendor in the Eternal Night Card [Weapon]": {
+    equip: "weapon",
+    quality: "blue",
+    stats: {
+      "PVP Final P.DMG Bonus": "12.80%",
+      "Final P.PEN": "13%"
+    }
+  },
+  "When Echoes Fade Card [Weapon]": {
+    equip: "weapon",
+    quality: "blue",
+    stats: {
+      "PVP Final M.DMG Bonus": "12.80%",
+      "Final M.PEN": "13%"
+    }
+  },
+  "Melody of Abundance [Day]": {
+    equip: "weapon",
+    quality: "gold",
+    stats: {
+      "PVP Final M.DMG Bonus": "23.50%",
+      "Final M.DMG Bonus": "15%"
+    }
+  },
+  "Splendor in the Eternal Night [Day]": {
+    equip: "weapon",
+    quality: "gold",
+    stats: {
+      "PVP Final P.DMG Bonus": "23.50%",
+      "Final P.DMG Bonus": "15%"
+    }
+  },
+  "When Echoes Fade [Day]": {
+    equip: "weapon",
+    quality: "gold",
+    stats: {
+      "PVP Final P.DMG Bonus": "23.50%",
+      "Crit DMG Bonus": "30%"
+    }
+  },
+  //
+  "Papa Card [Weapon]": {
+    equip: "weapon",
+    quality: "blue",
+    stats: {
+      "Debuff Enhancement": "10.0",
+      "Bonus DMG to Small": "31.5%"
+    }
+  },
+  "Papa Card [Accessory]": {
+    equip: "accessory",
+    quality: "blue",
+    stats: {
+      "Crit DMG Bonus": "40%",
+      "P.ATK%": "13%"
+    }
+  },
+  "Jump Card": {
+    equip: "accessory",
+    quality: "blue",
+    stats: {
+      "Final P.PEN": "20%",
+      "P.ATK%": "13%"
+    }
+  },
+  "Swift Guardian Card": {
+    equip: "accessory",
+    quality: "blue",
+    stats: {
+      "Final M.PEN": "20%",
+      "M.ATK%": "13%"
+    }
+  },
+  "Inspector Tawashi Card": {
+    equip: "headgear",
+    quality: "blue",
+    stats: {
+      "Shadow Enhance": "36.3%",
+      "Neutral Enhance": "36.3%"
+    }
+  },
+  "Stubborn Justice Card": {
+    equip: "headgear",
+    quality: "blue",
+    stats: {
+      "Undead Enhance": "36.3%",
+      "Holy Enhance": "36.3%"
+    }
+  },
+  "Mama Card": {
+    equip: "headgear",
+    quality: "blue",
+    stats: {
+      "Ghost Enhance": "36.3%",
+      "Poison Enhance": "36.3%"
+    }
+  },
+  "Gentle Tolerance Card": {
+    equip: "headgear",
+    quality: "blue",
+    stats: {
+      "Water Enhance": "36.3%",
+      "Earth Enhance": "36.3%"
+    }
+  },
+  "Higeoyaji Card [Cloak]": {
+    equip: "cloak",
+    quality: "blue",
+    stats: {
+      "Final P.DMG RED": "17%",
+      "VIT": "80"
+    }
+  },
+  "Higeoyaji Card [Shoes]": {
+    equip: "shoes",
+    quality: "blue",
+    stats: {
+      "Final M.DEF": "17%",
+      "Max HP%": "32%"
+    }
+  },
+  "Astro Boy Card [Day]": {
+    equip: "weapon",
+    quality: "gold",
+    stats: {
+      "Final Haste": "-10.5%",
+      "Final ASPD": "-105%",
+      "P.ATK%": "28%",
+      "Final P.DMG Bonus": "40%"
+    }
+  },
+  "Astro Boy Card [Night]": {
+    equip: "headgear",
+    quality: "gold",
+    stats: {
+      "Fire Enhance": "40%",
+      "Poison Enhance": "40%"
+    }
+  },
+  "Atlas Card [Day]": {
+    equip: "weapon",
+    quality: "gold",
+    stats: {
+      "M.ATK%": "21%",
+      "Final M.PEN": "35%",
+      "Debuff PEN": "10.0"
+    }
+  },
+  "Atlas Card [Night]": {
+    equip: "accessory",
+    quality: "gold",
+    stats: {
+      "Final M.DMG Bonus": "24%",
+      "Holy Enhance": "40%",
+      "Wind Enhance": "40%"
+    }
+  },
+  "Dr. Tenma Card [Day]": {
+    equip: "weapon",
+    quality: "gold",
+    stats: {
+      "P.ATK%": "21%",
+      "Final P.PEN": "35%",
+      "Debuff PEN": "10.0"
+    }
+  },
+  "Dr. Tenma Card [Night]": {
+    equip: "accessory",
+    quality: "gold",
+    stats: {
+      "Final P.DMG Bonus": "24%",
+      "Neutral Enhance": "40%",
+      "Shadow Enhance": "40%"
+    }
+  },
+  "Uran Card [Day]": {
+    equip: "cloak",
+    quality: "gold",
+    stats: {
+      "VIT": "130",
+      "Max HP%": "52%"
+    }
+  },
+  "Uran Card [Night]": {
+    equip: "shoes",
+    quality: "gold",
+    stats: {
+      "SP Regen per 5s": "13%",
+      "Max HP%": "52%"
+    }
+  },
+  "Dr. Ochanomizu Card [Day]": {
+    equip: "weapon",
+    quality: "gold",
+    stats: {
+      "Bonus DMG to Medium": "45%",
+      "Crit DMG Bonus": "52%",
+      "Final P.PEN": "26%",
+      "Final M.PEN": "26%"
+    }
+  },
+  "Dr. Ochanomizu Card [Night]": {
+    equip: "accessory",
+    quality: "gold",
+    stats: {
+      "Bonus DMG to Small": "45%",
+      "Final P.DMG Bonus": "26%",
+      "Final M.DMG Bonus": "26%"
+    }
+  },
 };
