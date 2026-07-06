@@ -228,6 +228,7 @@
             <ol class="disclaimer-text">
               <li>Keep your F. PEN above the target's DEF and your Final P/M DMG Bns above DMG Red, as this tool can't handle negative values.</li>
               <li>Make sure the <strong>Divinity, Card, Companion & Enchantment</strong> you're using match the offensive stats you have in-game, and that they're available here.</li>
+              <li>Each section has its own toggle that controls whether the optimizer will optimize it.</li>
               <li>Don't swap these out after entering your stats, as this tool won't update stat changes in real time like the game does.</li>
               <li>If you add buffs after setting your cards, the final stats will already have those buffs included (base stats above + active buffs).</li>
               <li>Always double-check the <strong>result (2nd slide)</strong> to make sure it matches yours.</li>
@@ -242,6 +243,11 @@
       <div class="grid" id="grid">
         <div class="summary-wrap">
           <div class="summary-controls">
+            <label class="sec-toggle sec-toggle--summary" title="Include in optimizer" onclick="event.stopPropagation()">
+              <input type="checkbox" class="sec-toggle-input" id="divinitySectionToggle" checked>
+              <span class="sec-toggle-track"></span>
+              <span class="sec-toggle-thumb"></span>
+            </label>
             <button class="summary-btn" id="summaryBtn">Summary</button>
           </div>
           <button class="help-btn" id="helpBtn" aria-label="Help">
@@ -445,7 +451,14 @@
   </div>
   <div class="card co-card" id="card-companion">
     <div class="co-hd" role="button" tabindex="0" aria-expanded="false">
-      <div class="co-hd-left"><span class="co-hd-title">Companion</span></div>
+      <div class="co-hd-left">
+        <label class="sec-toggle" title="Include in optimizer" onclick="event.stopPropagation()">
+          <input type="checkbox" class="sec-toggle-input" id="companionSectionToggle" checked>
+          <span class="sec-toggle-track"></span>
+          <span class="sec-toggle-thumb"></span>
+        </label>
+        <span class="co-hd-title">Companion</span>
+      </div>
       <span class="co-chevron"></span>
     </div>
     <div class="co-body collapsed">
@@ -641,15 +654,20 @@
   <div class="card co-card" id="card-enchantment">
     <div class="co-hd" role="button" tabindex="0" aria-expanded="false">
       <div class="co-hd-left">
+        <label class="sec-toggle" title="Include in optimizer" onclick="event.stopPropagation()">
+          <input type="checkbox" class="sec-toggle-input" id="enchSectionToggle" checked>
+          <span class="sec-toggle-track"></span>
+          <span class="sec-toggle-thumb"></span>
+        </label>
         <span class="co-hd-title">Enchantment</span>
-        <span class="ench-badge">Adv.</span><span class="ench-badge experimental-badge">EXPERI[PEN]CHANT</span>
+
       </div>
       <span class="co-chevron"></span>
     </div>
     <div class="co-body collapsed">
       <div class="co-body-inner">
         <div class="co-block">
-          <p class="co-block-desc">Enchant stats shown here are limited to specific cities. If yours isn't listed, leave it empty but still select the enchant level.</p><p class="co-block-desc">Results will be overestimated or lower(?) if your current enchants are STAT, the tool treats them as empty, but they still apply in-game.</p><p class="co-block-desc">Raw & PEN% still experimental too, dont expect too much.</p>
+          <p class="co-block-desc">Enchant stats shown here are limited to specific cities. If yours isn't listed, leave it empty but still select the enchant level.</p><p class="co-block-desc">Results will be overestimated or lower(?) if your current enchants are STAT, the tool treats them as empty, but they still apply in-game.</p><p class="co-block-desc">Raw & PEN% is <s>still experimental</s> already tested, <a href='#' class='job-sim' data-lightbox-gallery='roxtimizer_4' data-lightbox-trigger>see this</a>.</p>
           <div class="co-slider">
             <div class="co-slider-header">
               <div class="co-slider-label" id="enchSlideLabel">Weapon</div>

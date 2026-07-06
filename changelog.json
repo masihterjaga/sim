@@ -1,6 +1,19 @@
 {
   "versions": [
     {
+      "version": "1.2.9",
+      "date": "6 Jul, 2026",
+      "changes": [
+        {
+          "category": "Added",
+          "items": [
+            "on/off toggle per sections",
+            "flat & pen% enchantment img test"
+          ]
+        }
+      ]
+    },
+    {
       "version": "1.2.8",
       "date": "30 Jun, 2026",
       "changes": [

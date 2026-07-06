@@ -5604,7 +5604,7 @@ const cardData = {
       "P.ATK%": "13%"
     }
   },
-  "Jump Card": {
+  "Jump Card [Accessory]": {
     equip: "accessory",
     quality: "blue",
     stats: {
@@ -5612,7 +5612,7 @@ const cardData = {
       "P.ATK%": "13%"
     }
   },
-  "Swift Guardian Card": {
+  "Swift Guardian Card [Accessory]": {
     equip: "accessory",
     quality: "blue",
     stats: {
@@ -5620,7 +5620,7 @@ const cardData = {
       "M.ATK%": "13%"
     }
   },
-  "Inspector Tawashi Card": {
+  "Inspector Tawashi Card [Headgear]": {
     equip: "headgear",
     quality: "blue",
     stats: {
@@ -5628,7 +5628,7 @@ const cardData = {
       "Neutral Enhance": "36.3%"
     }
   },
-  "Stubborn Justice Card": {
+  "Stubborn Justice Card [Headgear]": {
     equip: "headgear",
     quality: "blue",
     stats: {
@@ -5636,7 +5636,7 @@ const cardData = {
       "Holy Enhance": "36.3%"
     }
   },
-  "Mama Card": {
+  "Mama Card [Headgear]": {
     equip: "headgear",
     quality: "blue",
     stats: {
@@ -5644,7 +5644,7 @@ const cardData = {
       "Poison Enhance": "36.3%"
     }
   },
-  "Gentle Tolerance Card": {
+  "Gentle Tolerance Card [Headgear]": {
     equip: "headgear",
     quality: "blue",
     stats: {

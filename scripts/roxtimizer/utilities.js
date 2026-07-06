@@ -49,6 +49,15 @@ const lightboxConfig = {
         { src: 'img/Retri_6Shadow.jpg', caption: 'All Shadow Enchant' },
         { src: 'img/Retri_3Angel_3Shadow.jpg', caption: 'DPS Mix angel & shadow enchant, actual-ingame increase ±41% (tool expect ±46%). As i said before, can be higher or lower ' }
       ]
+    },
+    {
+      name: 'roxtimizer_4',
+      images: [
+        { src: 'img/PEN_1.jpg', caption: '4xPEN% lv.15 (Enchant Awakening 6)' },
+        { src: 'img/PEN_2.jpg', caption: '' },
+        { src: 'img/PEN_4.jpg', caption: 'Change 1 Neutral to PEN%' },
+        { src: 'img/PEN_3.jpg', caption: 'Ingame RAW PEN 26449 \u{2705} (5xPEN% lv.15 EA6).' }
+      ]
     }
   ]
 };
