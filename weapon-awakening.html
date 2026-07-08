@@ -373,14 +373,16 @@ const WEAPON_AWK = [
   { tier: 'T10', score: 14000, rating: 3500, need: 6, bonus: 250 },
 ];
 
-const SUB_RATING = { '2h': 600, '1h': 400, shield: 200, dagger: 300, dagger2: 300 };
-const SLOT_GROUP = { shield: 'shield', dagger: 'dagger', dagger2: 'dagger' };
-const SLOT_CAP   = { shield: 1, dagger: 2 };
+const SUB_RATING = { '2h': 600, '1h': 400, shield: 200, dagger: 300, dagger2: 300, ar: 400, r: 200, sr: 400, sg: 200 };
+const SLOT_GROUP = { shield: 'shield', dagger: 'dagger', dagger2: 'dagger', ar: 'ar', r: 'r', sr: 'sr', sg: 'sg' };
+const SLOT_CAP   = { shield: 1, dagger: 2, ar: 1, r: 1, sr: 1, sg: 1 };
 
 const TYPE_SUBS = {
   '2h':     [{ key: '2h',     label: '2H' }],
   '1h':     [{ key: '1h',     label: '1H' }, { key: 'shield', label: 'Shield' }],
   dagger:   [{ key: 'dagger', label: 'Dagger A' }, { key: 'dagger2', label: 'Dagger B' }],
+  ar:       [{ key: 'ar',     label: 'AR' }, { key: 'r', label: 'R' }],
+  sr:       [{ key: 'sr',     label: 'SR' }, { key: 'sg', label: 'SG' }],
 };
 
 const REFINE_SCORES = [0,20,25,30,40,50,60,80,120,180,330,580,1000,1700,3420,7500];
@@ -400,13 +402,13 @@ const ENCHANT_SCORES = {
   Rachel:          [0,11,12,15,20,25,34,50,80,140,250,480,850,1400,2100,3200],
 };
 
-const MAX_UPGRADE = 280;
+const MAX_UPGRADE = 320;
 
 const UPGRADE_SCORES = (() => {
   const ranges = [
     [1,20,5],[21,40,10],[41,60,15],[61,100,20],[101,120,30],
     [121,140,35],[141,160,40],[161,180,60],[181,200,120],
-    [201,220,200],[221,240,300],[241,260,450],[261,280,600],
+    [201,220,200],[221,240,300],[241,260,450],[261,280,600],[281,300,800],[301,320,1200],
   ];
   const table = new Uint16Array(MAX_UPGRADE + 1);
   for (const [from, to, score] of ranges) table.fill(score, from, to + 1);
@@ -497,8 +499,10 @@ function buildWeaponEntry(wid, isFirst) {
           <div class="field" style="width:130px">
             <select data-field="type">
               <option value="2h">2H</option>
-              <option value="1h">1H + Shield</option>
-              <option value="dagger">Dagger + Dagger</option>
+              <option value="1h">1H+Shield</option>
+              <option value="dagger">Dual-Dagger</option>
+              <option value="ar">AR/R</option>
+              <option value="sr">SR/SG</option>
             </select>
           </div>
           ${isFirst ? '' : `<button class="btn-remove-weapon" data-wid="${wid}">Remove</button>`}
@@ -583,10 +587,8 @@ function handleFieldChange(weapon, target) {
   } else if (field === 'ench-city') {
     const idx = +target.dataset.idx;
     state.ench[idx].city = target.value;
-    state.ench[idx].lvl = 0;
     const lvlSel = subPanel.querySelector(`[data-field="ench-lvl"][data-idx="${idx}"]`);
     lvlSel.disabled = !target.value;
-    lvlSel.value = '0';
   } else if (field === 'ench-lvl') {
     const idx = +target.dataset.idx;
     state.ench[idx].lvl = +target.value;
@@ -599,6 +601,7 @@ function removeWeapon(wid) {
   weapons = weapons.filter(w => w.id !== wid);
   el(`weapon-entry-${wid}`)?.remove();
   renumberWeapons();
+  saveState();
   if (hasInteracted) calculate();
 }
 
@@ -707,18 +710,50 @@ function calculate() {
   el('result-panel').classList.add('visible');
 }
 
+function saveState() {
+  localStorage.setItem('rx_weapon_awk', JSON.stringify({ nextId, weapons }));
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem('rx_weapon_awk');
+    if (!raw) return false;
+    const { nextId: sid, weapons: sw } = JSON.parse(raw);
+    nextId = sid;
+    sw.forEach((saved, i) => {
+      const weapon = { id: saved.id, type: saved.type, subs: saved.subs };
+      weapons.push(weapon);
+      const entry = buildWeaponEntry(weapon.id, i === 0);
+      el('weapons-container').appendChild(entry);
+      entry.querySelector('[data-field="type"]').value = weapon.type;
+      renderSubPanels(weapon);
+      entry.addEventListener('input', e => handleFieldChange(weapon, e.target));
+      entry.addEventListener('change', e => handleFieldChange(weapon, e.target));
+      entry.addEventListener('click', e => {
+        const btn = e.target.closest('.btn-remove-weapon');
+        if (btn) removeWeapon(+btn.dataset.wid);
+      });
+    });
+    hasInteracted = true;
+    calculate();
+    return true;
+  } catch { return false; }
+}
+
 function onAnyChange() {
   if (!hasInteracted) {
     hasInteracted = true;
     el('result-panel').classList.add('visible');
   }
   calculate();
+  saveState();
 }
 
-addWeapon();
+if (!loadState()) addWeapon();
 
 el('btn-add-weapon').addEventListener('click', () => {
   addWeapon();
+  saveState();
   if (hasInteracted) calculate();
 });
 </script>

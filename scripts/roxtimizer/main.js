@@ -57,7 +57,7 @@ const Config = (() => {
     },
 
     optimizer: {
-      convergenceEpsilon: 1e-9,
+      convergenceEpsilon: 1e-8,
     },
 
     divinity: {
@@ -2595,6 +2595,7 @@ const Enchant = (() => {
 
   const enchantState = {
     awakening: '',
+    customPrefAwk: '',
     weapon: makeDefaultEnchantGroup(),
     acc:    makeDefaultEnchantGroup(),
     optimize: true,
@@ -2612,6 +2613,7 @@ const Enchant = (() => {
 
   const resetEnchantPrefs = (group, mode) => {
     enchantState[group].prefs[mode] = [];
+    if (mode === 'custom') enchantState.customPrefAwk = '';
     saveEnchantState();
     refresh();
   };
@@ -2648,6 +2650,7 @@ const Enchant = (() => {
   };
 
   const getAwkMult    = () => { const v = parseInt(Dom.enchAwakeningSelect?.value) || 0; return v > 0 ? (1 + v * enchantAwakeningPerLevel) : 1; };
+  const getCustomAwkMult = () => { const v = parseInt(enchantState.customPrefAwk) || 0; return v > 0 ? (1 + v * enchantAwakeningPerLevel) : getAwkMult(); };
   const getEnchantVal    = (key, level, col, awkMult) => {
     const eq     = EOMAP.get(key)?.eq;
     const perLvl = col === 'acc' ? eq?.acc?.value : eq?.weapon?.[col];
@@ -2725,6 +2728,7 @@ const Enchant = (() => {
     Store.restore(() => {
       const stored = Store.section(Config.app.storeKeys.enchant);
       enchantState.awakening = stored.awakening || '';
+      enchantState.customPrefAwk = stored.customPrefAwk || '';
       enchantState.optimize  = stored.optimize ?? true;
       const normalizeGroup = raw => ({
         slots: raw.slots || [],
@@ -2776,7 +2780,7 @@ const Enchant = (() => {
       if (isCustom) {
         const cs = prefs.custom?.[slotIdx];
         if (!cs?.enchant || !cs?.level) return [];
-        const entry = makeEnchantEntry(cs.enchant, parseInt(cs.level), col, awkMult);
+        const entry = makeEnchantEntry(cs.enchant, parseInt(cs.level), col, getCustomAwkMult());
         return entry ? [entry] : [];
       }
 
@@ -2971,6 +2975,33 @@ const Enchant = (() => {
       }
     }
     pairsWrap.addEventListener('change', () => onSave(readPairsFrom(pairsWrap)));
+
+    const awkDesc = document.createElement('p');
+    awkDesc.className   = 'co-block-desc';
+    awkDesc.textContent = "If your awakening level hasn't changed, you can skip this.";
+    pairsWrap.appendChild(awkDesc);
+    pairsWrap.appendChild(makeEnchantLabel('customAwkLbl', 'Custom Awakening'));
+    const awkPair = fromHTML(`<div class="select-wrap"><select class="stats-select" id="customAwkSelect">
+      <option value="" selected>Skip</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+      <option value="9">9</option>
+      <option value="10">10</option>
+    </select></div>`);
+    const awkSelect = awkPair.firstElementChild;
+    awkSelect.value = enchantState.customPrefAwk || '';
+    awkSelect.addEventListener('change', () => {
+      enchantState.customPrefAwk = awkSelect.value;
+      saveEnchantState();
+    });
+    pairsWrap.appendChild(awkPair);
+
     return pairsWrap;
   }
 
