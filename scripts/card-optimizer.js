@@ -26,7 +26,7 @@ const BUFF_STAT_OPTIONS = [
   { label: 'Final Damage Stack',  field: 'dmgStack' },
 ];
 
-const MAX_EVAL_LIMIT = 88_888;
+const MAX_EVAL_LIMIT = 888_888;
 
 const STAT_RESOLVERS = {
   'Final P.PEN':  (ctx) => ctx.atkType === 'pen'  ? 'pen'  : null,

@@ -696,7 +696,7 @@ function calculate() {
     const active = totalRating >= t.rating && countAtThreshold[i] >= t.need;
     return `<div class="awk-tier-row${active ? ' active' : ''}">
       <span class="awk-tier-badge">${t.tier}</span>
-      <span class="awk-tier-score">${t.score.toLocaleString('en-US')}pts (need ${t.need} weapon)</span>
+      <span class="awk-tier-score">${t.score.toLocaleString('en-US')}pts (min ${t.need} weapon)</span>
       <span class="awk-tier-bonus">+${t.bonus}%</span>
       <span class="awk-tier-need">${totalRating}/${t.rating}</span>
     </div>`;
